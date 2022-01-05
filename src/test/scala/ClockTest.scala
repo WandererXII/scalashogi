@@ -80,7 +80,7 @@ class ClockTest extends ShogiTest {
 
     def clockStep(clock: Clock, wait: Int, lags: Int*) = {
       (lags.foldLeft(clock) { (clk, lag) =>
-        advance(clk.step(), wait + lag) step durOf(lag)
+        advance(clk.step().value, wait + lag) step durOf(lag) value
       } currentClockFor Gote).time.centis
     }
 
@@ -89,7 +89,7 @@ class ClockTest extends ShogiTest {
 
     def clockStart(lag: Int) = {
       val clock = fakeClock60.step()
-      ((clock step durOf(lag)) currentClockFor Sente).time.centis
+      ((clock.value step durOf(lag)).value currentClockFor Sente).time.centis
     }
 
     "start" in {

@@ -83,13 +83,18 @@ case class Clock(
   def step(
       metrics: MoveMetrics = MoveMetrics.empty,
       gameActive: Boolean = true
-  ) =
-    (timer match {
+  ): Clock.WithCompensatedLag[Clock] =
+    timer match {
       case None =>
-        metrics.clientLag.fold(this) { l =>
-          updatePlayer(color) { _.recordLag(l) }
-        }
-      case Some(t) => {
+        Clock.WithCompensatedLag(
+          metrics.clientLag
+            .fold(this) { l =>
+              updatePlayer(color) { _.recordLag(l) }
+            }
+            .switch,
+          None
+        )
+      case Some(t) =>
         val elapsed = toNow(t)
         val lag     = ~metrics.reportedLag(elapsed) nonNeg
 
@@ -119,9 +124,11 @@ case class Clock(
                 .copy(lag = lagTrack, lastMoveTime = moveTime)
             }
 
-        if (clockActive) newC else newC.hardStop
-      }
-    }).switch
+        Clock.WithCompensatedLag(
+          (if (clockActive) newC else newC.hardStop).switch,
+          Some(lagComp)
+        )
+    }
 
   def takeback = switch
 
@@ -340,5 +347,9 @@ object Clock {
       players = Color.Map(player, player),
       timer = None
     )
+  }
+
+  case class WithCompensatedLag[A](value: A, compensated: Option[Centis]) {
+    def map[B](f: A => B) = copy(value = f(value))
   }
 }

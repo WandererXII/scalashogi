@@ -16,15 +16,28 @@ case class Game(
 ) {
 
   private def applySituation(sit: Situation, metrics: MoveMetrics = MoveMetrics.empty): Game =
-    copy(
-      situation = sit,
-      plies = plies + 1,
-      usiMoves = sit.history.lastMove.fold(usiMoves)(usiMoves :+ _),
-      clock = clock map { c =>
-        val newC = c.step(metrics, sit.status.isEmpty)
-        if (plies - startedAtPly == 1) newC.start else newC
-      }
+    applySituationWithCompensated(sit, metrics).value
+
+  def applySituationWithCompensated(sit: Situation, metrics: MoveMetrics = MoveMetrics.empty): Clock.WithCompensatedLag[Game] = {
+    val newClock = applyClock(metrics, sit.status.isEmpty)
+    Clock.WithCompensatedLag(
+      copy(
+        situation = sit,
+        plies = plies + 1,
+        usiMoves = sit.history.lastMove.fold(usiMoves)(usiMoves :+ _),
+        clock = newClock.map(_.value)
+      ),
+      newClock.flatMap(_.compensated)
     )
+  }
+
+  private def applyClock(metrics: MoveMetrics, gameActive: Boolean): Option[Clock.WithCompensatedLag[Clock]] =
+    clock.map { c =>
+      {
+        val newC = c.step(metrics, gameActive)
+        if (plies - startedAtPly == 1) newC.map(_.start) else newC
+      }
+    }
 
   def apply(usi: Usi, metrics: MoveMetrics): Validated[String, Game] =
     situation(usi).map(applySituation(_, metrics))
