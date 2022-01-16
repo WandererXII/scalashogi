@@ -80,6 +80,8 @@ case class Clock(
       timer = timer.map(_ => now)
     )
 
+  def withFrameLag(frameLag: Centis) = updatePlayer(color)(_ withFrameLag frameLag)
+
   def step(
       metrics: MoveMetrics = MoveMetrics.empty,
       gameActive: Boolean = true
@@ -211,6 +213,8 @@ case class ClockPlayer(
   def byoyomi = if (berserk) Centis(0) else config.byoyomi
 
   def periodsTotal = if (berserk) 0 else config.periodsTotal
+
+  def withFrameLag(frameLag: Centis) = copy(lag = lag.withFrameLag(frameLag, config))
 }
 
 object ClockPlayer {
