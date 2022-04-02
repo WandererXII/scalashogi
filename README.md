@@ -1,3 +1,5 @@
+[![Continuous Integration](https://github.com/WandererXII/scalashogi/actions/workflows/ci.yml/badge.svg)](https://github.com/WandererXII/scalashogi/actions/workflows/ci.yml)
+
 Shogi API forked from [scalachess](https://github.com/lichess-org/scalachess) and rewritten for shogi.
 Used on [lishogi.org](https://lishogi.org).
 
