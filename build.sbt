@@ -1,7 +1,5 @@
 name := "scalashogi"
 
-organization := "org.lishogi"
-
 version := "1.0.0"
 
 ThisBuild / scalaVersion := "2.13.8"
@@ -64,5 +62,3 @@ scalacOptions ++= Seq(
   "-Xmaxerrs",
   "12"
 )
-
-publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
