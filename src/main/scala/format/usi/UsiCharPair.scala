@@ -3,14 +3,15 @@ package format.usi
 
 import shogi.variant.Variant
 
-// We are trying to map every possible legal usi in a given situation to a unique char pair
+// Every possible legal usi in a given situation is mapped to a unique char pair
+// Not isomorphic on it's own, but together with situation it is
 case class UsiCharPair(a: Char, b: Char) {
   override def toString = s"$a$b"
 }
 
-// While char is 16 bit
-// we don't want to go above one byte
-// and 251-255 reserved for some special cases
+// Assumes usi is a legal move
+// We don't want to go above one byte
+// Keep 251-255 reserved for some special cases
 object UsiCharPair {
 
   def apply(usi: Usi, variant: Variant): UsiCharPair =
