@@ -15,10 +15,19 @@ class UsiCharPairTest extends ShogiTest {
       orig <- Pos.all
       dest <- Pos.all
     } yield Move(orig, dest, false)
-    val allPairs = allMoves.map(conv(_))
+    val allDrops = for {
+      role <- variant.Standard.handRoles
+      pos  <- Pos.all
+    } yield Drop(role, pos)
+
+    val allMovesCharPairs = allMoves.map(conv(_))
+    val allDropsCharPairs  = allDrops.map(conv(_))
+    val allPairs = allMoves.map(conv(_)) ++ allDrops.map(conv(_))
 
     "unicity" in {
-      allPairs.distinct.size must_== allMoves.size
+      allMovesCharPairs.distinct.size must_== allMoves.size
+      allDropsCharPairs.distinct.size must_== allDrops.size
+      allPairs.distinct.size must_== allMoves.size + allDrops.size
     }
     "no void char" in {
       allPairs.count(_ contains UsiCharPair.voidChar) must_== 0
