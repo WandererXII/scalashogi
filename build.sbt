@@ -8,6 +8,8 @@ ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
 )
 
+ThisBuild / versionPolicyIntention := Compatibility.None
+
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
   "org.specs2"             %% "specs2-core"              % "4.15.0" % Test,
