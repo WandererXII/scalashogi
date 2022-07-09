@@ -61,6 +61,8 @@ case class Game(
 
   def withColor(c: Color) = copy(situation = situation.copy(color = c))
 
+  def withHistory(h: History) = copy(situation = situation.copy(history = h))
+
   def withClock(c: Option[Clock]) = copy(clock = c)
 
   def withPlies(p: Int) = copy(plies = p)
