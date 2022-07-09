@@ -22,10 +22,9 @@ In the sbt shell, to compile scalashogi, run
 
     compile
 
-To run the tests (with coverage):
+To run the tests:
 
-    clean coverage test
-    coverageReport
+    test
 
 ### Code formatting
 
