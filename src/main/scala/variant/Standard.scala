@@ -121,4 +121,17 @@ case object Standard
   def promotionRanks(color: Color) =
     if (color.sente) List(Rank.A, Rank.B, Rank.C) else List(Rank.G, Rank.H, Rank.I)
 
+  override def impasse(sit: Situation): Boolean = !sit.check && {
+    val color = sit.color
+    val ranks = sit.variant.promotionRanks(color)
+    val enteredRoles = sit.board.pieces.collect {
+      case (pos, piece) if (piece is color) && (ranks contains pos.rank) => piece.role
+    }.toList
+    def impassePoints: Int =
+      enteredRoles.map(Role.impasseValueOf(_)).sum + sit.hands.impasseValueOf(color)
+
+    // more than 10 - including the king
+    enteredRoles.size > 10 && enteredRoles.contains(King) && impassePoints >= color.fold(28, 27)
+  }
+
 }

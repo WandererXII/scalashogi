@@ -67,6 +67,4 @@ case object Minishogi
 
   def promotionRanks(color: Color) = List(backrank(color))
 
-  override def impasse(sit: Situation): Boolean = false
-
 }

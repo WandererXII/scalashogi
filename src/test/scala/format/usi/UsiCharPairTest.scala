@@ -21,8 +21,8 @@ class UsiCharPairTest extends ShogiTest {
     } yield Drop(role, pos)
 
     val allMovesCharPairs = allMoves.map(conv(_))
-    val allDropsCharPairs  = allDrops.map(conv(_))
-    val allPairs = allMoves.map(conv(_)) ++ allDrops.map(conv(_))
+    val allDropsCharPairs = allDrops.map(conv(_))
+    val allPairs          = allMoves.map(conv(_)) ++ allDrops.map(conv(_))
 
     "unicity" in {
       allMovesCharPairs.distinct.size must_== allMoves.size
