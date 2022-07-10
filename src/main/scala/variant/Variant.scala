@@ -212,7 +212,7 @@ abstract class Variant private[variant] (
   def materialImbalance(sit: Situation): Int =
     sit.board.pieces.values.foldLeft(0) { case (acc, Piece(color, role)) =>
       acc + Role.valueOf(role) * color.fold(1, -1)
-    } + sit.hands.roleValue
+    } + (sit.hands(Sente).sum(Role.valueOf) - sit.hands(Gote).sum(Role.valueOf))
 
   // Returns true if neither player can win. The game should end immediately.
   def isInsufficientMaterial(sit: Situation) =

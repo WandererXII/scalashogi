@@ -11,7 +11,7 @@ class HandTest extends ShogiTest {
       hands.gote.isEmpty must beTrue
     }
     "have 0 value" in {
-      hands.roleValue must_== 0
+      (hands(Sente).sum(Role.valueOf) - hands(Gote).sum(Role.valueOf)) must_== 0
     }
 
   }
@@ -25,7 +25,7 @@ class HandTest extends ShogiTest {
           h.sente(Pawn) must_== 1
         }
         "have proper value" in {
-          h.roleValue must_== 1
+          (h(Sente).sum(Role.valueOf) - h(Gote).sum(Role.valueOf)) must_== 1
         }
         "not be empty" in {
           h.isEmpty must beFalse
@@ -61,7 +61,7 @@ class HandTest extends ShogiTest {
           h.sente(Pawn) must_== 2
         }
         "have proper value" in {
-          h.roleValue must_== 2
+          (h(Sente).sum(Role.valueOf) - h(Gote).sum(Role.valueOf)) must_== 2
         }
     }
   }
@@ -89,7 +89,7 @@ class HandTest extends ShogiTest {
           h.gote(Bishop) must_== 1
         }
         "have proper value" in {
-          h.roleValue must_== -6
+          (h(Sente).sum(Role.valueOf) - h(Gote).sum(Role.valueOf)) must_== -6
         }
     }
 

@@ -40,12 +40,6 @@ case class Hands(sente: Hand, gote: Hand) {
   def nonEmpty: Boolean =
     !isEmpty
 
-  def roleValue: Int =
-    sente.roleValue - gote.roleValue
-
-  def impasseValueOf(c: Color) =
-    c.fold(sente.impasseValue, gote.impasseValue)
-
 }
 
 object Hands {
@@ -86,14 +80,9 @@ case class Hand(handMap: HandMap) extends AnyVal {
   def isEmpty: Boolean =
     !nonEmpty
 
-  def roleValue: Int =
+  def sum(f: (Role) => Int): Int =
     handMap.foldLeft(0) { case (acc, (role, cnt)) =>
-      acc + Role.valueOf(role) * cnt
-    }
-
-  def impasseValue: Int =
-    handMap.foldLeft(0) { case (acc, (role, cnt)) =>
-      acc + Role.impasseValueOf(role) * cnt
+      acc + f(role) * cnt
     }
 
 }
