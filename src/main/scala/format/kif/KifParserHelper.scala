@@ -123,7 +123,9 @@ object KifParserHelper {
   // supporting only handicaps for standard shogi
   private def parseHandicap(str: String, variant: Variant): Validated[String, Situation] =
     for {
-      hPosition <- StartingPosition.searchByJapaneseName(str) toValid s"Unknown handicap: $str"
+      hPosition <- StartingPosition.handicaps.positions.find(
+        _.japanese == str
+      ) toValid s"Unknown handicap: $str"
       situation <- hPosition.sfen.toSituation(variant) toValid s"Cannot parse handicap: $str"
     } yield situation
 

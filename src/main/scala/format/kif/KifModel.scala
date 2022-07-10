@@ -78,7 +78,7 @@ object Kif {
         if (tag == Tag.Sente || tag == Tag.Gote) {
           val playerName = tags(tag.name) | ""
           val playerTag = {
-            if (!StartingPosition.isSfenHandicap(tags.sfen)) tag.kifName
+            if (!tags.sfen.exists(StartingPosition isHandicap _)) tag.kifName
             else if (tag == Tag.Sente) "下手"
             else "上手"
           }
@@ -183,7 +183,7 @@ object Kif {
     s"${((pos.file.index) + 49 + 65248).toChar}${KifUtils.intToKanji(pos.rank.index + 1)}"
 
   private def getHandicapName(sfen: Sfen): Option[String] =
-    StartingPosition.searchHandicapBySfen(sfen.some).map(t => t.japanese)
+    StartingPosition.handicaps.positions.find(_.sfen.truncate == sfen.truncate).map(t => t.japanese)
 
   private def clockString(cur: NotationMove): Option[String] =
     cur.secondsSpent.map(spent =>
