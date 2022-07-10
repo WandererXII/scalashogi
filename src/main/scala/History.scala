@@ -1,10 +1,12 @@
 package shogi
 
 import shogi.format.usi.Usi
+import shogi.format.forsyth.Sfen
 
 case class History(
     lastMove: Option[Usi],
-    positionHashes: PositionHash
+    positionHashes: PositionHash,
+    initialSfen: Option[Sfen]
 ) {
 
   private def isRepetition(times: Int) =
@@ -27,21 +29,16 @@ case class History(
 
   def withPositionHashes(h: PositionHash) = copy(positionHashes = h)
 
+  def withInitialSfen(s: Sfen) = copy(initialSfen = Some(s))
+
   override def toString = {
     val positions = (positionHashes grouped Hash.size).toList
-    s"${lastMove.fold("-")(_.usi)} ${positions.map(Hash.debug).mkString(" ")}"
+    s"${lastMove.fold("-")(_.usi)} ${positions.map(Hash.debug).mkString(" ")} ${initialSfen.getOrElse("-")}"
   }
 }
 
 object History {
 
-  def empty: History = History(None, Array.empty)
+  def empty: History = History(None, Array.empty, None)
 
-  def apply(
-      lastMove: Option[String]
-  ): History =
-    History(
-      lastMove = lastMove flatMap Usi.apply,
-      positionHashes = Array.empty
-    )
 }
