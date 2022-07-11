@@ -60,6 +60,30 @@ class ImpasseTest extends ShogiTest {
           game.situation.winner must beNone
         }
       }
+      "21 points for gote (uwate) plus 1 piece handicap" in {
+        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgr/K+P4ssg w r 2"))
+        g must beValid.like { case game =>
+          val handicapGame = game.withHistory(
+            game.situation.history.withInitialSfen(
+              Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+            )
+          )
+          handicapGame.situation.impasse must beFalse
+          handicapGame.situation.winner must beNone
+        }
+      }
+      "17 points for gote (uwate) and pieces in opponent hand - not missing" in {
+        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"))
+        g must beValid.like { case game =>
+          val handicapGame = game.withHistory(
+            game.situation.history.withInitialSfen(
+              Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB 1")
+            )
+          )
+          handicapGame.situation.impasse must beFalse
+          handicapGame.situation.winner must beNone
+        }
+      }
       "27 points for sente" in {
         val g = sfenToGame(Sfen("G3+R3S/GG5SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 b - 1"))
         g must beValid.like { case game =>
@@ -103,6 +127,20 @@ class ImpasseTest extends ShogiTest {
         g must beValid.like { case game =>
           game.situation.impasse must beTrue
           game.situation.winner must beSome.like { case color =>
+            color.gote
+          }
+        }
+      }
+      "17 points for gote (uwate), but 2 piece handicap" in {
+        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"))
+        g must beValid.like { case game =>
+          val handicapGame = game.withHistory(
+            game.situation.history.withInitialSfen(
+              Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+            )
+          )
+          handicapGame.situation.impasse must beTrue
+          handicapGame.situation.winner must beSome.like { case color =>
             color.gote
           }
         }

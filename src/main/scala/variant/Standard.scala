@@ -121,6 +121,21 @@ case object Standard
   def promotionRanks(color: Color) =
     if (color.sente) List(Rank.A, Rank.B, Rank.C) else List(Rank.G, Rank.H, Rank.I)
 
+  // In handicaps we give the value of the missing pieces to the handicap giver
+  // Since this rule applies only to handicap games, only gote/uwate can be affected
+  private def missingImpassePoints(sit: Situation): Int =
+    sit.history.initialSfen
+      .filter(StartingPosition isHandicap _)
+      .flatMap(_.toSituation(sit.variant))
+      .fold(0) { initSit =>
+        math.max(
+          0,
+          54 -
+            (initSit.board.pieces.values.map(p => Role.impasseValueOf(p.role)).sum +
+              initSit.hands(Sente).sum(Role.impasseValueOf) + initSit.hands(Gote).sum(Role.impasseValueOf))
+        )
+      }
+
   override def impasse(sit: Situation): Boolean = !sit.check && {
     val color = sit.color
     val ranks = sit.variant.promotionRanks(color)
@@ -128,10 +143,13 @@ case object Standard
       case (pos, piece) if (piece is color) && (ranks contains pos.rank) => piece.role
     }.toList
     def impassePoints: Int =
-      enteredRoles.map(Role.impasseValueOf(_)).sum + sit.hands.impasseValueOf(color)
+      enteredRoles.map(Role.impasseValueOf(_)).sum + sit
+        .hands(color)
+        .sum(Role.impasseValueOf)
 
     // more than 10 - including the king
-    enteredRoles.size > 10 && enteredRoles.contains(King) && impassePoints >= color.fold(28, 27)
+    enteredRoles.size > 10 && enteredRoles
+      .contains(King) && impassePoints >= color.fold(28, 27 - missingImpassePoints(sit))
   }
 
 }
