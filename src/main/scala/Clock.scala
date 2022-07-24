@@ -271,15 +271,11 @@ object Clock {
         case _  => limitFormatter.format(limitSeconds / 60d)
       }
 
-    def incrementString: String = if (hasIncrement) s"+${incrementSeconds}" else ""
-
-    def byoyomiString: String = if (hasByoyomi || !hasIncrement) s"|${byoyomiSeconds}" else ""
-
     def periodsString: String = if (periodsTotal > 1) s"(${periodsTotal}x)" else ""
 
-    def show = toString
+    def show: String = if (hasIncrement) s"${limitString}+${incrementSeconds}" else s"${limitString}|${byoyomiSeconds}${periodsString}"
 
-    override def toString = s"${limitString}${incrementString}${byoyomiString}${periodsString}"
+    override def toString = s"${limitSeconds}.${incrementSeconds}.${byoyomiSeconds}.${periodsTotal}"
   }
 
   def parseJPTime(str: String): Option[Int] = {
