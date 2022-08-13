@@ -262,4 +262,14 @@ class ClockTest extends ShogiTest {
       Clock.readKifConfig("1時間10分20秒+20秒") must_== Some(Clock.Config(4220, 0, 20, 1))
     }
   }
+
+  "show" in {
+    Clock.Config(600, 0, 20, 1).show must_== "10|20"
+    Clock.Config(300, 0, 20, 2).show must_== "5|20(2x)"
+    Clock.Config(300, 10, 20, 2).show must_== "5+10|20(2x)"
+    Clock.Config(60, 10, 0, 1).show must_== "1+10"
+    Clock.Config(0, 10, 0, 1).show must_== "0+10"
+    Clock.Config(0, 0, 10, 1).show must_== "0|10"
+    Clock.Config(600, 0, 0, 1).show must_== "10|0"
+  }
 }
