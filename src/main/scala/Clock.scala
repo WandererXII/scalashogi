@@ -271,11 +271,13 @@ object Clock {
         case _  => limitFormatter.format(limitSeconds / 60d)
       }
 
-    def baseString: String = if (hasIncrement) s"${limitSeconds}+${incrementSeconds}" else s"${limitSeconds}"
+    def baseString: String = if (hasIncrement) s"${limitString}+${incrementSeconds}" else s"${limitString}"
 
     def periodsString: String = if (periodsTotal > 1) s"(${periodsTotal}x)" else ""
 
-    def show: String = if (hasByoyomi) s"${baseString}|${byoyomiSeconds}${periodsString}" else baseString
+    def show: String = if (hasByoyomi) s"${baseString}|${byoyomiSeconds}${periodsString}"
+    else if (hasIncrement) baseString
+    else s"${baseString}|0"
 
     override def toString = s"${limitSeconds}.${incrementSeconds}.${byoyomiSeconds}.${periodsTotal}"
   }
