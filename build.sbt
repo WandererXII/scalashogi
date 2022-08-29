@@ -1,6 +1,6 @@
 name := "scalashogi"
 
-version := "2.0.1-SNAPSHOT"
+version := "2.0.1"
 
 ThisBuild / scalaVersion := "2.13.8"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
