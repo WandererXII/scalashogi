@@ -15,10 +15,7 @@ case class Game(
     startedAtMove: Int = 1
 ) {
 
-  private def applySituation(sit: Situation, metrics: MoveMetrics = MoveMetrics.empty): Game =
-    applySituationWithCompensated(sit, metrics).value
-
-  def applySituationWithCompensated(sit: Situation, metrics: MoveMetrics = MoveMetrics.empty): Clock.WithCompensatedLag[Game] = {
+  private def applySituation(sit: Situation, metrics: MoveMetrics = MoveMetrics.empty): Clock.WithCompensatedLag[Game] = {
     val newClock = applyClock(metrics, sit.status.isEmpty)
     Clock.WithCompensatedLag(
       copy(
@@ -43,17 +40,17 @@ case class Game(
       }
     }
 
-  def apply(usi: Usi, metrics: MoveMetrics): Validated[String, Game] =
+  def apply(usi: Usi, metrics: MoveMetrics): Validated[String, Clock.WithCompensatedLag[Game]] =
     situation(usi).map(applySituation(_, metrics))
 
   def apply(usi: Usi): Validated[String, Game] =
-    situation(usi).map(applySituation(_))
+    situation(usi).map(applySituation(_).value)
 
-  def apply(parsedMove: ParsedMove, metrics: MoveMetrics): Validated[String, Game] =
+  def apply(parsedMove: ParsedMove, metrics: MoveMetrics): Validated[String, Clock.WithCompensatedLag[Game]] =
     situation(parsedMove).map(applySituation(_, metrics))
 
   def apply(parsedMove: ParsedMove): Validated[String, Game] =
-    situation(parsedMove).map(applySituation(_))
+    situation(parsedMove).map(applySituation(_).value)
 
   def board = situation.board
 
