@@ -15,7 +15,10 @@ case class Game(
     startedAtMove: Int = 1
 ) {
 
-  private def applySituation(sit: Situation, metrics: MoveMetrics = MoveMetrics.empty): Clock.WithCompensatedLag[Game] = {
+  private def applySituation(
+      sit: Situation,
+      metrics: MoveMetrics = MoveMetrics.empty
+  ): Clock.WithCompensatedLag[Game] = {
     val newClock = applyClock(metrics, sit.status.isEmpty)
     Clock.WithCompensatedLag(
       copy(
