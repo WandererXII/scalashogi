@@ -22,12 +22,13 @@ case class Pos private (index: Int) extends AnyVal {
       p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
     } getOrElse Nil
 
-  def ?<(other: Pos): Boolean = file > other.file
-  def ?>(other: Pos): Boolean = file < other.file
-  def ?+(other: Pos): Boolean = rank > other.rank
-  def ?^(other: Pos): Boolean = rank < other.rank
-  def ?|(other: Pos): Boolean = file == other.file
-  def ?-(other: Pos): Boolean = rank == other.rank
+  def isLeftOf(other: Pos): Boolean = file > other.file
+  def isRightOf(other: Pos): Boolean = file < other.file
+  def isBelow(other: Pos): Boolean = rank > other.rank
+  def isAbove(other: Pos): Boolean = rank < other.rank
+
+  def isSameFile(other: Pos): Boolean = file == other.file
+  def isSameRank(other: Pos): Boolean = rank == other.rank
 
   def <->(other: Pos): Seq[Pos] =
     min(file.index, other.file.index) to max(file.index, other.file.index) flatMap { Pos.at(_, rank.index) }
@@ -42,7 +43,7 @@ case class Pos private (index: Int) extends AnyVal {
 
   def onSameDiagonal(other: Pos): Boolean =
     file.index - rank.index == other.file.index - other.rank.index || file.index + rank.index == other.file.index + other.rank.index
-  def onSameLine(other: Pos): Boolean = ?-(other) || ?|(other)
+  def onSameLine(other: Pos): Boolean = isSameRank(other) || isSameFile(other)
 
   def xDist(other: Pos) = abs(file - other.file)
   def yDist(other: Pos) = abs(rank - other.rank)
@@ -178,6 +179,27 @@ object Pos {
   val SQ9I = new Pos(80)
 
   val all: List[Pos] = (0 until (MaxFiles * MaxRanks)).map(new Pos(_)).toList
+
+  def findDirection(from: Pos, to: Pos): Option[Direction] = {
+    if (to == from) None
+    else if (to isSameFile from)
+      Some(
+        if (to isAbove from) (_.up) else (_.down)
+      )
+    else if (to isSameRank from)
+      Some(
+        if (to isLeftOf from) (_.left) else (_.right)
+      )
+    else if (to onSameDiagonal from)
+      Some(
+        if (to isAbove from) {
+          if (to isLeftOf from) (_.upLeft) else (_.upRight)
+        } else {
+          if (to isLeftOf from) (_.downLeft) else (_.downRight)
+        }
+      )
+    else None
+  }
 
   val allDirections: Directions =
     List(_.up, _.down, _.left, _.right, _.upLeft, _.upRight, _.downLeft, _.downRight)

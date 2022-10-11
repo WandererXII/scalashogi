@@ -17,10 +17,6 @@ sealed trait Role {
 
   val senteDirectDirs: Directions
   val goteDirectDirs: Directions
-
-  // Generating next possible position of piece based on previous positions
-  // for pieces that don't have long range attacks it's None
-  def dir(from: Pos, to: Pos): Option[Direction]
 }
 
 case object King extends Role {
@@ -32,8 +28,6 @@ case object King extends Role {
   val goteProjectionDirs  = Nil
   val senteDirectDirs     = Rook.senteProjectionDirs ::: Bishop.senteProjectionDirs
   val goteDirectDirs      = senteDirectDirs
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object Rook extends Role {
@@ -45,17 +39,6 @@ case object Rook extends Role {
   val goteProjectionDirs  = senteProjectionDirs
   val senteDirectDirs     = Nil
   val goteDirectDirs      = Nil
-
-  def dir(from: Pos, to: Pos) =
-    if (to ?| from)
-      Some(
-        if (to ?^ from) (_.up) else (_.down)
-      )
-    else if (to ?- from)
-      Some(
-        if (to ?< from) (_.left) else (_.right)
-      )
-    else None
 }
 
 case object Bishop extends Role {
@@ -67,17 +50,6 @@ case object Bishop extends Role {
   val goteProjectionDirs  = senteProjectionDirs
   val senteDirectDirs     = Nil
   val goteDirectDirs      = Nil
-
-  def dir(from: Pos, to: Pos) =
-    if (to onSameDiagonal from)
-      Some(
-        if (to ?^ from) {
-          if (to ?< from) (_.upLeft) else (_.upRight)
-        } else {
-          if (to ?< from) (_.downLeft) else (_.downRight)
-        }
-      )
-    else None
 }
 
 case object Knight extends Role {
@@ -95,8 +67,6 @@ case object Knight extends Role {
     p => Pos.at(p.file.index - 1, p.rank.index + 2),
     p => Pos.at(p.file.index + 1, p.rank.index + 2)
   )
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object Pawn extends Role {
@@ -108,8 +78,6 @@ case object Pawn extends Role {
   val goteProjectionDirs  = Nil
   val senteDirectDirs     = List(_.up)
   val goteDirectDirs      = List(_.down)
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object Gold extends Role {
@@ -121,8 +89,6 @@ case object Gold extends Role {
   val goteProjectionDirs  = Nil
   val senteDirectDirs     = List(_.up, _.down, _.left, _.right, _.upLeft, _.upRight)
   val goteDirectDirs      = List(_.up, _.down, _.left, _.right, _.downLeft, _.downRight)
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object Silver extends Role {
@@ -134,8 +100,6 @@ case object Silver extends Role {
   val goteProjectionDirs  = Nil
   val senteDirectDirs     = List(_.up, _.upLeft, _.upRight, _.downLeft, _.downRight)
   val goteDirectDirs      = List(_.down, _.upLeft, _.upRight, _.downLeft, _.downRight)
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object Lance extends Role {
@@ -147,13 +111,6 @@ case object Lance extends Role {
   val goteProjectionDirs  = List(_.down)
   val senteDirectDirs     = Nil
   val goteDirectDirs      = Nil
-
-  def dir(from: Pos, to: Pos) =
-    if (to ?| from)
-      Some(
-        if (to ?^ from) (_.up) else (_.down)
-      )
-    else None
 }
 
 case object Tokin extends Role {
@@ -165,8 +122,6 @@ case object Tokin extends Role {
   val goteProjectionDirs  = Gold.goteProjectionDirs
   val senteDirectDirs     = Gold.senteDirectDirs
   val goteDirectDirs      = Gold.goteDirectDirs
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object PromotedSilver extends Role {
@@ -180,8 +135,6 @@ case object PromotedSilver extends Role {
   val goteProjectionDirs  = Gold.goteProjectionDirs
   val senteDirectDirs     = Gold.senteDirectDirs
   val goteDirectDirs      = Gold.goteDirectDirs
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object PromotedKnight extends Role {
@@ -195,8 +148,6 @@ case object PromotedKnight extends Role {
   val goteProjectionDirs  = Gold.goteProjectionDirs
   val senteDirectDirs     = Gold.senteDirectDirs
   val goteDirectDirs      = Gold.goteDirectDirs
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object PromotedLance extends Role {
@@ -210,8 +161,6 @@ case object PromotedLance extends Role {
   val goteProjectionDirs  = Gold.goteProjectionDirs
   val senteDirectDirs     = Gold.senteDirectDirs
   val goteDirectDirs      = Gold.goteDirectDirs
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
 }
 
 case object Horse extends Role {
@@ -223,8 +172,6 @@ case object Horse extends Role {
   val goteProjectionDirs  = Bishop.goteProjectionDirs
   val senteDirectDirs     = Rook.senteProjectionDirs
   val goteDirectDirs      = Rook.goteProjectionDirs
-
-  def dir(from: Pos, to: Pos) = Bishop.dir(from, to)
 }
 
 case object Dragon extends Role {
@@ -236,8 +183,6 @@ case object Dragon extends Role {
   val goteProjectionDirs  = Rook.goteProjectionDirs
   val senteDirectDirs     = Bishop.senteProjectionDirs
   val goteDirectDirs      = Bishop.goteProjectionDirs
-
-  def dir(from: Pos, to: Pos): Option[Direction] = Rook.dir(from, to)
 }
 
 object Role {

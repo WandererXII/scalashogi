@@ -27,8 +27,8 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       actor.piece.eyes(actor.pos, to) && {
         (actor.piece.projectionDirs.isEmpty) ||
         (actor.piece.directDirs.exists(_(actor.pos).contains(to))) ||
-        actor.piece.role.dir(actor.pos, to).exists {
-          actor.situation.variant.longRangeThreatens(actor.situation.board, actor.pos, _, to)
+        Pos.findDirection(actor.pos, to).exists { dir =>
+          actor.situation.variant.longRangeThreatens(actor.situation.board, actor.pos, dir, to)
         }
       }
   }

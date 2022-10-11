@@ -31,9 +31,9 @@ case class Piece(color: Color, role: Role) {
       case Bishop => from onSameDiagonal to
 
       case Gold | Tokin | PromotedSilver | PromotedKnight | PromotedLance if color.sente =>
-        (from touches to) && (to.rank <= from.rank || (to ?| from))
+        (from touches to) && (to.rank <= from.rank || (to isSameFile from))
       case Gold | Tokin | PromotedSilver | PromotedKnight | PromotedLance =>
-        (from touches to) && (to.rank >= from.rank || (to ?| from))
+        (from touches to) && (to.rank >= from.rank || (to isSameFile from))
 
       case Silver if color.sente =>
         (from touches to) && from.rank != to.rank && (from.file != to.file || to.rank < from.rank)
@@ -49,11 +49,11 @@ case class Piece(color: Color, role: Role) {
         val yd = from yDist to
         (xd == 1 && yd == 2 && from.rank < to.rank)
 
-      case Lance if color.sente => (from ?| to) && (from ?+ to)
-      case Lance                => (from ?| to) && (from ?^ to)
+      case Lance if color.sente => (from isSameFile to) && (from isBelow to)
+      case Lance                => (from isSameFile to) && (from isAbove to)
 
-      case Pawn if color.sente => from.rank.index - 1 == to.rank.index && from ?| to
-      case Pawn                => from.rank.index + 1 == to.rank.index && from ?| to
+      case Pawn if color.sente => from.rank.index - 1 == to.rank.index && (from isSameFile to)
+      case Pawn                => from.rank.index + 1 == to.rank.index && (from isSameFile to)
 
       case Horse  => (from touches to) || (from onSameDiagonal to)
       case Dragon => (from touches to) || (from onSameLine to)

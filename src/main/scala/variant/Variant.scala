@@ -70,9 +70,9 @@ abstract class Variant private[variant] (
   def posThreatened(board: Board, color: Color, pos: Pos, filter: Piece => Boolean = _ => true): Boolean =
     board.pieces exists {
       case (from, piece) if piece.color == color && filter(piece) && piece.eyes(from, pos) =>
-        piece.projectionDirs.isEmpty || piece.directDirs.exists(_(from).contains(pos)) ||
-          piece.role.dir(from, pos).exists {
-            longRangeThreatens(board, from, _, pos)
+        piece.projectionDirs.isEmpty || piece.directDirs.exists(dir => dir(from).contains(pos)) ||
+          Pos.findDirection(from, pos).exists { dir =>
+            longRangeThreatens(board, from, dir, pos)
           }
       case _ => false
     }
