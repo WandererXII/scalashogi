@@ -132,11 +132,18 @@ abstract class Variant private[variant] (
   // Finalizes situation after usi, used both for moves and drops
   protected def finalizeSituation(beforeSit: Situation, board: Board, hands: Hands, usi: Usi): Situation = {
     val newSit = beforeSit.copy(board = board, hands = hands).switch
-    val h = beforeSit.history.withLastMove(usi).withPositionHashes {
-      val basePositionHashes =
-        if (beforeSit.history.positionHashes.isEmpty) Hash(beforeSit) else beforeSit.history.positionHashes
-      Hash(newSit) ++ basePositionHashes
-    }
+    val h = beforeSit.history
+      .withLastMove(usi)
+      .withConsecutiveAttacks {
+        if (newSit.check)
+          beforeSit.history.consecutiveAttacks.add(!newSit.color)
+        else beforeSit.history.consecutiveAttacks.reset(!newSit.color)
+      }
+      .withPositionHashes {
+        val basePositionHashes =
+          if (beforeSit.history.positionHashes.isEmpty) Hash(beforeSit) else beforeSit.history.positionHashes
+        Hash(newSit) ++ basePositionHashes
+      }
     newSit.withHistory(h)
   }
 
@@ -188,7 +195,9 @@ abstract class Variant private[variant] (
   def impasse(sit: Situation): Boolean = false
 
   def perpetualCheck(sit: Situation): Boolean =
-    sit.check && sit.history.fourfoldRepetition
+    sit.history.fourfoldRepetition && sit.history.firstRepetitionDistance.exists { dist =>
+      (dist + 1) <= sit.history.consecutiveAttacks(!sit.color)
+    }
 
   def stalemate(sit: Situation): Boolean =
     !sit.check && !sit.hasMoveDestinations && !sit.hasDropDestinations

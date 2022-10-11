@@ -30,6 +30,25 @@ class PerpetualCheckTest extends ShogiTest {
       (SQ7D, SQ6D, false),
       (SQ7F, SQ6F, false)
     )
+    val mi = List(
+      (SQ5F, SQ6F, false),
+      (SQ6D, SQ7D, false),
+      (SQ6F, SQ7F, false),
+      (SQ7D, SQ6D, false),
+      (SQ7F, SQ6F, false),
+      (SQ6D, SQ7D, false),
+      (SQ6F, SQ7F, false),
+      (SQ7D, SQ6D, false),
+      (SQ7I, SQ6H, false),
+      (SQ3A, SQ4B, false),
+      (SQ6H, SQ7I, false),
+      (SQ4B, SQ3A, false),
+      (SQ7F, SQ6F, false),
+      (SQ6D, SQ7D, false),
+      (SQ6F, SQ7F, false),
+      (SQ7D, SQ6D, false),
+      (SQ7F, SQ6F, false)
+    )
     "not trigger" in {
       "after 2 repetitions" in {
         g must beValid.like { case game =>
@@ -45,6 +64,15 @@ class PerpetualCheckTest extends ShogiTest {
           game.playMoveList(m take 9) must beValid.like { case game2 =>
             game2.situation.autoDraw must beFalse
             game2.situation.perpetualCheck must beFalse
+            game2.situation.winner must beNone
+          }
+        }
+      }
+      "if the checks weren't consecutive" in {
+        g must beValid.like { case game =>
+          game.playMoveList(mi) must beValid.like { case game2 =>
+            game2.situation.perpetualCheck must beFalse
+            game2.situation.autoDraw must beTrue
             game2.situation.winner must beNone
           }
         }
