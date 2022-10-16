@@ -121,6 +121,13 @@ case object Standard
   def promotionRanks(color: Color) =
     if (color.sente) List(Rank.A, Rank.B, Rank.C) else List(Rank.G, Rank.H, Rank.I)
 
+  private def impasseValueOf(r: Role): Int =
+    r match {
+      case Bishop | Rook | Horse | Dragon => 5
+      case King                           => 0
+      case _                              => 1
+    }
+
   // In handicaps we give the value of the missing pieces to the handicap giver
   // Since this rule applies only to handicap games, only gote/uwate can be affected
   private def missingImpassePoints(sit: Situation): Int =
@@ -131,8 +138,8 @@ case object Standard
         math.max(
           0,
           54 -
-            (initSit.board.pieces.values.map(p => Role.impasseValueOf(p.role)).sum +
-              initSit.hands(Sente).sum(Role.impasseValueOf) + initSit.hands(Gote).sum(Role.impasseValueOf))
+            (initSit.board.pieces.values.map(p => impasseValueOf(p.role)).sum +
+              initSit.hands(Sente).sum(impasseValueOf) + initSit.hands(Gote).sum(impasseValueOf))
         )
       }
 
@@ -143,9 +150,9 @@ case object Standard
       case (pos, piece) if (piece is color) && (ranks contains pos.rank) => piece.role
     }.toList
     def impassePoints: Int =
-      enteredRoles.map(Role.impasseValueOf(_)).sum + sit
+      enteredRoles.map(impasseValueOf).sum + sit
         .hands(color)
-        .sum(Role.impasseValueOf)
+        .sum(impasseValueOf)
 
     // more than 10 - including the king
     enteredRoles.size > 10 && enteredRoles
