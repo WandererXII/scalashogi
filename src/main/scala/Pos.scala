@@ -6,6 +6,10 @@ import scala.math.{ abs, max, min }
 // Directions are given from sente POV
 case class Pos private (index: Int) extends AnyVal {
 
+  def xDist(other: Pos) = abs(file - other.file)
+  def yDist(other: Pos) = abs(rank - other.rank)
+  def dist(other: Pos)  = max(xDist(other), yDist(other))
+
   def down: Option[Pos]      = Pos.at(file.index, rank.index + 1)
   def left: Option[Pos]      = Pos.at(file.index + 1, rank.index)
   def downLeft: Option[Pos]  = Pos.at(file.index + 1, rank.index + 1)
@@ -15,13 +19,6 @@ case class Pos private (index: Int) extends AnyVal {
   def upLeft: Option[Pos]    = Pos.at(file.index + 1, rank.index - 1)
   def upRight: Option[Pos]   = Pos.at(file.index - 1, rank.index - 1)
 
-  def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
-  def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
-  def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] =
-    dir(this) map { p =>
-      p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
-    } getOrElse Nil
-
   def isLeftOf(other: Pos): Boolean = file > other.file
   def isRightOf(other: Pos): Boolean = file < other.file
   def isBelow(other: Pos): Boolean = rank > other.rank
@@ -29,6 +26,19 @@ case class Pos private (index: Int) extends AnyVal {
 
   def isSameFile(other: Pos): Boolean = file == other.file
   def isSameRank(other: Pos): Boolean = rank == other.rank
+
+  def onSameDiagonal(other: Pos): Boolean =
+    file.index - rank.index == other.file.index - other.rank.index || file.index + rank.index == other.file.index + other.rank.index
+  def onSameLine(other: Pos): Boolean = isSameRank(other) || isSameFile(other)
+
+  def touches(other: Pos): Boolean = dist(other) == 1
+
+  def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
+  def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
+  def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] =
+    dir(this) map { p =>
+      p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
+    } getOrElse Nil
 
   def <->(other: Pos): Seq[Pos] =
     min(file.index, other.file.index) to max(file.index, other.file.index) flatMap { Pos.at(_, rank.index) }
@@ -38,15 +48,6 @@ case class Pos private (index: Int) extends AnyVal {
     min(rank.index, other.rank.index) to max(rank.index, other.rank.index) flatMap {
       Pos.at(file.index, _)
     } flatMap { _ <-> other }
-
-  def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
-
-  def onSameDiagonal(other: Pos): Boolean =
-    file.index - rank.index == other.file.index - other.rank.index || file.index + rank.index == other.file.index + other.rank.index
-  def onSameLine(other: Pos): Boolean = isSameRank(other) || isSameFile(other)
-
-  def xDist(other: Pos) = abs(file - other.file)
-  def yDist(other: Pos) = abs(rank - other.rank)
 
   @inline def file = File of this
   @inline def rank = Rank of this
@@ -78,15 +79,18 @@ object Pos {
   def fromKey(key: String): Option[Pos] =
     allUsiKeys.get(key) orElse allUciKeys.get(key) orElse allNumberKeys.get(key)
 
-  // 9a 8a 7a 6a 5a 4a 3a 2a 1a
-  // 9b 8b 7b 6b 5b 4b 3b 2b 1b
-  // 9c 8c 7c 6c 5c 4c 3c 2c 1c
-  // 9d 8d 7d 6d 5d 4d 3d 2d 1d
-  // 9e 8e 7e 6e 5e 4e 3e 2e 1e
-  // 9f 8f 7f 6f 5f 4f 3f 2f 1f
-  // 9g 8g 7g 6g 5g 4g 3g 2g 1g
-  // 9h 8h 7h 6h 5h 4h 3h 2h 1h
-  // 9i 8i 7i 6i 5i 4i 3i 2i 1i
+  // 12a 11a 10a 9a 8a 7a 6a 5a 4a 3a 2a 1a
+  // 12b 11b 10b 9b 8b 7b 6b 5b 4b 3b 2b 1b
+  // 12c 11c 10c 9c 8c 7c 6c 5c 4c 3c 2c 1c
+  // 12d 11d 10d 9d 8d 7d 6d 5d 4d 3d 2d 1d
+  // 12e 11e 10e 9e 8e 7e 6e 5e 4e 3e 2e 1e
+  // 12f 11f 10f 9f 8f 7f 6f 5f 4f 3f 2f 1f
+  // 12g 11g 10g 9g 8g 7g 6g 5g 4g 3g 2g 1g
+  // 12h 11h 10h 9h 8h 7h 6h 5h 4h 3h 2h 1h
+  // 12i 11i 10i 9i 8i 7i 6i 5i 4i 3i 2i 1i
+  // 12j 11j 10j 9j 8j 7j 6j 5j 4j 3j 2j 1j
+  // 12k 11k 10k 9k 8k 7k 6k 5k 4k 3k 2k 1k
+  // 12l 11l 10l 9l 8l 7l 6l 5l 4l 3l 2l 1l
 
   val SQ1A = new Pos(0)
   val SQ2A = new Pos(1)
