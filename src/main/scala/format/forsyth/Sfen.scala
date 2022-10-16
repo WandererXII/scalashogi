@@ -82,12 +82,12 @@ object Sfen {
     for (y <- 0 to (variant.numberOfRanks - 1)) {
       empty = 0
       for (x <- (variant.numberOfFiles - 1) to 0 by -1) {
-        board(x, y) match {
+        board(x, y).flatMap(p => SfenUtils.toForsyth(p, variant)) match {
           case None => empty = empty + 1
-          case Some(piece) =>
-            if (empty == 0) sfen append piece.forsyth
+          case Some(forsyth) =>
+            if (empty == 0) sfen append forsyth
             else {
-              sfen append (empty.toString + piece.forsyth)
+              sfen append (empty.toString + forsyth)
               empty = 0
             }
         }
@@ -101,8 +101,9 @@ object Sfen {
   private[forsyth] def handToString(hand: Hand, variant: Variant): String =
     variant.handRoles map { r =>
       val cnt = hand(r)
-      if (cnt == 1) r.forsyth
-      else if (cnt > 1) cnt.toString + r.forsyth
+      val forsyth = SfenUtils.toForsyth(r, variant).getOrElse("")
+      if (cnt == 1) forsyth
+      else if (cnt > 1) cnt.toString + forsyth
       else ""
     } mkString ""
 
@@ -130,7 +131,7 @@ object Sfen {
           (for {
             pos   <- Pos.at(x, y)
             _     <- Option.when(variant.isInsideBoard(pos))(())
-            piece <- Piece.fromForsyth("+" + c)
+            piece <- SfenUtils.toPiece("+" + c, variant)
           } yield (pos -> piece :: pieces)) match {
             case Some(ps) => piecesListRec(ps, rest, x - 1, y)
             case _        => None
@@ -139,7 +140,7 @@ object Sfen {
           (for {
             pos   <- Pos.at(x, y)
             _     <- Option.when(variant.isInsideBoard(pos))(())
-            piece <- Piece.fromForsyth(c.toString)
+            piece <- SfenUtils.toPiece(c.toString, variant)
           } yield (pos -> piece :: pieces)) match {
             case Some(ps) => piecesListRec(ps, rest, x - 1, y)
             case _        => None
@@ -160,7 +161,7 @@ object Sfen {
         case d :: rest if d.isDigit =>
           handsRec(hands, rest, curCount.map(_ * 10 + d.asDigit) orElse d.asDigit.some)
         case p :: rest =>
-          Piece.fromForsyth(p.toString).filter(variant.handRoles contains _.role) match {
+          SfenUtils.toPiece(p.toString, variant).filter(variant.handRoles contains _.role) match {
             case Some(piece) =>
               handsRec(hands.store(piece, curCount.fold(1)(math.min(_, 81))), rest, None)
             case _ => None
