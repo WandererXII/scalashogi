@@ -188,7 +188,7 @@ object CsaParser {
       str match {
         case MoveRegex(origS, destS, roleS) => {
           for {
-            role <- Role.allByCsa get roleS toValid s"Uknown role in move: $str"
+            role <- CsaUtils.toRole(roleS) toValid s"Uknown role in move: $str"
             _ <-
               if (Standard.allRoles contains role) valid(role)
               else invalid(s"$role not supported in standard shogi")
@@ -209,7 +209,7 @@ object CsaParser {
         }
         case DropRegex(posS, roleS) =>
           for {
-            role <- Role.allByCsa get roleS toValid s"Uknown role in drop: $str"
+            role <- CsaUtils.toRole(roleS) toValid s"Uknown role in drop: $str"
             _ <-
               if (Standard.handRoles contains role) valid(role)
               else invalid(s"$role can't be dropped in standard shogi")

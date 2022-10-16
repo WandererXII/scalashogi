@@ -61,10 +61,10 @@ object Csa {
   def renderCsaMove(usiWithRole: Usi.WithRole, turn: Option[Color]) =
     usiWithRole.usi match {
       case Usi.Drop(role, pos) =>
-        s"${turn.fold("")(_.fold("+", "-"))}00${pos.numberKey}${role.csa}"
+        s"${turn.fold("")(_.fold("+", "-"))}00${pos.numberKey}${CsaUtils.toCsa(role).getOrElse("")}"
       case Usi.Move(orig, dest, prom) => {
         val finalRole = Standard.promote(usiWithRole.role).filter(_ => prom) | usiWithRole.role
-        s"${turn.fold("")(_.fold("+", "-"))}${orig.numberKey}${dest.numberKey}${finalRole.csa}"
+        s"${turn.fold("")(_.fold("+", "-"))}${orig.numberKey}${dest.numberKey}${CsaUtils.toCsa(finalRole).getOrElse("")}"
       }
     }
 
@@ -97,10 +97,10 @@ object Csa {
     for (y <- 0 to 8) {
       csaBoard append ("P" + (y + 1))
       for (x <- 8 to 0 by -1) {
-        sit.board(x, y) match {
+        sit.board(x, y).flatMap(CsaUtils toCsa _) match {
           case None => csaBoard append " * "
-          case Some(piece) =>
-            csaBoard append s"${piece.csa}"
+          case Some(csa) =>
+            csaBoard append s"$csa"
         }
       }
       if (y < 8) csaBoard append '\n'
@@ -119,7 +119,7 @@ object Csa {
       Standard.handRoles
         .map { r =>
           val cnt = hand(r)
-          s"00${r.csa}".repeat(math.min(cnt, 81))
+          s"00${CsaUtils.toCsa(r).getOrElse("")}".repeat(math.min(cnt, 81))
         }
         .filter(_.nonEmpty)
         .mkString(prefix, "", "")
