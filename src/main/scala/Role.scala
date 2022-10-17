@@ -1,5 +1,7 @@
 package shogi
 
+import scala.annotation.nowarn
+
 sealed trait Role {
   lazy val name: String = toString.toLowerCase
 
@@ -11,9 +13,11 @@ sealed trait Role {
   val senteDirectDirs: Directions
   val goteDirectDirs: Directions
 
-  // // For generating second move of lion pieces // here?
-  // val senteLionDirs: Directions = Nil
-  // val goteLionDirs: Directions = Nil
+  // For generating second destinations of lion pieces after moving to `to`
+  @nowarn
+  def senteLionDirs(from: Pos, to: Pos): Directions = Nil
+  @nowarn
+  def goteLionDirs(from: Pos, to: Pos): Directions = Nil
 
   // Can move from `from` position to `to` position assuming empty max-sized board, for optimization
   def senteEyes(from: Pos, to: Pos): Boolean
@@ -118,6 +122,15 @@ case object Eagle extends Role {
     p => Pos.at(p.file.index - 2, p.rank.index + 2)
   )
 
+  override def senteLionDirs(from: Pos, to: Pos): Directions =
+    if (from.upRight.exists(_==to)) List(_.upRight, _.downLeft)
+    else if (from.upLeft.exists(_==to)) List(_.downLeft, _.upLeft)
+    else Nil
+  override def goteLionDirs(from: Pos, to: Pos): Directions =
+    if (from.downRight.exists(_==to)) List(_.downRight, _.upLeft)
+    else if (from.upLeft.exists(_==to)) List(_.upRight, _.downLeft)
+    else Nil
+
   def senteEyes(from: Pos, to: Pos) =
     Rook.senteEyes(from, to) || ((from onSameDiagonal to) && ((from isAbove to) || (from xDist to) == 2 || (from xDist to) == 1))
   def goteEyes(from: Pos, to: Pos) =
@@ -160,6 +173,13 @@ case object Falcon extends Role {
     _.down,
     p => Pos.at(p.file.index, p.rank.index + 2),
   )
+
+  override def senteLionDirs(from: Pos, to: Pos): Directions =
+    if (from.up.exists(_==to)) List(_.up, _.down)
+    else Nil
+  override def goteLionDirs(from: Pos, to: Pos): Directions =
+    if (from.down.exists(_==to)) List(_.up, _.down)
+    else Nil
 
   def senteEyes(from: Pos, to: Pos) =
     (Bishop.senteEyes(from, to) || (from isSameRank to) || ((from isSameFile to) && ((from isAbove to) || (from yDist to) <= 2))) && from != to
@@ -314,6 +334,13 @@ case object Lion extends Role {
     ) ::: King.senteDirectDirs
   val goteDirectDirs = senteDirectDirs
 
+  override def senteLionDirs(from: Pos, to: Pos): Directions =
+    if (from touches to) King.senteDirectDirs
+    else Nil
+  override def goteLionDirs(from: Pos, to: Pos): Directions =
+    if (from touches to) King.goteDirectDirs
+    else Nil
+
   def senteEyes(from: Pos, to: Pos) = (from dist to) <= 2 && from != to
   def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
 }
@@ -324,6 +351,11 @@ case object LionPromoted extends Role {
 
   val senteDirectDirs     = Lion.senteDirectDirs
   val goteDirectDirs      = Lion.goteDirectDirs
+
+  override def senteLionDirs(from: Pos, to: Pos): Directions =
+    Lion.senteLionDirs(from, to)
+  override def goteLionDirs(from: Pos, to: Pos): Directions =
+    Lion.goteLionDirs(from, to)
 
   def senteEyes(from: Pos, to: Pos) = Lion.senteEyes(from, to)
   def goteEyes(from: Pos, to: Pos) = Lion.goteEyes(from, to)
