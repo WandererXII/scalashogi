@@ -11,8 +11,7 @@ class RoleTest extends ShogiTest {
       ).moveDestsFrom(SQ5E).get
 
       s"$color-$role" in {
-        forall(Pos.all) { pos =>
-          if (piece.eyes(SQ5E, pos) != (dests contains pos)) println(s"$piece, $pos, eyes? ${piece.eyes(SQ5E, pos)}, dests? ${dests contains pos}")
+        forall(shogi.variant.Standard.allPositions) { pos =>
           piece.eyes(SQ5E, pos) ==== (dests contains pos)
         }
       }

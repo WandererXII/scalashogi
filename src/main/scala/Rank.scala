@@ -7,8 +7,7 @@ case class Rank private (val index: Int) extends AnyVal with Ordered[Rank] {
   def offset(delta: Int): Option[Rank] =
     Rank(index + delta)
 
-  @inline def char: Char = (97 + index).toChar
-  override def toString  = char.toString
+  override def toString  = (97 + index).toChar.toString
 }
 
 object Rank {
@@ -17,8 +16,6 @@ object Rank {
     else None
 
   @inline def of(pos: Pos): Rank = new Rank(pos.index / Pos.MaxFiles)
-
-  def fromChar(ch: Char): Option[Rank] = apply(ch.toInt - 97)
 
   val A = new Rank(0)
   val B = new Rank(1)
@@ -29,7 +26,10 @@ object Rank {
   val G = new Rank(6)
   val H = new Rank(7)
   val I = new Rank(8)
+  val J = new Rank(9)
+  val K = new Rank(10)
+  val L = new Rank(11)
 
-  val all                     = List(A, B, C, D, E, F, G, H, I)
+  val all                     = List(A, B, C, D, E, F, G, H, I, J, K, L)
   val allReversed: List[Rank] = all.reverse
 }
