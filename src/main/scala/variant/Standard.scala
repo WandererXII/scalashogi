@@ -18,7 +18,7 @@ case object Standard
   val numberOfRanks: Int = 9
   val numberOfFiles: Int = 9
 
-  val allPositions = Pos.all
+  val allPositions = (SQ9I upTo SQ1A).toList
 
   val pieces =
     Map(
