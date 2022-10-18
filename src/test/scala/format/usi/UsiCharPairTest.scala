@@ -3,6 +3,7 @@ package format
 package usi
 
 import Usi._
+import variant.Standard
 
 class UsiCharPairTest extends ShogiTest {
 
@@ -12,12 +13,12 @@ class UsiCharPairTest extends ShogiTest {
     def convStr(str: String) = conv(Usi(str).get)
 
     val allMoves = for {
-      orig <- Pos.all
-      dest <- Pos.all
+      orig <- Standard.allPositions
+      dest <- Standard.allPositions
     } yield Move(orig, dest, false)
     val allDrops = for {
       role <- variant.Standard.handRoles
-      pos  <- Pos.all
+      pos  <- Standard.allPositions
     } yield Drop(role, pos)
 
     val allMovesCharPairs = allMoves.map(conv(_))

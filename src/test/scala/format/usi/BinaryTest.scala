@@ -88,18 +88,18 @@ class BinaryTest extends ShogiTest {
         forall(format.usi.Fixtures.prod500standard)(compareStrAndBin)
       }
     }
-    "for all move combinations" in {
+    "for all move combinations (standard)" in {
       val allMoves = for {
-        orig <- Pos.all
-        dest <- Pos.all
+        orig <- Standard.allPositions
+        dest <- Standard.allPositions
       } yield Usi.Move(orig, dest, true)
       forall(allMoves.map(_.usiKeys))(compareStrAndBin)
       forall(allMoves.map(_.usi))(compareStrAndBin)
     }
-    "for all drop combinations" in {
+    "for all drop combinations (standard)" in {
       val allDrops = for {
-        role <- Role.all
-        pos  <- Pos.all
+        role <- Standard.handRoles
+        pos  <- Standard.allPositions
       } yield Usi.Drop(role, pos)
       forall(allDrops.map(_.usi))(compareStrAndBin)
     }
