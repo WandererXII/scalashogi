@@ -8,7 +8,7 @@ final case class DropActor(
 ) {
 
   lazy val destinations: List[Pos] =
-    if (situation.variant.supportsDrops)
+    if (situation.variant.supportsDrops && situation.variant.handRoles.contains(piece.role))
       situation.variant.dropLegalityFilter(this)
     else Nil
 

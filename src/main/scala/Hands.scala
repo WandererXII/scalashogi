@@ -57,7 +57,7 @@ object Hands {
   def empty: Hands = Hands(Nil, Nil)
 }
 
-case class Hand(handMap: HandMap) extends AnyVal {
+case class Hand(handMap: Map[Role, Int]) extends AnyVal {
 
   def apply(role: Role): Int =
     handMap.getOrElse(role, 0)

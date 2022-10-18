@@ -184,6 +184,7 @@ abstract class Variant private[variant] (
   def drop(sit: Situation, usi: Usi.Drop): Validated[String, Situation] =
     for {
       _ <- Validated.cond(sit.variant.supportsDrops, (), "Variant doesn't support drops")
+      _ <- Validated.cond(handRoles contains usi.role, (), "Can't drop this role in this variant")
       piece = Piece(sit.color, usi.role)
       actor <- sit.dropActorOf(piece) toValid s"No actor of $piece"
       _     <- Validated.cond(actor.destinations.contains(usi.pos), (), s"Dropping $piece is not valid")
