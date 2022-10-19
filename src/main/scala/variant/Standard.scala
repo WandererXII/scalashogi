@@ -64,8 +64,6 @@ case object Standard
       SQ1A -> Gote.lance
     )
 
-  val hands = Map.empty
-
   val allRoles = List(
     Pawn,
     Lance,
@@ -83,7 +81,7 @@ case object Standard
     Tokin
   )
 
-  val handRoles: List[Role] = List(
+  val handRoles = List(
     Rook,
     Bishop,
     Gold,

@@ -24,7 +24,9 @@ sealed trait Role {
   def goteEyes(from: Pos, to: Pos): Boolean
 }
 
-case object Bishop extends Role {
+sealed trait DroppableRole extends Role
+
+case object Bishop extends DroppableRole {
   val senteProjectionDirs = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
   val goteProjectionDirs  = senteProjectionDirs
 
@@ -201,7 +203,7 @@ case object GoBetween extends Role {
   def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
 }
 
-case object Gold extends Role {
+case object Gold extends DroppableRole {
   val senteProjectionDirs = Nil
   val goteProjectionDirs  = Nil
 
@@ -265,7 +267,7 @@ case object Kirin extends Role {
   def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
 }
 
-case object Knight extends Role {
+case object Knight extends DroppableRole {
   val senteProjectionDirs = Nil
   val goteProjectionDirs  = Nil
 
@@ -284,7 +286,7 @@ case object Knight extends Role {
     (from xDist to) == 1 && (from yDist to) == 2 && (to isBelow from)
 }
 
-case object Lance extends Role {
+case object Lance extends DroppableRole {
   val senteProjectionDirs = List(_.up)
   val goteProjectionDirs  = List(_.down)
 
@@ -373,7 +375,7 @@ case object Ox extends Role {
   def goteEyes(from: Pos, to: Pos) = senteEyes(from ,to)
 }
 
-case object Pawn extends Role {
+case object Pawn extends DroppableRole {
   val senteProjectionDirs = Nil
   val goteProjectionDirs  = Nil
 
@@ -480,7 +482,7 @@ case object QueenPromoted extends Role {
   def goteEyes(from: Pos, to: Pos) = Queen.goteEyes(from, to)
 }
 
-case object Rook extends Role {
+case object Rook extends DroppableRole {
   val senteProjectionDirs = List(_.up, _.down, _.left, _.right)
   val goteProjectionDirs  = senteProjectionDirs
 
@@ -525,7 +527,7 @@ case object SideMoverPromoted extends Role {
   def goteEyes(from: Pos, to: Pos) = SideMover.goteEyes(from, to)
 }
 
-case object Silver extends Role {
+case object Silver extends DroppableRole {
   val senteProjectionDirs = Nil
   val goteProjectionDirs  = Nil
 
@@ -666,6 +668,16 @@ object Role {
     VerticalMoverPromoted,
     Whale,
     WhiteHorse,
+  )
+
+  val allDroppable: List[DroppableRole] = List(
+    Bishop,
+    Gold,
+    Knight,
+    Lance,
+    Pawn,
+    Rook,
+    Silver
   )
 
   val allByName: Map[String, Role] = all map { r =>

@@ -161,9 +161,11 @@ object Sfen {
         case d :: rest if d.isDigit =>
           handsRec(hands, rest, curCount.map(_ * 10 + d.asDigit) orElse d.asDigit.some)
         case p :: rest =>
-          SfenUtils.toPiece(p.toString, variant).filter(variant.handRoles contains _.role) match {
-            case Some(piece) =>
-              handsRec(hands.store(piece, curCount.fold(1)(math.min(_, 81))), rest, None)
+          SfenUtils.toPiece(p.toString, variant).flatMap { p =>
+            variant.handRoles.find(_==p.role).map((p.color, _))
+          } match {
+            case Some((color, role)) =>
+              handsRec(hands.store(color, role, curCount.fold(1)(math.min(_, 81))), rest, None)
             case _ => None
           }
       }

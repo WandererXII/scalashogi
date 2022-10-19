@@ -14,27 +14,20 @@ object Binary {
     Writer.encode(ms, variant)
 
   private object Encoding {
-    val roleToInt: Map[Role, Int] = Map(
-      King           -> 0,
+    val roleToInt: Map[DroppableRole, Int] = Map(
       Pawn           -> 1,
       Lance          -> 2,
       Knight         -> 3,
       Silver         -> 4,
       Gold           -> 5,
       Bishop         -> 6,
-      Rook           -> 7,
-      Tokin          -> 8,
-      PromotedLance  -> 9,
-      PromotedKnight -> 10,
-      PromotedSilver -> 11,
-      Horse          -> 12,
-      Dragon         -> 13
+      Rook           -> 7
     )
-    val intToRole: Map[Int, Role] = roleToInt map { case (k, v) => v -> k }
+    val intToRole: Map[Int, DroppableRole] = roleToInt map { case (k, v) => v -> k }
   }
 
   private object Reader {
-    private val maxPlies = 600
+    private val maxPlies = 600 // ?
 
     def decode(bs: Seq[Byte], variant: Variant): Vector[Usi] =
       decode(bs, variant, maxPlies * 2)
@@ -96,7 +89,7 @@ object Binary {
         (if (prom) (1 << 7) else 0) | posInt(dest, variant.numberOfFiles)
       ).map(_.toByte)
 
-    private def encodeDrop(role: Role, pos: Pos, variant: Variant): Seq[Byte] =
+    private def encodeDrop(role: DroppableRole, pos: Pos, variant: Variant): Seq[Byte] =
       Seq(
         (1 << 7) | Encoding.roleToInt(role),
         posInt(pos, variant.numberOfFiles)

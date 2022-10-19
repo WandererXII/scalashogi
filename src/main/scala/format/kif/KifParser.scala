@@ -360,7 +360,7 @@ object KifParser {
       str.map(KifUtils toDigit _) match {
         case MoveRegex(destS, roleS, promS, origS) =>
           for {
-            role <- Role.allByEverything get roleS toValid s"Unknown role in move: $str"
+            role <- KifUtils.anyToRole(roleS, variant) toValid s"Unknown role in move: $str"
             _ <-
               if (variant.allRoles contains role) valid(role)
               else invalid(s"$role not supported in $variant variant")
@@ -382,10 +382,8 @@ object KifParser {
           )
         case DropRegex(posS, roleS) =>
           for {
-            role <- Role.allByEverything get roleS toValid s"Unknown role in drop: $str"
-            _ <-
-              if (variant.handRoles contains role) valid(role)
-              else invalid(s"$role can't be dropped in $variant variant")
+            roleBase <- KifUtils.anyToRole(roleS, variant) toValid s"Unknown role in drop: $str"
+            role <- variant.handRoles.find(_==roleBase) toValid s"$roleBase can't be dropped in $variant variant"
             pos <- Pos.allNumberKeys get posS toValid s"Cannot parse destination square in drop: $str"
           } yield Drop(
             role = role,

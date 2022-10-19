@@ -6,7 +6,6 @@ import cats.implicits._
 sealed trait Usi {
 
   def usi: String
-  def uci: String // will be removed
 
   def positions: List[Pos]
 
@@ -20,11 +19,8 @@ object Usi {
       promotion: Boolean = false
   ) extends Usi {
 
-    def usiKeys = orig.usiKey + dest.usiKey
-    def usi     = usiKeys + promotionString
-
-    def uciKeys = orig.uciKey + dest.uciKey
-    def uci     = uciKeys + promotionString
+    def keys = orig.usiKey + dest.usiKey
+    def usi     = keys + promotionString
 
     def promotionString = if (promotion) "+" else ""
 
@@ -42,11 +38,9 @@ object Usi {
 
   }
 
-  case class Drop(role: Role, pos: Pos) extends Usi {
-
-    def usi = s"${role.forsythUpper}*${pos.usiKey}"
-
-    def uci = s"${role.forsythUpper}*${pos.uciKey}"
+  case class Drop(role: DroppableRole, pos: Pos) extends Usi {
+  
+    def usi = s"${Drop.roleToUsi(role)}*${pos.usiKey}"
 
     def positions = List(pos)
 
@@ -56,10 +50,21 @@ object Usi {
 
     def apply(drop: String): Option[Drop] =
       for {
-        role <- Role.allByForsythUpper.get(drop.takeWhile(_ != '*'))
+        role <- usiToRole get (drop.takeWhile(_ != '*'))
         pos  <- Pos.fromKey(drop takeRight 2)
       } yield Drop(role, pos)
 
+    val roleToUsi: Map[DroppableRole, String] = Map(
+        Pawn -> "P",
+        Lance -> "L",
+        Knight -> "N",
+        Silver -> "S",
+        Gold -> "G",
+        Bishop -> "B",
+        Rook -> "R"
+      )
+    val usiToRole: Map[String, DroppableRole] = roleToUsi map { case (k, v) => v -> k }
+    
   }
 
   case class WithRole(usi: Usi, role: Role)

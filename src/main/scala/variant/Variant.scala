@@ -25,13 +25,13 @@ abstract class Variant private[variant] (
   def allPositions: List[Pos]
 
   def pieces: PieceMap
-  def hands: HandsMap
+  def hands: HandsMap = Color.Map(Map.empty, Map.empty)
 
   // Roles available in the variant
   def allRoles: List[Role]
 
-  // Only these roles will be stored in hand, order matters for export
-  def handRoles: List[Role]
+  // Only these roles can be stored in hand, order matters for export
+  def handRoles: List[DroppableRole]
 
   // Promotions based on current variant, None for roles that do not promote
   def promote(role: Role): Option[Role]
@@ -168,9 +168,8 @@ abstract class Variant private[variant] (
       )
       unpromotedCapture = sit.board(usi.dest).map(p => p.updateRole(unpromote) | p)
       hands =
-        unpromotedCapture
-          .filter(c => handRoles.contains(c.role) && addCapturedPiecesToHand)
-          .fold(sit.hands)(sit.hands store _.switch)
+        unpromotedCapture.filter(_ => addCapturedPiecesToHand).flatMap(c => handRoles.find(_==c.role))
+          .fold(sit.hands)(sit.hands.store(sit.color, _))
       board <-
         (if (usi.promotion)
            sit.board.promote(usi.orig, usi.dest, promote)
@@ -188,7 +187,7 @@ abstract class Variant private[variant] (
       piece = Piece(sit.color, usi.role)
       actor <- sit.dropActorOf(piece) toValid s"No actor of $piece"
       _     <- Validated.cond(actor.destinations.contains(usi.pos), (), s"Dropping $piece is not valid")
-      hands <- sit.hands.take(piece) toValid s"No $piece to drop on ${usi.pos}"
+      hands <- sit.hands.take(sit.color, usi.role) toValid s"No ${usi.role} to drop on ${usi.pos}"
       board <- sit.board.place(piece, usi.pos) toValid s"Can't drop ${usi.role} on ${usi.pos}, it's occupied"
     } yield finalizeSituation(sit, board, hands, usi)
 

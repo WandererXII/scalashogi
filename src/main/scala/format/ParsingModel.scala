@@ -48,7 +48,7 @@ sealed trait ParsedMove {
 case class KifMove(
     dest: Pos,
     orig: Pos,
-    role: Role,
+    role: Role, // todo  roles?
     promotion: Boolean = false,
     metas: Metas = Metas.empty
 ) extends ParsedMove {
@@ -81,7 +81,7 @@ case class CsaMove(
 
 // All notations can share drop
 case class Drop(
-    role: Role,
+    role: DroppableRole,
     pos: Pos,
     metas: Metas = Metas.empty
 ) extends ParsedMove {

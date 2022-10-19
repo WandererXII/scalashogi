@@ -35,7 +35,7 @@ object UsiCharPair {
   def posToChar(variant: Variant, pos: Pos): Char =
     (charOffset + pos.rank.index * variant.numberOfFiles + pos.file.index).toChar
 
-  def roleToChar(variant: Variant, role: Role): Char =
+  def roleToChar(variant: Variant, role: DroppableRole): Char =
     variant.handRoles.zipWithIndex
       .find(_._1 == role)
       .map { case (_, i) => (charOffset + variant.allPositions.size + i).toChar }

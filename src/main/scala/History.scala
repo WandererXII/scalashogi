@@ -33,7 +33,7 @@ case class History(
         Some(positions lastIndexWhere {
           case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
           case _                 => false
-        }).filterNot(_ == -1).pp("FPD")
+        }).filterNot(_ == -1)
       case _ => None
     }
   }

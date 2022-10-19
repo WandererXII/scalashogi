@@ -61,7 +61,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       game.apply(Usi.Move(orig, dest, promotion))
 
     def playDrop(
-        role: Role,
+        role: DroppableRole,
         dest: Pos
     ): Validated[String, Game] =
       game.apply(Usi.Drop(role, dest))

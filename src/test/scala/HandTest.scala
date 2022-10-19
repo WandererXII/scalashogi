@@ -16,7 +16,7 @@ class HandTest extends ShogiTest {
 
   }
   "Adding a sente pawn" should {
-    hands.store(Sente - Pawn) match {
+    hands.store(Sente, Pawn) match {
       case h =>
         "have 1 piece" in {
           h.size must_== 1
@@ -41,7 +41,7 @@ class HandTest extends ShogiTest {
   }
   "Taking the piece away" should {
     "have no pieces" in {
-      hands.store(Sente - Pawn).take(Sente - Pawn) must beSome.like { h =>
+      hands.store(Sente, Pawn).take(Sente, Pawn) must beSome.like { h =>
         h.size must_== 0
         h.isEmpty must beTrue
         hands.sente.isEmpty must beTrue
@@ -51,8 +51,8 @@ class HandTest extends ShogiTest {
   }
   "Adding more sente pawns" should {
     hands
-      .store(Sente - Pawn)
-      .store(Sente - Pawn) match {
+      .store(Sente, Pawn)
+      .store(Sente, Pawn) match {
       case h =>
         "have 2 pieces" in {
           h.size must_== 2
@@ -68,9 +68,9 @@ class HandTest extends ShogiTest {
   "Taking another pawn" should {
     "have 1 sente pawn" in {
       hands
-        .store(Sente - Pawn)
-        .store(Sente - Pawn)
-        .take(Sente - Pawn) must beSome.like { h =>
+        .store(Sente, Pawn)
+        .store(Sente, Pawn)
+        .take(Sente, Pawn) must beSome.like { h =>
         h.size must_== 1
         h.sente(Pawn) must_== 1
       }
@@ -78,9 +78,9 @@ class HandTest extends ShogiTest {
   }
   "Adding gote bishop" should {
     hands
-      .store(Sente - Pawn)
-      .store(Sente - Pawn)
-      .store(Gote - Bishop) match {
+      .store(Sente, Pawn)
+      .store(Sente, Pawn)
+      .store(Gote, Bishop) match {
       case h =>
         "have 3 pieces" in {
           h.size must_== 3

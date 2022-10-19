@@ -3,19 +3,24 @@ package shogi
 import shogi.format.usi.Usi
 
 final case class DropActor(
-    piece: Piece,
+    color: Color,
+    role: DroppableRole,
     situation: Situation
 ) {
 
   lazy val destinations: List[Pos] =
-    if (situation.variant.supportsDrops && situation.variant.handRoles.contains(piece.role))
+    if (
+      situation.variant.supportsDrops &&
+      situation.variant.handRoles.contains(role) &&
+      situation.hands.has(color, role)
+    )
       situation.variant.dropLegalityFilter(this)
     else Nil
 
   def toUsis: List[Usi.Drop] =
-    destinations.map(Usi.Drop(piece.role, _))
+    destinations.map(Usi.Drop(role, _))
 
-  def color = piece.color
+  def piece = Piece(color, role)
 
 }
 

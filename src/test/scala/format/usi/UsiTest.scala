@@ -24,6 +24,7 @@ class UsiTest extends ShogiTest {
       u.pos must_== SQ8B
       u.usi must_== "G*8b"
     }
+    Usi("H*8b") must beNone
   }
 
 }

@@ -93,7 +93,7 @@ class BinaryTest extends ShogiTest {
         orig <- Standard.allPositions
         dest <- Standard.allPositions
       } yield Usi.Move(orig, dest, true)
-      forall(allMoves.map(_.usiKeys))(compareStrAndBin)
+      forall(allMoves.map(_.keys))(compareStrAndBin)
       forall(allMoves.map(_.usi))(compareStrAndBin)
     }
     "for all drop combinations (standard)" in {

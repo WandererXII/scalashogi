@@ -70,11 +70,9 @@ object KifParserHelper {
         case p :: rest =>
           (for {
             pos <- Pos.at(x, y) toValid s"Too many files in board setup on rank $y"
-            gote    = pieceSoFar.toLowerCase.startsWith("v")
-            roleStr = if (gote) pieceSoFar.drop(1) + p else pieceSoFar + p
-            role <- Role.allByEverything.get(roleStr) toValid s"Unknown piece in board setup: $roleStr"
-            _    <- Validated.cond(variant.allRoles contains role, (), s"$role is not valid $variant variant")
-            piece = Piece(Color.fromSente(!gote), role)
+            pieceStr = pieceSoFar + p
+            piece <- KifUtils.toPiece(pieceStr, variant) toValid s"Unknown piece in board setup: $pieceStr"
+            _     <- Validated.cond(variant.allRoles contains piece.role, (), s"${piece.role} is not valid in $variant variant")
           } yield (pos -> piece :: pieces)) match {
             case cats.data.Validated.Valid(ps) => makePiecesList(ps, rest, "", x - 1, y)
             case e                             => e
@@ -99,10 +97,8 @@ object KifParserHelper {
         for {
           roleStr <- str.headOption toValid "Cannot parse hand"
           num = KifUtils kanjiToInt str.tail
-          role <- Role.allByEverything.get(roleStr.toString) toValid s"Unknown piece in hand: $roleStr"
-          _ <-
-            if (variant.handRoles contains role) valid(role)
-            else invalid(s"Cannot place $role in hand in $variant variant")
+          roleBase <- KifUtils.anyToRole(roleStr.toString, variant) toValid s"Unknown piece in hand: $roleStr"
+          role <- variant.handRoles.find(_==roleBase) toValid s"Cannot place $roleBase in hand in $variant variant"
         } yield (hand.store(role, num))
       val values = str.split(":").lastOption.getOrElse("").trim
       if (values == "なし" || values == "") valid(Hand.empty)

@@ -209,10 +209,8 @@ object CsaParser {
         }
         case DropRegex(posS, roleS) =>
           for {
-            role <- CsaUtils.toRole(roleS) toValid s"Uknown role in drop: $str"
-            _ <-
-              if (Standard.handRoles contains role) valid(role)
-              else invalid(s"$role can't be dropped in standard shogi")
+            roleBase <- CsaUtils.toRole(roleS) toValid s"Uknown role in drop: $str"
+            role <- Standard.handRoles.find(_==roleBase) toValid s"$roleBase can't be dropped in standard shogi"
             pos <- Pos.allNumberKeys get posS toValid s"Cannot parse destination sqaure in drop: $str"
           } yield Drop(
             role = role,
