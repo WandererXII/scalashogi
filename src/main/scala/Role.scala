@@ -125,12 +125,12 @@ case object Eagle extends Role {
   )
 
   override def senteLionDirs(from: Pos, to: Pos): Directions =
-    if (from.upRight.exists(_==to)) List(_.upRight, _.downLeft)
-    else if (from.upLeft.exists(_==to)) List(_.downLeft, _.upLeft)
+    if (from.upRight.contains(to)) List(_.upRight, _.downLeft)
+    else if (from.upLeft.contains(to)) List(_.downLeft, _.upLeft)
     else Nil
   override def goteLionDirs(from: Pos, to: Pos): Directions =
-    if (from.downRight.exists(_==to)) List(_.downRight, _.upLeft)
-    else if (from.upLeft.exists(_==to)) List(_.upRight, _.downLeft)
+    if (from.downRight.contains(to)) List(_.downRight, _.upLeft)
+    else if (from.upLeft.contains(to)) List(_.upRight, _.downLeft)
     else Nil
 
   def senteEyes(from: Pos, to: Pos) =
@@ -177,10 +177,10 @@ case object Falcon extends Role {
   )
 
   override def senteLionDirs(from: Pos, to: Pos): Directions =
-    if (from.up.exists(_==to)) List(_.up, _.down)
+    if (from.up.contains(to)) List(_.up, _.down)
     else Nil
   override def goteLionDirs(from: Pos, to: Pos): Directions =
-    if (from.down.exists(_==to)) List(_.up, _.down)
+    if (from.down.contains(to)) List(_.up, _.down)
     else Nil
 
   def senteEyes(from: Pos, to: Pos) =
