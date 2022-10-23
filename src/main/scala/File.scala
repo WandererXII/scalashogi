@@ -4,7 +4,12 @@ case class File private (val index: Int) extends AnyVal with Ordered[File] {
   @inline def -(that: File): Int           = index - that.index
   @inline override def compare(that: File) = this - that
 
-  override def toString  = (index + 1).toString
+  def key: String       = (index + 1).toString
+  def hexKey: String    = (index + 1).toHexString
+  def kanjiFullWidthKey: String =
+    key.map(c => (c + 65248).toChar)
+
+  override def toString  = key
 }
 
 object File {

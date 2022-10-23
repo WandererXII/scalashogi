@@ -52,10 +52,12 @@ case class Pos private (index: Int) extends AnyVal {
   @inline def file = File of this
   @inline def rank = Rank of this
 
-  def usiKey    = file.toString + rank.toString
-  def numberKey = (file.index + 1).toString + (rank.index + 1).toString
+  def key      = file.key + rank.key
+  def hexKey   = file.hexKey + rank.hexKey
+  def kanjiKey = file.key + rank.kanjiKey
+  def kanjiFullWidthKey = file.kanjiFullWidthKey + rank.kanjiKey
 
-  override def toString = usiKey
+  override def toString = key
 }
 
 object Pos {
@@ -76,7 +78,7 @@ object Pos {
     else None
 
   def fromKey(key: String): Option[Pos] =
-    allUsiKeys.get(key) orElse allNumberKeys.get(key)
+    allKeys.get(key) orElse allHexKeys.get(key) orElse allKanjiKeys.get(key) orElse allKanjiFullWidthKeys.get(key)
 
   val all: List[Pos] = (0 until (MaxFiles * MaxRanks)).map(new Pos(_)).toList
 
@@ -235,7 +237,7 @@ object Pos {
   val SQ10K= all(129)
   val SQ11K= all(130)
   val SQ12K= all(131)
-  
+
   val SQ1L = all(132)
   val SQ2L = all(133)
   val SQ3L = all(134)
@@ -273,12 +275,21 @@ object Pos {
   val allDirections: Directions =
     List(_.up, _.down, _.left, _.right, _.upLeft, _.upRight, _.downLeft, _.downRight)
 
-  val allUsiKeys: Map[String, Pos] = all.map { pos =>
-    pos.usiKey -> pos
+  val allKeys: Map[String, Pos] = all.map { pos =>
+    pos.key -> pos
   }.toMap
 
-  val allNumberKeys: Map[String, Pos] = all.map { pos =>
-    pos.numberKey -> pos
+  val allHexKeys: Map[String, Pos] = all.map { pos =>
+    pos.hexKey -> pos
   }.toMap
+
+  val allKanjiKeys: Map[String, Pos] = all.map { pos =>
+    pos.kanjiKey -> pos
+  }.toMap
+
+  val allKanjiFullWidthKeys: Map[String, Pos] = all.map { pos =>
+    pos.kanjiFullWidthKey -> pos
+  }.toMap
+
 
 }

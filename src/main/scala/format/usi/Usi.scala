@@ -19,7 +19,7 @@ object Usi {
       promotion: Boolean = false
   ) extends Usi {
 
-    def keys = orig.usiKey + dest.usiKey
+    def keys = orig.key + dest.key
     def usi     = keys + promotionString
 
     def promotionString = if (promotion) "+" else ""
@@ -40,7 +40,7 @@ object Usi {
 
   case class Drop(role: DroppableRole, pos: Pos) extends Usi {
   
-    def usi = s"${Drop.roleToUsi(role)}*${pos.usiKey}"
+    def usi = s"${Drop.roleToUsi(role)}*${pos.key}"
 
     def positions = List(pos)
 

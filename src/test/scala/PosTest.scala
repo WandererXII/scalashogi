@@ -61,15 +61,28 @@ class PosTest extends ShogiTest {
     }
     "USI" in {
       "be correctly converted" in {
-        SQ9I.usiKey must_== "9i"
-        SQ9A.usiKey must_== "9a"
-        SQ1A.usiKey must_== "1a"
-        SQ1I.usiKey must_== "1i"
-        SQ5E.usiKey must_== "5e"
-        SQ5G.usiKey must_== "5g"
-        SQ5C.usiKey must_== "5c"
-        SQ6E.usiKey must_== "6e"
-        SQ4E.usiKey must_== "4e"
+        SQ9I.key must_== "9i"
+        SQ9A.key must_== "9a"
+        SQ1A.key must_== "1a"
+        SQ1I.key must_== "1i"
+        SQ5E.key must_== "5e"
+        SQ5G.key must_== "5g"
+        SQ5C.key must_== "5c"
+        SQ6E.key must_== "6e"
+        SQ4E.key must_== "4e"
+
+        SQ1A.hexKey must_== "11"
+        SQ10A.hexKey must_== "a1"
+        SQ1L.hexKey must_== "1c"
+
+        SQ1A.kanjiKey must_== "1一"
+        SQ10A.kanjiKey must_== "10一"
+        SQ10L.kanjiKey must_== "10十二"
+
+        SQ1A.kanjiFullWidthKey must_== "１一"
+        SQ10A.kanjiFullWidthKey must_== "１０一"
+        SQ10L.kanjiFullWidthKey must_== "１０十二"
+
       }
     }
 

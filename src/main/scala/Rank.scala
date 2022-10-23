@@ -7,7 +7,12 @@ case class Rank private (val index: Int) extends AnyVal with Ordered[Rank] {
   def offset(delta: Int): Option[Rank] =
     Rank(index + delta)
 
-  override def toString  = (97 + index).toChar.toString
+  def key: String       = (97 + index).toChar.toString
+  def hexKey: String    = (index + 1).toHexString
+  
+  def kanjiKey: String = Rank.kanjiKeys(index % Rank.kanjiKeys.size)
+
+  override def toString  = key
 }
 
 object Rank {
@@ -16,6 +21,9 @@ object Rank {
     else None
 
   @inline def of(pos: Pos): Rank = new Rank(pos.index / Pos.MaxFiles)
+
+  private val kanjiKeys =
+    Vector("一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二")
 
   val A = new Rank(0)
   val B = new Rank(1)
