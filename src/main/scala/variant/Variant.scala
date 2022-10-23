@@ -278,7 +278,8 @@ object Variant {
 
   val all = List(
     Standard,
-    Minishogi
+    Minishogi,
+    Chushogi
   )
 
   val byId = all map { v =>
