@@ -41,7 +41,7 @@ object CsaParserHelper {
           else invalid(s"Incorrect square and piece format in handicap setup: $squarePiece")
         posStr  = squarePiece.slice(0, 2)
         roleStr = squarePiece.slice(2, 4)
-        pos <- Pos.allNumberKeys get posStr toValid s"Incorrect position in handicap setup: $posStr"
+        pos <- Pos.allHexKeys get posStr toValid s"Incorrect position in handicap setup: $posStr"
         _ <-
           if (pieces contains pos) valid(pos)
           else invalid(s"No piece to remove from $posStr in handicap setup")
@@ -126,7 +126,7 @@ object CsaParserHelper {
             else invalid(s"Incorrect square piece format (${str}) in: $line")
           posStr  = str.slice(0, 2)
           roleStr = str.slice(2, 4)
-          pos  <- Pos.allNumberKeys get posStr toValid s"Incorrect position (${posStr}) in: $line"
+          pos  <- Pos.allHexKeys get posStr toValid s"Incorrect position (${posStr}) in: $line"
           role <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
           boardWithPiece <- sit.board
             .place(

@@ -61,10 +61,10 @@ object Csa {
   def renderCsaMove(usiWithRole: Usi.WithRole, turn: Option[Color]) =
     usiWithRole.usi match {
       case Usi.Drop(role, pos) =>
-        s"${turn.fold("")(_.fold("+", "-"))}00${pos.numberKey}${CsaUtils.toCsa(role).getOrElse("")}"
+        s"${turn.fold("")(_.fold("+", "-"))}00${pos.hexKey}${CsaUtils.toCsa(role).getOrElse("")}"
       case Usi.Move(orig, dest, prom) => {
         val finalRole = Standard.promote(usiWithRole.role).filter(_ => prom) | usiWithRole.role
-        s"${turn.fold("")(_.fold("+", "-"))}${orig.numberKey}${dest.numberKey}${CsaUtils.toCsa(finalRole).getOrElse("")}"
+        s"${turn.fold("")(_.fold("+", "-"))}${orig.hexKey}${dest.hexKey}${CsaUtils.toCsa(finalRole).getOrElse("")}"
       }
     }
 
