@@ -20,7 +20,7 @@ object Usi {
   ) extends Usi {
 
     def keys = orig.key + dest.key
-    def usi     = keys + promotionString
+    def usi  = keys + promotionString
 
     def promotionString = if (promotion) "+" else ""
 
@@ -39,7 +39,7 @@ object Usi {
   }
 
   case class Drop(role: DroppableRole, pos: Pos) extends Usi {
-  
+
     def usi = s"${Drop.roleToUsi(role)}*${pos.key}"
 
     def positions = List(pos)
@@ -55,16 +55,16 @@ object Usi {
       } yield Drop(role, pos)
 
     val roleToUsi: Map[DroppableRole, String] = Map(
-        Pawn -> "P",
-        Lance -> "L",
-        Knight -> "N",
-        Silver -> "S",
-        Gold -> "G",
-        Bishop -> "B",
-        Rook -> "R"
-      )
+      Pawn   -> "P",
+      Lance  -> "L",
+      Knight -> "N",
+      Silver -> "S",
+      Gold   -> "G",
+      Bishop -> "B",
+      Rook   -> "R"
+    )
     val usiToRole: Map[String, DroppableRole] = roleToUsi map { case (k, v) => v -> k }
-    
+
   }
 
   case class WithRole(usi: Usi, role: Role)

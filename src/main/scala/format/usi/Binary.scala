@@ -15,13 +15,13 @@ object Binary {
 
   private object Encoding {
     val roleToInt: Map[DroppableRole, Int] = Map(
-      Pawn           -> 1,
-      Lance          -> 2,
-      Knight         -> 3,
-      Silver         -> 4,
-      Gold           -> 5,
-      Bishop         -> 6,
-      Rook           -> 7
+      Pawn   -> 1,
+      Lance  -> 2,
+      Knight -> 3,
+      Silver -> 4,
+      Gold   -> 5,
+      Bishop -> 6,
+      Rook   -> 7
     )
     val intToRole: Map[Int, DroppableRole] = roleToInt map { case (k, v) => v -> k }
   }

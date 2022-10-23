@@ -168,7 +168,9 @@ abstract class Variant private[variant] (
       )
       unpromotedCapture = sit.board(usi.dest).map(p => p.updateRole(unpromote) | p)
       hands =
-        unpromotedCapture.filter(_ => addCapturedPiecesToHand).flatMap(c => handRoles.find(_==c.role))
+        unpromotedCapture
+          .filter(_ => addCapturedPiecesToHand)
+          .flatMap(c => handRoles.find(_ == c.role))
           .fold(sit.hands)(sit.hands.store(sit.color, _))
       board <-
         (if (usi.promotion)

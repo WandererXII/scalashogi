@@ -100,7 +100,7 @@ object Sfen {
 
   private[forsyth] def handToString(hand: Hand, variant: Variant): String =
     variant.handRoles map { r =>
-      val cnt = hand(r)
+      val cnt     = hand(r)
       val forsyth = SfenUtils.toForsyth(r, variant).getOrElse("")
       if (cnt == 1) forsyth
       else if (cnt > 1) cnt.toString + forsyth
@@ -162,7 +162,7 @@ object Sfen {
           handsRec(hands, rest, curCount.map(_ * 10 + d.asDigit) orElse d.asDigit.some)
         case p :: rest =>
           SfenUtils.toPiece(p.toString, variant).flatMap { p =>
-            variant.handRoles.find(_==p.role).map((p.color, _))
+            variant.handRoles.find(_ == p.role).map((p.color, _))
           } match {
             case Some((color, role)) =>
               handsRec(hands.store(color, role, curCount.fold(1)(math.min(_, 81))), rest, None)

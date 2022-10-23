@@ -116,7 +116,7 @@ object CsaParserHelper {
               else invalid(s"Incorrect format (${str}) in: $line")
             roleStr = str.slice(2, 4)
             roleBase <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
-            role <- Standard.handRoles.find(_==roleBase) toValid s"Can't have $roleBase in hand: $line"
+            role     <- Standard.handRoles.find(_ == roleBase) toValid s"Can't have $roleBase in hand: $line"
           } yield (sit.withHands(sit.hands.store(color, role)))
       }
       def parseBoardAddition(str: String, color: Color, sit: Situation): Validated[String, Situation] = {

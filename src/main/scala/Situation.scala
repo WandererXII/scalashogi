@@ -51,10 +51,12 @@ case class Situation(
 
   // Drops
 
-  lazy val dropActors: Map[Piece, DropActor] = hands.rolesOf.reduce[List[(Piece,DropActor)]]{ (sente, gote) =>
-    sente.map(role => (Piece(Sente, role), DropActor(Sente, role, this))) :::
-     gote.map(role => (Piece(Gote, role), DropActor(Gote, role, this)))
-  }.toMap
+  lazy val dropActors: Map[Piece, DropActor] = hands.rolesOf
+    .reduce[List[(Piece, DropActor)]] { (sente, gote) =>
+      sente.map(role => (Piece(Sente, role), DropActor(Sente, role, this))) :::
+        gote.map(role => (Piece(Gote, role), DropActor(Gote, role, this)))
+    }
+    .toMap
 
   lazy val dropActorsOf: Color.Map[List[DropActor]] = {
     val (s, g) = dropActors.values.toList.partition { _.color.sente }
