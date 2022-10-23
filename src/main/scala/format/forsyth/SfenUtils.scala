@@ -39,24 +39,23 @@ object SfenUtils {
   }
 
   private val toForsythStandard: Map[Role, String] = Map(
-      King           -> "k",
-      Pawn           -> "p",
-      Lance          -> "l",
-      Knight         -> "n",
-      Silver         -> "s",
-      Gold           -> "g",
-      Bishop         -> "b",
-      Rook           -> "r",
-      Tokin          -> "+p",
-      PromotedLance  -> "+l",
-      PromotedKnight -> "+n",
-      PromotedSilver -> "+s",
-      Horse          -> "+b",
-      Dragon         -> "+r"
+    King           -> "k",
+    Pawn           -> "p",
+    Lance          -> "l",
+    Knight         -> "n",
+    Silver         -> "s",
+    Gold           -> "g",
+    Bishop         -> "b",
+    Rook           -> "r",
+    Tokin          -> "+p",
+    PromotedLance  -> "+l",
+    PromotedKnight -> "+n",
+    PromotedSilver -> "+s",
+    Horse          -> "+b",
+    Dragon         -> "+r"
   )
 
   private val toRoleStandard: Map[String, Role] = toForsythStandard map { case (k, v) => v -> k }
-
 
   private val toForsythMinishogi: Map[Role, String] =
     toForsythStandard filter { case (k, _) => Minishogi.allRoles contains k }
@@ -64,43 +63,54 @@ object SfenUtils {
   private val toRoleMinishogi: Map[String, Role] =
     toForsythMinishogi map { case (k, v) => v -> k }
 
-
   private val toForsythChushogi: Map[Role, String] =
     (toForsythStandard filter { case (k, _) => Chushogi.allRoles contains k }) ++ Map(
-      WhiteHorse -> "+l",
-      Leopard -> "f",
-      BishopPromoted -> "+f",
-      Copper -> "c",
-      SideMoverPromoted -> "+c",
+      WhiteHorse            -> "+l",
+      Leopard               -> "f",
+      BishopPromoted        -> "+f",
+      Copper                -> "c",
+      SideMoverPromoted     -> "+c",
       VerticalMoverPromoted -> "+s",
-      RookPromoted -> "+g",
-      Elephant -> "e",
-      Prince -> "+e",
-      Chariot -> "a",
-      Whale -> "+a",
-      HorsePromoted -> "+b",
-      Tiger -> "t",
-      Stag -> "+t",
-      Kirin -> "o",
-      LionPromoted -> "+o",
-      Phoenix -> "x",
-      QueenPromoted -> "+x",
-      SideMover -> "m",
-      Boar -> "+m",
-      VerticalMover -> "v",
-      Ox -> "+v",
-      DragonPromoted -> "+r",
-      Horse -> "h",
-      Falcon -> "+h",
-      Dragon -> "d",
-      Eagle -> "+d",
-      Lion -> "n",
-      Queen -> "q",
-      PromotedPawn -> "+p",
-      GoBetween -> "i",
-      ElephantPromoted -> "+i",
+      RookPromoted          -> "+g",
+      Elephant              -> "e",
+      Prince                -> "+e",
+      Chariot               -> "a",
+      Whale                 -> "+a",
+      HorsePromoted         -> "+b",
+      Tiger                 -> "t",
+      Stag                  -> "+t",
+      Kirin                 -> "o",
+      LionPromoted          -> "+o",
+      Phoenix               -> "x",
+      QueenPromoted         -> "+x",
+      SideMover             -> "m",
+      Boar                  -> "+m",
+      VerticalMover         -> "v",
+      Ox                    -> "+v",
+      DragonPromoted        -> "+r",
+      Horse                 -> "h",
+      Falcon                -> "+h",
+      Dragon                -> "d",
+      Eagle                 -> "+d",
+      Lion                  -> "n",
+      Queen                 -> "q",
+      PromotedPawn          -> "+p",
+      GoBetween             -> "i",
+      ElephantPromoted      -> "+i"
     )
 
   private val toRoleChushogi: Map[String, Role] = toForsythChushogi map { case (k, v) => v -> k }
+
+  val allForsyth: List[String] = (Role.all flatMap { r: Role =>
+    Variant.all flatMap { v =>
+      toForsyth(r, v)
+    }
+  }).distinct
+
+  val allForsythDroppable: List[String] = (Role.allDroppable flatMap { r: Role =>
+    Variant.all.filter(_.supportsDrops) flatMap { v =>
+      toForsyth(r, v)
+    }
+  }).distinct
 
 }
