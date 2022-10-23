@@ -17,25 +17,25 @@ object UsiCharPair {
   def apply(usi: Usi, variant: Variant): UsiCharPair =
     usi match {
       case Usi.Move(orig, dest, false) =>
-        UsiCharPair(posToChar(variant, orig), posToChar(variant, dest))
+        UsiCharPair(posToChar(orig, variant), posToChar(dest, variant))
       // If we are moving from orig to dest, we know it's not possible to move from dest to orig
       // Therefore that combination can be used for promotions
       case Usi.Move(orig, dest, true) =>
-        UsiCharPair(posToChar(variant, dest), posToChar(variant, orig))
+        UsiCharPair(posToChar(dest, variant), posToChar(orig, variant))
       case Usi.Drop(role, pos) =>
         UsiCharPair(
-          posToChar(variant, pos),
-          roleToChar(variant, role)
+          posToChar(pos, variant),
+          roleToChar(role, variant)
         )
     }
 
   val charOffset = 35        // Start at Char(35) == '#'
   val voidChar   = 33.toChar // '!'
 
-  def posToChar(variant: Variant, pos: Pos): Char =
+  def posToChar(pos: Pos, variant: Variant): Char =
     (charOffset + pos.rank.index * variant.numberOfFiles + pos.file.index).toChar
 
-  def roleToChar(variant: Variant, role: DroppableRole): Char =
+  def roleToChar(role: DroppableRole, variant: Variant): Char =
     variant.handRoles.zipWithIndex
       .find(_._1 == role)
       .map { case (_, i) => (charOffset + variant.allPositions.size + i).toChar }
