@@ -279,7 +279,7 @@ object Clock {
     else if (hasIncrement) baseString
     else s"${baseString}|0"
 
-    override def toString = s"${limitSeconds}.${incrementSeconds}.${byoyomiSeconds}.${periodsTotal}"
+    override def toString = s"${limitSeconds}.${incrementSeconds}.${byoyomiSeconds}.${periods}"
   }
 
   def parseJPTime(str: String): Option[Int] = {

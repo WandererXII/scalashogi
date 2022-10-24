@@ -2,8 +2,8 @@ package shogi
 
 import scala.concurrent.duration._
 
+import alleycats.Zero
 import cats.Monoid
-import ornicar.scalalib.Zero
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
 final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
@@ -38,7 +38,7 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 }
 
 object Centis {
-  implicit final val zeroInstance = Zero.instance(Centis(0))
+  implicit final val zeroInstance = Zero(Centis(0))
   implicit val CentisMonoid = new Monoid[Centis] {
     def combine(c1: Centis, c2: Centis) = c1 + c2
     final val empty                     = Centis(0)
