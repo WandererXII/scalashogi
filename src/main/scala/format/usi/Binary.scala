@@ -5,8 +5,6 @@ import shogi.variant.Variant
 
 object Binary {
 
-  def decodeMoves(bs: Seq[Byte], variant: Variant): Vector[Usi] =
-    Reader.decode(bs, variant)
   def decodeMoves(bs: Seq[Byte], variant: Variant, nb: Int): Vector[Usi] =
     Reader.decode(bs, variant, nb)
 
@@ -34,10 +32,6 @@ object Binary {
   }
 
   private object Reader {
-    private val maxPlies = 600
-
-    def decode(bs: Seq[Byte], variant: Variant): Vector[Usi] =
-      decode(bs, variant, maxPlies * 2)
     def decode(bs: Seq[Byte], variant: Variant, nb: Int): Vector[Usi] =
       decodeMovesAndDrops(bs take (nb * 2) map toInt, variant)
 
