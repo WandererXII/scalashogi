@@ -12,7 +12,8 @@ object KifParserHelper {
 
   def parseSituation(
       str: String,
-      handicap: Option[String]
+      handicap: Option[String],
+      moves: List[String]
   ): Validated[String, Situation] = {
     val lines = augmentString(str).linesIterator.toList.map(_.trim.replace("：", ":").replace("　", " "))
     val ranks = lines.view
@@ -25,11 +26,11 @@ object KifParserHelper {
       )
       .toList
 
-    val variant = detectVariant(ranks, handicap) | Standard
+    val variant = detectVariant(ranks, handicap, moves) | Standard
 
     if (ranks.isEmpty)
       handicap
-        .filterNot(h => KifUtils.defaultHandicaps.exists(_._2 contains h))
+        .filterNot(h => KifUtils.defaultHandicaps.exists(_._2.exists(_ == h)))
         .fold(valid(Situation(variant)): Validated[String, Situation])(parseHandicap(_, variant))
     else if (ranks.size == variant.numberOfRanks)
       for {
@@ -46,11 +47,23 @@ object KifParserHelper {
       )
   }
 
-  private def detectVariant(ranks: List[String], handicap: Option[String]): Option[Variant] = {
+  // We need to somehow figure out if it's chushogi
+  // looking for something like this - `△6五龍馬 （←4三）`
+  // but not strictly - focus on the two kanji representation
+  private val chushogiFullKanjiRoles = KifUtils.toKifChushogi map { case (_, v) => v.head } mkString "|"
+  private val chushogiKifMoveRegex =
+    raw"""^(${KifParser.colorsS})?(${KifParser.positionS})(${chushogiFullKanjiRoles})\s*(${KifParser.parsS})?←?(${KifParser.positionS})(${KifParser.parsS})?""".r.unanchored
+  private def detectVariant(
+      ranks: List[String],
+      handicap: Option[String],
+      moves: List[String]
+  ): Option[Variant] = {
     if (
       ranks.size == 5 ||
-      handicap.exists(h => KifUtils.defaultHandicaps.get(Minishogi).fold(false)(_ contains h))
+      handicap.exists(h => KifUtils.defaultHandicaps.get(Minishogi).fold(false)(_.exists(_ == h)))
     ) Minishogi.some
+    else if (ranks.size == 12 || moves.exists(m => chushogiKifMoveRegex.matches(m)))
+      Chushogi.some
     else None
   }
 
@@ -71,8 +84,15 @@ object KifParserHelper {
           (for {
             pos <- Pos.at(x, y) toValid s"Too many files in board setup on rank $y"
             pieceStr = pieceSoFar + p
-            piece <- KifUtils.toPiece(pieceStr, variant) toValid s"Unknown piece in board setup: $pieceStr"
-            _     <- Validated.cond(variant.allRoles contains piece.role, (), s"${piece.role} is not valid in $variant variant")
+            piece <- KifUtils.toPieceBoard(
+              pieceStr,
+              variant
+            ) toValid s"Unknown piece in board setup: $pieceStr"
+            _ <- Validated.cond(
+              variant.allRoles contains piece.role,
+              (),
+              s"${piece.role} is not valid in $variant variant"
+            )
           } yield (pos -> piece :: pieces)) match {
             case cats.data.Validated.Valid(ps) => makePiecesList(ps, rest, "", x - 1, y)
             case e                             => e
@@ -97,8 +117,12 @@ object KifParserHelper {
         for {
           roleStr <- str.headOption toValid "Cannot parse hand"
           num = KifUtils kanjiToInt str.tail
-          roleBase <- KifUtils.anyToRole(roleStr.toString, variant) toValid s"Unknown piece in hand: $roleStr"
-          role <- variant.handRoles.find(_==roleBase) toValid s"Cannot place $roleBase in hand in $variant variant"
+          rolesBase <- KifUtils
+            .anyToRole(roleStr.toString, variant)
+            .map(_.toList) toValid s"Unknown piece in hand: $roleStr"
+          role <- variant.handRoles.find(
+            rolesBase contains _
+          ) toValid s"Cannot place ${rolesBase mkString ","} in hand in $variant variant"
         } yield (hand.store(role, num))
       val values = str.split(":").lastOption.getOrElse("").trim
       if (values == "なし" || values == "") valid(Hand.empty)

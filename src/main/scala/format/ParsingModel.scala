@@ -1,6 +1,7 @@
 package shogi
 package format
 
+import cats.data.NonEmptyList
 import cats.data.Validated
 import cats.data.Validated.valid
 
@@ -48,7 +49,8 @@ sealed trait ParsedMove {
 case class KifMove(
     dest: Pos,
     orig: Pos,
-    role: Role, // todo  roles?
+    roles: NonEmptyList[Role], // in chushogi some kanji map to many roles
+    midStep: Option[Pos] = None,
     promotion: Boolean = false,
     metas: Metas = Metas.empty
 ) extends ParsedMove {

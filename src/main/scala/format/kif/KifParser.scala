@@ -8,34 +8,46 @@ import cats.data.Validated.{ invalid, valid, Invalid, Valid }
 import cats.implicits._
 
 import shogi.variant._
+import shogi.format.forsyth.SfenUtils
 
 // We are keeping the original interface of the parser
 // Instead of being strict with what is a valid kif
 // we are gonna try to be rather benevolent.
 // Both half-width and full-width numbers are accepted (not in clock times)
-// All reasonable position formats (1一, 1a, 11) will be accepted
-// Pieces can either be kanji(1 or 2) or english letters (sfen)
+// All reasonable position formats (1一, 1a, 11) will be accepted, but not positions like (111) for chushogi
+// Pieces can either be kanji or english letters (sfen)
 
 // https://gist.github.com/Marken-Foo/7694548af1f562ecd01fba6b60a9c96a
 object KifParser {
 
   // Helper strings for regex, so we don't have to repeat ourselves that much
-  val colorsS        = """▲|△|☗|☖"""
-  val numbersS       = """[1-9１-９一二三四五六七八九十百][0-9０-９一二三四五六七八九十百]*"""
-  val positionS      = """[1-9１-９一二三四五六七八九][1-9a-i１-９一二三四五六七八九]|同"""
-  val piecesJPS      = """玉|王|飛|龍|角|馬|金|銀|成銀|桂|成桂|香|成香|歩|と|竜|全|圭|今|杏|仝|个|兵"""
-  val handPiecesJPS  = """飛|角|金|銀|桂|香|歩|兵"""
-  val piecesENGS     = """K|R|\+R|B|\+B|G|S|\+G|N|\+N|L|\+L|P|\+P"""
-  val handPiecesENGS = """R|B|G|S|N|L|P"""
-  val promotionS     = """不成|成|\+"""
-  val dropS          = """打"""
-  val parsS          = """\(|（|\)|）"""
+  val colorsS  = """▲|△|☗|☖"""
+  val numbersS = """[1-9１-９一二三四五六七八九十百][0-9０-９一二三四五六七八九十百]*"""
+  val filesS = s"""${(Pos.MaxFiles to 1 by -1)
+    .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}")
+    .toList
+    .mkString("|")}"""
+  val ranksS = s"""${(Pos.MaxRanks to 1 by -1)
+    .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}|${('a' + i - 1).toChar}")
+    .toList
+    .mkString("|")}"""
+  val positionS     = s"""(?:(?:(?:${filesS})(?:${ranksS}))|同|仝)"""
+  val piecesJPS     = s"""${KifUtils.allKif mkString "|"}"""
+  val handPiecesJPS = s"""${KifUtils.allKifDroppable mkString "|"}"""
+  val piecesENGS    = s"""${SfenUtils.allForsyth.mkString("|").toUpperCase.replace("+", """\+""")}"""
+  val handPiecesENGS =
+    s"""${SfenUtils.allForsythDroppable.mkString("|").toUpperCase.replace("+", """\+""")}"""
+  val promotionS = """不成|成|\+"""
+  val dropS      = """打"""
+  val parsS      = """\(|（|\)|）"""
+  val lionMoveS  = """(?:一歩目|二歩目)\s?"""
+  val iguiS      = raw"""(?:まで|(?:${parsS})居食い(?:${parsS}))\s?"""
 
   val moveOrDropRegex =
-    raw"""(${colorsS})?(${positionS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?(${parsS})?(${positionS})(${parsS})?)|(${dropS}))""".r
+    raw"""(${colorsS})?(${positionS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(${iguiS})?(${parsS})?←?(${positionS})(${parsS})?)|(${dropS}))""".r
 
   val moveOrDropLineRegex =
-    raw"""(${numbersS}[\s\.。]{1,})?(${colorsS})?(${positionS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?(${parsS})?${positionS}(${parsS})?)|${dropS})""".r.unanchored
+    raw"""(${numbersS}[\s\.。(?:手目)]{1,})?(${lionMoveS})?(${colorsS})?(${positionS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(?:${iguiS})?(${parsS})?←?${positionS}(${parsS})?)|${dropS})""".r.unanchored
 
   val commentRegex =
     raw"""\*|＊""".r
@@ -44,6 +56,7 @@ object KifParser {
       turnNumber: Option[Int],
       move: String,
       comments: List[String],
+      secondLionMove: Boolean, // only for chushogi
       timeSpent: Option[Centis] = None,
       timeTotal: Option[Centis] = None
   )
@@ -75,7 +88,7 @@ object KifParser {
         init             <- getComments(headerStr)
         parsedVariations <- VariationParser(variationStr)
         variations = createVariations(parsedVariations)
-        situation <- KifParserHelper.parseSituation(boardStr, preTags(_.Handicap))
+        situation <- KifParserHelper.parseSituation(boardStr, preTags(_.Handicap), strMoves.map(_.move))
         tags = createTags(preTags, situation, strMoves.size, terminationOption)
         parsedMoves <- objMoves(strMoves, situation.variant, variations)
         _ <-
@@ -110,8 +123,15 @@ object KifParser {
         case Nil => valid(parsedMoves.reverse)
         case move :: rest =>
           move match {
-            case StrMove(moveNumber, moveStr, comments, timeSpent, timeTotal) => {
-              MoveParser(moveStr, lastDest, variant) map { m =>
+            case StrMove(moveNumber, moveStr, comments, secondLionMove, timeSpent, timeTotal) => {
+              MoveDropParser(
+                moveStr,
+                lastDest,
+                if (variant == Chushogi && secondLionMove)
+                  parsedMoves.headOption.flatMap(_.positions.headOption)
+                else None,
+                variant
+              ) map { m =>
                 val m1 = m withComments comments withVariations {
                   variations
                     .withFilter(_.variationStart == moveNumber.getOrElse(ply))
@@ -122,7 +142,13 @@ object KifParser {
                 }
                 if (uselessTimes) m1 else m1 withTimeSpent timeSpent withTimeTotal timeTotal
               } match {
-                case Valid(move)  => mk(move :: parsedMoves, rest, move.positions.lastOption, ply + 1)
+                case Valid(move) => {
+                  val newMoves =
+                    if (variant == Chushogi && secondLionMove && parsedMoves.nonEmpty)
+                      move :: parsedMoves.tail
+                    else move :: parsedMoves
+                  mk(newMoves, rest, move.positions.lastOption, ply + 1)
+                }
                 case Invalid(err) => invalid(err)
               }
             }
@@ -219,14 +245,14 @@ object KifParser {
     def move: Parser[StrMove] =
       as("move") {
         (commentary *) ~>
-          (opt(number) ~ moveOrDropRegex ~ opt(clock) ~ rep(commentary)) <~
-          (moveExtras *) ^^ { case num ~ moveStr ~ _ ~ comments =>
-            StrMove(num, moveStr, cleanComments(comments))
+          (opt(number) ~ opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(commentary)) <~
+          (moveExtras *) ^^ { case num ~ lionMove ~ moveStr ~ _ ~ comments =>
+            StrMove(num, moveStr, cleanComments(comments), lionMove.exists(_.contains("二歩目")))
           }
       }
 
-    def number: Parser[Int] = raw"""${numbersS}[\s\.。]{1,}""".r ^^ { case n =>
-      KifUtils.kanjiToInt(n.filterNot(c => (c == '.' || c == '。')).trim)
+    def number: Parser[Int] = raw"""${numbersS}[\s\.。(?:手目)]{1,}""".r ^^ { case n =>
+      KifUtils.kanjiToInt(n.filterNot(c => List('.', '。', '手', '目').contains(c)).trim)
     }
 
     def clock: Parser[String] =
@@ -281,14 +307,21 @@ object KifParser {
     def strMove: Parser[StrMove] =
       as("move") {
         (commentary *) ~>
-          (opt(number) ~ moveOrDropRegex ~ opt(clock) ~ rep(commentary)) <~
-          (moveExtras *) ^^ { case num ~ moveStr ~ clk ~ comments =>
-            StrMove(num, moveStr, cleanComments(comments), clk.flatMap(_._1), clk.flatMap(_._2))
+          (opt(number) ~ opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(commentary)) <~
+          (moveExtras *) ^^ { case num ~ lionMove ~ moveStr ~ clk ~ comments =>
+            StrMove(
+              num,
+              moveStr,
+              cleanComments(comments),
+              lionMove.exists(_.contains("二歩目")),
+              clk.flatMap(_._1),
+              clk.flatMap(_._2)
+            )
           }
       }
 
-    def number: Parser[Int] = raw"""${numbersS}[\s\.。]{1,}""".r ^^ { case n =>
-      KifUtils.kanjiToInt(n.filterNot(c => (c == '.' || c == '。')).trim)
+    def number: Parser[Int] = raw"""${numbersS}[\s\.。(?:手目)]{1,}""".r ^^ { case n =>
+      KifUtils.kanjiToInt(n.filterNot(c => List('.', '。', '手', '目').contains(c)).trim)
     }
 
     private val clockMinuteSecondRegex     = """(\d++):(\d+(?:\.\d+)?)""".r
@@ -348,29 +381,38 @@ object KifParser {
     val termValue: Parser[String] = "中断" | "投了" | "持将棋" | "千日手" | "詰み" | "切れ負け" | "反則勝ち" | "入玉勝ち" | "Time-up"
   }
 
-  object MoveParser extends RegexParsers with Logging {
+  object MoveDropParser extends RegexParsers with Logging {
 
     val MoveRegex =
-      raw"""(?:${colorsS})?(${positionS})\s?(${piecesJPS}|${piecesENGS})(${promotionS})?(?:(?:${parsS})?(${positionS})(?:${parsS})?)?""".r
+      raw"""(?:${colorsS})?(${positionS})\s?(${piecesJPS}|${piecesENGS})(${promotionS})?\s?(?:${iguiS})?(?:(?:${parsS})?←?(${positionS})(?:${parsS})?)?""".r
     val DropRegex = raw"""(?:${colorsS})?(${positionS})\s?(${handPiecesJPS}|${handPiecesENGS})${dropS}""".r
 
     override def skipWhitespace = false
 
-    def apply(str: String, lastDest: Option[Pos], variant: Variant): Validated[String, ParsedMove] = {
-      str.map(KifUtils toDigit _) match {
+    def apply(
+        str: String,
+        lastDest: Option[Pos],
+        firstLionOrig: Option[Pos], // for chushogi lion moves
+        variant: Variant
+    ): Validated[String, ParsedMove] = {
+      str match {
         case MoveRegex(destS, roleS, promS, origS) =>
           for {
-            role <- KifUtils.anyToRole(roleS, variant) toValid s"Unknown role in move: $str"
-            _ <-
-              if (variant.allRoles contains role) valid(role)
-              else invalid(s"$role not supported in $variant variant")
-            destOpt = if (destS == "同") lastDest else (Pos.allNumberKeys get destS)
+            roles <- KifUtils.anyToRole(
+              roleS,
+              variant
+            ) toValid s"Unknown role in move: $str (variant - $variant)"
+            destOpt =
+              if (destS == "同" || destS == "仝") lastDest
+              else
+                (Pos.fromKey(destS) orElse Pos.allHexKeys.get(augmentString(destS).map(KifUtils.toDigit _)))
             dest <- destOpt toValid s"Cannot parse destination square in move: $str"
-            orig <- Pos.allNumberKeys get origS toValid s"Cannot parse origin square in move: $str"
+            orig <- Pos.fromKey(origS) toValid s"Cannot parse origin square in move: $str"
           } yield KifMove(
             dest = dest,
-            role = role,
-            orig = orig,
+            roles = roles,
+            orig = firstLionOrig getOrElse orig,
+            midStep = if (firstLionOrig.isDefined) Some(orig) else None,
             promotion = if (promS == "成" || promS == "+") true else false,
             metas = Metas(
               comments = Nil,
@@ -382,9 +424,15 @@ object KifParser {
           )
         case DropRegex(posS, roleS) =>
           for {
-            roleBase <- KifUtils.anyToRole(roleS, variant) toValid s"Unknown role in drop: $str"
-            role <- variant.handRoles.find(_==roleBase) toValid s"$roleBase can't be dropped in $variant variant"
-            pos <- Pos.allNumberKeys get posS toValid s"Cannot parse destination square in drop: $str"
+            rolesBase <- KifUtils
+              .anyToRole(roleS, variant)
+              .map(_.toList) toValid s"Unknown role in drop: $str"
+            role <- variant.handRoles.find(
+              rolesBase contains _
+            ) toValid s"${rolesBase mkString ","} can't be dropped in $variant variant"
+            pos <- Pos.fromKey(posS) orElse Pos.allHexKeys.get(
+              augmentString(posS).map(KifUtils.toDigit _)
+            ) toValid s"Cannot parse destination square in drop: $str"
           } yield Drop(
             role = role,
             pos = pos,

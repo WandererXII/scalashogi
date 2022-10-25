@@ -8,7 +8,7 @@ import KifParserHelper._
 class KifParserHelperTest extends ShogiTest {
 
   def parseAndCompare(source: String, handicap: Option[String], resSfen: Sfen) =
-    parseSituation(source, handicap) must beValid.like { case s =>
+    parseSituation(source, handicap, Nil) must beValid.like { case s =>
       s.toSfen.truncate must_== resSfen
     }
 
