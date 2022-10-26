@@ -11,6 +11,8 @@ class ReplayTest extends ShogiTest {
         val r = Replay.gamesWhileValid(u, None, shogi.variant.Standard)
         r._1.tail.size must_== u.size
         r._2 must beEmpty
+        val r2 = Replay.usiWithRoleWhilePossible(u, None, shogi.variant.Standard)
+        r2.size must_== u.size
       }
     }
   }

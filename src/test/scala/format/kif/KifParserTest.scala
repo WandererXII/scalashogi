@@ -31,7 +31,7 @@ class KifParserTest extends ShogiTest {
   }
 
   "chushogi move" in {
-    parseChushogiMove("2八龍馬 (4十)") must beValid.like { case a: KifMove =>
+    parseChushogiMove("2八龍馬 (←4十)") must beValid.like { case a: KifMove =>
       a.dest === Pos.SQ2H
       a.orig === Pos.SQ4J
       a.roles.head === Horse
@@ -41,7 +41,7 @@ class KifParserTest extends ShogiTest {
   }
 
   "chushogi second lion move" in {
-    parseChushogiMove("2八龍馬 (4十)", None, Some(Pos.SQ5E)) must beValid.like { case a: KifMove =>
+    parseChushogiMove("2八龍馬 (←4十)", None, Some(Pos.SQ5E)) must beValid.like { case a: KifMove =>
       a.orig === Pos.SQ5E
       a.midStep === Some(Pos.SQ4J)
       a.dest === Pos.SQ2H
