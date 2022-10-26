@@ -197,7 +197,7 @@ object KifUtils {
   private val toRoleChushogi: Map[String, NonEmptyList[Role]] =
     toKifChushogi flatMap { case (r, kifs) =>
       kifs.toList map { k =>
-        (k, toRoleChushogiAlt(k).getOrElse(NonEmptyList.of(r)))
+        (k, toRoleChushogiAlt(k) | NonEmptyList.of(r))
       }
     } toMap
 

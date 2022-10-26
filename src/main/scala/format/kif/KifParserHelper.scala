@@ -124,7 +124,7 @@ object KifParserHelper {
             rolesBase contains _
           ) toValid s"Cannot place ${rolesBase mkString ","} in hand in $variant variant"
         } yield (hand.store(role, num))
-      val values = str.split(":").lastOption.getOrElse("").trim
+      val values = (str.split(":").lastOption | "").trim
       if (values == "なし" || values == "") valid(Hand.empty)
       else
         values.split(" ").foldLeft[Validated[String, Hand]](valid(Hand.empty)) { case (acc, cur) =>

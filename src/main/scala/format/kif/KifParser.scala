@@ -72,7 +72,7 @@ object KifParser {
       val preprocessed = augmentString(cleanKif(kif)).linesIterator
         .collect {
           case l if !commentRegex.matches(l.trim.take(1)) =>
-            l.split("#|&").headOption.getOrElse("").trim
+            (l.split("#|&").headOption | "").trim
           case l => l.trim
         } // remove # or & comments, but keep them in * comments
         .filterNot(l => l.isEmpty || l.startsWith("まで") || commentRegex.matches(l))
@@ -134,7 +134,7 @@ object KifParser {
               ) map { m =>
                 val m1 = m withComments comments withVariations {
                   variations
-                    .withFilter(_.variationStart == moveNumber.getOrElse(ply))
+                    .withFilter(_.variationStart == (moveNumber | ply))
                     .map { v =>
                       objMoves(v.moves, variant, v.variations, lastDest, ply + 1) getOrElse ParsedMoves.empty
                     }
@@ -238,7 +238,7 @@ object KifParser {
 
     def header: Parser[Int] =
       """.+""".r ^^ { case num =>
-        (raw"""${numbersS}""".r findFirstIn num).map(KifUtils.kanjiToInt _).getOrElse(0)
+        raw"""${numbersS}""".r.findFirstIn(num).map(KifUtils.kanjiToInt _) | 0
       }
 
     // todo - don't repeat this just use MovesParser
@@ -411,7 +411,7 @@ object KifParser {
           } yield KifMove(
             dest = dest,
             roles = roles,
-            orig = firstLionOrig getOrElse orig,
+            orig = firstLionOrig | orig,
             midStep = if (firstLionOrig.isDefined) Some(orig) else None,
             promotion = if (promS == "成" || promS == "+") true else false,
             metas = Metas(
@@ -466,7 +466,7 @@ object KifParser {
     def tag: Parser[Tag] =
       """.+(:).*""".r ^^ { case line =>
         val s = line.split(":", 2).map(_.trim).toList
-        Tag(normalizeKifName(s.head), s.lift(1).getOrElse(""))
+        Tag(normalizeKifName(s.head), s.lift(1) | "")
       }
   }
   def normalizeKifName(str: String): String =

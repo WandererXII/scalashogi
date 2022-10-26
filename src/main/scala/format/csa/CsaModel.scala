@@ -34,7 +34,7 @@ case class Csa(
       else ""
     val header = Csa renderHeader tags
     val setup =
-      tags.sfen.getOrElse(Standard.initialSfen).toSituation(Standard).fold("")(Csa renderSituation _)
+      (tags.sfen | Standard.initialSfen).toSituation(Standard).fold("")(Csa renderSituation _)
     val startColor: Color = tags.sfen.flatMap(_.color) | Sente
     val movesStr          = renderMainline(moves, startColor)
     List(
@@ -61,10 +61,10 @@ object Csa {
   def renderCsaMove(usiWithRole: Usi.WithRole, turn: Option[Color]) =
     usiWithRole.usi match {
       case Usi.Drop(role, pos) =>
-        s"${turn.fold("")(_.fold("+", "-"))}00${pos.hexKey}${CsaUtils.toCsa(role).getOrElse("")}"
+        s"${turn.fold("")(_.fold("+", "-"))}00${pos.hexKey}${CsaUtils.toCsa(role) | ""}"
       case Usi.Move(orig, dest, prom) => {
         val finalRole = Standard.promote(usiWithRole.role).filter(_ => prom) | usiWithRole.role
-        s"${turn.fold("")(_.fold("+", "-"))}${orig.hexKey}${dest.hexKey}${CsaUtils.toCsa(finalRole).getOrElse("")}"
+        s"${turn.fold("")(_.fold("+", "-"))}${orig.hexKey}${dest.hexKey}${CsaUtils.toCsa(finalRole) | ""}"
       }
     }
 
@@ -119,7 +119,7 @@ object Csa {
       Standard.handRoles
         .map { r =>
           val cnt = hand(r)
-          s"00${CsaUtils.toCsa(r).getOrElse("")}".repeat(math.min(cnt, 81))
+          s"00${CsaUtils.toCsa(r) | ""}".repeat(math.min(cnt, 81))
         }
         .filter(_.nonEmpty)
         .mkString(prefix, "", "")

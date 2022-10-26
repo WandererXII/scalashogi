@@ -101,7 +101,7 @@ object Sfen {
   private[forsyth] def handToString(hand: Hand, variant: Variant): String =
     variant.handRoles map { r =>
       val cnt     = hand(r)
-      val forsyth = SfenUtils.toForsyth(r, variant).getOrElse("")
+      val forsyth = SfenUtils.toForsyth(r, variant) | ""
       if (cnt == 1) forsyth
       else if (cnt > 1) cnt.toString + forsyth
       else ""
@@ -111,7 +111,7 @@ object Sfen {
     List(
       handToString(hands.sente, variant).toUpperCase,
       handToString(hands.gote, variant)
-    ).mkString("").some.filterNot(_.isEmpty).getOrElse("-")
+    ).mkString("").some.filterNot(_.isEmpty) | "-"
 
   private def makePieceMapFromString(boardStr: String, variant: Variant): Option[PieceMap] = {
 

@@ -51,10 +51,10 @@ object Visual {
     }
     for (y <- 0 to (sit.variant.numberOfRanks - 1)) yield {
       for (x <- (sit.variant.numberOfFiles - 1) to 0 by -1) yield {
-        "%2s" format (Pos.at(x, y) flatMap markedPoss.get getOrElse sit
+        "%2s" format (Pos.at(x, y).flatMap(markedPoss.get).map(_.toString) | (sit
           .board(x, y)
           .flatMap(p => SfenUtils.toForsyth(p, sit.variant))
-          .getOrElse("."))
+          | "."))
       }
     } mkString
   } map (_.trim) mkString "\n" pipe { board =>
