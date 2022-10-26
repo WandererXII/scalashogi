@@ -46,7 +46,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
         case (vg, (orig, dest, prom)) =>
           vg.foreach { _.situation.moveDestinations }
           val ng = vg flatMap { g =>
-            g(Usi.Move(orig, dest, prom))
+            g(Usi.Move(orig, dest, prom, None))
           }
           ng
       }
@@ -56,9 +56,10 @@ trait ShogiTest extends Specification with ValidatedMatchers {
     def playMove(
         orig: Pos,
         dest: Pos,
-        promotion: Boolean = false
+        promotion: Boolean = false,
+        midStep: Option[Pos] = None
     ): Validated[String, Game] =
-      game.apply(Usi.Move(orig, dest, promotion))
+      game.apply(Usi.Move(orig, dest, promotion, midStep))
 
     def playDrop(
         role: DroppableRole,

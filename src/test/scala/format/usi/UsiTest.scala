@@ -25,6 +25,13 @@ class UsiTest extends ShogiTest {
       u.usi must_== "G*8b"
     }
     Usi("H*8b") must beNone
+    Usi("9a5e1a") must beSome.like { case u: Usi.Move =>
+      u.orig must_== SQ9A
+      u.dest must_== SQ1A
+      u.midStep must_== Some(SQ5E)
+      u.promotion must beFalse
+      u.usi must_== "9a5e1a"
+    }
   }
 
 }

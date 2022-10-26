@@ -2,13 +2,13 @@ package shogi
 package format
 package usi
 
-class BinaryPerfTest extends ShogiTest {
+class UsiPerfTest extends ShogiTest {
 
-  val usis       = format.usi.Fixtures.prod500standard.map(Usi.readList(_).get)
+  val usis       = format.usi.Fixtures.prod500standard
   val iterations = 15
 
-  def runOne(usis: List[Usi]) =
-    Binary.decodeMoves(Binary.encodeMoves(usis, variant.Standard).toVector, variant.Standard)
+  def runOne(usisStr: String) =
+    Usi.readList(usisStr).get
   def run(): Unit = { usis foreach runOne }
 
   "reading a game" should {

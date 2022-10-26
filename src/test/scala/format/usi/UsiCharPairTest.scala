@@ -15,7 +15,7 @@ class UsiCharPairTest extends ShogiTest {
     val allMoves = for {
       orig <- Standard.allPositions
       dest <- Standard.allPositions
-    } yield Move(orig, dest, false)
+    } yield Move(orig, dest, false, None)
     val allDrops = for {
       role <- variant.Standard.handRoles
       pos  <- Standard.allPositions

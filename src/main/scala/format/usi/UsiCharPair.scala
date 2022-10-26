@@ -16,11 +16,11 @@ object UsiCharPair {
 
   def apply(usi: Usi, variant: Variant): UsiCharPair =
     usi match {
-      case Usi.Move(orig, dest, false) =>
+      case Usi.Move(orig, dest, false, _) =>
         UsiCharPair(posToChar(orig, variant), posToChar(dest, variant))
       // If we are moving from orig to dest, we know it's not possible to move from dest to orig
       // Therefore that combination can be used for promotions
-      case Usi.Move(orig, dest, true) =>
+      case Usi.Move(orig, dest, true, _) =>
         UsiCharPair(posToChar(dest, variant), posToChar(orig, variant))
       case Usi.Drop(role, pos) =>
         UsiCharPair(

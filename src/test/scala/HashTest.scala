@@ -11,7 +11,7 @@ class HashTest extends ShogiTest {
     "be consistent" in {
       val sfen          = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
       val situation     = sfen.toSituation(Standard).get
-      val sitAfter      = situation(Usi.Move(Pos.SQ8H, Pos.SQ2B, false)).toOption.get
+      val sitAfter      = situation(Usi.Move(Pos.SQ8H, Pos.SQ2B, false, None)).toOption.get
       val hashAfterMove = Hash(sitAfter)
 
       val sfenAfter      = Sfen("lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4")

@@ -50,7 +50,8 @@ object Binary {
       Usi.Move(
         pos(right(i1, 7), variant.numberOfFiles),
         pos(right(i2, 7), variant.numberOfFiles),
-        bitAt(i2, 7)
+        bitAt(i2, 7),
+        None
       )
 
     private def decodeDrop(i1: Int, i2: Int, variant: Variant): Usi =
@@ -79,8 +80,8 @@ object Binary {
 
     private def encode(usi: Usi, variant: Variant): Seq[Byte] =
       usi match {
-        case Usi.Move(orig, dest, prom) => encodeMove(orig, dest, prom, variant)
-        case Usi.Drop(role, pos)        => encodeDrop(role, pos, variant)
+        case Usi.Move(orig, dest, prom, _) => encodeMove(orig, dest, prom, variant)
+        case Usi.Drop(role, pos)           => encodeDrop(role, pos, variant)
       }
 
     private def encodeMove(orig: Pos, dest: Pos, prom: Boolean, variant: Variant): Seq[Byte] =

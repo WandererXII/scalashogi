@@ -127,11 +127,12 @@ object Replay {
         case Nil => roles
         case usi :: rest =>
           usi match {
-            case Usi.Move(orig, dest, prom) =>
+            case Usi.Move(orig, dest, prom, midStep) =>
               roleMap.get(orig) match {
                 case Some(role) => {
                   val maybePromoted = variant.promote(role).filter(_ => prom) | role
-                  mk(roleMap - orig + (dest -> maybePromoted), rest, Usi.WithRole(usi, role) :: roles)
+                  val toRemove      = List(Some(orig), midStep).flatten
+                  mk(roleMap -- toRemove + (dest -> maybePromoted), rest, Usi.WithRole(usi, role) :: roles)
                 }
                 case None => roles
               }

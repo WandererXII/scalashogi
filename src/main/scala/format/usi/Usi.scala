@@ -16,25 +16,34 @@ object Usi {
   case class Move(
       orig: Pos,
       dest: Pos,
-      promotion: Boolean = false
+      promotion: Boolean = false,
+      midStep: Option[Pos] = None
   ) extends Usi {
 
-    def keys = orig.key + dest.key
+    def keys = orig.key + midStep.fold("")(_.key) + dest.key
     def usi  = keys + promotionString
 
     def promotionString = if (promotion) "+" else ""
 
-    def positions = List(orig, dest)
+    def positions = midStep.fold(List(orig, dest))(List(orig, _, dest))
 
   }
 
   object Move {
 
-    def apply(move: String): Option[Move] =
-      for {
-        orig <- Pos.fromKey(move take 2)
-        dest <- Pos.fromKey(move.slice(2, 4))
-      } yield Move(orig, dest, move.takeRight(1) == "+")
+    private val MoveRegex = """(\d\d?[a-l])(\d\d?[a-l])?(\d\d?[a-l])(\+|=|\?)?""".r
+
+    def apply(str: String): Option[Move] =
+      str match {
+        case MoveRegex(origS, midStepS, destS, promS) =>
+          for {
+            orig <- Pos.fromKey(origS)
+            dest <- Pos.fromKey(destS)
+            prom = promS == "+"
+            midStep = Option(midStepS).flatMap(Pos.fromKey(_))
+          } yield Move(orig, dest, prom, midStep)
+        case _ => None
+      }
 
   }
 
@@ -48,10 +57,10 @@ object Usi {
 
   object Drop {
 
-    def apply(drop: String): Option[Drop] =
+    def apply(str: String): Option[Drop] =
       for {
-        role <- usiToRole get (drop.takeWhile(_ != '*'))
-        pos  <- Pos.fromKey(drop takeRight 2)
+        role <- usiToRole get str.take(1)
+        pos  <- Pos.fromKey(str.drop(2))
       } yield Drop(role, pos)
 
     val roleToUsi: Map[DroppableRole, String] = Map(

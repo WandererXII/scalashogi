@@ -92,7 +92,7 @@ class BinaryTest extends ShogiTest {
       val allMoves = for {
         orig <- Standard.allPositions
         dest <- Standard.allPositions
-      } yield Usi.Move(orig, dest, true)
+      } yield Usi.Move(orig, dest, true, None)
       forall(allMoves.map(_.keys))(compareStrAndBin)
       forall(allMoves.map(_.usi))(compareStrAndBin)
     }
