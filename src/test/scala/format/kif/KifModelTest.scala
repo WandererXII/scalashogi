@@ -5,8 +5,15 @@ package kif
 import forsyth.Sfen
 import variant._
 import Kif._
+import usi._
 
 class KifModelTest extends ShogiTest {
+  "render moves" in {
+    Kif.renderMove(Usi.WithRole(Usi("7h7g").get, Gold), None, Standard) must_== "７七金(78)"
+    Kif.renderMove(Usi.WithRole(Usi("P*6d").get, Pawn), None, Standard) must_== "６四歩打"
+    Kif.renderMove(Usi.WithRole(Usi("4j2h").get, Horse), None, Chushogi) must_== "2八龍馬 （←4十）"
+  }
+
   "render kif situation - board, hands, turn, from random sfen" in {
     renderSituation(
       Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p").toSituation(Standard).get
@@ -48,6 +55,43 @@ class KifModelTest extends ShogiTest {
 +---------------+
 先手の持駒：なし
 後手番"""
+  }
+
+  "kif render" in {
+    // random bs
+    val moves = List(
+      NotationMove(1, Usi.WithRole(Usi("7h7g").get, Gold)),
+      NotationMove(2, Usi.WithRole(Usi("P*6d").get, Pawn)),
+      NotationMove(3, Usi.WithRole(Usi("4i2h").get, Horse))
+    )
+    Kif(
+      Tags.empty,
+      moves
+    ).render must_== """手合割：平手
+先手：
+後手：
+手数----指手---------消費時間--
+   1   ７七金(78)
+   2   ６四歩打
+   3   ２八馬(49)"""
+  }
+
+  "chushogi kif render" in {
+    // random bs
+    val moves = List(
+      NotationMove(1, Usi.WithRole(Usi("7h7g").get, Gold)),
+      NotationMove(2, Usi.WithRole(Usi("4i2h").get, Pawn)),
+      NotationMove(3, Usi.WithRole(Usi("5i2h1a").get, Horse))
+    )
+    Kif(
+      Tags(
+        List(
+          Tag(_.Variant, "Chushogi")
+        )
+      ),
+      moves
+    ).pp
+    true
   }
 
 }
