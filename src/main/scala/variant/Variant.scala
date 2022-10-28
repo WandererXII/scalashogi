@@ -179,7 +179,9 @@ abstract class Variant private[variant] (
            sit.board.move(
              usi.orig,
              usi.dest
-           )) toValid s"Can't update board with ${usi.usi} in \n${sit.toSfen}"
+           )).map(b =>
+          usi.midStep.fold(b)(b forceTake _)
+        ) toValid s"Can't update board with ${usi.usi} in \n${sit.toSfen}"
     } yield finalizeSituation(sit, board, hands, usi)
 
   def drop(sit: Situation, usi: Usi.Drop): Validated[String, Situation] =
