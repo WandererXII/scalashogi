@@ -216,6 +216,9 @@ case object Chushogi
   def promotionRanks(color: Color) =
     if (color.sente) List(Rank.A, Rank.B, Rank.C, Rank.D) else List(Rank.I, Rank.J, Rank.K, Rank.L)
 
+  override def royalSafetyFilter(a: MoveActor): List[Pos] =
+    a.unsafeDestinations
+
   override def perpetualCheck(sit: Situation): Boolean =
     sit.history.fourfoldRepetition && sit.history.firstRepetitionDistance.exists { dist =>
       (dist + 1) <= sit.history.consecutiveAttacks(!sit.color)
@@ -224,5 +227,7 @@ case object Chushogi
   override def stalemate(sit: Situation): Boolean = !sit.hasMoveDestinations
 
   override def checkmate(sit: Situation): Boolean = false
+
+  //override def specialEnd(sit: Situation): Boolean =
 
 }

@@ -10,7 +10,7 @@ final case class MoveActor(
     situation: Situation
 ) {
 
-  lazy val destinations: List[Pos] = situation.variant.kingSafetyFilter(this)
+  lazy val destinations: List[Pos] = situation.variant.royalSafetyFilter(this)
 
   // Destinations without taking defending the king into account
   def unsafeDestinations: List[Pos] =

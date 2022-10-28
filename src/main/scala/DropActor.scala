@@ -26,9 +26,9 @@ final case class DropActor(
 
 object DropActor {
 
-  def blockades(sit: Situation, kingPos: Pos): List[Pos] = {
+  def blockades(sit: Situation, royalPos: Pos): List[Pos] = {
     def attacker(piece: Piece, from: Pos) =
-      piece.projectionDirs.nonEmpty && piece.eyes(from, kingPos) && piece.color != sit.color
+      piece.projectionDirs.nonEmpty && piece.eyes(from, royalPos) && piece.color != sit.color
     @scala.annotation.tailrec
     def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] =
       dir(p) match {
@@ -38,7 +38,7 @@ object DropActor {
         case Some(next) if sit.board(next).isDefined                 => Nil
         case Some(next)                                              => forward(next, dir, next :: squares)
       }
-    Pos.allDirections flatMap { forward(kingPos, _, Nil) } filter { square =>
+    Pos.allDirections flatMap { forward(royalPos, _, Nil) } filter { square =>
       sit.board.place(Piece(sit.color, Gold), square) exists { defended =>
         !sit.copy(board = defended).check
       }

@@ -85,12 +85,22 @@ case class Situation(
   lazy val checkSente = variant.check(board, Sente)
   lazy val checkGote  = variant.check(board, Gote)
 
-  def checkSquares = variant checkSquares this
+  def checkSquares: List[Pos] = checkSquaresOf(color)
+
+  private def checkSquaresOf(c: Color): List[Pos] = c.fold(checkSquaresSente, checkSquaresGote)
+
+  lazy val checkSquaresSente = variant.checkSquares(board, Sente)
+  lazy val checkSquaresGote  = variant.checkSquares(board, Gote)
 
   // Not taking into account specific drop rules
   lazy val possibleDropDests: List[Pos] =
-    if (check) board.kingPosOf(color).fold[List[Pos]](Nil)(DropActor.blockades(this, _))
-    else variant.allPositions.filterNot(board.pieces contains _)
+    Some(checkSquares)
+      .filter(_.size == 1)
+      .fold(
+        variant.allPositions.filterNot(board.pieces contains _)
+      ) { royals =>
+        DropActor.blockades(this, royals.head)
+      }
 
   // Results
 

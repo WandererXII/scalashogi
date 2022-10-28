@@ -79,13 +79,13 @@ abstract class Variant private[variant] (
 
   // Filters out moves that would put the king in danger
   // Critical function - optimize for performance
-  def kingSafetyFilter(a: MoveActor): List[Pos] = {
+  def royalSafetyFilter(a: MoveActor): List[Pos] = {
     // only long range roles, since you can only unpin a check from a role with projection
     val filter: Piece => Boolean =
       if ((a.piece is King) || a.situation.check) (_ => true) else (_.projectionDirs.nonEmpty)
-    val stableKingPos = if (a.piece is King) None else a.situation.board kingPosOf a.color
+    val stableRoyalPos = if (a.piece is King) None else a.situation.board.singleRoyalPosOf(a.color)
     a.unsafeDestinations filterNot { dest =>
-      (stableKingPos orElse Option.when(a.piece is King)(dest)) exists {
+      (stableRoyalPos orElse Option.when(a.piece is King)(dest)) exists {
         posThreatened(
           a.situation.board.forceMove(a.piece, a.pos, dest),
           !a.color,
@@ -97,12 +97,12 @@ abstract class Variant private[variant] (
   }
 
   def check(board: Board, color: Color): Boolean =
-    board.kingPosOf(color) exists {
+    board.royalPossOf(color) exists {
       posThreatened(board, !color, _)
     }
 
-  def checkSquares(sit: Situation): List[Pos] =
-    if (sit.check) sit.board.kingPosOf(sit.color).toList else Nil
+  def checkSquares(board: Board, color: Color): List[Pos] =
+    board.royalPossOf(color).filter(posThreatened(board, !color, _))
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     dir(p) exists { next =>
@@ -117,7 +117,7 @@ abstract class Variant private[variant] (
         a.situation.board.pieces.exists { case (pos, piece) =>
           a.piece == piece && pos.file == d.file
         } ||
-          a.situation.board.kingPosOf(!a.situation.color).fold(false) { kingPos =>
+          a.situation.board.singleRoyalPosOf(!a.situation.color).fold(false) { kingPos =>
             a.piece.eyes(d, kingPos) && a.situation
               .withBoard(a.situation.board.forcePlace(a.piece, d))
               .switch
