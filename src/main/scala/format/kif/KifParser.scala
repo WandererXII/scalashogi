@@ -413,7 +413,7 @@ object KifParser {
             roles = roles,
             orig = firstLionOrig | orig,
             midStep = if (firstLionOrig.isDefined) Some(orig) else None,
-            promotion = if (promS == "成" || promS == "+") true else false,
+            promotion = promS == "成" || promS == "+",
             metas = Metas(
               comments = Nil,
               glyphs = Glyphs.empty,

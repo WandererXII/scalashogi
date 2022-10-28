@@ -39,7 +39,7 @@ object Usi {
           for {
             orig <- Pos.fromKey(origS)
             dest <- Pos.fromKey(destS)
-            prom = promS == "+"
+            prom    = promS == "+"
             midStep = Option(midStepS).flatMap(Pos.fromKey(_))
           } yield Move(orig, dest, prom, midStep)
         case _ => None
