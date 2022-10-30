@@ -6,7 +6,7 @@ import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
 
-import scala.annotation.nowarn
+//import scala.annotation.nowarn
 
 import format.forsyth.{ Sfen, Visual }
 import format.usi.Usi
@@ -41,10 +41,12 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
     def playMoves(moves: (Pos, Pos, Boolean)*): Validated[String, Game] = playMoveList(moves)
 
-    @nowarn def playMoveList(moves: Seq[(Pos, Pos, Boolean)]): Validated[String, Game] = {
+    def playMoveList(moves: Seq[(Pos, Pos, Boolean)]): Validated[String, Game] = {
       val vg = moves.foldLeft[Validated[String, Game]](Validated.valid(game)) {
         case (vg, (orig, dest, prom)) =>
-          vg.foreach { _.situation.moveDestinations }
+          vg.foreach { g =>
+            val _ = g.situation.moveDestinations
+          }
           val ng = vg flatMap { g =>
             g(Usi.Move(orig, dest, prom, None))
           }

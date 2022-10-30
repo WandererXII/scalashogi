@@ -1,6 +1,6 @@
 package shogi
 
-import scala.annotation.nowarn
+import scala.annotation.unused
 
 sealed trait Role {
   lazy val name: String = toString.toLowerCase
@@ -14,10 +14,8 @@ sealed trait Role {
   val goteDirectDirs: Directions
 
   // For generating second destinations of lion pieces after moving to `to`
-  @nowarn
-  def senteLionDirs(from: Pos, to: Pos): Directions = Nil
-  @nowarn
-  def goteLionDirs(from: Pos, to: Pos): Directions = Nil
+  def senteLionDirs(@unused from: Pos, @unused to: Pos): Directions = Nil
+  def goteLionDirs(@unused from: Pos, @unused to: Pos): Directions  = Nil
 
   // Can move from `from` position to `to` position assuming empty max-sized board, for optimization
   def senteEyes(from: Pos, to: Pos): Boolean
