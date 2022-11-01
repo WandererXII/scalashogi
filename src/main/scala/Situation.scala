@@ -110,19 +110,20 @@ case class Situation(
 
   def perpetualCheck: Boolean = variant perpetualCheck this
 
+  def royalsLost: Boolean = variant royalsLost this
+
+  def bareKing: Boolean = variant bareKing this
+
   def autoDraw: Boolean =
     (history.fourfoldRepetition && !perpetualCheck) ||
-      variant.specialDraw(this) ||
       variant.isInsufficientMaterial(this)
 
   def opponentHasInsufficientMaterial: Boolean = variant opponentHasInsufficientMaterial this
 
-  def variantEnd = variant specialEnd this
-
   def impasse = variant impasse this
 
   def end(withImpasse: Boolean): Boolean =
-    checkmate || stalemate || autoDraw || perpetualCheck || variantEnd || (withImpasse && impasse)
+    checkmate || stalemate || autoDraw || perpetualCheck || (withImpasse && impasse)
 
   def winner: Option[Color] = variant.winner(this)
 
@@ -135,7 +136,8 @@ case class Situation(
 
   lazy val status: Option[Status] =
     if (checkmate) Status.Mate.some
-    else if (variantEnd) Status.VariantEnd.some
+    else if (royalsLost) Status.RoyalsLost.some
+    else if (bareKing) Status.BareKing.some
     else if (stalemate) Status.Stalemate.some
     else if (impasse) Status.Impasse27.some
     else if (perpetualCheck) Status.PerpetualCheck.some
