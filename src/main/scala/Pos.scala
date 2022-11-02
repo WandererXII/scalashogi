@@ -36,9 +36,9 @@ case class Pos private (index: Int) extends AnyVal {
   def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
   def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
   def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] =
-    dir(this) map { p =>
+    (dir(this) map { p =>
       p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
-    } getOrElse Nil
+    }) | Nil
 
   def <->(other: Pos): Seq[Pos] =
     min(file.index, other.file.index) to max(file.index, other.file.index) flatMap { Pos.at(_, rank.index) }

@@ -3,7 +3,7 @@ package variant
 
 import cats.data.Validated
 import cats.syntax.option._
-import scala.annotation.nowarn
+import scala.annotation.unused
 
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
@@ -54,13 +54,11 @@ abstract class Variant private[variant] (
       case _                                                                     => false
     }
 
-  def canPromote(piece: Piece, orig: Pos, dest: Pos): Boolean =
+  def canPromote(piece: Piece, orig: Pos, dest: Pos, @unused capture: Boolean): Boolean =
     promote(piece.role).isDefined &&
       promotionRanks(piece.color).exists(r => r == dest.rank || r == orig.rank)
 
   def supportsDrops = true
-
-  def addCapturedPiecesToHand = true
 
   def isInsideBoard(pos: Pos): Boolean =
     pos.file.index < numberOfFiles && pos.rank.index < numberOfRanks
@@ -79,12 +77,12 @@ abstract class Variant private[variant] (
 
   // Filters out moves that would put the king in danger
   // Critical function - optimize for performance
-  def royalSafetyFilter(a: MoveActor): List[Pos] = {
+  def moveFilter(a: MoveActor): List[Pos] = {
     // only long range roles, since you can only unpin a check from a role with projection
     val filter: Piece => Boolean =
       if ((a.piece is King) || a.situation.check) (_ => true) else (_.projectionDirs.nonEmpty)
     val stableRoyalPos = if (a.piece is King) None else a.situation.board.singleRoyalPosOf(a.color)
-    a.unsafeDestinations filterNot { dest =>
+    a.unfilteredDestinations filterNot { dest =>
       (stableRoyalPos orElse Option.when(a.piece is King)(dest)) exists {
         posThreatened(
           a.situation.board.forceMove(a.piece, a.pos, dest),
@@ -94,6 +92,17 @@ abstract class Variant private[variant] (
         )
       }
     }
+  }
+
+  def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] = {
+    if ((a.piece is Lion) || (a.piece is LionPromoted))
+      a.shortUnfilteredDestinations.filter { d =>
+        d.dist(midStep) == 1 && a.situation.board(d).fold(true) { capture =>
+          (!(capture is Lion) && !(capture is LionPromoted)) ||
+          a.situation.board(midStep).exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween))
+        }
+      }
+    else a.shortUnfilteredDestinations.filter(_.dist(midStep) == 1)
   }
 
   def check(board: Board, color: Color): Boolean =
@@ -111,7 +120,7 @@ abstract class Variant private[variant] (
     }
 
   // For example, can't drop a pawn on a file with another pawn of the same color
-  def dropLegalityFilter(a: DropActor): List[Pos] = {
+  def dropFilter(a: DropActor): List[Pos] = {
     def illegalPawn(d: Pos) =
       (a.piece is Pawn) && (
         a.situation.board.pieces.exists { case (pos, piece) =>
@@ -129,19 +138,29 @@ abstract class Variant private[variant] (
     }
   }
 
+  // Could the position before the move occur ever again
+  def isIrreversible(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean = false
+
+  // for perpetual check
+  def isAttacked(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean =
+    after.check
+
   // Finalizes situation after usi, used both for moves and drops
   protected def finalizeSituation(beforeSit: Situation, board: Board, hands: Hands, usi: Usi): Situation = {
     val newSit = beforeSit.copy(board = board, hands = hands).switch
     val h = beforeSit.history
       .withLastMove(usi)
+      .withLastCapture(usi.positions.lastOption.flatMap(beforeSit.board(_)))
       .withConsecutiveAttacks {
-        if (newSit.check)
+        if (isAttacked(beforeSit, newSit, usi))
           beforeSit.history.consecutiveAttacks.add(!newSit.color)
         else beforeSit.history.consecutiveAttacks.reset(!newSit.color)
       }
       .withPositionHashes {
         val basePositionHashes =
-          if (beforeSit.history.positionHashes.isEmpty) Hash(beforeSit) else beforeSit.history.positionHashes
+          if (isIrreversible(beforeSit, newSit, usi)) Array.empty: PositionHash
+          else if (beforeSit.history.positionHashes.isEmpty) Hash(beforeSit)
+          else beforeSit.history.positionHashes
         Hash(newSit) ++ basePositionHashes
       }
     newSit.withHistory(h)
@@ -151,8 +170,9 @@ abstract class Variant private[variant] (
     for {
       actor <- sit.moveActorAt(usi.orig) toValid s"No piece on ${usi.orig}"
       _     <- Validated.cond(actor is sit.color, (), s"Not my piece on ${usi.orig}")
+      capture = sit.board(usi.dest)
       _ <- Validated.cond(
-        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest),
+        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined),
         (),
         s"${actor.piece} cannot promote"
       )
@@ -162,14 +182,16 @@ abstract class Variant private[variant] (
         s"${actor.piece} needs to promote"
       )
       _ <- Validated.cond(
-        actor.destinations.exists(_ == usi.dest),
+        usi.midStep.fold(actor.destinations contains usi.dest) { ms =>
+          actor.lionMoveDestinationsMap.get(ms).exists(_ contains usi.dest)
+        },
         (),
-        s"Piece on ${usi.orig} cannot move to ${usi.dest}"
+        s"Piece on ${usi.orig} cannot move to ${usi.dest}${usi.midStep.fold("")(ms => s" via $ms")}"
       )
-      unpromotedCapture = sit.board(usi.dest).map(p => p.updateRole(unpromote) | p)
+      unpromotedCapture = capture.map(p => p.updateRole(unpromote) | p)
       hands =
         unpromotedCapture
-          .filter(_ => addCapturedPiecesToHand)
+          .filter(_ => supportsDrops)
           .flatMap(c => handRoles.find(_ == c.role))
           .fold(sit.hands)(sit.hands.store(sit.color, _))
       board <-
@@ -195,8 +217,7 @@ abstract class Variant private[variant] (
       board <- sit.board.place(piece, usi.pos) toValid s"Can't drop ${usi.role} on ${usi.pos}, it's occupied"
     } yield finalizeSituation(sit, board, hands, usi)
 
-  @nowarn
-  def impasse(sit: Situation): Boolean = false
+  def impasse(@unused sit: Situation): Boolean = false
 
   def perpetualCheck(sit: Situation): Boolean =
     sit.history.fourfoldRepetition && sit.history.firstRepetitionDistance.exists { dist =>
@@ -209,17 +230,15 @@ abstract class Variant private[variant] (
   def checkmate(sit: Situation): Boolean =
     sit.check && !sit.hasMoveDestinations && !sit.hasDropDestinations
 
+  def bareKing(@unused sit: Situation): Boolean = false
+
+  def royalsLost(@unused sit: Situation): Boolean = false
+
   // Player wins or loses after their move
   def winner(sit: Situation): Option[Color] =
-    if (sit.checkmate || sit.stalemate) Some(!sit.color)
+    if (sit.checkmate || sit.stalemate || sit.bareKing || sit.royalsLost) Some(!sit.color)
     else if (sit.impasse || sit.perpetualCheck) Some(sit.color)
     else None
-
-  @nowarn
-  def specialEnd(sit: Situation): Boolean = false
-
-  @nowarn
-  def specialDraw(sit: Situation) = false
 
   // Returns the material imbalance in pawns
   def materialImbalance(sit: Situation): Int =

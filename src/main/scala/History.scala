@@ -5,6 +5,7 @@ import shogi.format.forsyth.Sfen
 
 case class History(
     lastMove: Option[Usi],
+    lastCapture: Option[Piece],
     consecutiveAttacks: ConsecutiveAttacks,
     positionHashes: PositionHash,
     initialSfen: Option[Sfen]
@@ -42,6 +43,9 @@ case class History(
 
   def withLastMove(u: Usi) = copy(lastMove = Some(u))
 
+  def withLastCapture(op: Option[Piece]) = copy(lastCapture = op)
+  def withLastCapture(p: Piece)          = copy(lastCapture = Some(p))
+
   def withConsecutiveAttacks(ca: ConsecutiveAttacks) = copy(consecutiveAttacks = ca)
 
   def withPositionHashes(h: PositionHash) = copy(positionHashes = h)
@@ -56,7 +60,7 @@ case class History(
 
 object History {
 
-  def empty: History = History(None, ConsecutiveAttacks.empty, Array.empty, None)
+  def empty: History = History(None, None, ConsecutiveAttacks.empty, Array.empty, None)
 
 }
 

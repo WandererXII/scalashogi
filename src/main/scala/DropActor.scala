@@ -14,7 +14,7 @@ final case class DropActor(
       situation.variant.handRoles.contains(role) &&
       situation.hands.has(color, role)
     )
-      situation.variant.dropLegalityFilter(this)
+      situation.variant.dropFilter(this)
     else Nil
 
   def toUsis: List[Usi.Drop] =

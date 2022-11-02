@@ -10,21 +10,37 @@ final case class MoveActor(
     situation: Situation
 ) {
 
-  lazy val destinations: List[Pos] = situation.variant.royalSafetyFilter(this)
+  lazy val destinations: List[Pos] = situation.variant.moveFilter(this)
 
-  // Destinations without taking defending the king into account
-  def unsafeDestinations: List[Pos] =
-    shortRange(piece.directDirs) ::: longRange(piece.projectionDirs)
+  // Destinations where the piece can end up after the entire move
+  // without move filter - e.g. not taking defending the king into account
+  def unfilteredDestinations: List[Pos] =
+    shortUnfilteredDestinations ::: longRange(piece.projectionDirs)
+
+  lazy val shortUnfilteredDestinations = shortRange(piece.directDirs)
+
+  lazy val lionMoveDestinationsMap: Map[Pos, List[Pos]] =
+    if (piece.role.hasLionPower)
+      shortUnfilteredDestinations
+        .withFilter(_.dist(pos) == 1)
+        .map { ms =>
+          (ms, situation.variant.lionMoveFilter(this, ms))
+        }
+        .toMap
+    else Map.empty
 
   def toUsis: List[Usi.Move] = {
     val normalMoves = destinations
       .withFilter(!situation.variant.pieceInDeadZone(piece, _))
       .map(Usi.Move(pos, _, false, None))
     val promotedMoves = destinations
-      .withFilter(situation.variant.canPromote(piece, pos, _))
+      .withFilter(d => situation.variant.canPromote(piece, pos, d, situation.board(d).isDefined))
       .map(Usi.Move(pos, _, true, None))
+    val lionMoves = lionMoveDestinationsMap.flatMap { case (ms, dests) =>
+      dests.map(d => Usi.Move(pos, d, false, Some(ms)))
+    }.toList
 
-    normalMoves ::: promotedMoves
+    normalMoves ::: promotedMoves ::: lionMoves
   }
 
   def color        = piece.color
@@ -32,7 +48,8 @@ final case class MoveActor(
 
   private def shortRange(dirs: Directions): List[Pos] =
     dirs flatMap { _(pos) } filter { to =>
-      situation.variant.isInsideBoard(to) && situation.board.pieces.get(to).fold(true)(_.color != color)
+      situation.variant
+        .isInsideBoard(to) && situation.board.pieces.get(to).fold(true)(_.color != color || to == pos)
     }
 
   private def longRange(dirs: Directions): List[Pos] = {

@@ -5,6 +5,7 @@ import cats.syntax.option._
 
 import shogi.Pos._
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 
 case object Chushogi
     extends Variant(
@@ -216,18 +217,97 @@ case object Chushogi
   def promotionRanks(color: Color) =
     if (color.sente) List(Rank.A, Rank.B, Rank.C, Rank.D) else List(Rank.I, Rank.J, Rank.K, Rank.L)
 
-  override def royalSafetyFilter(a: MoveActor): List[Pos] =
-    a.unsafeDestinations
+  override def pieceInDeadZone(piece: Piece, pos: Pos): Boolean = false
 
-  override def perpetualCheck(sit: Situation): Boolean =
-    sit.history.fourfoldRepetition && sit.history.firstRepetitionDistance.exists { dist =>
-      (dist + 1) <= sit.history.consecutiveAttacks(!sit.color)
+  override def canPromote(piece: Piece, orig: Pos, dest: Pos, capture: Boolean): Boolean = {
+    val pRanks = promotionRanks(piece.color)
+    promote(piece.role).isDefined &&
+    (
+      (pRanks
+        .contains(dest.rank) && !pRanks.contains(orig.rank)) ||
+        (capture && (pRanks.exists(r => r == dest.rank || r == orig.rank))) ||
+        (List(Pawn, Lance).contains(piece.role) && backrank(piece.color) == dest.rank)
+    )
+  }
+
+  override def supportsDrops = false
+
+  override def moveFilter(a: MoveActor): List[Pos] =
+    if ((a.piece is Lion) || (a.piece is LionPromoted)) {
+      val oppLions = a.situation.board.pieces.collect {
+        case (pos, piece) if ((piece is Lion) || (a.piece is LionPromoted)) && (piece is a.color) => pos
+      }.toList
+      a.unfilteredDestinations.filterNot { dest =>
+        oppLions.contains(dest) && a.pos.dist(dest) > 1 && posThreatened(
+          a.situation.board.forceTake(a.pos),
+          !a.color,
+          dest,
+          _ => true
+        )
+      }
+    } else if ((a.piece is Eagle) || (a.piece is Falcon)) a.unfilteredDestinations.filterNot(_ == a.pos)
+    else if (a.situation.history.lastCapture.exists(p => (p is Lion) || (p is LionPromoted))) {
+      a.unfilteredDestinations.filterNot(d =>
+        a.situation.history.lastMove.flatMap(_.positions.lastOption) != Some(d) &&
+          a.situation.board(d).exists(p => (p is Lion) || (p is LionPromoted))
+      )
+    } else a.unfilteredDestinations
+
+  override def isIrreversible(before: Situation, after: Situation, usi: Usi): Boolean =
+    usi match {
+      case Usi.Move(_, dest, prom, _) => {
+        prom || after
+          .board(dest)
+          .exists(List(Pawn, Lance) contains _.role) || before.board.pieces.size != after.board.pieces.size
+      }
+      case _ => false
+    }
+
+  override def isAttacked(before: Situation, after: Situation, usi: Usi): Boolean =
+    after.check || {
+      usi match {
+        case Usi.Move(_, dest, _, _) => {
+          val oppPieces = after.board.piecesOf(after.color)
+          after.moveActorAt(dest).exists(a => a.destinations.exists(oppPieces contains _))
+        }
+        case _ => false
+      }
     }
 
   override def stalemate(sit: Situation): Boolean = !sit.hasMoveDestinations
 
   override def checkmate(sit: Situation): Boolean = false
 
-  //override def specialEnd(sit: Situation): Boolean =
+  // from our side - was our king bared
+  override def bareKing(sit: Situation): Boolean = {
+    val ourKing = sit.board.royalPossOf(sit.color)
+    val ourPiecesFiltered = sit.board.pieces.collect {
+      case (pos, piece)
+          if (piece is sit.color) && ((piece is Pawn) || (piece is Lance)) && backrank(
+            sit.color
+          ) == pos.rank =>
+        pos
+    }
+    val theirPiecesFiltered = sit.board.pieces.collect {
+      case (pos, piece)
+          if (piece is sit.color) && (((piece is Pawn) || (piece is GoBetween)) || ((piece is Lance) && backrank(
+            sit.color
+          ) == pos.rank)) =>
+        pos
+    }
+    ourKing.size == 1 &&            // we still have to have a king/prince
+    ourPiecesFiltered.size == 1 &&  // but no other pieces
+    theirPiecesFiltered.size > 1 && // opponent has to have more than just a single king/prince
+    sit.switch.check &&             // we cannot be threating to capture opponents king/prince
+    (theirPiecesFiltered.size > 2 || ((for {
+      king  <- ourKing.headOption
+      their <- theirPiecesFiltered.headOption
+    } yield (king.dist(
+      their
+    ) > 1)) | false)) // opponent either has more pieces than we can capture, or we don't threaten to bare his king
+  }
+
+  override def royalsLost(sit: Situation): Boolean =
+    sit.board.royalPossOf(sit.color).isEmpty
 
 }
