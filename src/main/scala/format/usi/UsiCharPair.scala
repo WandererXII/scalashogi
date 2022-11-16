@@ -16,6 +16,8 @@ object UsiCharPair {
 
   def apply(usi: Usi, variant: Variant): UsiCharPair =
     usi match {
+      case Usi.Move(orig, dest, _, Some(midStep)) =>
+        UsiCharPair(posToChar(orig, variant), lionMoveToChar(orig, dest, midStep, variant))
       case Usi.Move(orig, dest, false, _) =>
         UsiCharPair(posToChar(orig, variant), posToChar(dest, variant))
       // If we are moving from orig to dest, we know it's not possible to move from dest to orig
@@ -34,6 +36,13 @@ object UsiCharPair {
 
   def posToChar(pos: Pos, variant: Variant): Char =
     (charOffset + pos.rank.index * variant.numberOfFiles + pos.file.index).toChar
+
+  def lionMoveToChar(orig: Pos, dest: Pos, ms: Pos, variant: Variant): Char = {
+    // making sure only 8 surrounding squares are encoded, getting rid of the center one
+    val toMidStep = ((orig.file - ms.file + 1) + 3 * (orig.rank - ms.rank + 1) + 4) % 9
+    val toDest    = ((ms.file - dest.file + 1) + 3 * (ms.rank - dest.rank + 1) + 4) % 9
+    (charOffset + variant.allPositions.size + toMidStep + 8 * toDest).toChar
+  }
 
   def roleToChar(role: DroppableRole, variant: Variant): Char =
     variant.handRoles.zipWithIndex
