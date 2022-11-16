@@ -1,4 +1,5 @@
 package shogi
+package pieces
 
 import Pos._
 
