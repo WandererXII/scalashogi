@@ -203,7 +203,7 @@ object KifUtils {
 
   def toKifBoard(piece: Piece, variant: Variant): Option[String] =
     toKifBoard(piece.role, variant) map { k =>
-      if (piece.color.sente) s" $k" else s"v$k"
+      if (piece.color.sente) k else s"v$k"
     }
 
   def toPieceBoard(str: String, variant: Variant): Option[Piece] = {
