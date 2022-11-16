@@ -14,7 +14,11 @@ import variant._
 
 trait ShogiTest extends Specification with ValidatedMatchers {
 
-  implicit def stringToSituation(str: String): Situation = (Visual parse str).get
+  implicit def stringToSituation(str: String): Situation =
+    ((Visual parse str)
+      .orElse(Visual.parse(str, shogi.variant.Chushogi))
+      .orElse(Visual.parse(str, shogi.variant.Minishogi)))
+      .get
 
   implicit def colorChanger(str: String) =
     new {
@@ -87,6 +91,8 @@ trait ShogiTest extends Specification with ValidatedMatchers {
   def makeSituation: Situation = Situation(shogi.variant.Standard)
 
   def makeEmptySituation: Situation = Situation(shogi.variant.Standard).withBoard(Board.empty)
+  def makeEmptySituation(variant: shogi.variant.Variant): Situation =
+    Situation(variant).withBoard(Board.empty)
 
   def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>
@@ -112,8 +118,12 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
 
-  def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] = {
-    val sit = makeEmptySituation
+  def pieceMoves(
+      piece: Piece,
+      pos: Pos,
+      variant: shogi.variant.Variant = shogi.variant.Standard
+  ): Option[List[Pos]] = {
+    val sit = makeEmptySituation(variant)
     sit.withBoard(sit.board.place(piece, pos).get).moveActorAt(pos) map (_.destinations)
   }
 }
