@@ -235,7 +235,7 @@ case object Chushogi
   override def moveFilter(a: MoveActor): List[Pos] =
     if ((a.piece is Lion) || (a.piece is LionPromoted)) {
       val oppLions = a.situation.board.pieces.collect {
-        case (pos, piece) if ((piece is Lion) || (a.piece is LionPromoted)) && (piece is a.color) => pos
+        case (pos, piece) if ((piece is Lion) || (a.piece is LionPromoted)) && (piece is !a.color) => pos
       }.toList
       a.unfilteredDestinations.filterNot { dest =>
         oppLions.contains(dest) && a.pos.dist(dest) > 1 && posThreatened(
@@ -245,8 +245,7 @@ case object Chushogi
           _ => true
         )
       }
-    } else if ((a.piece is Eagle) || (a.piece is Falcon)) a.unfilteredDestinations.filterNot(_ == a.pos)
-    else if (a.situation.history.lastCapture.exists(p => (p is Lion) || (p is LionPromoted))) {
+    } else if (a.situation.history.lastCapture.exists(p => (p is Lion) || (p is LionPromoted))) {
       a.unfilteredDestinations.filterNot(d =>
         a.situation.history.lastMove.flatMap(_.positions.lastOption) != Some(d) &&
           a.situation.board(d).exists(p => (p is Lion) || (p is LionPromoted))

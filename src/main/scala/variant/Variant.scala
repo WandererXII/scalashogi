@@ -98,7 +98,7 @@ abstract class Variant private[variant] (
     if ((a.piece is Lion) || (a.piece is LionPromoted))
       a.shortUnfilteredDestinations.filter { d =>
         d.dist(midStep) == 1 && a.situation.board(d).fold(true) { capture =>
-          (!(capture is Lion) && !(capture is LionPromoted)) ||
+          d.dist(a.pos) == 1 || (!(capture is Lion) && !(capture is LionPromoted)) ||
           a.situation.board(midStep).exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween))
         }
       }
