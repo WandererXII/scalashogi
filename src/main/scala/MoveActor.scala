@@ -24,7 +24,7 @@ final case class MoveActor(
       shortUnfilteredDestinations
         .withFilter(_.dist(pos) == 1)
         .map { ms =>
-          (ms, situation.variant.lionMoveFilter(this, ms))
+          (ms, pos :: situation.variant.lionMoveFilter(this, ms))
         }
         .toMap
     else Map.empty
