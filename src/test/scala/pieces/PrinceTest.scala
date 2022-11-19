@@ -7,10 +7,12 @@ class PrinceTest extends ShogiTest {
 
   "a prince" should {
 
-    val prince = Sente - Prince
+    val prince     = Sente - Prince
+    val princeGote = Gote - Prince
 
     "move 1 position in any direction" in {
       pieceMoves(prince, SQ6F) must bePoss(SQ6G, SQ7G, SQ7F, SQ7E, SQ6E, SQ5E, SQ5F, SQ5G)
+      pieceMoves(princeGote, SQ6F) must bePoss(SQ6G, SQ7G, SQ7F, SQ7E, SQ6E, SQ5E, SQ5F, SQ5G)
     }
 
     "move 1 position in any direction, even from the edges" in {

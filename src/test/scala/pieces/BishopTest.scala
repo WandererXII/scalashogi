@@ -7,10 +7,29 @@ class BishopTest extends ShogiTest {
 
   "a bishop" should {
 
-    val bishop = Sente - Bishop
+    val bishop     = Sente - Bishop
+    val bishopGote = Gote - Bishop
 
     "move in 4 directions" in {
       pieceMoves(bishop, SQ5E) must bePoss(
+        SQ4F,
+        SQ4D,
+        SQ3G,
+        SQ3C,
+        SQ2H,
+        SQ2B,
+        SQ1I,
+        SQ1A,
+        SQ6F,
+        SQ6D,
+        SQ7G,
+        SQ7C,
+        SQ8H,
+        SQ8B,
+        SQ9I,
+        SQ9A
+      )
+      pieceMoves(bishopGote, SQ5E) must bePoss(
         SQ4F,
         SQ4D,
         SQ3G,

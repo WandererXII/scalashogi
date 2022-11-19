@@ -7,10 +7,33 @@ class DragonTest extends ShogiTest {
 
   "a dragon" should {
 
-    val dragon = Sente - Dragon
+    val dragon     = Sente - Dragon
+    val dragonGote = Gote - Dragon
 
     "move to any position along the same rank or file and directly around" in {
       pieceMoves(dragon, SQ5E) must bePoss(
+        SQ5D,
+        SQ5C,
+        SQ5B,
+        SQ5A,
+        SQ5F,
+        SQ5G,
+        SQ5H,
+        SQ5I,
+        SQ4E,
+        SQ3E,
+        SQ2E,
+        SQ1E,
+        SQ6E,
+        SQ7E,
+        SQ8E,
+        SQ9E,
+        SQ6F,
+        SQ6D,
+        SQ4F,
+        SQ4D
+      )
+      pieceMoves(dragonGote, SQ5E) must bePoss(
         SQ5D,
         SQ5C,
         SQ5B,

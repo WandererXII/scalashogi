@@ -7,10 +7,29 @@ class RookTest extends ShogiTest {
 
   "a rook" should {
 
-    val rook = Sente - Rook
+    val rook     = Sente - Rook
+    val rookGote = Gote - Rook
 
     "move to any position along the same rank or file" in {
       pieceMoves(rook, SQ5E) must bePoss(
+        SQ5D,
+        SQ5C,
+        SQ5B,
+        SQ5A,
+        SQ5F,
+        SQ5G,
+        SQ5H,
+        SQ5I,
+        SQ4E,
+        SQ3E,
+        SQ2E,
+        SQ1E,
+        SQ6E,
+        SQ7E,
+        SQ8E,
+        SQ9E
+      )
+      pieceMoves(rookGote, SQ5E) must bePoss(
         SQ5D,
         SQ5C,
         SQ5B,

@@ -7,7 +7,8 @@ class WhiteHorseTest extends ShogiTest {
 
   "a whiteHorse" should {
 
-    val whiteHorse = Sente - WhiteHorse
+    val whiteHorse     = Sente - WhiteHorse
+    val whiteHorseGote = Gote - WhiteHorse
 
     "move to valid positions" in {
       pieceMoves(whiteHorse, SQ6F, shogi.variant.Chushogi) must bePoss(
@@ -32,6 +33,30 @@ class WhiteHorseTest extends ShogiTest {
         SQ4D,
         SQ7E,
         SQ5E
+      )
+      pieceMoves(whiteHorseGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+        SQ6A,
+        SQ6B,
+        SQ6C,
+        SQ6D,
+        SQ6E,
+        SQ6G,
+        SQ6H,
+        SQ6I,
+        SQ6J,
+        SQ6K,
+        SQ6L,
+        SQ7G,
+        SQ5G,
+        SQ8H,
+        SQ4H,
+        SQ9I,
+        SQ3I,
+        SQ10J,
+        SQ2J,
+        SQ11K,
+        SQ1K,
+        SQ12L
       )
     }
 
