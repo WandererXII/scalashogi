@@ -107,14 +107,12 @@ case object Eagle extends Role {
   val goteProjectionDirs  = List(_.up, _.upRight, _.right, _.down, _.left, _.upLeft)
 
   val senteDirectDirs: Directions = List(
-    p => Some(p),
     _.upRight,
     p => Pos.at(p.file.index + 2, p.rank.index - 2),
     _.upLeft,
     p => Pos.at(p.file.index - 2, p.rank.index - 2)
   )
   val goteDirectDirs: Directions = List(
-    p => Some(p),
     _.downRight,
     p => Pos.at(p.file.index + 2, p.rank.index + 2),
     _.downLeft,
@@ -164,12 +162,10 @@ case object Falcon extends Role {
   val goteProjectionDirs  = List(_.up, _.upRight, _.right, _.downRight, _.downLeft, _.left, _.upLeft)
 
   val senteDirectDirs = List(
-    p => Some(p),
     _.up,
     p => Pos.at(p.file.index, p.rank.index - 2)
   )
   val goteDirectDirs = List(
-    p => Some(p),
     _.down,
     p => Pos.at(p.file.index, p.rank.index + 2)
   )
@@ -315,7 +311,6 @@ case object Lion extends Role {
 
   val senteDirectDirs: Directions =
     List[Direction](
-      p => Some(p),
       p => Pos.at(p.file.index, p.rank.index + 2),
       p => Pos.at(p.file.index + 1, p.rank.index + 2),
       p => Pos.at(p.file.index + 2, p.rank.index + 2),
