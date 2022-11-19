@@ -1,0 +1,25 @@
+package shogi
+package pieces
+
+import Pos._
+
+class TigerTest extends ShogiTest {
+
+  "a tiger" should {
+
+    val tiger = Sente - Tiger
+
+    "move to valid positions" in {
+      pieceMoves(tiger, SQ6F, shogi.variant.Chushogi) must bePoss(
+        SQ7E,
+        SQ5E,
+        SQ7F,
+        SQ5F,
+        SQ7G,
+        SQ5G,
+        SQ6G
+      )
+    }
+
+  }
+}

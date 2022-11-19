@@ -56,7 +56,6 @@ Turn:Sente
       )
     }
 
-
     "threaten" in {
       val situation = """
 +e. B . . . . . . . . .
