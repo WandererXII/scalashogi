@@ -3,7 +3,7 @@ package format
 package forsyth
 
 import Pos._
-import variant.{ Minishogi, Standard }
+import variant.{ Chushogi, Minishogi, Standard }
 
 import cats.syntax.option._
 
@@ -253,6 +253,14 @@ class SfenTest extends ShogiTest {
     }
     "too many files" in {
       Sfen("rrbsgk/4p/5/PG3/K1SBR/PG3").toSituation(Minishogi) must beNone
+    }
+  }
+  "chushogi" in {
+    Sfen("11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b").toSituation(Chushogi) must beSome.like { case s =>
+      s.toSfen.truncate must_== Sfen("11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b -")
+      s.board(Pos.SQ1F) must beSome
+      s.board(Pos.SQ2G) must beSome
+      s.board(Pos.SQ3H) must beSome
     }
   }
 }

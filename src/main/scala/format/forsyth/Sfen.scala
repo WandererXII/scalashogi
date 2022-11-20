@@ -126,7 +126,8 @@ object Sfen {
         case Nil => Some(pieces)
         case '/' :: rest if y < variant.numberOfRanks =>
           piecesListRec(pieces, rest, variant.numberOfFiles - 1, y + 1)
-        case c :: rest if c.isDigit && x >= 0 => piecesListRec(pieces, rest, x - c.asDigit, y)
+        case '1' :: c :: rest if c.isDigit && x >= 0 => piecesListRec(pieces, rest, x - (10 + c.asDigit), y)
+        case c :: rest if c.isDigit && x >= 0        => piecesListRec(pieces, rest, x - c.asDigit, y)
         case '+' :: c :: rest =>
           (for {
             pos   <- Pos.at(x, y)
