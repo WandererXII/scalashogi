@@ -94,16 +94,29 @@ abstract class Variant private[variant] (
     }
   }
 
-  def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] = {
+  def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] =
     if ((a.piece is Lion) || (a.piece is LionPromoted))
-      a.shortUnfilteredDestinations.filter { d =>
+      a.shortUnfilteredDestinations filter { d =>
         d.dist(midStep) == 1 && a.situation.board(d).fold(true) { capture =>
           d.dist(a.pos) == 1 || (!(capture is Lion) && !(capture is LionPromoted)) ||
-          a.situation.board(midStep).exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween))
+          a.situation
+            .board(midStep)
+            .exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween)) ||
+          (!posThreatened(
+            a.situation.board.forceTake(a.pos).forceTake(midStep),
+            !a.color,
+            d,
+            _ => true
+          ) &&
+            !posThreatened(
+              a.situation.board.forceTake(a.pos),
+              !a.color,
+              d,
+              p => ((p is Pawn) || (p is GoBetween))
+            ))
         }
       }
     else a.shortUnfilteredDestinations.filter(_.dist(midStep) == 1)
-  }
 
   def check(board: Board, color: Color): Boolean =
     board.royalPossOf(color) exists {
