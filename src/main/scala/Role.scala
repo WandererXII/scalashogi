@@ -122,15 +122,15 @@ case object Eagle extends Role {
   override val hasLionPower = true
 
   def senteEyes(from: Pos, to: Pos) =
-    Rook.senteEyes(
+    (Rook.senteEyes(
       from,
       to
-    ) || ((from onSameDiagonal to) && ((from isAbove to) || (from xDist to) <= 2))
+    ) || ((from onSameDiagonal to) && ((from isAbove to) || (from xDist to) <= 2))) && from != to
   def goteEyes(from: Pos, to: Pos) =
-    Rook.senteEyes(
+    (Rook.senteEyes(
       from,
       to
-    ) || ((from onSameDiagonal to) && ((from isBelow to) || (from xDist to) <= 2))
+    ) || ((from onSameDiagonal to) && ((from isBelow to) || (from xDist to) <= 2))) && from != to
 }
 
 case object Elephant extends Role {
@@ -173,15 +173,15 @@ case object Falcon extends Role {
   override val hasLionPower = true
 
   def senteEyes(from: Pos, to: Pos) =
-    Bishop.senteEyes(
+    (Bishop.senteEyes(
       from,
       to
-    ) || (from isSameRank to) || ((from isSameFile to) && ((from isAbove to) || (from yDist to) <= 2))
+    ) || (from isSameRank to) || ((from isSameFile to) && ((from isAbove to) || (from yDist to) <= 2))) && from != to
   def goteEyes(from: Pos, to: Pos) =
-    Bishop.senteEyes(
+    (Bishop.senteEyes(
       from,
       to
-    ) || (from isSameRank to) || ((from isSameFile to) && ((from isBelow to) || (from yDist to) <= 2))
+    ) || (from isSameRank to) || ((from isSameFile to) && ((from isBelow to) || (from yDist to) <= 2))) && from != to
 
 }
 
@@ -332,7 +332,7 @@ case object Lion extends Role {
 
   override val hasLionPower = true
 
-  def senteEyes(from: Pos, to: Pos) = (from dist to) <= 2
+  def senteEyes(from: Pos, to: Pos) = (from dist to) <= 2 && from != to
   def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
 }
 
