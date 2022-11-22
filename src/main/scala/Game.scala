@@ -91,7 +91,7 @@ object Game {
             board = parsed.situation.board,
             hands = parsed.situation.hands,
             color = parsed.situation.color,
-            history = History.empty,
+            history = parsed.situation.history,
             variant = g.variant
           ),
           plies = parsed.plies,
