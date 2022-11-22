@@ -5,7 +5,7 @@ import shogi.format.forsyth.Sfen
 
 case class History(
     lastMove: Option[Usi],
-    lastCapture: Option[Piece],
+    lastLionCapture: Option[Pos],
     consecutiveAttacks: ConsecutiveAttacks,
     positionHashes: PositionHash,
     initialSfen: Option[Sfen]
@@ -43,8 +43,7 @@ case class History(
 
   def withLastMove(u: Usi) = copy(lastMove = Some(u))
 
-  def withLastCapture(op: Option[Piece]) = copy(lastCapture = op)
-  def withLastCapture(p: Piece)          = copy(lastCapture = Some(p))
+  def withLastLionCapture(op: Option[Pos]) = copy(lastLionCapture = op)
 
   def withConsecutiveAttacks(ca: ConsecutiveAttacks) = copy(consecutiveAttacks = ca)
 
@@ -54,7 +53,9 @@ case class History(
 
   override def toString = {
     val positions = (positionHashes grouped Hash.size).toList
-    s"${lastMove.fold("-")(_.usi)} ${positions.map(Hash.debug).mkString(" ")} ${initialSfen.fold("-")(_.value)}"
+    s"${lastMove.fold("-")(_.usi)} ${lastLionCapture.fold("-")(_.key)} $consecutiveAttacks ${positions
+      .map(Hash.debug)
+      .mkString(" ")} ${initialSfen.fold("-")(_.value)}"
   }
 }
 
@@ -80,6 +81,9 @@ case class ConsecutiveAttacks(sente: Int, gote: Int) {
     )
 
   def apply(color: Color) = color.fold(sente, gote)
+
+  override def toString =
+   s"($sente, $gote)"
 }
 
 object ConsecutiveAttacks {
