@@ -18,8 +18,9 @@ final case class Sfen(value: String) extends AnyVal {
     for {
       board <- toBoard(variant)
       hands <- toHands(variant)
+      history = toHistory(variant)
     } yield {
-      val sit = Situation(board, hands, color | Sente, variant)
+      val sit = Situation(board, hands, color | Sente, history, variant)
       if (color.isEmpty && sit.check) sit.switch else sit
     }
 
@@ -31,7 +32,14 @@ final case class Sfen(value: String) extends AnyVal {
   }
 
   def toHands(variant: Variant): Option[Hands] =
-    handsString.fold(Hands(variant).some)(Sfen.makeHandsFromString(_, variant))
+    if (variant.supportsDrops)
+      handsString.fold(Hands(variant).some)(Sfen.makeHandsFromString(_, variant))
+    else Hands.empty.some
+
+  def toHistory(variant: Variant): History =
+    if (variant == shogi.variant.Chushogi)
+      handsString.map(s => History.empty withLastLionCapture Pos.fromKey(s)).getOrElse(History.empty)
+    else History.empty
 
   def boardString: Option[String] =
     value.split(' ').lift(0)
@@ -73,7 +81,8 @@ object Sfen {
     List(
       boardToString(sit.board, sit.variant),
       sit.color.letter,
-      handsToString(sit.hands, sit.variant)
+      if (sit.variant == shogi.variant.Chushogi) lastLionCaptureDestToString(sit.history)
+      else handsToString(sit.hands, sit.variant)
     ) mkString " "
 
   def boardToString(board: Board, variant: Variant): String = {
@@ -97,6 +106,9 @@ object Sfen {
     }
     sfen.toString
   }
+
+  private def lastLionCaptureDestToString(history: History): String =
+    history.lastLionCapture.fold("-")(_.key)
 
   private[forsyth] def handToString(hand: Hand, variant: Variant): String =
     variant.handRoles map { r =>
