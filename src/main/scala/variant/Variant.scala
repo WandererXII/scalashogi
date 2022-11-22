@@ -163,7 +163,13 @@ abstract class Variant private[variant] (
     val newSit = beforeSit.copy(board = board, hands = hands).switch
     val h = beforeSit.history
       .withLastMove(usi)
-      .withLastCapture(usi.positions.lastOption.flatMap(beforeSit.board(_)))
+      .withLastLionCapture {
+        if (
+          usi.positions.lastOption.flatMap(beforeSit.board(_)).exists(p => (p is Lion) || (p is LionPromoted))
+        )
+          usi.positions.lastOption
+        else None
+      }
       .withConsecutiveAttacks {
         if (isAttacked(beforeSit, newSit, usi))
           beforeSit.history.consecutiveAttacks.add(!newSit.color)
@@ -243,14 +249,14 @@ abstract class Variant private[variant] (
   def checkmate(sit: Situation): Boolean =
     sit.check && !sit.hasMoveDestinations && !sit.hasDropDestinations
 
-  def bareKing(@unused sit: Situation): Boolean = false
+  def bareKing(@unused sit: Situation, @unused color: Color): Boolean = false
 
   def royalsLost(@unused sit: Situation): Boolean = false
 
   // Player wins or loses after their move
   def winner(sit: Situation): Option[Color] =
-    if (sit.checkmate || sit.stalemate || sit.bareKing || sit.royalsLost) Some(!sit.color)
-    else if (sit.impasse || sit.perpetualCheck) Some(sit.color)
+    if (sit.checkmate || sit.stalemate || sit.bareKing(sit.color) || sit.royalsLost) Some(!sit.color)
+    else if (sit.bareKing(!sit.color) || sit.impasse || sit.perpetualCheck) Some(sit.color)
     else None
 
   // Returns the material imbalance in pawns

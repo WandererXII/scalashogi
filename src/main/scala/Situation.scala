@@ -112,7 +112,7 @@ case class Situation(
 
   def royalsLost: Boolean = variant royalsLost this
 
-  def bareKing: Boolean = variant bareKing this
+  def bareKing(color: Color): Boolean = variant.bareKing(this, color)
 
   def autoDraw: Boolean =
     (history.fourfoldRepetition && !perpetualCheck) ||
@@ -137,7 +137,7 @@ case class Situation(
   lazy val status: Option[Status] =
     if (checkmate) Status.Mate.some
     else if (royalsLost) Status.RoyalsLost.some
-    else if (bareKing) Status.BareKing.some
+    else if (bareKing(Sente) || bareKing(Gote)) Status.BareKing.some
     else if (stalemate) Status.Stalemate.some
     else if (impasse) Status.Impasse27.some
     else if (perpetualCheck) Status.PerpetualCheck.some
