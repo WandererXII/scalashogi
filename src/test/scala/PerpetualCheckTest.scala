@@ -1,6 +1,8 @@
 package shogi
 
 import Pos._
+import format.forsyth.Sfen
+import format.usi.Usi
 
 class PerpetualCheckTest extends ShogiTest {
 
@@ -84,11 +86,73 @@ class PerpetualCheckTest extends ShogiTest {
           game.playMoveList(m) must beValid.like { case game2 =>
             game2.situation.autoDraw must beFalse
             game2.situation.perpetualCheck must beTrue
-            game2.situation.winner must beSome.like { case color =>
-              color.gote
-            }
+            game2.situation.winner must_== Some(Gote)
           }
         }
+      }
+    }
+  }
+
+  "Chushogi perpetual check" should {
+    "not trigger" in {
+      val dGame = Game(shogi.variant.Chushogi)
+      val dMoves = List(
+        "4h4g",
+        "9e9f",
+        "4g4h",
+        "9f9e", // first repetition
+        "4h4g",
+        "9e9f",
+        "4g4h",
+        "9f9e", // second repetition
+        "4h4g",
+        "9e9f",
+        "4g4h",
+        "9f9e", // third repetition
+        "4h4g",
+        "9e9f",
+        "4g4h",
+        "9f9e" // forth repetition
+      ).map(Usi.Move(_).get)
+      dGame.playMoveList(dMoves.map(u => (u.orig, u.dest, false))) must beValid.like { case game =>
+        game.situation.autoDraw must beTrue
+        game.situation.perpetualCheck must beFalse
+        game.situation.winner must beNone
+      }
+    }
+    "trigger" in {
+      val aGame = Game(
+        Some(shogi.variant.Chushogi),
+        Some(
+          Sfen(
+            "lfcsgek1scfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/8i3/3I8/3g8/8I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL w"
+          )
+        )
+      )
+      val aMoves = List(
+        "1d1e",
+        "9f9e", // start
+        "4e4f",
+        "9e9f",
+        "4f4e",
+        "9f9e", // 1st
+        "4e4f",
+        "9e9f",
+        "4f4e",
+        "9f9e", // 2nd
+        "4e4f",
+        "9e9f",
+        "4f4e",
+        "9f9e", // 3rd
+        "4e4f",
+        "9e9f",
+        "4f4e",
+        "9f9e"
+      ).map(Usi.Move(_).get)
+      aGame.playMoveList(aMoves.map(u => (u.orig, u.dest, false))) must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.perpetualCheck must beTrue
+        game.situation.winner must_== Some(Gote)
       }
     }
   }

@@ -265,10 +265,8 @@ case object Chushogi
   override def isAttacked(before: Situation, after: Situation, usi: Usi): Boolean =
     after.check || {
       usi match {
-        case Usi.Move(_, dest, _, _) => {
-          val oppPieces = after.board.piecesOf(after.color)
-          after.moveActorAt(dest).exists(a => a.destinations.exists(oppPieces contains _))
-        }
+        case Usi.Move(_, dest, _, _) =>
+          after.moveActorAt(dest).exists(a => a.destinations.exists(d => after.board(d).isDefined))
         case _ => false
       }
     }

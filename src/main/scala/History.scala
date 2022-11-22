@@ -83,7 +83,7 @@ case class ConsecutiveAttacks(sente: Int, gote: Int) {
   def apply(color: Color) = color.fold(sente, gote)
 
   override def toString =
-   s"($sente, $gote)"
+    s"($sente, $gote)"
 }
 
 object ConsecutiveAttacks {
