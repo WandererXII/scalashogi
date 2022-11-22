@@ -48,6 +48,7 @@ class ChushogiTest extends ShogiTest {
         line match {
           case (sfenStr, d1) => {
             val game = Game(Some(shogi.variant.Chushogi), Some(Sfen(sfenStr)))
+            game.situation.end(false) must beFalse
             perft(game, 1) must be equalTo d1.toInt
           }
         }
@@ -164,7 +165,6 @@ class ChushogiTest extends ShogiTest {
       val sit7     = sit7Base(Usi("8f8j").get).toOption.get
       val sit7Alt  = sit7Base(Usi("7i8j+").get).toOption.get
       val sit7Alt2 = sit7Base(Usi("7i8j").get).toOption.get
-      println(sit7.history)
       sit7(Usi("6l8j").get).isValid must beTrue
       sit7(Usi("6l3i").get).isValid must beFalse
       sit7Alt(Usi("6l8j").get).isValid must beTrue
