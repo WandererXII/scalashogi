@@ -17,7 +17,7 @@ object KifParserHelper {
   ): Validated[String, Situation] = {
     val lines = augmentString(str).linesIterator.toList.map(_.trim.replace("：", ":").replace("　", " "))
     val ranks = lines.view
-      .filter(l => (l lift 0 contains '|') && (l.size <= 42))
+      .filter(l => (l lift 0 contains '|') && (l.size <= 100))
       .map(
         _.replace(".", "・")
           .replace(" ", "")
@@ -79,7 +79,7 @@ object KifParserHelper {
       chars match {
         case Nil                                   => valid(pieces)
         case '・' :: rest                           => makePiecesList(pieces, rest, "", x - 1, y)
-        case (c @ ('v' | 'V' | '成' | '+')) :: rest => makePiecesList(pieces, rest, c.toString, x, y)
+        case (c @ ('v' | 'V' | '成' | '+')) :: rest => makePiecesList(pieces, rest, pieceSoFar + c.toString, x, y)
         case p :: rest =>
           (for {
             pos <- Pos.at(x, y) toValid s"Too many files in board setup on rank $y"
