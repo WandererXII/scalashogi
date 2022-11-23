@@ -49,7 +49,7 @@ final case class MoveActor(
   private def shortRange(dirs: Directions): List[Pos] =
     dirs flatMap { _(pos) } filter { to =>
       situation.variant
-        .isInsideBoard(to) && situation.board.pieces.get(to).fold(true)(_.color != color || to == pos)
+        .isInsideBoard(to) && situation.board.pieces.get(to).fold(true)(_.color != color)
     }
 
   private def longRange(dirs: Directions): List[Pos] = {
