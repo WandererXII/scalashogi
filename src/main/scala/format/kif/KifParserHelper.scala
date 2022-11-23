@@ -77,9 +77,10 @@ object KifParserHelper {
         y: Int
     ): Validated[String, List[(Pos, Piece)]] =
       chars match {
-        case Nil                                   => valid(pieces)
-        case '・' :: rest                           => makePiecesList(pieces, rest, "", x - 1, y)
-        case (c @ ('v' | 'V' | '成' | '+')) :: rest => makePiecesList(pieces, rest, pieceSoFar + c.toString, x, y)
+        case Nil         => valid(pieces)
+        case '・' :: rest => makePiecesList(pieces, rest, "", x - 1, y)
+        case (c @ ('v' | 'V' | '成' | '+')) :: rest =>
+          makePiecesList(pieces, rest, pieceSoFar + c.toString, x, y)
         case p :: rest =>
           (for {
             pos <- Pos.at(x, y) toValid s"Too many files in board setup on rank $y"
