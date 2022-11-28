@@ -1,6 +1,7 @@
 package shogi
 package format
 
+import cats.data.NonEmptyList
 import cats.data.Validated
 import cats.data.Validated.valid
 
@@ -48,12 +49,13 @@ sealed trait ParsedMove {
 case class KifMove(
     dest: Pos,
     orig: Pos,
-    role: Role,
+    roles: NonEmptyList[Role], // in chushogi some kanji map to many roles
+    midStep: Option[Pos] = None,
     promotion: Boolean = false,
     metas: Metas = Metas.empty
 ) extends ParsedMove {
 
-  def toUsi(sit: Situation) = valid(Usi.Move(orig, dest, promotion))
+  def toUsi(sit: Situation) = valid(Usi.Move(orig, dest, promotion, midStep))
 
   def withMetas(m: Metas) = copy(metas = m)
 
@@ -70,7 +72,7 @@ case class CsaMove(
 
   def toUsi(sit: Situation): Validated[String, Usi] =
     Validated.fromOption(sit.board(orig), s"No piece at $orig") map { p =>
-      Usi.Move(orig, dest, role != p.role)
+      Usi.Move(orig, dest, role != p.role, None)
     }
 
   def withMetas(m: Metas) = copy(metas = m)
@@ -81,7 +83,7 @@ case class CsaMove(
 
 // All notations can share drop
 case class Drop(
-    role: Role,
+    role: DroppableRole,
     pos: Pos,
     metas: Metas = Metas.empty
 ) extends ParsedMove {

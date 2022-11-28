@@ -34,7 +34,7 @@ case class Csa(
       else ""
     val header = Csa renderHeader tags
     val setup =
-      tags.sfen.getOrElse(Standard.initialSfen).toSituation(Standard).fold("")(Csa renderSituation _)
+      (tags.sfen | Standard.initialSfen).toSituation(Standard).fold("")(Csa renderSituation _)
     val startColor: Color = tags.sfen.flatMap(_.color) | Sente
     val movesStr          = renderMainline(moves, startColor)
     List(
@@ -61,10 +61,10 @@ object Csa {
   def renderCsaMove(usiWithRole: Usi.WithRole, turn: Option[Color]) =
     usiWithRole.usi match {
       case Usi.Drop(role, pos) =>
-        s"${turn.fold("")(_.fold("+", "-"))}00${pos.numberKey}${role.csa}"
-      case Usi.Move(orig, dest, prom) => {
+        s"${turn.fold("")(_.fold("+", "-"))}00${pos.hexKey}${CsaUtils.toCsa(role) | ""}"
+      case Usi.Move(orig, dest, prom, _) => {
         val finalRole = Standard.promote(usiWithRole.role).filter(_ => prom) | usiWithRole.role
-        s"${turn.fold("")(_.fold("+", "-"))}${orig.numberKey}${dest.numberKey}${finalRole.csa}"
+        s"${turn.fold("")(_.fold("+", "-"))}${orig.hexKey}${dest.hexKey}${CsaUtils.toCsa(finalRole) | ""}"
       }
     }
 
@@ -97,10 +97,10 @@ object Csa {
     for (y <- 0 to 8) {
       csaBoard append ("P" + (y + 1))
       for (x <- 8 to 0 by -1) {
-        sit.board(x, y) match {
+        sit.board(x, y).flatMap(CsaUtils toCsa _) match {
           case None => csaBoard append " * "
-          case Some(piece) =>
-            csaBoard append s"${piece.csa}"
+          case Some(csa) =>
+            csaBoard append s"$csa"
         }
       }
       if (y < 8) csaBoard append '\n'
@@ -119,7 +119,7 @@ object Csa {
       Standard.handRoles
         .map { r =>
           val cnt = hand(r)
-          s"00${r.csa}".repeat(math.min(cnt, 81))
+          s"00${CsaUtils.toCsa(r) | ""}".repeat(math.min(cnt, 81))
         }
         .filter(_.nonEmpty)
         .mkString(prefix, "", "")
@@ -132,18 +132,17 @@ object Csa {
   ): Option[String] = {
     import Status._
     status match {
-      case Aborted | NoStart                                                         => "%CHUDAN".some
-      case Timeout | Outoftime                                                       => "%TIME_UP".some
-      case Resign if !winnerTurn                                                     => "%TORYO".some
-      case PerpetualCheck if winnerColor.contains(Sente)                             => "%-ILLEGAL_ACTION".some
-      case PerpetualCheck                                                            => "%+ILLEGAL_ACTION".some
-      case Mate if winnerTurn && winnerColor.contains(Sente)                         => "%-ILLEGAL_ACTION".some // pawn checkmate
-      case Mate if winnerTurn                                                        => "%+ILLEGAL_ACTION".some // pawn checkmate
-      case Mate | Stalemate                                                          => "%TSUMI".some
-      case Draw                                                                      => "%SENNICHITE".some
-      case Impasse27                                                                 => "%KACHI".some
-      case Created | Started | UnknownFinish | VariantEnd | TryRule | Cheat | Resign => None
-      case _                                                                         => None
+      case Aborted | NoStart                                 => "%CHUDAN".some
+      case Timeout | Outoftime                               => "%TIME_UP".some
+      case Resign if !winnerTurn                             => "%TORYO".some
+      case PerpetualCheck if winnerColor.contains(Sente)     => "%-ILLEGAL_ACTION".some
+      case PerpetualCheck                                    => "%+ILLEGAL_ACTION".some
+      case Mate if winnerTurn && winnerColor.contains(Sente) => "%-ILLEGAL_ACTION".some // pawn checkmate
+      case Mate if winnerTurn                                => "%+ILLEGAL_ACTION".some // pawn checkmate
+      case Mate | Stalemate                                  => "%TSUMI".some
+      case Draw                                              => "%SENNICHITE".some
+      case Impasse27                                         => "%KACHI".some
+      case _                                                 => None
     }
   }
 

@@ -1,30 +1,14 @@
 package shogi
+package variant
 
 import format.forsyth.Sfen
-import format.usi.Usi
 
-class PerftTest extends ShogiTest {
+class StandardTest extends ShogiTest {
 
-  def drops(sit: Situation): List[Usi] =
-    sit
-      .dropActorsOf(sit.color)
-      .flatMap(_.toUsis)
-
-  def moves(sit: Situation): List[Usi] =
-    sit
-      .moveActorsOf(sit.color)
-      .flatMap(_.toUsis)
-
-  def perft(game: Game, depth: Int): Int =
-    if (depth > 0) {
-      val mds: List[Usi] = moves(game.situation) ::: drops(game.situation)
-      mds.foldLeft(0) { (p, u) =>
-        p + perft(game(u).toOption.get, depth - 1)
-      }
-    } else 1
+  def perft(game: Game, depth: Int) = Perft.perft(game, depth)
 
   "starting position" should {
-    val game = Game(variant.Standard)
+    val game = Game(shogi.variant.Standard)
     "1 depth" in {
       perft(game, 1) must be equalTo 30
     }
@@ -39,25 +23,6 @@ class PerftTest extends ShogiTest {
     }
     // "5 depth" in {
     //  perft(game, 5) must be equalTo 19861490
-    // }
-  }
-
-  "calculate minishogi perfts" should {
-    val game = Game(variant.Minishogi)
-    "1 depth" in {
-      perft(game, 1) must be equalTo 14
-    }
-    "2 depth" in {
-      perft(game, 2) must be equalTo 181
-    }
-    "3 depth" in {
-      perft(game, 3) must be equalTo 2512
-    }
-    "4 depth" in {
-      perft(game, 4) must be equalTo 35401
-    }
-    // "5 depth" in {
-    //  perft(game, 5) must be equalTo 533203
     // }
   }
 

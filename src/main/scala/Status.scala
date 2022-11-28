@@ -28,7 +28,8 @@ object Status {
   case object TryRule        extends Status(39)
   case object PerpetualCheck extends Status(40)
   case object Impasse27      extends Status(41)
-  case object VariantEnd     extends Status(60) // the variant has a special ending
+  case object RoyalsLost     extends Status(42)
+  case object BareKing       extends Status(43)
 
   val all = List(
     Created,
@@ -46,7 +47,8 @@ object Status {
     TryRule,
     Impasse27,
     PerpetualCheck,
-    VariantEnd
+    RoyalsLost,
+    BareKing
   )
 
   val finishedNotCheated = all filter { s =>
@@ -61,8 +63,9 @@ object Status {
       Outoftime,
       Cheat,
       NoStart,
-      VariantEnd,
       Stalemate,
+      RoyalsLost,
+      BareKing,
       TryRule,
       Impasse27,
       PerpetualCheck

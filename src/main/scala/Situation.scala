@@ -51,9 +51,12 @@ case class Situation(
 
   // Drops
 
-  lazy val dropActors: Map[Piece, DropActor] = (hands.pieces map { piece: Piece =>
-    (piece, DropActor(piece, this))
-  }).toMap
+  lazy val dropActors: Map[Piece, DropActor] = hands.rolesOf
+    .reduce[List[(Piece, DropActor)]] { (sente, gote) =>
+      sente.map(role => (Piece(Sente, role), DropActor(Sente, role, this))) :::
+        gote.map(role => (Piece(Gote, role), DropActor(Gote, role, this)))
+    }
+    .toMap
 
   lazy val dropActorsOf: Color.Map[List[DropActor]] = {
     val (s, g) = dropActors.values.toList.partition { _.color.sente }
@@ -82,12 +85,22 @@ case class Situation(
   lazy val checkSente = variant.check(board, Sente)
   lazy val checkGote  = variant.check(board, Gote)
 
-  def checkSquares = variant checkSquares this
+  def checkSquares: List[Pos] = checkSquaresOf(color)
+
+  private def checkSquaresOf(c: Color): List[Pos] = c.fold(checkSquaresSente, checkSquaresGote)
+
+  lazy val checkSquaresSente = variant.checkSquares(board, Sente)
+  lazy val checkSquaresGote  = variant.checkSquares(board, Gote)
 
   // Not taking into account specific drop rules
   lazy val possibleDropDests: List[Pos] =
-    if (check) board.kingPosOf(color).fold[List[Pos]](Nil)(DropActor.blockades(this, _))
-    else variant.allPositions.filterNot(board.pieces contains _)
+    Some(checkSquares)
+      .filter(_.size == 1)
+      .fold(
+        variant.allPositions.filterNot(board.pieces contains _)
+      ) { royals =>
+        DropActor.blockades(this, royals.head)
+      }
 
   // Results
 
@@ -97,19 +110,20 @@ case class Situation(
 
   def perpetualCheck: Boolean = variant perpetualCheck this
 
+  def royalsLost: Boolean = variant royalsLost this
+
+  def bareKing(color: Color): Boolean = variant.bareKing(this, color)
+
   def autoDraw: Boolean =
     (history.fourfoldRepetition && !perpetualCheck) ||
-      variant.specialDraw(this) ||
       variant.isInsufficientMaterial(this)
 
   def opponentHasInsufficientMaterial: Boolean = variant opponentHasInsufficientMaterial this
 
-  def variantEnd = variant specialEnd this
-
   def impasse = variant impasse this
 
   def end(withImpasse: Boolean): Boolean =
-    checkmate || stalemate || autoDraw || perpetualCheck || variantEnd || (withImpasse && impasse)
+    checkmate || stalemate || autoDraw || perpetualCheck || (withImpasse && impasse)
 
   def winner: Option[Color] = variant.winner(this)
 
@@ -122,7 +136,8 @@ case class Situation(
 
   lazy val status: Option[Status] =
     if (checkmate) Status.Mate.some
-    else if (variantEnd) Status.VariantEnd.some
+    else if (royalsLost) Status.RoyalsLost.some
+    else if (bareKing(Sente) || bareKing(Gote)) Status.BareKing.some
     else if (stalemate) Status.Stalemate.some
     else if (impasse) Status.Impasse27.some
     else if (perpetualCheck) Status.PerpetualCheck.some

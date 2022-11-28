@@ -40,7 +40,11 @@ object Visual {
       .mkString("")
       .filter(_ != '.')
     val pad = sfenReversed.size + variant.numberOfRanks - sfenReversed.count(_ == '/') - 1
-    Sfen(sfenReversed.padTo(pad, "9/").reverse.mkString + " " + turn + " " + hands).toSituation(variant)
+    val finalSfen =
+      (sfenReversed.padTo(pad, s"${variant.numberOfFiles}/").reverse.mkString + " " + turn + " " + hands)
+        .replace("01", "10")
+        .replace("21", "12")
+    Sfen(finalSfen).toSituation(variant)
   }
 
   def render(sit: Situation, marks: Map[Iterable[Pos], Char] = Map.empty): String = {
@@ -51,15 +55,19 @@ object Visual {
     }
     for (y <- 0 to (sit.variant.numberOfRanks - 1)) yield {
       for (x <- (sit.variant.numberOfFiles - 1) to 0 by -1) yield {
-        "%2s" format (Pos.at(x, y) flatMap markedPoss.get getOrElse sit.board(x, y).fold(".")(_ forsyth))
+        "%2s" format (Pos.at(x, y).flatMap(markedPoss.get).map(_.toString) | (sit
+          .board(x, y)
+          .flatMap(p => SfenUtils.toForsyth(p, sit.variant))
+          | "."))
       }
     } mkString
   } map (_.trim) mkString "\n" pipe { board =>
     List(
       board,
-      s"Hands:${Sfen.handsToString(sit.hands, sit.variant).filterNot('-' ==)}",
+      if (sit.variant.supportsDrops) s"Hands:${Sfen.handsToString(sit.hands, sit.variant).filterNot('-' ==)}"
+      else "",
       s"Turn:${sit.color.name.capitalize}"
-    ) mkString "\n"
+    ).filter(_.nonEmpty).mkString("\n")
   }
 
   def addNewLines(str: String) = "\n" + str + "\n"

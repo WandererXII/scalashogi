@@ -3,34 +3,55 @@ package format
 package usi
 
 import Usi._
+import variant.{ Chushogi, Standard }
 
 class UsiCharPairTest extends ShogiTest {
 
   "char pair encoding" should {
 
-    def conv(usi: Usi)       = UsiCharPair(usi, variant.Standard).toString
-    def convStr(str: String) = conv(Usi(str).get)
+    def conv(usi: Usi)               = UsiCharPair(usi, Standard).toString
+    def convChushogi(usi: Usi)       = UsiCharPair(usi, Chushogi).toString
+    def convStr(str: String)         = conv(Usi(str).get)
+    def convStrChushogi(str: String) = convChushogi(Usi(str).get)
 
     val allMoves = for {
-      orig <- Pos.all
-      dest <- Pos.all
-    } yield Move(orig, dest, false)
+      orig <- Standard.allPositions
+      dest <- Standard.allPositions
+    } yield Move(orig, dest, false, None)
+    val allMovesChushogi = for {
+      orig <- Chushogi.allPositions
+      dest <- Chushogi.allPositions
+    } yield Move(orig, dest, false, None)
     val allDrops = for {
       role <- variant.Standard.handRoles
-      pos  <- Pos.all
+      pos  <- Standard.allPositions
     } yield Drop(role, pos)
 
-    val allMovesCharPairs = allMoves.map(conv(_))
-    val allDropsCharPairs = allDrops.map(conv(_))
-    val allPairs          = allMoves.map(conv(_)) ++ allDrops.map(conv(_))
+    val lionMoves = for {
+      midStep <- Chushogi.allPositions.filter(_.dist(Pos.SQ5E) == 1)
+      dest    <- Chushogi.allPositions.filter(_.dist(midStep) == 1)
+    } yield Move(Pos.SQ5E, dest, false, Some(midStep))
+
+    val allMovesCharPairs = allMoves.map(conv)
+    val allDropsCharPairs = allDrops.map(conv)
+    val allPairs          = allMoves.map(conv) ++ allDrops.map(conv)
+
+    // Chushogi
+    val allMovesChushogiCharPairs = allMovesChushogi.map(convChushogi)
+    val lionPairs                 = lionMoves.map(convChushogi)
 
     "unicity" in {
       allMovesCharPairs.distinct.size must_== allMoves.size
       allDropsCharPairs.distinct.size must_== allDrops.size
       allPairs.distinct.size must_== allMoves.size + allDrops.size
+
+      allMovesChushogiCharPairs.distinct.size must_== allMovesChushogi.size
+      lionPairs.distinct.size must_== lionMoves.size
+      lionPairs.count(allMovesChushogiCharPairs contains _) must_== 0 // no overlap
     }
     "no void char" in {
       allPairs.count(_ contains UsiCharPair.voidChar) must_== 0
+      allMovesChushogiCharPairs.count(_ contains UsiCharPair.voidChar) must_== 0
     }
 
     "check all moves" in {
@@ -924,6 +945,73 @@ class UsiCharPairTest extends ShogiTest {
       convStr("G*9i") must_== """sv"""
       convStr("B*9i") must_== """su"""
       convStr("R*9i") must_== """st"""
+    }
+
+    "lion moves" in {
+      convStrChushogi("5e4d3c") must_== """WÎ"""
+      convStrChushogi("5e4d4c") must_== """WÆ"""
+      convStrChushogi("5e4d5c") must_== """W¾"""
+      convStrChushogi("5e4d3d") must_== """W¶"""
+      convStrChushogi("5e4d5d") must_== """Wî"""
+      convStrChushogi("5e4d3e") must_== """Wæ"""
+      convStrChushogi("5e4d4e") must_== """WÞ"""
+      convStrChushogi("5e4d5e") must_== """WÖ"""
+      convStrChushogi("5e5d4c") must_== """WÍ"""
+      convStrChushogi("5e5d5c") must_== """WÅ"""
+      convStrChushogi("5e5d6c") must_== """W½"""
+      convStrChushogi("5e5d4d") must_== """Wµ"""
+      convStrChushogi("5e5d6d") must_== """Wí"""
+      convStrChushogi("5e5d4e") must_== """Wå"""
+      convStrChushogi("5e5d5e") must_== """WÝ"""
+      convStrChushogi("5e5d6e") must_== """WÕ"""
+      convStrChushogi("5e6d5c") must_== """WÌ"""
+      convStrChushogi("5e6d6c") must_== """WÄ"""
+      convStrChushogi("5e6d7c") must_== """W¼"""
+      convStrChushogi("5e6d5d") must_== """W´"""
+      convStrChushogi("5e6d7d") must_== """Wì"""
+      convStrChushogi("5e6d5e") must_== """Wä"""
+      convStrChushogi("5e6d6e") must_== """WÜ"""
+      convStrChushogi("5e6d7e") must_== """WÔ"""
+      convStrChushogi("5e4e3d") must_== """WË"""
+      convStrChushogi("5e4e4d") must_== """WÃ"""
+      convStrChushogi("5e4e5d") must_== """W»"""
+      convStrChushogi("5e4e3e") must_== """W³"""
+      convStrChushogi("5e4e5e") must_== """Wë"""
+      convStrChushogi("5e4e3f") must_== """Wã"""
+      convStrChushogi("5e4e4f") must_== """WÛ"""
+      convStrChushogi("5e4e5f") must_== """WÓ"""
+      convStrChushogi("5e6e5d") must_== """WÒ"""
+      convStrChushogi("5e6e6d") must_== """WÊ"""
+      convStrChushogi("5e6e7d") must_== """WÂ"""
+      convStrChushogi("5e6e5e") must_== """Wº"""
+      convStrChushogi("5e6e7e") must_== """Wò"""
+      convStrChushogi("5e6e5f") must_== """Wê"""
+      convStrChushogi("5e6e6f") must_== """Wâ"""
+      convStrChushogi("5e6e7f") must_== """WÚ"""
+      convStrChushogi("5e4f3e") must_== """WÑ"""
+      convStrChushogi("5e4f4e") must_== """WÉ"""
+      convStrChushogi("5e4f5e") must_== """WÁ"""
+      convStrChushogi("5e4f3f") must_== """W¹"""
+      convStrChushogi("5e4f5f") must_== """Wñ"""
+      convStrChushogi("5e4f3g") must_== """Wé"""
+      convStrChushogi("5e4f4g") must_== """Wá"""
+      convStrChushogi("5e4f5g") must_== """WÙ"""
+      convStrChushogi("5e5f4e") must_== """WÐ"""
+      convStrChushogi("5e5f5e") must_== """WÈ"""
+      convStrChushogi("5e5f6e") must_== """WÀ"""
+      convStrChushogi("5e5f4f") must_== """W¸"""
+      convStrChushogi("5e5f6f") must_== """Wð"""
+      convStrChushogi("5e5f4g") must_== """Wè"""
+      convStrChushogi("5e5f5g") must_== """Wà"""
+      convStrChushogi("5e5f6g") must_== """WØ"""
+      convStrChushogi("5e6f5e") must_== """WÏ"""
+      convStrChushogi("5e6f6e") must_== """WÇ"""
+      convStrChushogi("5e6f7e") must_== """W¿"""
+      convStrChushogi("5e6f5f") must_== """W·"""
+      convStrChushogi("5e6f7f") must_== """Wï"""
+      convStrChushogi("5e6f5g") must_== """Wç"""
+      convStrChushogi("5e6f6g") must_== """Wß"""
+      convStrChushogi("5e6f7g") must_== """W×"""
     }
   }
 }

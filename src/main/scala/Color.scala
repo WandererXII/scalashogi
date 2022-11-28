@@ -12,20 +12,50 @@ sealed trait Color {
   val name: String
   val engName: String
 
-  final def pawn           = this - Pawn
-  final def gold           = this - Gold
-  final def silver         = this - Silver
-  final def lance          = this - Lance
-  final def bishop         = this - Bishop
-  final def knight         = this - Knight
-  final def rook           = this - Rook
-  final def tokin          = this - Tokin
-  final def dragon         = this - Dragon
-  final def horse          = this - Horse
-  final def promotedsilver = this - PromotedSilver
-  final def promotedknight = this - PromotedKnight
-  final def promotedlance  = this - PromotedLance
-  final def king           = this - King
+  final def bishop                = this - Bishop
+  final def bishopPromoted        = this - BishopPromoted
+  final def boar                  = this - Boar
+  final def chariot               = this - Chariot
+  final def copper                = this - Copper
+  final def dragon                = this - Dragon
+  final def dragonPromoted        = this - DragonPromoted
+  final def eagle                 = this - Eagle
+  final def elephant              = this - Elephant
+  final def elephantPromoted      = this - ElephantPromoted
+  final def falcon                = this - Falcon
+  final def goBetween             = this - GoBetween
+  final def gold                  = this - Gold
+  final def horse                 = this - Horse
+  final def horsePromoted         = this - HorsePromoted
+  final def king                  = this - King
+  final def kirin                 = this - Kirin
+  final def knight                = this - Knight
+  final def lance                 = this - Lance
+  final def leopard               = this - Leopard
+  final def lion                  = this - Lion
+  final def lionPromoted          = this - LionPromoted
+  final def ox                    = this - Ox
+  final def pawn                  = this - Pawn
+  final def phoenix               = this - Phoenix
+  final def prince                = this - Prince
+  final def promotedKnight        = this - PromotedKnight
+  final def promotedLance         = this - PromotedLance
+  final def promotedPawn          = this - PromotedPawn
+  final def promotedSilver        = this - PromotedSilver
+  final def queen                 = this - Queen
+  final def queenPromoted         = this - QueenPromoted
+  final def rook                  = this - Rook
+  final def rookPromoted          = this - RookPromoted
+  final def sideMover             = this - SideMover
+  final def sideMoverPromoted     = this - SideMoverPromoted
+  final def silver                = this - Silver
+  final def stag                  = this - Stag
+  final def tiger                 = this - Tiger
+  final def tokin                 = this - Tokin
+  final def verticalMover         = this - VerticalMover
+  final def verticalMoverPromoted = this - VerticalMoverPromoted
+  final def whale                 = this - Whale
+  final def whiteHorse            = this - WhiteHorse
 
   final val sente = this == Color.Sente
   final val gote  = this == Color.Gote

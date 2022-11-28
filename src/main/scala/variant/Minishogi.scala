@@ -36,8 +36,6 @@ case object Minishogi
       SQ1B -> Gote.pawn
     )
 
-  val hands = Map.empty
-
   val allRoles = List(
     Pawn,
     Silver,

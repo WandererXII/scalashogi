@@ -18,8 +18,9 @@ final case class Sfen(value: String) extends AnyVal {
     for {
       board <- toBoard(variant)
       hands <- toHands(variant)
+      history = toHistory(variant)
     } yield {
-      val sit = Situation(board, hands, color | Sente, variant)
+      val sit = Situation(board, hands, color | Sente, history, variant)
       if (color.isEmpty && sit.check) sit.switch else sit
     }
 
@@ -31,7 +32,14 @@ final case class Sfen(value: String) extends AnyVal {
   }
 
   def toHands(variant: Variant): Option[Hands] =
-    handsString.fold(Hands(variant).some)(Sfen.makeHandsFromString(_, variant))
+    if (variant.supportsDrops)
+      handsString.fold(Hands(variant).some)(Sfen.makeHandsFromString(_, variant))
+    else Hands.empty.some
+
+  def toHistory(variant: Variant): History =
+    if (variant == shogi.variant.Chushogi)
+      handsString.map(s => History.empty withLastLionCapture Pos.fromKey(s)).getOrElse(History.empty)
+    else History.empty
 
   def boardString: Option[String] =
     value.split(' ').lift(0)
@@ -73,7 +81,8 @@ object Sfen {
     List(
       boardToString(sit.board, sit.variant),
       sit.color.letter,
-      handsToString(sit.hands, sit.variant)
+      if (sit.variant == shogi.variant.Chushogi) lastLionCaptureDestToString(sit.history)
+      else handsToString(sit.hands, sit.variant)
     ) mkString " "
 
   def boardToString(board: Board, variant: Variant): String = {
@@ -82,12 +91,12 @@ object Sfen {
     for (y <- 0 to (variant.numberOfRanks - 1)) {
       empty = 0
       for (x <- (variant.numberOfFiles - 1) to 0 by -1) {
-        board(x, y) match {
+        board(x, y).flatMap(p => SfenUtils.toForsyth(p, variant)) match {
           case None => empty = empty + 1
-          case Some(piece) =>
-            if (empty == 0) sfen append piece.forsyth
+          case Some(forsyth) =>
+            if (empty == 0) sfen append forsyth
             else {
-              sfen append (empty.toString + piece.forsyth)
+              sfen append (empty.toString + forsyth)
               empty = 0
             }
         }
@@ -98,11 +107,15 @@ object Sfen {
     sfen.toString
   }
 
+  private def lastLionCaptureDestToString(history: History): String =
+    history.lastLionCapture.fold("-")(_.key)
+
   private[forsyth] def handToString(hand: Hand, variant: Variant): String =
     variant.handRoles map { r =>
-      val cnt = hand(r)
-      if (cnt == 1) r.forsyth
-      else if (cnt > 1) cnt.toString + r.forsyth
+      val cnt     = hand(r)
+      val forsyth = SfenUtils.toForsyth(r, variant) | ""
+      if (cnt == 1) forsyth
+      else if (cnt > 1) cnt.toString + forsyth
       else ""
     } mkString ""
 
@@ -110,7 +123,7 @@ object Sfen {
     List(
       handToString(hands.sente, variant).toUpperCase,
       handToString(hands.gote, variant)
-    ).mkString("").some.filterNot(_.isEmpty).getOrElse("-")
+    ).mkString("").some.filterNot(_.isEmpty) | "-"
 
   private def makePieceMapFromString(boardStr: String, variant: Variant): Option[PieceMap] = {
 
@@ -125,12 +138,13 @@ object Sfen {
         case Nil => Some(pieces)
         case '/' :: rest if y < variant.numberOfRanks =>
           piecesListRec(pieces, rest, variant.numberOfFiles - 1, y + 1)
-        case c :: rest if c.isDigit && x >= 0 => piecesListRec(pieces, rest, x - c.asDigit, y)
+        case '1' :: c :: rest if c.isDigit && x >= 0 => piecesListRec(pieces, rest, x - (10 + c.asDigit), y)
+        case c :: rest if c.isDigit && x >= 0        => piecesListRec(pieces, rest, x - c.asDigit, y)
         case '+' :: c :: rest =>
           (for {
             pos   <- Pos.at(x, y)
             _     <- Option.when(variant.isInsideBoard(pos))(())
-            piece <- Piece.fromForsyth("+" + c)
+            piece <- SfenUtils.toPiece("+" + c, variant)
           } yield (pos -> piece :: pieces)) match {
             case Some(ps) => piecesListRec(ps, rest, x - 1, y)
             case _        => None
@@ -139,7 +153,7 @@ object Sfen {
           (for {
             pos   <- Pos.at(x, y)
             _     <- Option.when(variant.isInsideBoard(pos))(())
-            piece <- Piece.fromForsyth(c.toString)
+            piece <- SfenUtils.toPiece(c.toString, variant)
           } yield (pos -> piece :: pieces)) match {
             case Some(ps) => piecesListRec(ps, rest, x - 1, y)
             case _        => None
@@ -160,9 +174,11 @@ object Sfen {
         case d :: rest if d.isDigit =>
           handsRec(hands, rest, curCount.map(_ * 10 + d.asDigit) orElse d.asDigit.some)
         case p :: rest =>
-          Piece.fromForsyth(p.toString).filter(variant.handRoles contains _.role) match {
-            case Some(piece) =>
-              handsRec(hands.store(piece, curCount.fold(1)(math.min(_, 81))), rest, None)
+          SfenUtils.toPiece(p.toString, variant).flatMap { p =>
+            variant.handRoles.find(_ == p.role).map((p.color, _))
+          } match {
+            case Some((color, role)) =>
+              handsRec(hands.store(color, role, curCount.fold(1)(math.min(_, 81))), rest, None)
             case _ => None
           }
       }

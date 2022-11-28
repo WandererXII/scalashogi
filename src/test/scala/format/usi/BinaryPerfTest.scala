@@ -11,7 +11,7 @@ class BinaryPerfTest extends ShogiTest {
     Binary.decodeMoves(Binary.encodeMoves(usis, variant.Standard).toVector, variant.Standard, 600)
   def run(): Unit = { usis foreach runOne }
 
-  "playing a game" should {
+  "reading a game" should {
     "many times" in {
       println("warming up")
       run()

@@ -1,92 +1,270 @@
 package shogi
 
-import cats.data.NonEmptyList
-
 sealed trait Role {
-  val forsyth: String
-  val csa: String
-  val kif: NonEmptyList[String]
-
-  lazy val forsythUpper: String = forsyth.toUpperCase
-  lazy val kifSingle: String    = kif.head
-
   lazy val name: String = toString.toLowerCase
 
+  // For generating long-range moves, moves until stopped, e.g. bishop
   val senteProjectionDirs: Directions
   val goteProjectionDirs: Directions
 
+  // For generating moves to adjacent squares or jumps, consumed after one use, e.g. pawn, knight
   val senteDirectDirs: Directions
   val goteDirectDirs: Directions
 
-  // Generating next possible position of piece based on previous positions
-  // for pieces that don't have long range attacks it's None
-  def dir(from: Pos, to: Pos): Option[Direction]
+  // Moving inside direct dirs by 1 dist, it can move again inside direct dirs by 1 dist
+  val hasLionPower: Boolean = false
+
+  // Can move from `from` position to `to` position assuming empty max-sized board, for optimization
+  def senteEyes(from: Pos, to: Pos): Boolean
+  def goteEyes(from: Pos, to: Pos): Boolean
+}
+
+sealed trait DroppableRole extends Role
+
+case object Bishop extends DroppableRole {
+  val senteProjectionDirs = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
+  val goteProjectionDirs  = senteProjectionDirs
+
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) = (from onSameDiagonal to) && from != to
+  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+}
+
+case object BishopPromoted extends Role {
+  val senteProjectionDirs = Bishop.senteProjectionDirs
+  val goteProjectionDirs  = Bishop.goteProjectionDirs
+
+  val senteDirectDirs = Bishop.senteDirectDirs
+  val goteDirectDirs  = Bishop.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Bishop.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Bishop.goteEyes(from, to)
+}
+
+case object Boar extends Role {
+  val senteProjectionDirs = List(_.upRight, _.right, _.downRight, _.downLeft, _.left, _.upLeft)
+  val goteProjectionDirs  = senteProjectionDirs
+
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) =
+    ((from onSameDiagonal to) || (from isSameRank to)) && from != to
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object Chariot extends Role {
+  val senteProjectionDirs = List(_.up, _.down)
+  val goteProjectionDirs  = senteProjectionDirs
+
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) = (from isSameFile to) && from != to
+  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+}
+
+case object Copper extends Role {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
+  val senteDirectDirs = List(_.up, _.upLeft, _.upRight, _.down)
+  val goteDirectDirs  = List(_.up, _.down, _.downLeft, _.downRight)
+
+  def senteEyes(from: Pos, to: Pos) =
+    (from touches to) && ((from isSameFile to) || (from isBelow to))
+  def goteEyes(from: Pos, to: Pos) =
+    (from touches to) && ((from isSameFile to) || (from isAbove to))
+}
+
+case object Dragon extends Role {
+  val senteProjectionDirs = Rook.senteProjectionDirs
+  val goteProjectionDirs  = Rook.goteProjectionDirs
+
+  val senteDirectDirs = Bishop.senteProjectionDirs
+  val goteDirectDirs  = Bishop.goteProjectionDirs
+
+  def senteEyes(from: Pos, to: Pos) =
+    (from touches to) || Rook.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object DragonPromoted extends Role {
+  val senteProjectionDirs = Dragon.senteProjectionDirs
+  val goteProjectionDirs  = Dragon.goteProjectionDirs
+
+  val senteDirectDirs = Dragon.senteDirectDirs
+  val goteDirectDirs  = Dragon.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Dragon.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Dragon.goteEyes(from, to)
+}
+
+case object Eagle extends Role {
+  val senteProjectionDirs = List(_.up, _.right, _.downRight, _.down, _.downLeft, _.left)
+  val goteProjectionDirs  = List(_.up, _.upRight, _.right, _.down, _.left, _.upLeft)
+
+  val senteDirectDirs: Directions = List(
+    _.upRight,
+    p => Pos.at(p.file.index + 2, p.rank.index - 2),
+    _.upLeft,
+    p => Pos.at(p.file.index - 2, p.rank.index - 2)
+  )
+  val goteDirectDirs: Directions = List(
+    _.downRight,
+    p => Pos.at(p.file.index + 2, p.rank.index + 2),
+    _.downLeft,
+    p => Pos.at(p.file.index - 2, p.rank.index + 2)
+  )
+
+  override val hasLionPower = true
+
+  def senteEyes(from: Pos, to: Pos) =
+    (Rook.senteEyes(
+      from,
+      to
+    ) || ((from onSameDiagonal to) && ((from isAbove to) || (from xDist to) <= 2))) && from != to
+  def goteEyes(from: Pos, to: Pos) =
+    (Rook.senteEyes(
+      from,
+      to
+    ) || ((from onSameDiagonal to) && ((from isBelow to) || (from xDist to) <= 2))) && from != to
+}
+
+case object Elephant extends Role {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
+  val senteDirectDirs = List(_.up, _.upLeft, _.upRight, _.left, _.right, _.downLeft, _.downRight)
+  val goteDirectDirs  = List(_.down, _.downLeft, _.downRight, _.left, _.right, _.upRight, _.upLeft)
+
+  def senteEyes(from: Pos, to: Pos) =
+    (from touches to) && (!(from isSameFile to) || (from isBelow to))
+  def goteEyes(from: Pos, to: Pos) =
+    (from touches to) && (!(from isSameFile to) || (from isAbove to))
+}
+
+case object ElephantPromoted extends Role {
+  val senteProjectionDirs = Elephant.senteProjectionDirs
+  val goteProjectionDirs  = Elephant.goteProjectionDirs
+
+  val senteDirectDirs = Elephant.senteDirectDirs
+  val goteDirectDirs  = Elephant.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Elephant.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Elephant.goteEyes(from, to)
+}
+
+case object Falcon extends Role {
+  val senteProjectionDirs = List(_.upRight, _.right, _.downRight, _.down, _.downLeft, _.left, _.upLeft)
+  val goteProjectionDirs  = List(_.up, _.upRight, _.right, _.downRight, _.downLeft, _.left, _.upLeft)
+
+  val senteDirectDirs = List(
+    _.up,
+    p => Pos.at(p.file.index, p.rank.index - 2)
+  )
+  val goteDirectDirs = List(
+    _.down,
+    p => Pos.at(p.file.index, p.rank.index + 2)
+  )
+
+  override val hasLionPower = true
+
+  def senteEyes(from: Pos, to: Pos) =
+    (Bishop.senteEyes(
+      from,
+      to
+    ) || (from isSameRank to) || ((from isSameFile to) && ((from isAbove to) || (from yDist to) <= 2))) && from != to
+  def goteEyes(from: Pos, to: Pos) =
+    (Bishop.senteEyes(
+      from,
+      to
+    ) || (from isSameRank to) || ((from isSameFile to) && ((from isBelow to) || (from yDist to) <= 2))) && from != to
+
+}
+
+case object GoBetween extends Role {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
+  val senteDirectDirs = List(_.up, _.down)
+  val goteDirectDirs  = senteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) =
+    (from isSameFile to) && ((from yDist to) == 1)
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object Gold extends DroppableRole {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
+  val senteDirectDirs = List(_.up, _.down, _.left, _.right, _.upLeft, _.upRight)
+  val goteDirectDirs  = List(_.up, _.down, _.left, _.right, _.downLeft, _.downRight)
+
+  def senteEyes(from: Pos, to: Pos) =
+    (from touches to) && ((to isAbove from) || (to onSameLine from))
+  def goteEyes(from: Pos, to: Pos) =
+    (from touches to) && ((to isBelow from) || (to onSameLine from))
+}
+
+case object Horse extends Role {
+  val senteProjectionDirs = Bishop.senteProjectionDirs
+  val goteProjectionDirs  = Bishop.goteProjectionDirs
+
+  val senteDirectDirs = Rook.senteProjectionDirs
+  val goteDirectDirs  = Rook.goteProjectionDirs
+
+  def senteEyes(from: Pos, to: Pos) =
+    (from touches to) || Bishop.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object HorsePromoted extends Role {
+  val senteProjectionDirs = Horse.senteProjectionDirs
+  val goteProjectionDirs  = Horse.goteProjectionDirs
+
+  val senteDirectDirs = Horse.senteDirectDirs
+  val goteDirectDirs  = Horse.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Horse.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Horse.goteEyes(from, to)
 }
 
 case object King extends Role {
-  val forsyth = "k"
-  val csa     = "OU"
-  val kif     = NonEmptyList.of("玉", "王")
-
   val senteProjectionDirs = Nil
   val goteProjectionDirs  = Nil
-  val senteDirectDirs     = Rook.senteProjectionDirs ::: Bishop.senteProjectionDirs
-  val goteDirectDirs      = senteDirectDirs
 
-  def dir(from: Pos, to: Pos): Option[Direction] = None
+  val senteDirectDirs = Rook.senteProjectionDirs ::: Bishop.senteProjectionDirs
+  val goteDirectDirs  = senteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = from touches to
+  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
 }
 
-case object Rook extends Role {
-  val forsyth = "r"
-  val csa     = "HI"
-  val kif     = NonEmptyList.of("飛")
-
-  val senteProjectionDirs = List(_.up, _.down, _.left, _.right)
-  val goteProjectionDirs  = senteProjectionDirs
-  val senteDirectDirs     = Nil
-  val goteDirectDirs      = Nil
-
-  def dir(from: Pos, to: Pos) =
-    if (to ?| from)
-      Some(
-        if (to ?^ from) (_.up) else (_.down)
-      )
-    else if (to ?- from)
-      Some(
-        if (to ?< from) (_.left) else (_.right)
-      )
-    else None
-}
-
-case object Bishop extends Role {
-  val forsyth = "b"
-  val csa     = "KA"
-  val kif     = NonEmptyList.of("角")
-
-  val senteProjectionDirs = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
-  val goteProjectionDirs  = senteProjectionDirs
-  val senteDirectDirs     = Nil
-  val goteDirectDirs      = Nil
-
-  def dir(from: Pos, to: Pos) =
-    if (to onSameDiagonal from)
-      Some(
-        if (to ?^ from) {
-          if (to ?< from) (_.upLeft) else (_.upRight)
-        } else {
-          if (to ?< from) (_.downLeft) else (_.downRight)
-        }
-      )
-    else None
-}
-
-case object Knight extends Role {
-  val forsyth = "n"
-  val csa     = "KE"
-  val kif     = NonEmptyList.of("桂")
-
+case object Kirin extends Role {
   val senteProjectionDirs = Nil
   val goteProjectionDirs  = Nil
+
+  val senteDirectDirs: Directions = List[Direction](
+    p => Pos.at(p.file.index, p.rank.index - 2),
+    p => Pos.at(p.file.index + 2, p.rank.index),
+    p => Pos.at(p.file.index, p.rank.index + 2),
+    p => Pos.at(p.file.index - 2, p.rank.index)
+  ) ::: Bishop.senteProjectionDirs
+  val goteDirectDirs = senteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) =
+    ((from touches to) && !(from onSameLine to)) || ((from onSameLine to) && (from dist to) == 2)
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object Knight extends DroppableRole {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
   val senteDirectDirs: Directions = List(
     p => Pos.at(p.file.index - 1, p.rank.index - 2),
     p => Pos.at(p.file.index + 1, p.rank.index - 2)
@@ -96,193 +274,401 @@ case object Knight extends Role {
     p => Pos.at(p.file.index + 1, p.rank.index + 2)
   )
 
-  def dir(from: Pos, to: Pos): Option[Direction] = None
+  def senteEyes(from: Pos, to: Pos) =
+    (from xDist to) == 1 && (from yDist to) == 2 && (to isAbove from)
+  def goteEyes(from: Pos, to: Pos) =
+    (from xDist to) == 1 && (from yDist to) == 2 && (to isBelow from)
 }
 
-case object Pawn extends Role {
-  val forsyth = "p"
-  val csa     = "FU"
-  val kif     = NonEmptyList.of("歩", "兵")
-
-  val senteProjectionDirs = Nil
-  val goteProjectionDirs  = Nil
-  val senteDirectDirs     = List(_.up)
-  val goteDirectDirs      = List(_.down)
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
-}
-
-case object Gold extends Role {
-  val forsyth = "g"
-  val csa     = "KI"
-  val kif     = NonEmptyList.of("金")
-
-  val senteProjectionDirs = Nil
-  val goteProjectionDirs  = Nil
-  val senteDirectDirs     = List(_.up, _.down, _.left, _.right, _.upLeft, _.upRight)
-  val goteDirectDirs      = List(_.up, _.down, _.left, _.right, _.downLeft, _.downRight)
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
-}
-
-case object Silver extends Role {
-  val forsyth = "s"
-  val csa     = "GI"
-  val kif     = NonEmptyList.of("銀")
-
-  val senteProjectionDirs = Nil
-  val goteProjectionDirs  = Nil
-  val senteDirectDirs     = List(_.up, _.upLeft, _.upRight, _.downLeft, _.downRight)
-  val goteDirectDirs      = List(_.down, _.upLeft, _.upRight, _.downLeft, _.downRight)
-
-  def dir(from: Pos, to: Pos): Option[Direction] = None
-}
-
-case object Lance extends Role {
-  val forsyth = "l"
-  val csa     = "KY"
-  val kif     = NonEmptyList.of("香")
-
+case object Lance extends DroppableRole {
   val senteProjectionDirs = List(_.up)
   val goteProjectionDirs  = List(_.down)
-  val senteDirectDirs     = Nil
-  val goteDirectDirs      = Nil
 
-  def dir(from: Pos, to: Pos) =
-    if (to ?| from)
-      Some(
-        if (to ?^ from) (_.up) else (_.down)
-      )
-    else None
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) =
+    (from isSameFile to) && (from isBelow to)
+  def goteEyes(from: Pos, to: Pos) =
+    (from isSameFile to) && (from isAbove to)
 }
 
-case object Tokin extends Role {
-  val forsyth = "+p"
-  val csa     = "TO"
-  val kif     = NonEmptyList.of("と", "个")
+case object Leopard extends Role {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
 
-  val senteProjectionDirs = Gold.senteProjectionDirs
-  val goteProjectionDirs  = Gold.goteProjectionDirs
-  val senteDirectDirs     = Gold.senteDirectDirs
-  val goteDirectDirs      = Gold.goteDirectDirs
+  val senteDirectDirs = List(_.up, _.upLeft, _.upRight, _.down, _.downLeft, _.downRight)
+  val goteDirectDirs  = senteDirectDirs
 
-  def dir(from: Pos, to: Pos): Option[Direction] = None
+  def senteEyes(from: Pos, to: Pos) =
+    (from touches to) && !(from isSameRank to)
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
 }
 
-case object PromotedSilver extends Role {
-  val forsyth = "+s"
-  val csa     = "NG"
-  val kif     = NonEmptyList.of("成銀", "全")
+case object Lion extends Role {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
 
-  override lazy val kifSingle = "全"
+  val senteDirectDirs: Directions =
+    List[Direction](
+      p => Pos.at(p.file.index, p.rank.index + 2),
+      p => Pos.at(p.file.index + 1, p.rank.index + 2),
+      p => Pos.at(p.file.index + 2, p.rank.index + 2),
+      p => Pos.at(p.file.index + 2, p.rank.index + 1),
+      p => Pos.at(p.file.index + 2, p.rank.index),
+      p => Pos.at(p.file.index + 2, p.rank.index - 1),
+      p => Pos.at(p.file.index + 2, p.rank.index - 2),
+      p => Pos.at(p.file.index + 1, p.rank.index - 2),
+      p => Pos.at(p.file.index, p.rank.index - 2),
+      p => Pos.at(p.file.index - 1, p.rank.index - 2),
+      p => Pos.at(p.file.index - 2, p.rank.index - 2),
+      p => Pos.at(p.file.index - 2, p.rank.index - 1),
+      p => Pos.at(p.file.index - 2, p.rank.index),
+      p => Pos.at(p.file.index - 2, p.rank.index + 1),
+      p => Pos.at(p.file.index - 2, p.rank.index + 2),
+      p => Pos.at(p.file.index - 1, p.rank.index + 2)
+    ) ::: King.senteDirectDirs
+  val goteDirectDirs = senteDirectDirs
 
-  val senteProjectionDirs = Gold.senteProjectionDirs
-  val goteProjectionDirs  = Gold.goteProjectionDirs
-  val senteDirectDirs     = Gold.senteDirectDirs
-  val goteDirectDirs      = Gold.goteDirectDirs
+  override val hasLionPower = true
 
-  def dir(from: Pos, to: Pos): Option[Direction] = None
+  def senteEyes(from: Pos, to: Pos) = (from dist to) <= 2 && from != to
+  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+}
+
+case object LionPromoted extends Role {
+  val senteProjectionDirs = Lion.senteProjectionDirs
+  val goteProjectionDirs  = Lion.goteProjectionDirs
+
+  val senteDirectDirs = Lion.senteDirectDirs
+  val goteDirectDirs  = Lion.goteDirectDirs
+
+  override val hasLionPower = Lion.hasLionPower
+
+  def senteEyes(from: Pos, to: Pos) = Lion.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Lion.goteEyes(from, to)
+}
+
+case object Ox extends Role {
+  val senteProjectionDirs = List(_.up, _.upRight, _.downRight, _.down, _.downLeft, _.upLeft)
+  val goteProjectionDirs  = senteProjectionDirs
+
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) =
+    ((from isSameFile to) || (from onSameDiagonal to)) && from != to
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object Pawn extends DroppableRole {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
+  val senteDirectDirs = List(_.up)
+  val goteDirectDirs  = List(_.down)
+
+  def senteEyes(from: Pos, to: Pos) = from.up.exists(_ == to)
+  def goteEyes(from: Pos, to: Pos)  = from.down.exists(_ == to)
+}
+
+case object Phoenix extends Role {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
+  val senteDirectDirs: Directions =
+    List[Direction](
+      p => Pos.at(p.file.index + 2, p.rank.index + 2),
+      p => Pos.at(p.file.index + 2, p.rank.index - 2),
+      p => Pos.at(p.file.index - 2, p.rank.index + 2),
+      p => Pos.at(p.file.index - 2, p.rank.index - 2)
+    ) ::: Rook.senteProjectionDirs
+  val goteDirectDirs = senteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) =
+    ((from touches to) && (from onSameLine to)) || ((from xDist to) == 2 && (from onSameDiagonal to))
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object Prince extends Role {
+  val senteProjectionDirs = King.senteProjectionDirs
+  val goteProjectionDirs  = King.goteProjectionDirs
+
+  val senteDirectDirs = King.senteDirectDirs
+  val goteDirectDirs  = King.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = King.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = King.goteEyes(from, to)
 }
 
 case object PromotedKnight extends Role {
-  val forsyth = "+n"
-  val csa     = "NK"
-  val kif     = NonEmptyList.of("成桂", "今", "圭")
-
-  override lazy val kifSingle = "圭"
-
   val senteProjectionDirs = Gold.senteProjectionDirs
   val goteProjectionDirs  = Gold.goteProjectionDirs
-  val senteDirectDirs     = Gold.senteDirectDirs
-  val goteDirectDirs      = Gold.goteDirectDirs
 
-  def dir(from: Pos, to: Pos): Option[Direction] = None
+  val senteDirectDirs = Gold.senteDirectDirs
+  val goteDirectDirs  = Gold.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
 }
 
 case object PromotedLance extends Role {
-  val forsyth = "+l"
-  val csa     = "NY"
-  val kif     = NonEmptyList.of("成香", "仝", "杏")
-
-  override lazy val kifSingle = "杏"
-
   val senteProjectionDirs = Gold.senteProjectionDirs
   val goteProjectionDirs  = Gold.goteProjectionDirs
-  val senteDirectDirs     = Gold.senteDirectDirs
-  val goteDirectDirs      = Gold.goteDirectDirs
 
-  def dir(from: Pos, to: Pos): Option[Direction] = None
+  val senteDirectDirs = Gold.senteDirectDirs
+  val goteDirectDirs  = Gold.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
 }
 
-case object Horse extends Role {
-  val forsyth = "+b"
-  val csa     = "UM"
-  val kif     = NonEmptyList.of("馬")
+case object PromotedPawn extends Role {
+  val senteProjectionDirs = Gold.senteProjectionDirs
+  val goteProjectionDirs  = Gold.goteProjectionDirs
 
-  val senteProjectionDirs = Bishop.senteProjectionDirs
-  val goteProjectionDirs  = Bishop.goteProjectionDirs
-  val senteDirectDirs     = Rook.senteProjectionDirs
-  val goteDirectDirs      = Rook.goteProjectionDirs
+  val senteDirectDirs = Gold.senteDirectDirs
+  val goteDirectDirs  = Gold.goteDirectDirs
 
-  def dir(from: Pos, to: Pos) = Bishop.dir(from, to)
+  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
 }
 
-case object Dragon extends Role {
-  val forsyth = "+r"
-  val csa     = "RY"
-  val kif     = NonEmptyList.of("龍", "竜")
+case object PromotedSilver extends Role {
+  val senteProjectionDirs = Gold.senteProjectionDirs
+  val goteProjectionDirs  = Gold.goteProjectionDirs
 
+  val senteDirectDirs = Gold.senteDirectDirs
+  val goteDirectDirs  = Gold.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
+}
+
+case object Queen extends Role {
+  val senteProjectionDirs = Rook.senteProjectionDirs ::: Bishop.senteProjectionDirs
+  val goteProjectionDirs  = Rook.goteProjectionDirs ::: Bishop.goteProjectionDirs
+
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) =
+    Rook.senteEyes(from, to) || Bishop.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object QueenPromoted extends Role {
+  val senteProjectionDirs = Queen.senteProjectionDirs
+  val goteProjectionDirs  = Queen.goteProjectionDirs
+
+  val senteDirectDirs = Queen.senteDirectDirs
+  val goteDirectDirs  = Queen.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Queen.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Queen.goteEyes(from, to)
+}
+
+case object Rook extends DroppableRole {
+  val senteProjectionDirs = List(_.up, _.down, _.left, _.right)
+  val goteProjectionDirs  = senteProjectionDirs
+
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) = (from onSameLine to) && from != to
+  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+}
+
+case object RookPromoted extends Role {
   val senteProjectionDirs = Rook.senteProjectionDirs
   val goteProjectionDirs  = Rook.goteProjectionDirs
-  val senteDirectDirs     = Bishop.senteProjectionDirs
-  val goteDirectDirs      = Bishop.goteProjectionDirs
 
-  def dir(from: Pos, to: Pos): Option[Direction] = Rook.dir(from, to)
+  val senteDirectDirs = Rook.senteDirectDirs
+  val goteDirectDirs  = Rook.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Rook.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Rook.goteEyes(from, to)
+}
+
+case object SideMover extends Role {
+  val senteProjectionDirs = List(_.left, _.right)
+  val goteProjectionDirs  = senteProjectionDirs
+
+  val senteDirectDirs = List(_.up, _.down)
+  val goteDirectDirs  = senteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) =
+    ((from isSameRank to) && from != to) || GoBetween.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object SideMoverPromoted extends Role {
+  val senteProjectionDirs = SideMover.senteProjectionDirs
+  val goteProjectionDirs  = SideMover.goteProjectionDirs
+
+  val senteDirectDirs = SideMover.senteDirectDirs
+  val goteDirectDirs  = SideMover.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = SideMover.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = SideMover.goteEyes(from, to)
+}
+
+case object Silver extends DroppableRole {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
+  val senteDirectDirs = List(_.up, _.upLeft, _.upRight, _.downLeft, _.downRight)
+  val goteDirectDirs  = List(_.down, _.upLeft, _.upRight, _.downLeft, _.downRight)
+
+  def senteEyes(from: Pos, to: Pos) =
+    (from touches to) && !(from isSameRank to) && (!(from isSameFile to) || (to isAbove from))
+  def goteEyes(from: Pos, to: Pos) =
+    (from touches to) && !(from isSameRank to) && (!(from isSameFile to) || (to isBelow from))
+}
+
+case object Stag extends Role {
+  val senteProjectionDirs = List(_.up, _.down)
+  val goteProjectionDirs  = senteProjectionDirs
+
+  val senteDirectDirs = List(_.upRight, _.right, _.downRight, _.downLeft, _.left, _.upLeft)
+  val goteDirectDirs  = senteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) =
+    ((from isSameFile to) && from != to) || (from touches to)
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object Tiger extends Role {
+  val senteProjectionDirs = Nil
+  val goteProjectionDirs  = Nil
+
+  val senteDirectDirs = List(_.down, _.downLeft, _.downRight, _.left, _.right, _.upRight, _.upLeft)
+  val goteDirectDirs  = List(_.up, _.upLeft, _.upRight, _.left, _.right, _.downLeft, _.downRight)
+
+  def senteEyes(from: Pos, to: Pos) = Elephant.goteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Elephant.senteEyes(from, to)
+}
+
+case object Tokin extends Role {
+  val senteProjectionDirs = Gold.senteProjectionDirs
+  val goteProjectionDirs  = Gold.goteProjectionDirs
+
+  val senteDirectDirs = Gold.senteDirectDirs
+  val goteDirectDirs  = Gold.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
+}
+
+case object VerticalMover extends Role {
+  val senteProjectionDirs = List(_.up, _.down)
+  val goteProjectionDirs  = senteProjectionDirs
+
+  val senteDirectDirs = List(_.left, _.right)
+  val goteDirectDirs  = senteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) =
+    Chariot.senteEyes(from, to) || ((from isSameRank to) && ((from xDist to) == 1))
+  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+}
+
+case object VerticalMoverPromoted extends Role {
+  val senteProjectionDirs = VerticalMover.senteProjectionDirs
+  val goteProjectionDirs  = VerticalMover.goteProjectionDirs
+
+  val senteDirectDirs = VerticalMover.senteDirectDirs
+  val goteDirectDirs  = VerticalMover.goteDirectDirs
+
+  def senteEyes(from: Pos, to: Pos) = VerticalMover.senteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = VerticalMover.goteEyes(from, to)
+}
+
+case object Whale extends Role {
+  val senteProjectionDirs = List(_.down, _.downLeft, _.downRight, _.up)
+  val goteProjectionDirs  = List(_.up, _.upLeft, _.upRight, _.down)
+
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) = WhiteHorse.goteEyes(from, to)
+  def goteEyes(from: Pos, to: Pos)  = WhiteHorse.senteEyes(from, to)
+}
+
+case object WhiteHorse extends Role {
+  val senteProjectionDirs = List(_.up, _.upLeft, _.upRight, _.down)
+  val goteProjectionDirs  = List(_.down, _.downLeft, _.downRight, _.up)
+
+  val senteDirectDirs = Nil
+  val goteDirectDirs  = Nil
+
+  def senteEyes(from: Pos, to: Pos) =
+    ((from isSameFile to) && from != to) || ((from onSameDiagonal to) && (from isBelow to))
+  def goteEyes(from: Pos, to: Pos) =
+    ((from isSameFile to) && from != to) || ((from onSameDiagonal to) && (from isAbove to))
 }
 
 object Role {
 
   val all: List[Role] = List(
-    King,
-    Rook,
     Bishop,
-    Knight,
-    Pawn,
+    BishopPromoted,
+    Boar,
+    Chariot,
+    Copper,
+    Dragon,
+    DragonPromoted,
+    Eagle,
+    Elephant,
+    ElephantPromoted,
+    Falcon,
+    GoBetween,
     Gold,
-    Silver,
-    Lance,
-    Tokin,
     Horse,
-    PromotedSilver,
+    HorsePromoted,
+    King,
+    Kirin,
+    Knight,
+    Lance,
+    Leopard,
+    Lion,
+    LionPromoted,
+    Ox,
+    Pawn,
+    Phoenix,
+    Prince,
     PromotedKnight,
     PromotedLance,
-    Dragon
+    PromotedPawn,
+    PromotedSilver,
+    Queen,
+    QueenPromoted,
+    Rook,
+    RookPromoted,
+    SideMover,
+    SideMoverPromoted,
+    Silver,
+    Stag,
+    Tiger,
+    Tokin,
+    VerticalMover,
+    VerticalMoverPromoted,
+    Whale,
+    WhiteHorse
+  )
+
+  val allDroppable: List[DroppableRole] = List(
+    Bishop,
+    Gold,
+    Knight,
+    Lance,
+    Pawn,
+    Rook,
+    Silver
   )
 
   val allByName: Map[String, Role] = all map { r =>
     (r.name, r)
   } toMap
-
-  val allByForsyth: Map[String, Role] = all map { r =>
-    (r.forsyth, r)
-  } toMap
-
-  val allByForsythUpper: Map[String, Role] = all map { r =>
-    (r.forsythUpper, r)
-  } toMap
-
-  val allByKif: Map[String, Role] = all flatMap { r =>
-    r.kif.toList map { k =>
-      (k, r)
-    }
-  } toMap
-
-  val allByCsa: Map[String, Role] = all map { r =>
-    (r.csa, r)
-  } toMap
-
-  val allByEverything: Map[String, Role] =
-    allByForsyth ++ allByForsythUpper ++ allByKif ++ allByCsa
 
   def valueOf(r: Role): Int =
     r match {
@@ -297,12 +683,6 @@ object Role {
       case Horse                                                  => 10
       case Dragon                                                 => 12
       case King                                                   => 0
-    }
-
-  def impasseValueOf(r: Role): Int =
-    r match {
-      case Bishop | Rook | Horse | Dragon => 5
-      case King                           => 0
-      case _                              => 1
+      case _                                                      => 0
     }
 }

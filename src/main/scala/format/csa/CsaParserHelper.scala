@@ -41,11 +41,11 @@ object CsaParserHelper {
           else invalid(s"Incorrect square and piece format in handicap setup: $squarePiece")
         posStr  = squarePiece.slice(0, 2)
         roleStr = squarePiece.slice(2, 4)
-        pos <- Pos.allNumberKeys get posStr toValid s"Incorrect position in handicap setup: $posStr"
+        pos <- Pos.allHexKeys get posStr toValid s"Incorrect position in handicap setup: $posStr"
         _ <-
           if (pieces contains pos) valid(pos)
           else invalid(s"No piece to remove from $posStr in handicap setup")
-        role <- Role.allByCsa get roleStr toValid s"Non existent piece role in handicap setup: $roleStr"
+        role <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role in handicap setup: $roleStr"
         _ <-
           if (pieces.get(pos).exists(_.role == role)) valid(role)
           else invalid(s"$role not present on $posStr in handicap setup")
@@ -65,7 +65,7 @@ object CsaParserHelper {
           8 - i % 9,
           (i / 9)
         ) toValid s"Invalid board setup - too many squares"
-        piece <- Piece.fromCsa(sq) toValid s"Non existent piece (${sq}) in board setup"
+        piece <- CsaUtils.toPiece(sq) toValid s"Non existent piece (${sq}) in board setup"
       } yield (pieces + (pos -> piece))
 
     val squares = ranks.flatMap(_.drop(2).grouped(3)).zipWithIndex
@@ -115,11 +115,9 @@ object CsaParserHelper {
               if (str.size == 4) valid(str)
               else invalid(s"Incorrect format (${str}) in: $line")
             roleStr = str.slice(2, 4)
-            role <- Role.allByCsa get roleStr toValid s"Non existent piece role (${roleStr}) in: $line"
-            _ <-
-              if (Standard.handRoles.contains(role)) valid(role)
-              else invalid(s"Can't have $role in hand: $line")
-          } yield (sit.withHands(sit.hands.store(Piece(color, role))))
+            roleBase <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
+            role     <- Standard.handRoles.find(_ == roleBase) toValid s"Can't have $roleBase in hand: $line"
+          } yield (sit.withHands(sit.hands.store(color, role)))
       }
       def parseBoardAddition(str: String, color: Color, sit: Situation): Validated[String, Situation] = {
         for {
@@ -128,8 +126,8 @@ object CsaParserHelper {
             else invalid(s"Incorrect square piece format (${str}) in: $line")
           posStr  = str.slice(0, 2)
           roleStr = str.slice(2, 4)
-          pos  <- Pos.allNumberKeys get posStr toValid s"Incorrect position (${posStr}) in: $line"
-          role <- Role.allByCsa get roleStr toValid s"Non existent piece role (${roleStr}) in: $line"
+          pos  <- Pos.allHexKeys get posStr toValid s"Incorrect position (${posStr}) in: $line"
+          role <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
           boardWithPiece <- sit.board
             .place(
               Piece(color, role),

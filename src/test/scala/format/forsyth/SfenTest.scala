@@ -3,7 +3,8 @@ package format
 package forsyth
 
 import Pos._
-import variant.{ Minishogi, Standard }
+import format.usi.Usi
+import variant.{ Chushogi, Minishogi, Standard }
 
 import cats.syntax.option._
 
@@ -244,15 +245,44 @@ class SfenTest extends ShogiTest {
   }
   "minishogi" in {
     "default" in {
-      Sfen("rbsgk/4p/5/PG3/K1SBR").toSituation(Minishogi) must beSome.like { case s =>
-        s.toSfen.truncate must_== Sfen("rbsgk/4p/5/PG3/K1SBR b -")
-      }
+      Situation(Minishogi).toSfen.value must_== "rbsgk/4p/5/P4/KGSBR b -"
     }
     "too many ranks" in {
       Sfen("rbsgk/4p/5/PG3/K1SBR/PG3").toSituation(Minishogi) must beNone
     }
     "too many files" in {
       Sfen("rrbsgk/4p/5/PG3/K1SBR/PG3").toSituation(Minishogi) must beNone
+    }
+  }
+  "chushogi" in {
+    "default" in {
+      Situation(
+        Chushogi
+      ).toSfen.value must_== "lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b -"
+    }
+    "double digit files" in {
+      Sfen("11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b").toSituation(Chushogi) must beSome.like { case s =>
+        s.toSfen.truncate.value must_== "11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b -"
+        s.board(Pos.SQ1F) must beSome
+        s.board(Pos.SQ2G) must beSome
+        s.board(Pos.SQ3H) must beSome
+      }
+    }
+    "last lion capture" in {
+      Sfen(
+        "lf1s1x1kg1sl/ac1degt1ocfa/mb1h1tn1drvm/pv6pbp1/3pp1p1i2p/1prI2P3h1/3PP1+H1IPPP/1Pp4pPR2/P3DP1S2Q1/MR1HO1E1B1VM/AVBCTKDT2FA/LF1S1G1GXC1L b 5h"
+      ).toSituation(Chushogi) must beSome.like { case s =>
+        s.toSfen.truncate.value must_== "lf1s1x1kg1sl/ac1degt1ocfa/mb1h1tn1drvm/pv6pbp1/3pp1p1i2p/1prI2P3h1/3PP1+H1IPPP/1Pp4pPR2/P3DP1S2Q1/MR1HO1E1B1VM/AVBCTKDT2FA/LF1S1G1GXC1L b 5h"
+      }
+    }
+    "last lion capture from play" in {
+      Sfen("12/12/12/12/12/4r7/12/12/5o3n2/4N7/12/6B5 w - 1").toSituation(Chushogi) must beSome.like {
+        case s =>
+          val s1 = s(Usi("8f8j+").get).toOption.get
+          val s2 = s(Usi("8f3f").get).toOption.get
+          s1.toSfen.truncate.value must_== "12/12/12/12/12/12/12/12/5o3n2/4+r7/12/6B5 b 8j"
+          s2.toSfen.truncate.value must_== "12/12/12/12/12/9r2/12/12/5o3n2/4N7/12/6B5 b -"
+      }
     }
   }
 }

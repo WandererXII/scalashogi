@@ -1,15 +1,17 @@
 package shogi
+package pieces
 
 import Pos._
 
-class BishopTest extends ShogiTest {
+class HorseTest extends ShogiTest {
 
-  "a bishop" should {
+  "a horse" should {
 
-    val bishop = Sente - Bishop
+    val horse     = Sente - Horse
+    val horseGote = Gote - Horse
 
-    "move in 4 directions" in {
-      pieceMoves(bishop, SQ5E) must bePoss(
+    "move diagonally in 4 directions and all around" in {
+      pieceMoves(horse, SQ5E) must bePoss(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -25,12 +27,38 @@ class BishopTest extends ShogiTest {
         SQ8H,
         SQ8B,
         SQ9I,
-        SQ9A
+        SQ9A,
+        SQ6E,
+        SQ4E,
+        SQ5D,
+        SQ5F
+      )
+      pieceMoves(horseGote, SQ5E) must bePoss(
+        SQ4F,
+        SQ4D,
+        SQ3G,
+        SQ3C,
+        SQ2H,
+        SQ2B,
+        SQ1I,
+        SQ1A,
+        SQ6F,
+        SQ6D,
+        SQ7G,
+        SQ7C,
+        SQ8H,
+        SQ8B,
+        SQ9I,
+        SQ9A,
+        SQ6E,
+        SQ4E,
+        SQ5D,
+        SQ5F
       )
     }
 
     "move in 2 directions, when at the edges" in {
-      pieceMoves(bishop, SQ1C) must bePoss(SQ2B, SQ3A, SQ2D, SQ3E, SQ4F, SQ5G, SQ6H, SQ7I)
+      pieceMoves(horse, SQ1C) must bePoss(SQ2B, SQ3A, SQ2D, SQ3E, SQ4F, SQ5G, SQ6H, SQ7I, SQ2C, SQ1D, SQ1B)
     }
 
     "not move to positions that are occupied by the same colour" in {
@@ -39,7 +67,7 @@ k . B . . . . . .
 . . . . . . . . .
 . . . . . . . . .
 . . . . . . . . .
-N . B . . . . P .
+N .+B . . . . P .
 . . . . . . . . .
 P P P P P P P . P
 . . . . . . . . .
@@ -53,9 +81,9 @@ Turn:Sente
 k . B . . . x . .
 . . . . . x . . .
 x . . . x . . . .
-. x . x . . . . .
-N . B . . . . P .
-. x . x . . . . .
+. x x x . . . . .
+N x+B x . . . P .
+. x x x . . . . .
 P P P P P P P . P
 . . . . . . . . .
 . . . . K . . . .
@@ -71,7 +99,7 @@ k . B . . . . . .
 . . . . . r . . .
 p . . . . . . . .
 . . . . . . . . .
-N . B . . . . P .
+N .+B . . . . P .
 . . . . . . . . .
 P P P P P P P . P
 . . . . . . . . .
@@ -85,9 +113,9 @@ Turn:Sente
 k . B . . . . . .
 . . . . . x . . .
 x . . . x . . . .
-. x . x . . . . .
-N . B . . . . P .
-. x . x . . . . .
+. x x x . . . . .
+N x+B x . . . P .
+. x x x . . . . .
 P P P P P P P . P
 . . . . . . . . .
 . . . . K . . . .
@@ -102,7 +130,7 @@ k . B . . . . . .
 . . r . r . . . .
 p . . . . . . . .
 . . . . . . . . .
-N . B . . . . P .
+N .+B . . . . P .
 . . . . . . . . .
 P P P P P P P . P
 . . . . . . . . .

@@ -6,6 +6,49 @@ class PosTest extends ShogiTest {
 
   "A position" should {
 
+    "boolean directions" in {
+      "isLeftOf" in {
+        SQ2A.isLeftOf(SQ1A) must beTrue
+        SQ9A.isLeftOf(SQ1I) must beTrue
+        SQ1A.isLeftOf(SQ2A) must beFalse
+        SQ1I.isLeftOf(SQ9A) must beFalse
+        SQ1A.isLeftOf(SQ1B) must beFalse
+      }
+      "isRightOf" in {
+        SQ1A.isRightOf(SQ2A) must beTrue
+        SQ1I.isRightOf(SQ9A) must beTrue
+        SQ2A.isRightOf(SQ1A) must beFalse
+        SQ9A.isRightOf(SQ1I) must beFalse
+        SQ1A.isRightOf(SQ1B) must beFalse
+      }
+      "isAbove" in {
+        SQ1A.isAbove(SQ1B) must beTrue
+        SQ1A.isAbove(SQ9I) must beTrue
+        SQ1B.isAbove(SQ1A) must beFalse
+        SQ9I.isAbove(SQ1A) must beFalse
+        SQ1A.isAbove(SQ2A) must beFalse
+      }
+      "isBelow" in {
+        SQ1B.isBelow(SQ1A) must beTrue
+        SQ9I.isBelow(SQ1A) must beTrue
+        SQ1A.isBelow(SQ1B) must beFalse
+        SQ1A.isBelow(SQ9I) must beFalse
+        SQ2A.isBelow(SQ1A) must beFalse
+      }
+    }
+
+    "project from to" in {
+      Pos.findDirection(SQ5E, SQ5D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ5D) }
+      Pos.findDirection(SQ5E, SQ4D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4D) }
+      Pos.findDirection(SQ5E, SQ4E) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4E) }
+      Pos.findDirection(SQ5E, SQ4F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4F) }
+      Pos.findDirection(SQ5E, SQ5F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ5F) }
+      Pos.findDirection(SQ5E, SQ6F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6F) }
+      Pos.findDirection(SQ5E, SQ6E) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6E) }
+      Pos.findDirection(SQ5E, SQ6D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6D) }
+      Pos.findDirection(SQ5E, SQ2G) must beNone
+    }
+
     "be used to derive a relative list of positions" in {
       "SQ6F >| false" in { SQ6F >| (_ => false) must contain(SQ5F, SQ4F, SQ3F, SQ2F, SQ1F) }
       "SQ6F |< false" in { SQ6F |< (_ => false) must contain(SQ7F, SQ8F, SQ9F) }
@@ -18,22 +61,38 @@ class PosTest extends ShogiTest {
     }
     "USI" in {
       "be correctly converted" in {
-        SQ9I.usiKey must_== "9i"
-        SQ9A.usiKey must_== "9a"
-        SQ1A.usiKey must_== "1a"
-        SQ1I.usiKey must_== "1i"
-        SQ5E.usiKey must_== "5e"
-        SQ5G.usiKey must_== "5g"
-        SQ5C.usiKey must_== "5c"
-        SQ6E.usiKey must_== "6e"
-        SQ4E.usiKey must_== "4e"
+        SQ9I.key must_== "9i"
+        SQ9A.key must_== "9a"
+        SQ1A.key must_== "1a"
+        SQ1I.key must_== "1i"
+        SQ5E.key must_== "5e"
+        SQ5G.key must_== "5g"
+        SQ5C.key must_== "5c"
+        SQ6E.key must_== "6e"
+        SQ4E.key must_== "4e"
+
+        SQ1A.hexKey must_== "11"
+        SQ10A.hexKey must_== "a1"
+        SQ1L.hexKey must_== "1c"
+
+        SQ1A.kanjiKey must_== "1一"
+        SQ10A.kanjiKey must_== "10一"
+        SQ10L.kanjiKey must_== "10十二"
+
+        SQ1A.kanjiFullWidthKey must_== "１一"
+        SQ10A.kanjiFullWidthKey must_== "１０一"
+        SQ10L.kanjiFullWidthKey must_== "１０十二"
+
       }
     }
 
     "board sizes" in {
+      "12x12" in {
+        Pos.all must have size 144
+      }
       "9x9" in {
-        Pos.all must have size 81
-        Pos.all must contain(
+        (SQ9I upTo SQ1A).toList must have size 81
+        (SQ9I upTo SQ1A).toList must contain(
           exactly(
             SQ9I,
             SQ8I,

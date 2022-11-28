@@ -643,4 +643,1345 @@ object KifFixtures {
   43 中断         ( 0:09/00:07:00)
 まで42手で中断"""
 
+val kif4 = """
+開始日時：1982-04-13T00:00:00.000Z
+棋戦：名人戦
+場所：神奈川県箱根町「ホテル花月園」
+手合割：平手
+先手：加藤一二三
+後手：中原誠
+戦型：矢倉
+手数----指手---------消費時間--
+1 ７六歩(77) (00:00/00:00:00)
+2 ８四歩(83) (00:00/00:00:00)
+3 ６八銀(79) (00:00/00:00:00)
+4 ３四歩(33) (00:00/00:00:00)
+5 ７七銀(68) (00:00/00:00:00)
+6 ６二銀(71) (00:00/00:00:00)
+7 ２六歩(27) (00:00/00:00:00)
+8 ４二銀(31) (00:00/00:00:00)
+9 ４八銀(39) (00:00/00:00:00)
+10 ３二金(41) (00:00/00:00:00)
+11 ７八金(69) (00:00/00:00:00)
+12 ５四歩(53) (00:00/00:00:00)
+13 ５六歩(57) (00:00/00:00:00)
+14 ４一王(51) (00:00/00:00:00)
+15 ６九玉(59) (00:00/00:00:00)
+16 ５二金(61) (00:00/00:00:00)
+17 ３六歩(37) (00:00/00:00:00)
+18 ７四歩(73) (00:00/00:00:00)
+19 ５八金(49) (00:00/00:00:00)
+20 ３三銀(42) (00:00/00:00:00)
+21 ７九角(88) (00:00/00:00:00)
+22 ３一角(22) (00:00/00:00:00)
+23 ６六歩(67) (00:00/00:00:00)
+24 ４四歩(43) (00:00/00:00:00)
+25 ６七金(58) (00:00/00:00:00)
+26 ４三金(52) (00:00/00:00:00)
+27 ３七銀(48) (00:00/00:00:00)
+28 ８五歩(84) (00:00/00:00:00)
+29 １六歩(17) (00:00/00:00:00)
+30 ６四角(31) (00:00/00:00:00)
+31 ６八角(79) (00:00/00:00:00)
+32 ３一王(41) (00:00/00:00:00)
+33 ７九玉(69) (00:00/00:00:00)
+34 ２二王(31) (00:00/00:00:00)
+35 １五歩(16) (00:00/00:00:00)
+36 ７三銀(62) (00:00/00:00:00)
+37 ４六銀(37) (00:00/00:00:00)
+38 ７五歩(74) (00:00/00:00:00)
+39 同　歩(76) (00:00/00:00:00)
+40 同　角(64) (00:00/00:00:00)
+41 ３七桂(29) (00:00/00:00:00)
+42 ４二角(75) (00:00/00:00:00)
+43 ３八飛(28) (00:00/00:00:00)
+44 ２四銀(33) (00:00/00:00:00)
+45 ２五桂(37) (00:00/00:00:00)
+46 ４五歩(44) (00:00/00:00:00)
+47 ３七銀(46) (00:00/00:00:00)
+48 ７四銀(73) (00:00/00:00:00)
+49 ７六歩打 (00:00/00:00:00)
+50 ７五歩打 (00:00/00:00:00)
+51 同　歩(76) (00:00/00:00:00)
+52 同　銀(74) (00:00/00:00:00)
+53 ６五歩(66) (00:00/00:00:00)
+54 ７六歩打 (00:00/00:00:00)
+55 同　銀(77) (00:00/00:00:00)
+56 ８六歩(85) (00:00/00:00:00)
+57 同　歩(87) (00:00/00:00:00)
+58 同　銀(75) (00:00/00:00:00)
+59 ８七歩打 (00:00/00:00:00)
+60 ７五銀(86) (00:00/00:00:00)
+61 同　銀(76) (00:00/00:00:00)
+62 同　角(42) (00:00/00:00:00)
+63 ７六歩打 (00:00/00:00:00)
+64 ５三角(75) (00:00/00:00:00)
+65 ７七角(68) (00:00/00:00:00)
+66 ３三桂(21) (00:00/00:00:00)
+67 同　桂成(25) (00:00/00:00:00)
+68 同　銀(24) (00:00/00:00:00)
+69 ２五桂打 (00:00/00:00:00)
+70 ４四角(53) (00:00/00:00:00)
+71 ５五歩(56) (00:00/00:00:00)
+72 同　角(44) (00:00/00:00:00)
+73 ６六銀打 (00:00/00:00:00)
+74 ７三角(55) (00:00/00:00:00)
+75 ３三桂成(25) (00:00/00:00:00)
+76 同　金(32) (00:00/00:00:00)
+77 ５五歩打 (00:00/00:00:00)
+78 ９五桂打 (00:00/00:00:00)
+79 ９六銀打 (00:00/00:00:00)
+80 ９四歩(93) (00:00/00:00:00)
+81 ５四歩(55) (00:00/00:00:00)
+82 ４九銀打 (00:00/00:00:00)
+83 ３九飛(38) (00:00/00:00:00)
+84 ５八銀(49) (00:00/00:00:00)
+85 ５七金(67) (00:00/00:00:00)
+86 ２七桂打 (00:00/00:00:00)
+87 ３八飛(39) (00:00/00:00:00)
+88 ４九銀(58) (00:00/00:00:00)
+89 ４八飛(38) (00:00/00:00:00)
+90 ３七角成(73) (00:00/00:00:00)
+91 ４九飛(48) (00:00/00:00:00)
+92 １九桂成(27) (00:00/00:00:00)
+93 ９五銀(96) (00:00/00:00:00)
+94 ２四歩(23) (00:00/00:00:00)
+95 ８六角(77) (00:00/00:00:00)
+96 ５一香打 (00:00/00:00:00)
+97 ５五桂打 (00:00/00:00:00)
+98 ５四金(43) (00:00/00:00:00)
+99 ５二歩打 (00:00/00:00:00)
+100 ５三歩打 (00:00/00:00:00)
+101 ５一歩成(52) (00:00/00:00:00)
+102 ８五歩打 (00:00/00:00:00)
+103 ５九角(86) (00:00/00:00:00)
+104 ２八馬(37) (00:00/00:00:00)
+105 ８四香打 (00:00/00:00:00)
+106 ７二飛(82) (00:00/00:00:00)
+107 ７七角(59) (00:00/00:00:00)
+108 ９五歩(94) (00:00/00:00:00)
+109 ８一香成(84) (00:00/00:00:00)
+110 １四歩(13) (00:00/00:00:00)
+111 ６三桂成(55) (00:00/00:00:00)
+112 ７六飛(72) (00:00/00:00:00)
+113 ５五歩打 (00:00/00:00:00)
+114 ４四金(54) (00:00/00:00:00)
+115 ５六桂打 (00:00/00:00:00)
+116 １五歩(14) (00:00/00:00:00)
+117 ４四桂(56) (00:00/00:00:00)
+118 ２三王(22) (00:00/00:00:00)
+119 ９一成香(81) (00:00/00:00:00)
+120 １四王(23) (00:00/00:00:00)
+121 ９五角(77) (00:00/00:00:00)
+122 １六歩(15) (00:00/00:00:00)
+123 ７七香打 (00:00/00:00:00)
+124 ６六飛(76) (00:00/00:00:00)
+125 同　金(57) (00:00/00:00:00)
+126 １五王(14) (00:00/00:00:00)
+127 ３一飛打 (00:00/00:00:00)
+128 ４四金(33) (00:00/00:00:00)
+129 １一飛成(31) (00:00/00:00:00)
+130 ２六王(15) (00:00/00:00:00)
+131 ３九金打 (00:00/00:00:00)
+132 同　馬(28) (00:00/00:00:00)
+133 同　飛(49) (00:00/00:00:00)
+134 ２八銀打 (00:00/00:00:00)
+135 ５九飛(39) (00:00/00:00:00)
+136 ２七王(26) (00:00/00:00:00)
+137 ８八玉(79) (00:00/00:00:00)
+138 ４八銀打 (00:00/00:00:00)
+139 ７九飛(59) (00:00/00:00:00)
+140 ５七銀打 (00:00/00:00:00)
+141 ５六金(66) (00:00/00:00:00)
+142 ６八金打 (00:00/00:00:00)
+143 ５七金(56) (00:00/00:00:00)
+144 ７九金(68) (00:00/00:00:00)
+145 同　金(78) (00:00/00:00:00)
+146 ５七銀(48) (00:00/00:00:00)
+147 ４九金打 (00:00/00:00:00)
+148 ３七金打 (00:00/00:00:00)
+149 ３九香打 (00:00/00:00:00)
+150 ４八銀成(57) (00:00/00:00:00)
+151 同　金(49) (00:00/00:00:00)
+152 同　金(37) (00:00/00:00:00)
+153 ４九角打 (00:00/00:00:00)
+154 ３八金打 (00:00/00:00:00)
+155 ８五角(49) (00:00/00:00:00)
+156 ３九金(38) (00:00/00:00:00)
+157 ７三角成(95) (00:00/00:00:00)
+158 ５四歩(53) (00:00/00:00:00)
+159 ９六歩(97) (00:00/00:00:00)
+160 ５五金(44) (00:00/00:00:00)
+161 ９七玉(88) (00:00/00:00:00)
+162 ３八金(39) (00:00/00:00:00)
+163 ８六玉(97) (00:00/00:00:00)
+164 ３九飛打 (00:00/00:00:00)
+165 ８八金(79) (00:00/00:00:00)
+166 ７九飛成(39) (00:00/00:00:00)
+167 ９七金(88) (00:00/00:00:00)
+168 ８九竜(79) (00:00/00:00:00)
+169 ９五玉(86) (00:00/00:00:00)
+170 ８八竜(89) (00:00/00:00:00)
+171 ７四香(77) (00:00/00:00:00)
+172 ６五金(55) (00:00/00:00:00)
+173 ８四玉(95) (00:00/00:00:00)
+174 ７六歩打 (00:00/00:00:00)
+175 ６四成桂(63) (00:00/00:00:00)
+176 ６六金(65) (00:00/00:00:00)
+177 ８六金(97) (00:00/00:00:00)
+178 ７七歩成(76) (00:00/00:00:00)
+179 ９四角(85) (00:00/00:00:00)
+180 ８七と(77) (00:00/00:00:00)
+181 ９五金(86) (00:00/00:00:00)
+182 ８六と(87) (00:00/00:00:00)
+183 ９三玉(84) (00:00/00:00:00)
+184 ９九竜(88) (00:00/00:00:00)
+185 ７二角成(94) (00:00/00:00:00)
+186 ９六と(86) (00:00/00:00:00)
+187 ８四金(95) (00:00/00:00:00)
+188 ８六と(96) (00:00/00:00:00)
+189 ８二玉(93) (00:00/00:00:00)
+190 ４七金(48) (00:00/00:00:00)
+191 ５四馬(72) (00:00/00:00:00)
+192 １七歩成(16) (00:00/00:00:00)
+193 ４五馬(54) (00:00/00:00:00)
+194 ３七金(38) (00:00/00:00:00)
+195 ３五歩(36) (00:00/00:00:00)
+196 ３八王(27) (00:00/00:00:00)
+197 ３四歩(35) (00:00/00:00:00)
+198 ７六と(86) (00:00/00:00:00)
+199 ５四成桂(64) (00:00/00:00:00)
+200 ５六歩打 (00:00/00:00:00)
+201 ５五成桂(54) (00:00/00:00:00)
+202 ５七歩成(56) (00:00/00:00:00)
+203 ２六銀打 (00:00/00:00:00)
+204 ２七金(37) (00:00/00:00:00)
+205 １七銀(26) (00:00/00:00:00)
+206 同　銀成(28) (00:00/00:00:00)
+207 ３六銀打 (00:00/00:00:00)
+208 ２八銀打 (00:00/00:00:00)
+209 ４七銀(36) (00:00/00:00:00)
+210 同　と(57) (00:00/00:00:00)
+211 ５六成桂(55) (00:00/00:00:00)
+212 ４九竜(99) (00:00/00:00:00)
+213 ３三歩成(34) (00:00/00:00:00)
+214 ２五歩(24) (00:00/00:00:00)
+215 ２二竜(11) (00:00/00:00:00)
+216 ２六歩(25) (00:00/00:00:00)
+217 ３四と(33) (00:00/00:00:00)
+218 ５九竜(49) (00:00/00:00:00)
+219 ５二竜(22) (00:00/00:00:00)
+220 ６七金(66) (00:00/00:00:00)
+221 ４六成桂(56) (00:00/00:00:00)
+222 ５七と(47) (00:00/00:00:00)
+223 ３六成桂(46) (00:00/00:00:00)
+224 投了 (00:00/00:00:00)
+"""
+
+val kif8 = """
+﻿# KIF形式棋譜ファイル
+# Generated by Shogidokoro
+手合割：平手
+先手：Gikou 20160606
+後手：elmo
+手数----指手---------消費時間--
+   1 ７六歩(77)    (00:01 / 00:00:01)
+*104
+*P7g-7f
+   2 ３二金(41)    (02:27 / 00:02:27)
+*-65
+*P3c-3d P2g-2f P8c-8d P2f-2e P8d-8e G6i-7h G4a-3b P2e-2d P2cx2d R2hx2d P8e-8f P8gx8f R8bx8f S3i-3h R8f-8b P*8g P*2c R2d-2h B2b-3c K5i-6h S3a-2b P3g-3f P*8f B8hx3c+ N2ax3c P8gx8f R8bx8f S7i-8h R8fx7f B*8c R7fx3f B8c-6e+
+   3 ２六歩(27)    (00:04 / 00:00:05)
+*135
+*P2g-2f
+   4 ８四歩(83)    (01:35 / 00:04:02)
+*-97
+*P3c-3d P2f-2e P8c-8d P6g-6f P8d-8e B8h-7g B2b-3c S7i-6h S3a-4b S6h-6g P4c-4d P5g-5f S7a-6b G6i-7h S4b-4c B7g-6h G6a-5b G4i-5h B3c-4b P2e-2d B4bx2d B6hx2d P2cx2d R2hx2d P*2c R2d-2h P7c-7d P*2d P2cx2d
+   5 ７八金(69)    (00:01 / 00:00:06)
+*106
+*G6i-7h
+   6 ８五歩(84)    (01:39 / 00:05:41)
+*-52
+*P3c-3d P2f-2e P8d-8e P2e-2d P2cx2d R2hx2d P8e-8f P8gx8f R8bx8f S3i-3h R8f-8b P*8g P*2c R2d-2f S7a-7b K5i-6h P7c-7d P3g-3f P1c-1d P*2d P2cx2d R2fx2d S7b-7c R2dx3d B2b-3c P*2d P*2g S3hx2g B3cx8h+ S7ix8h G3b-3c R3d-3e
+   7 ７七角(88)    (00:01 / 00:00:07)
+*123
+*B8h-7g
+   8 ３四歩(33)    (01:39 / 00:07:20)
+*-72
+*S3a-4b S7i-6h P3c-3d B7gx2b+ G3bx2b S6h-7g S7a-7b S3i-3h G2b-3b K5i-6h S4b-3c P3g-3f P7c-7d N2i-3g N8a-7c P2f-2e K5a-4b P4g-4f P4c-4d P6g-6f G6a-5b R2h-2i P1c-1d P9g-9f R8b-8a P9f-9e P1d-1e G4i-4h P6c-6d S3h-4g
+   9 ８八銀(79)    (00:04 / 00:00:11)
+*88
+*S7i-8h
+  10 ４四歩(43)    (01:32 / 00:08:52)
+*-54
+*S7a-6b P2f-2e B2b-3c B7gx3c+ G3bx3c S8h-7g P7c-7d S3i-3h K5a-4b P3g-3f N8a-7c K5i-6h G6a-5a N2i-3g B*6d R2h-2i K4b-3b P9g-9f S3a-4b G4i-4h P5c-5d P6g-6f P4c-4d G4h-5h S4b-4c P9f-9e P1c-1d P1g-1f
+  11 ４八銀(39)    (00:01 / 00:00:12)
+*191
+*S3i-4h
+  12 ６二銀(71)    (02:27 / 00:11:19)
+*4
+*S3a-4b P3g-3f S7a-6b P2f-2e S4b-4c S4h-3g G6a-5b K5i-6h B2b-3c S3g-4f P6c-6d P3f-3e S6b-6c R2h-2f S6c-5d N2i-3g K5a-4b P9g-9f P1c-1d G4i-5h P7c-7d K6h-7i N8a-7c P3ex3d S4cx3d R2f-3f P4d-4e R3fx3d P4ex4f R3d-3f B3cx7g+ S8hx7g P4fx4g+ G5hx4g
+  13 ６九玉(59)    (00:52 / 00:01:04)
+*209
+*K5i-6i S3a-4b P5g-5f P5c-5d G4i-5h K5a-4a B7g-6h G6a-5b P6g-6f S4b-3c S8h-7g B2b-3a G5h-6g P7c-7d K6i-7i S6b-7c P2f-2e P7d-7e P7fx7e B3ax7e S4h-5g B7e-3a
+  14 ４二銀(31)    (05:12 / 00:16:31)
+*62
+*G6a-5b P2f-2e B2b-3c P3g-3f S3a-4b S4h-3g S4b-4c S3g-4f P7c-7d G7h-6h N8a-7c K6i-7h P5c-5d P3f-3e P6c-6d G4i-5h N7c-6e B7g-6f P8e-8f P8gx8f R8bx8f P3ex3d S4cx3d R2h-3h G5b-4c P*3e S3d-4e P2e-2d P2cx2d S4fx4e P4dx4e B6fx3c+ N2ax3c
+  15 ５九角(77)    (00:28 / 00:01:32)
+*136
+*B7g-5i K5a-4a S8h-7g S4b-3c P3g-3f B2b-3a P4g-4f P5c-5d S4h-4g G6a-5b G4i-5h G5b-4c B5i-3g B3a-6d K6i-7i K4a-3a P6g-6f P7c-7d K7i-8h K3a-2b S4g-5f S6b-7c R2h-4h P7d-7e P7fx7e
+  16 ７四歩(73)    (00:58 / 00:17:29)
+*117
+*S4b-4c P2f-2e P7c-7d P2e-2d P2cx2d R2hx2d P*2c R2d-2h P6c-6d P5g-5f N8a-7c B5i-6h K5a-5b P3g-3f G6a-7b K6i-7i P1c-1d S4h-5g P9c-9d S5g-4f P4d-4e S4fx4e R8b-8a S8h-7g S6b-6c
+  17 ７七銀(88)    (01:16 / 00:02:48)
+*144
+*S8h-7g S6b-7c G4i-5h P5c-5d P4g-4f S4b-3c S4h-4g B2b-3a S4g-5f G6a-5b P3g-3f G5b-4c P2f-2e K5a-4a B5i-2f B3a-6d R2h-4h K4a-3a P6g-6f K3a-2b N2i-3g
+  18 ４三銀(42)    (00:58 / 00:18:27)
+*100
+*N8a-7c P2f-2e P6c-6d P4g-4f P1c-1d S4h-4g S4b-4c G4i-5h B2b-3c S4g-5f P9c-9d P6g-6f S6b-6c P3g-3f R8b-8a K6i-7i K5a-4b P9g-9f S6c-5d P1g-1f G6a-6b B5i-3g P6d-6e P6fx6e N7cx6e S7g-6f P4d-4e
+  19 ５八金(49)    (03:57 / 00:06:45)
+*142
+*G4i-5h P6c-6d P2f-2e S6b-6c P2e-2d P2cx2d R2hx2d P*2c R2d-2h N8a-7c P6g-6f G6a-5b P5g-5f K5a-6b G5h-6g R8b-8a S4h-5g P4d-4e K6i-7i P3d-3e P4g-4f S4c-5d P4fx4e S5dx4e
+  20 ５四歩(53)    (00:58 / 00:19:25)
+*47
+*N8a-7c P2f-2e R8b-8a P4g-4f P6c-6d P9g-9f G6a-7b P3g-3f P5c-5d S4h-4g P6d-6e P2e-2d P2cx2d R2hx2d P*2c R2d-2h B2b-3a S4g-5f P9c-9d B5i-3g N2a-3c P6g-6f P6ex6f S7gx6f S6b-6c N8i-7g P*6d
+  21 ２五歩(26)    (01:12 / 00:07:57)
+*171
+*P2f-2e B2b-3c P3g-3f P6c-6d P4g-4f S6b-6c S4h-4g N8a-7c B5i-2f R8b-8a N2i-3g K5a-6b P4f-4e K6b-7b S4g-5f G6a-5b R2h-4h R8a-4a K6i-7i P9c-9d P6g-6f
+  22 ５二金(61)    (00:58 / 00:20:23)
+*51
+*B2b-3a P3g-3f G6a-5b P4g-4f N8a-7c S4h-4g P1c-1d P2e-2d P2cx2d R2hx2d P*2c R2d-2g B3a-4b P6g-6f P6c-6d K6i-7i K5a-4a S4g-5f R8b-8a R2g-2h K4a-3a K7i-8h S6b-6c N2i-3g P9c-9d P4f-4e P4dx4e S5fx4e
+  23 ３六歩(37)    (02:02 / 00:09:59)
+*100
+*P3g-3f P6c-6d P4g-4f S6b-6c S4h-4g N8a-7c P6g-6f P9c-9d P9g-9f B2b-3c B5i-2f R8b-8a S4g-5f K5a-6b P4f-4e K6b-7b R2h-4h P4dx4e S5fx4e P*4d S4e-5f B3c-4b K6i-7i
+  24 ７三桂(81)    (00:58 / 00:21:21)
+*37
+*P6c-6d P4g-4f P6d-6e S4h-4g N8a-7c B5i-3g P1c-1d K6i-7i N2a-3c S4g-5f B2b-3a P2e-2d P2cx2d R2hx2d P*2c R2d-2h P9c-9d G5h-6h R8b-8a P9g-9f P1d-1e P6g-6f P6ex6f S7gx6f P8e-8f P8gx8f B3ax8f P*8g B8f-5c
+  25 ６六歩(67)    (01:50 / 00:11:49)
+*107
+*P6g-6f P6c-6d G5h-6g S6b-6c P4g-4f K5a-6b S4h-4g P9c-9d P9g-9f R8b-8a K6i-7i B2b-3a P1g-1f P1c-1d K7i-8h B3a-5c P5g-5f N2a-3c P2e-2d P2cx2d R2hx2d P*2e
+  26 ６四歩(63)    (00:58 / 00:22:19)
+*54
+*P9c-9d P4g-4f P9d-9e K6i-7i R8b-8a P2e-2d P2cx2d R2hx2d P*2c R2d-2h B2b-3a K7i-8h P6c-6d S4h-4g S6b-6c S4g-5f K5a-6b P1g-1f P1c-1d P4f-4e B3a-5c P4ex4d S4cx4d N2i-3g N2a-3c P*4e S4d-5e S5fx5e P5dx5e
+  27 ７九玉(69)    (02:17 / 00:14:06)
+*143
+*K6i-7i S6b-6c G5h-6g P9c-9d P9g-9f R8b-8a P4g-4f B2b-3a S4h-4g B3a-5c P1g-1f P1c-1d K7i-8h N2a-3c P5g-5f K5a-6b L9i-9h P6d-6e P6fx6e N7cx6e S7g-6f P*6d B5i-6h P4d-4e N2i-3g P4ex4f
+  28 １四歩(13)    (00:58 / 00:23:17)
+*0
+*P9c-9d P9g-9f R8b-8a N2i-3g B2b-3c P4g-4f S6b-6c S4h-4g P1c-1d P1g-1f B3c-4b K7i-8h K5a-6b R2h-2i K6b-7b R2i-2h K7b-6b
+  29 ９六歩(97)    (01:09 / 00:15:15)
+*156
+*P9g-9f P9c-9d G5h-6g S6b-6c P4g-4f R8b-8a K7i-8h B2b-3a S4h-4g B3a-4b P1g-1f N2a-3c P5g-5f B4b-5c N2i-3g K5a-6b P2e-2d P2cx2d R2hx2d P6d-6e P6fx6e
+  30 ９四歩(93)    (00:58 / 00:24:15)
+*-20--
+*R8b-8a P2e-2d
+  31 ６七金(58)    (00:42 / 00:15:57)
+*197
+*G5h-6g R8b-8a P4g-4f S6b-6c K7i-8h K5a-6b P1g-1f K6b-7b S4h-4g G5b-6b P5g-5f B2b-3a L9i-9h N2a-3c K8h-9i P4d-4e P4fx4e P6d-6e P6fx6e N7cx6e S7g-6f B3a-6d B5i-3g B6dx3g+
+  32 ３三角(22)    (00:58 / 00:25:13)
+*0
+*S6b-6c P2e-2d
+  33 ４六歩(47)    (01:02 / 00:16:59)
+*253
+*P4g-4f S6b-6c P1g-1f B3c-4b K7i-8h R8b-8a S4h-4g B4b-5c S4g-5f N2a-3c L9i-9h K5a-6b K8h-9i K6b-7b S7g-8h G5b-6b P2e-2d P2cx2d R2hx2d P*2c R2d-2h R8a-2a
+  34 １五歩(14)    (00:58 / 00:26:11)
+*-35
+*R8b-8a P1g-1f K5a-6a S4h-4g K6a-7b S4g-5f S6b-6c G6g-6h G5b-6b K7i-8h B3c-4b K8h-9h N2a-3c N2i-3g G6b-5b R2h-2i K7b-6b K9h-8h B4b-5c P2e-2d P2cx2d R2ix2d P5d-5e S5f-6g S4c-5d P5g-5f P5ex5f S6gx5f P*2c
+  35 ８八玉(79)    (00:59 / 00:17:58)
+*245
+*K7i-8h R8b-8a S4h-4g S6b-6c S4g-5f B3c-4b L9i-9h N2a-3c K8h-9i G5b-6b G7h-8h K5a-4a G6g-6h K4a-5b G6h-7h B4b-5c P2e-2d P2cx2d R2hx2d P*2c R2d-2h R8a-2a N2i-3g
+  36 ６三銀(62)    (00:58 / 00:27:09)
+*-20
+*B3c-4b S4h-4g
+  37 ４七銀(48)    (00:59 / 00:18:57)
+*265
+*S4h-4g R8b-8a S4g-5f B3c-4b L9i-9h N2a-3c K8h-9i G5b-6b G7h-8h K5a-5b G6g-6h B4b-3a B5i-3g B3a-5c G6h-7h R8a-2a S5f-6g G6b-7b P5g-5f G7b-8c B3g-5i G8c-8d B5i-6h P9d-9e P9fx9e L9ax9e
+  38 ８一飛(82)    (00:58 / 00:28:07)
+*0
+*K5a-6b S4g-5f R8b-8a N2i-3g K6b-7b G6g-6h B3c-5a R2h-2i B5a-4b R2i-4i B4b-5c R4i-2i B5c-4b
+  39 ５六銀(47)    (00:59 / 00:19:56)
+*246
+*S4g-5f B3c-4b L9i-9h N2a-3c K8h-9i B4b-5c G7h-8h K5a-4a G6g-6h K4a-3a G6h-7h K3a-2b B5i-3g G5b-4b B3g-4h P6d-6e P6fx6e P5d-5e S5fx5e N7cx6e S7g-6f P*5d P*6d S6cx6d S5ex6d B5cx6d S6fx6e B6dx4f B4h-3g
+  40 ６二玉(51)    (00:58 / 00:29:05)
+*+Mate:2--
+*B3c-4b G6g-6h K5a-6b N2i-3g K6b-7b R2h-2i G3b-3c R2i-4i B4b-5a K8h-9h G3c-3b K9h-8h G3b-3c
+  41 ９八香(99)    (00:59 / 00:20:55)
+*301
+*L9i-9h K6b-7b K8h-9i B3c-4b G6g-6h N2a-3c G7h-8h B4b-3a B5i-2f G5b-6b B2f-3g B3a-4b G6h-7h B4b-5c B3g-5i B5c-3a B5i-6h B3a-1c S5f-4g B1c-3a P2e-2d P2cx2d R2hx2d
+  42 ４二角(33)    (00:58 / 00:30:03)
+*0
+*B3c-5a G6g-6h B5a-4b B5i-2f B4b-3a B2f-5i B3a-5c K8h-9i B5c-4b K9i-8h B4b-5c
+  43 ９九玉(88)    (00:59 / 00:21:54)
+*294
+*K8h-9i K6b-7b G6g-6h N2a-3c G7h-8h B4b-3a B5i-4h B3a-1c S5f-4g P6d-6e P1g-1f P4d-4e P4fx4e B1c-3a S4g-5f B3a-6d B4h-3g B6dx3g+ N2ix3g P6ex6f P1fx1e B*6d R2h-3h
+  44 ５三角(42)    (00:58 / 00:31:01)
+*-85
+*N2a-3c G6g-6h B4b-5c N2i-3g K6b-5a P2e-2d P2cx2d R2hx2d P*2c R2d-2h K5a-4b G7h-8h K4b-3a G6h-7h P9d-9e P9fx9e P6d-6e P6fx6e K3a-2b S7g-6f P8e-8f P8gx8f B5cx8f B5ix8f R8ax8f P*8g R8f-8a P4f-4e N3cx4e
+  45 ８八銀(77)    (00:59 / 00:22:53)
+*301
+*S7g-8h N2a-3c G6g-7g R8a-2a N2i-3g K6b-7b B5i-6h B5c-6b S5f-6g B6b-7a P5g-5f B7a-9c P2e-2d P2cx2d P4f-4e P4dx4e R2hx2d P*2c R2d-2f B9c-8d P3f-3e P3dx3e B6hx3e P*3d B3e-6h S4c-4d R2f-2i
+  46 ３三桂(21)    (00:58 / 00:31:59)
+*-87
+*B5c-4b N2i-3g N2a-3c S8h-7g B4b-5c R2h-2i B5c-3a G6g-6h B3a-1c R2i-4i B1c-2b G7h-8h N3cx2e N3gx2e P2c-2d R4i-2i P2dx2e R2ix2e P*2c R2e-2i N*8d G6h-7h B2b-1c S5f-4g B1c-3a P4f-4e P4dx4e
+  47 ３七桂(29)    (00:59 / 00:23:52)
+*346
+*N2i-3g K6b-6a B5i-6h K6a-7b G7h-7i R8a-4a G6g-7g R4a-2a G7g-7h B5c-7a B6h-5i B7a-5c S5f-6g B5c-7a B5i-7g B7a-9c S6g-5f B9c-8d P4f-4e P4dx4e N3gx4e N3cx4e S5fx4e P*4d S4e-5f
+  48 ４二角(53)    (00:58 / 00:32:57)
+*-102
+*R8a-2a S8h-7g K6b-5a G6g-6h K5a-4b G7h-8h R2a-8a G6h-7h P9d-9e P9fx9e P6d-6e P6fx6e P7d-7e P7fx7e B5cx7e G7h-6g B7e-5c R2h-7h K4b-3a S7g-6f P*7d P1g-1f P1ex1f P*1d P*9g L9hx9g L1ax1d
+  49 ７七金(67)    (01:00 / 00:24:52)
+*378
+*G6g-7g B4b-5c B5i-6h R8a-2a S5f-6g K6b-7b R2h-2i B5c-7a P5g-5f B7a-9c R2i-4i B9c-7a P4f-4e P4dx4e P3f-3e P3dx3e N3gx4e N3cx2e P5f-5e P5dx5e R4i-3i P*4d R3ix3e
+  50 ２一飛(81)    (00:59 / 00:33:56)
+*0
+*G5b-5c B5i-6h
+  51 ２九飛(28)    (00:59 / 00:25:51)
+*388
+*R2h-2i K6b-7b G7h-7i B4b-5c G7g-7h B5c-7a B5i-7g B7a-5c S5f-6g B5c-7a R2i-4i P2c-2d P6f-6e N7cx6e B7g-6f P2dx2e P4f-4e N3cx4e N3gx4e P4dx4e R4ix4e P*4d R4e-4i B7a-6b P5g-5f
+  52 ３一角(42)    (00:58 / 00:34:54)
+*-173
+*L9a-9b B5i-6h S6c-7b S5f-6g S7b-8c P5g-5f K6b-6c R2i-5i P9d-9e P9fx9e R2a-9a P5f-5e P5dx5e R5ix5e P*5d R5e-5i S8c-8d S6g-5f S8dx9e P4f-4e N3cx4e N3gx4e P4dx4e S5fx4e P*4d
+  53 ６八角(59)    (00:59 / 00:26:50)
+*376
+*B5i-6h B3a-5c G7h-7i K6b-7b G7g-7h B5c-7a B6h-7g B7a-5c B7g-5i B5c-6b P4f-4e P4dx4e N3gx4e N3cx4e S5fx4e N*8d B5i-3g B6b-5c R2i-4i P*4d S4e-5f N8dx9f S8h-7g R2a-8a
+  54 ５三角(31)    (00:58 / 00:35:52)
+*-256--
+*B3a-1c S5f-4g
+  55 ７九金(78)    (00:58 / 00:27:48)
+*422
+*G7h-7i K6b-7b G7g-7h B5c-7a B6h-7g B7a-5c S5f-6g B5c-7a R2i-4i P2c-2d P6f-6e N7cx6e B7g-6f P2dx2e P4f-4e P5d-5e P4ex4d S4cx4d P7f-7e P2e-2f P7ex7d S6cx7d P3f-3e P2f-2g+
+  56 ５一玉(62)    (00:58 / 00:36:50)
+*-88
+*R2a-8a G7g-7h
+  57 ７八金(77)    (00:59 / 00:28:47)
+*485
+*G7g-7h K5a-4b S5f-6g G5b-6b R2i-2h K4b-5b P5g-5f G3b-4b R2h-2g G4b-3b R2g-2i G3b-4b R2i-2h G4b-3b R2h-2f G6b-7b R2f-2i G7b-6b R2i-4i G3b-4b P5f-5e P5dx5e P4f-4e
+  58 ４二玉(51)    (00:58 / 00:37:48)
+*-118
+*B5c-7a L1i-1h L1a-1b S8h-7g K5a-4b G7i-8h B7a-9c R2i-4i R2a-8a P4f-4e P4dx4e N3gx4e N3cx2e P3f-3e P*4d R4i-3i P6d-6e P3ex3d P4dx4e P6fx6e N*6f S7gx6f B9cx6f S5f-6g B6f-9c N*5f N7cx6e
+  59 ７七角(68)    (00:59 / 00:29:46)
+*394
+*B6h-7g G5b-6b B7g-5i K4b-5b S5f-6g G6b-7b B5i-6h G7b-6b P5g-5f G3b-4b R2i-2g G4b-3b R2g-2h G6b-7b P4f-4e P4dx4e P2e-2d P2cx2d R2hx2d P*2c R2d-2i B5c-4d R2i-4i P6d-6e N3gx4e
+  60 ２二金(32)    (00:58 / 00:38:46)
+*0--
+*R2a-8a B7g-6h R8a-2a
+  61 ４九飛(29)    (00:59 / 00:30:45)
+*487
+*R2i-4i G2b-3b P4f-4e P4dx4e N3gx4e N3cx4e S5fx4e P*4d S4ex4d S4cx4d N*5f S*5e N5fx4d S5ex4d P6f-6e G3b-4c P*4e S4d-5e P5g-5f N7cx6e P5fx5e N6ex7g+ G7hx7g B*3h
+  62 ７一角(53)    (00:58 / 00:39:44)
+*-62--
+*B5c-6b P3f-3e
+  63 １八香(19)    (00:59 / 00:31:44)
+*480
+*L1i-1h G2b-3b P1g-1f P2c-2d P1fx1e P2dx2e P1e-1d P2e-2f P4f-4e P2f-2g+ P6f-6e N7cx6e S5fx6e N3cx4e P*2b G3bx2b N3gx4e P6dx6e N*5f
+  64 ６二角(71)    (00:58 / 00:40:42)
+*-101
+*L9a-9b B7g-6h
+  65 ２九飛(49)    (00:59 / 00:32:43)
+*461
+*R4i-2i K4b-3b P1g-1f P1ex1f R2i-1i P5d-5e S5f-6g G2b-1c L1hx1f P*1d P5g-5f P2c-2d P5fx5e P2dx2e P4f-4e P4dx4e B7g-6h G1c-2d S6g-5f P1d-1e N3gx4e N3cx4e
+  66 ８一飛(21)    (00:58 / 00:41:40)
+*+Mate:2--
+*L9a-9b S8h-9g B6b-7a S9g-8h G2b-3b B7g-6h B7a-9c P1g-1f B9cx6f P1fx1e P8e-8f P8gx8f P*8g S8h-7g B6f-9c P1e-1d N7c-6e S5fx6e P6dx6e P4f-4e S*6f G7hx8g L1ax1d P4ex4d L1dx1h+ P4dx4c+ G3bx4c
+  67 ６八角(77)    (00:59 / 00:33:42)
+*441
+*B7g-6h B6b-7a R2i-1i B7a-9c P1g-1f B9cx6f P1fx1e B6fx8h+ G7ix8h S*2h R1i-4i S2hx3g+ P4f-4e N3cx4e S5fx4e N*6f S4ex4d S4cx4d R4ix4d P*4c R4dx3d
+  68 ３二玉(42)    (00:58 / 00:42:38)
+*75
+*B6b-5c P2e-2d P2cx2d R2ix2d P*2c R2d-2i K4b-3b R2i-2g P9d-9e P9fx9e P7d-7e P7fx7e L9a-9b S8h-7g P6d-6e P6fx6e B5cx7e P*7f B7e-8d P4f-4e P4dx4e G7i-8h P*9f L9hx9f P*6f
+  69 １九飛(29)    (00:59 / 00:34:41)
+*444
+*R2i-1i B6b-5c P1g-1f P1ex1f L1hx1f P*1c B6h-7g L1a-1b R1i-1h P1c-1d P4f-4e P4dx4e N3gx4e N3cx4e S5fx4e P*4d S4e-5f P9d-9e P9fx9e P6d-6e P*4e P6ex6f B7gx6f P*6e B6fx4d
+  70 ７五歩(74)    (00:58 / 00:43:36)
+*167
+*P9d-9e P9fx9e
+  71 同　歩(76)    (00:59 / 00:35:40)
+*430
+*P7fx7e B6b-5c P1g-1f P1ex1f L1hx1f P*1c P4f-4e P4dx4e S5fx4e P*4d S4e-5f P6d-6e P6fx6e B5cx7e P*7f B7e-5c P*4e P9d-9e P9fx9e P*9f B6h-7g N3cx4e N3gx4e P4dx4e N*7e S6c-7d
+  72 ９五歩(94)    (00:58 / 00:44:34)
+*110
+*P8e-8f P8gx8f P9d-9e P9fx9e N3cx2e N3gx2e P2c-2d S8h-8g P2dx2e P1g-1f P2e-2f P1fx1e P2f-2g+ P1e-1d P*1b L1h-1f +P2g-2f K9i-8h +P2fx3f P4f-4e +P3f-4f P7e-7d S6cx7d P*3c G2bx3c N*2e +P4fx5f P5gx5f
+  73 同　歩(96)    (00:59 / 00:36:39)
+*442
+*P9fx9e N3cx2e N3gx2e P2c-2d P9e-9d P2dx2e P9d-9c+ L9ax9c L9hx9c+ N*7f B6h-9e N7fx8h+ G7ix8h P*9g G8hx9g P8e-8f G9gx8f N7c-8e B9ex6b+ G5bx6b P*2d P*7g G7h-8h B*6h L*8b
+  74 ２五桂(33)    (00:58 / 00:45:32)
+*114
+*P8e-8f P8gx8f N3cx2e N3gx2e P2c-2d P1g-1f P2dx2e P1fx1e N*7f B6h-5i N7fx8h+ G7ix8h P*8e P1e-1d S*2h P1d-1c+ G2bx1c R1i-4i P*1g P4f-4e P8ex8f P7e-7d S6cx7d P*8b R8ax8b P*8c R8bx8c P*8d R8cx8d N*7f R8d-8e N7fx6d P1gx1h+ P4ex4d L9ax9e
+  75 同　桂(37)    (00:59 / 00:37:38)
+*406
+*N3gx2e P2c-2d R1i-2i P2dx2e S5f-6g N*2f S6g-7f N2fx1h+ R2ix2e P*2d R2e-2g G2b-3c P5g-5f L*9b P*2e P2dx2e R2gx2e P8e-8f P8gx8f L9bx9e P*9g P*2d R2e-2g B6b-5c R2g-8g
+  76 ２四歩(23)    (00:58 / 00:46:30)
+*3
+*P8e-8f P1g-1f P*9g L9hx9g N7c-8e P8gx8f N8ex9g+ S8hx9g L*9b N*8g P2c-2d P1fx1e B6bx9e N8gx9e L9bx9e P*9f L9ex9f S9gx9f L9ax9f P*9g N*7f B6h-7g P2dx2e P9gx9f
+  77 １六歩(17)    (00:59 / 00:38:37)
+*309
+*P1g-1f P2dx2e P1fx1e N*7f B6h-5i N7fx8h+ G7ix8h G2b-3c R1i-2i P8e-8f B5ix8f N7c-8e P1e-1d P*9g N8ix9g N8ex9g+ L9hx9g N*8e
+  78 ２五歩(24)    (00:58 / 00:47:28)
+*-151
+*P8e-8f
+  79 ６七銀(56)    (00:59 / 00:39:36)
+*340
+*S5f-6g P6d-6e P1fx1e P6ex6f S6gx6f N*7f B6h-5i N7fx8h+ G7ix8h P*9g L9hx9g S*2h R1i-4i P*1g P4f-4e P4dx4e R4ix4e P1gx1h+ P*6d
+  80 ８六歩(85)    (00:58 / 00:48:26)
+*178
+*P2e-2f R1i-2i P8e-8f R2ix2f P8fx8g+ G7hx8g P*9g L9hx9g N7c-8e P*8f N8ex9g+ S8hx9g N*8c S6g-7f P*9f G8gx9f L9ax9e G9fx9e N8cx9e
+  81 同　角(68)    (00:59 / 00:40:35)
+*348
+*B6hx8f N7c-8e P1fx1e P*9g N8ix9g N8ex9g+ L9hx9g N*8e P1e-1d N8ex9g+ S8hx9g B6bx9e P*9f B9ex8f P8gx8f P*1b P*2d B*3g R1i-4i N*8d P4f-4e L9ax9f S9gx9f N8dx9f P4ex4d
+  82 ８五桂(73)    (00:58 / 00:49:24)
+*111--
+*P2e-2f R1i-2i
+  83 １五歩(16)    (00:59 / 00:41:34)
+*235
+*P1fx1e P*9g N8ix9g N8ex9g+ L9hx9g N*8e P1e-1d N8ex9g+ B8fx9g L9ax9e P1d-1c+ G2b-3c P*9h L9ex9g+ P9hx9g B*3g R1i-2i B3gx4f+ P*1b P*7g S8hx7g +B4fx3f P1bx1a+ K3b-4b K9i-8h N*8e
+  84 ９七歩打      (00:58 / 00:50:22)
+*147
+*P*9f P1e-1d
+  85 同　桂(89)    (00:59 / 00:42:33)
+*153
+*N8ix9g N8ex9g+ L9hx9g N*8e P1e-1d N8ex9g+ S8hx9g B6bx9e P*9f B9ex8f P8gx8f B*3g P1d-1c+ B3gx1i+ +P1cx2b K3bx2b L1hx1a+ P*7g +L1a-1b K2b-3c G7h-8h +B1ix4f B*1c +B4fx3f P*3g +B3fx3g B1c-2b+ K3c-2d L*8e R*1i
+  86 同　桂成(85)  (00:58 / 00:51:20)
+*-64
+*N8ex9g P1e-1d N*2g R1i-2i L9ax9e R2ix2g N*8e R2gx2e P*2d R2e-2h G2b-2c S6g-7f L1ax1d N*8d P*7g S8hx7g N8ex7g+ B8fx7g B6bx8d L1hx1d N9g-8i+ K9ix8i L9ex9h+ K8ix9h L*9f P*9g G2cx1d P9gx9f
+  87 同　銀(88)    (00:59 / 00:43:32)
+*95
+*S8hx9g B6bx9e P*9f B9ex8f P8gx8f P*1g L1hx1g B*2h R1i-1h B2hx4f+ P1e-1d N*2f R1h-6h +B4fx5g N*8i P*7g G7hx7g N2f-1h+ P1d-1c+ L1ax1c L1gx1c+ +B5gx1c
+  88 ９五角(62)    (00:58 / 00:52:18)
+*346
+*L9ax9e P*9f N*8e P9fx9e N8ex9g+ L9hx9g N*8e L9g-9f P6d-6e N*8i B6b-7c R1i-4i P*7g G7h-8h P6ex6f S6g-7f P*9g S7fx8e S*9h G8hx9h P9gx9h+ K9ix9h R8ax8e N8ix7g
+  89 １四歩(15)    (00:59 / 00:44:31)
+*139
+*P1e-1d B9ex8f S9gx8f P*9g L9hx9g L9ax9g+ S8fx9g L*9e P*9h L9ex9g+ P9hx9g B*3g P1d-1c+ B3gx1i+ +P1cx2b K3bx2b L*8f R8a-9a L1hx1a+ +B1ix4f B*1e
+  90 ９六歩打      (00:58 / 00:53:16)
+*440
+*B9ex8f
+  91 ８八銀(97)    (01:01 / 00:45:32)
+*-111
+*S9g-8h B9ex8f P8gx8f B*3g P1d-1c+ B3gx1i+ +P1cx2b K3bx2b L1hx1a+ +B1ix4f +L1a-1b K2bx1b G*3c K1b-1c L*8e N*8d L8ex8d R8ax8d
+  92 ８六角(95)    (00:59 / 00:54:15)
+*128--
+*N*8e N*8i
+  93 同　歩(87)    (01:00 / 00:46:32)
+*-64
+*P8gx8f B*3g P1d-1c+ B3gx1i+ +P1cx2b K3bx2b L1hx1a+ P*8g B*1e P8gx8h+ G7ix8h R8ax1a G*3c K2b-1c L*1g R*2i N*8i N*2c
+  94 ３七角打      (00:58 / 00:55:13)
+*591
+*N*9d P*9b L9ax9b L9hx9f B*3g R1i-4i N*8d L9f-9e P*1g P4f-4e P4dx4e P*4d S4cx4d N*5f S4d-3c L1hx1g K3b-2c K9i-8i P*9g S8hx9g L1ax1d P*2d S3cx2d L1gx1d K2cx1d
+  95 １三歩成(14)  (00:59 / 00:47:31)
+*-255
+*P1d-1c+ B3gx1i+ +P1cx2b K3bx2b L1hx1a+ P*8g G7hx8g N*9e +L1a-1b K2b-3c B*1e N*2d G8gx9f +B1ix4f L*8e P*8d L8ex8d R8ax8d G9fx9e L9ax9e L9hx9e
+  96 １九角成(37)  (00:58 / 00:56:11)
+*221
+*G2b-3c
+  97 ２二と(13)    (00:59 / 00:48:30)
+*-224
+*+P1cx2b K3bx2b L1hx1a+ P*8g S8hx8g +B1ix4f +L1a-1b K2bx1b P*2d +B4fx2d N*1f +B2d-3c P*2d P9f-9g+ P*9b L9ax9b P*9c L9bx9c P*9d L9cx9d L9hx9g L9dx9g+
+  98 同　玉(32)    (00:58 / 00:57:09)
+*306
+*K3b-4b
+  99 １一香成(18)  (00:59 / 00:49:29)
+*-202
+*L1hx1a+ P*8g S8hx8g +B1ix4f +L1a-1b K2bx1b P*2d +B4fx2d N*1f +B2d-3c L*2d P9f-9g+ P*1d +B3cx2d N1fx2d K1b-2c L9hx9g L9ax9g+ P*9h +L9gx8g G7hx8g N*9e P1d-1c+ K2cx1c
+ 100 ４六馬(19)    (00:58 / 00:58:07)
+*516
+*P9f-9g+ L9hx9g
+ 101 １二成香(11)  (00:59 / 00:50:28)
+*-71
+*+L1a-1b K2b-3c L*4h +B4fx5g P*5c P*8g P5cx5b+ P8gx8h+ G7ix8h S6cx5b P*5c R*1i P*4i P*8g G7hx8g N*9e B*2b K3c-2d B2b-1c+ R1ix1c+ +L1bx1c N9ex8g G8hx8g
+ 102 同　玉(22)    (00:58 / 00:59:05)
+*612
+*K2b-3c L*4i +B4fx3f P*9b L9ax9b B*1e N*2d N*1f K3c-4b P*9c L9bx9c P*3g +B3f-2g N*8e +B2gx4i B1ex2d K4b-5c N8ex9c R8a-7a L9hx9f R7ax7e P*7f
+ 103 ２四歩打      (00:59 / 00:51:27)
+*-201
+*P*2d +B4fx2d N*1f +B2d-1e P*2d L*9g P*9b L9ax9b B*3c L9gx9h+ K9ix9h P9f-9g+ S8hx9g L9bx9g+ K9hx9g P*9f K9g-8g R*9g K8g-7f N*8d
+ 104 同　馬(46)    (00:58 / 01:00:03)
+*313
+*L*2a N*1f K1b-2b P*9b L9ax9b B*1a K2bx1a G*3c K1a-1b P*1d P*1c L*2c N*9e L9hx9f P*9g P*9h P9gx9h+ K9ix9h P*9g K9hx9g
+ 105 １六桂打      (00:59 / 00:52:26)
+*-321
+*N*1f +B2d-3c P*9b P*8g G7hx8g L9ax9b L*2d N*9e P*1d N9ex8g S8hx8g L*2b P*2c +B3cx2d P2cx2b+ K1bx2b N1fx2d K2b-3c P1d-1c+ P9f-9g+
+ 106 ３三馬(24)    (00:58 / 01:01:01)
+*472
+*L*9g N1fx2d
+ 107 ２四香打      (00:59 / 00:53:25)
+*-353
+*L*2d P*8g S8hx8g L*2a L2dx2a+ P9f-9g+ L*2d +P9gx8g G7hx8g R*1i K9i-8h L9ax9h+ K8hx9h R1ix1f+ B*1a +B3cx1a +L2ax1a K1b-1c
+ 108 ２三香打      (00:58 / 01:01:59)
+*700
+*N*3b N*3g N3bx2d N3gx2e K1b-2c P*9b L9ax9b N2ex3c+ K2cx3c B*1c K3c-4b B1cx2d+ K4b-5c G*8b P*7g G8bx8a P7gx7h+ S6gx7h P*7g S7hx7g N*9e L9hx9f N*8g K9i-9h N8gx7i+
+ 109 １四金打      (00:59 / 00:54:24)
+*-355
+*G*1d L2cx2d N1fx2d K1b-2a N*1e K2a-3a N1e-2c+ K3a-4b L*8e P*8c +N2cx3c K4bx3c N2d-1b+ K3c-4b P*4e N*9e P4ex4d S4cx4d B*2b P*4c L9hx9f N*8g
+ 110 ２四香(23)    (00:58 / 01:02:57)
+*457
+*P*8g S8hx8g
+ 111 同　桂(16)    (01:02 / 00:55:26)
+*-338
+*N1fx2d K1b-2a N*1e K2a-3a N1e-2c+ K3a-4b L*8e P*8c +N2cx3c K4bx3c P*4e P*7g N2d-1b+ K3c-4b G7hx7g L*9g P*9e R*1i G1d-2c L9ax9e P4ex4d S4cx4d
+ 112 ２一玉(12)    (00:58 / 01:03:55)
+*-158
+*K1b-2b B*1c K2b-2a P*9b L9ax9b P*9c L9bx9c N*1e L*2b P*2c P9f-9g+ L9hx9g L9cx9g+ S8hx9g K2a-3a P2cx2b+ K3a-4b N1e-2c+ +B3cx2c +P2bx2c P*7g G7hx7g R*1i K9i-8h R1ix1d+ B1c-2b+ +R1d-1h G7i-7h K4b-5c
+ 113 １五桂打      (00:59 / 00:56:25)
+*-390
+*N*1e K2a-3a N1e-2c+ K3a-4b L*8e P*8c +N2cx3c K4bx3c P*4e P*7g P4ex4d K3cx4d G7hx7g K4d-5c B*2b P9f-9g+ L9hx9g L9ax9g+ S8hx9g R*4i S9g-8h
+ 114 ３一玉(21)    (00:58 / 01:04:53)
+*778
+*L*9g P*9b N*8e P9bx9a+ R8ax9a P*9b R9ax9b P*9d K2a-3a N1e-2c+ +B3c-4b L*3c K3a-4a P8fx8e N*8f L9hx9g P9fx9g+ L3c-3b+ K4a-5a +L3bx4b K5ax4b S8hx9g
+ 115 ２三桂成(15)  (00:59 / 00:57:24)
+*-395
+*N1e-2c+ K3a-4b +N2cx3c K4bx3c P*9e L9ax9e L*5c G5bx5c B*1e K3c-4b N2d-3b+ K4bx3b B*5a G5c-5b B1e-3c+ K3b-4a B5ax9e+ P*7g G7hx7g N*8d L*8e P*7f S6gx7f
+ 116 同　馬(33)    (00:58 / 01:05:51)
+*877
+*K3a-4b
+ 117 同　金(14)    (00:59 / 00:58:23)
+*-481
+*G1dx2c K3a-4b L*8e P*8d L8ex8d R8ax8d P*4e P*7g G7hx7g P*8g G7gx8g N*9e P4ex4d N9ex8g S8hx8g S4cx4d B*3a K4b-4a N2d-3b+ K4a-5a B*7c
+ 118 ４二玉(31)    (00:58 / 01:06:49)
+*425
+*P9f-9g+ L9hx9g L9ax9g+ S8hx9g K3a-4b K9i-8h L*9b P*9c L9bx9c P*9d L9cx9d P*9e L9dx9e P*9f N*5e S6g-7f N*8d P9fx9e L*9f
+ 119 ９三歩打      (00:59 / 00:59:22)
+*-526
+*P*9c N*9e L*8e P*8d L8ex8d R8a-7a L8d-8b+ R7ax7e P*7f R7e-4e +L8bx9a P*8g S8hx8g N9ex8g+ G7hx8g N*9e
+ 120 ９七香打      (00:58 / 01:07:47)
+*1231--
+*N*9d P7e-7d
+ 121 同　香(98)    (00:59 / 01:00:21)
+*-598
+*L9hx9g P9fx9g+ S8hx9g P*7g G7hx7g K4b-5c L*9h N*9e S9g-8h P*8g S8hx8g N9ex8g G7gx8g L9ax9c P*9f P*9g L9hx9g N*8d
+ 122 同　歩成(96)  (00:58 / 01:08:45)
+*1412
+*P*7g L9gx9f
+ 123 同　銀(88)    (00:59 / 01:01:20)
+*-979
+*S8hx9g P*7g G7hx7g L*9d L*9h L9dx9g L9hx9g P*9f L9gx9f N*8d P9c-9b+ N8dx9f P*9g L9ax9b K9i-8i R*4h S6g-7h P*8h K8i-9h R4h-4i+ P9gx9f +R4ix7i
+ 124 ９四香打      (00:58 / 01:09:43)
+*1765
+*P*7g G7hx7g L*9d L*9h N*8d B*8e L9dx9g+ L9hx9g P*9f L9gx9f N8dx9f K9i-8i N*5e S6g-7h P*7f B8ex7f K4b-5c G2c-3c S*9g G7g-8g S9gx8f+
+ 125 ９六香打      (00:59 / 01:02:19)
+*-1207
+*L*9f P*9e N2d-3b+ K4b-5c B*4b K5c-6b L*8e P*8d L8ex8d R8ax8d G2c-3c P9ex9f G3cx4c G5bx4b +N3bx4b P9fx9g+ B*5a K6b-7a
+ 126 ９五歩打      (00:58 / 01:10:41)
+*2091
+*P*7g N2d-3b+
+ 127 ３二桂成(24)  (00:59 / 01:03:18)
+*-1355
+*N2d-3b+ K4b-5c B*4b K5c-6b L*7d P9ex9f B*7c K6b-6a +N3b-4a N*6b +N4a-5a G5bx5a B4bx5a+ K6ax5a G*5c L*9h K9i-8h P9fx9g+ K8h-7g B*5i G7i-6h R*8g G7hx8g +P9gx8g K7gx8g R8ax8f K8gx8f B5ix6h+ R*7g
+ 128 同　銀(43)    (00:58 / 01:11:39)
+*2176
+*K4b-5c B*4b K5c-6b L*9h P9ex9f S9gx9f L9dx9f L9hx9f P*7g G7hx7g S*9g L*9h R*4i B*6h G5bx4b L9hx9g S4cx3b P9c-9b+ S3bx2c +P9bx8a L9ax9f K9i-8h K6b-5c G7i-7h
+ 129 １五角打      (00:59 / 01:04:17)
+*-1751
+*B*1e K4b-5c G2cx3b P9ex9f B*4b K5c-6b S*5c K6b-7a S5cx5b P9fx9g+ B4b-5c+ K7a-8b L*8e P*8d L8ex8d P*8c G*7c K8bx9c L8dx8c+ R8ax8c G7cx8c K9cx8c R*7c K8c-8d P8f-8e K8d-9e P*9h
+ 130 ３三桂打      (00:58 / 01:12:37)
+*2690
+*K4b-5c G2cx3b
+ 131 ３二金(23)    (00:59 / 01:05:16)
+*-1821
+*G2cx3b K4bx3b S*2d N*2a L9fx9e L9dx9e L*9f L9ex9f S9gx9f P*7g G7hx7g L9ax9c P*9e N*8d S9f-8g L9cx9e P*9h P*9g P9hx9g L9ex9g+
+ 132 同　玉(42)    (00:58 / 01:13:35)
+*-834
+*K4b-5c B1ex3c+ P9ex9f S*7c P5d-5e L*4g L*9h K9i-8h N*4f L4gx4f N*4e S9gx9f L9dx9f K8h-7g S*9g N*8d R*4i N*5h L9ax9c +B3cx3d N*8g K7gx8g
+ 133 ９五香(96)    (00:59 / 01:06:15)
+*-1893
+*L9fx9e L9dx9e L*9f L9ex9f S9gx9f L*9d L*9g L9dx9f L9gx9f G*9g L*9h N*8g G7hx8g G9gx8g N*2d K3b-4b
+ 134 同　香(94)    (00:58 / 01:14:33)
+*2264
+*N*8e
+ 135 ９八香打      (00:59 / 01:07:14)
+*-2260
+*L*9h G*1d P3f-3e G1dx1e P3ex3d L9ex9g+ L9hx9g P*9f L9gx9f R*3i B*4h N*8g K9i-8h N8gx7i+ B4hx3i +N7ix7h K8hx7h P*7g K7h-6h R8ax8f N*2d K3b-4c P3dx3c+
+ 136 ９四香打      (00:58 / 01:15:31)
+*3012--
+*P*9f S9gx9f
+ 137 ２四歩打      (01:02 / 01:08:16)
+*-2272
+*P*2d L9ex9g+ L9hx9g L9dx9g+ P2d-2c+ K3b-4a L*9h P*9f S*8h L9ax9c P*9e L9cx9e S8hx9g P9fx9g+
+ 138 ９七香成(95)  (00:58 / 01:16:29)
+*3114
+*N*3a
+ 139 ２三歩成(24)  (00:59 / 01:09:15)
+*-2542
+*P2d-2c+ K3b-4a L9hx9g L9dx9g+ L*9h P*9f S*8h L9ax9c P*4b K4a-5a P*9e +L9gx9h K9ix9h S*9g S8hx9g P9fx9g+ K9hx9g L9cx9e K9g-8h S*9g K8h-7g S9gx8f+ K7g-6h R*1h S*4h R1hx1e+ +P2cx3c N*7f
+ 140 同　玉(32)    (00:58 / 01:17:27)
+*3482
+*K3b-4a S*8g +L9gx9h S8gx9h L9dx9h+ K9ix9h L*9d K9h-8h S*9g K8h-7g S9gx8f+ K7g-6h R*1h L*4h R1hx1e+ P*1f S*7g K6h-5i +R1e-2f L*4i +R2f-2i G7hx7g N*4g L4hx4g B*2f P*4h +S8fx7g +P2cx3c +S7gx6g
+ 141 ２四銀打      (00:59 / 01:10:14)
+*-2448
+*S*2d K2c-1b L9hx9g L9dx9g+ L*9h P*9f G7i-8i N*9e S6g-7f R*1i B*2c K1b-2a P*2b K2a-3a S2dx3c+ R1ix8i+
+ 142 １二玉(23)    (00:58 / 01:18:25)
+*2866
+*K2c-2b L9hx9g L9dx9g+ S2dx3c K2b-3a L*9h P*9f N*8i L*9e G7i-8h P*7g G7hx7g S*7i G7g-7h +L9gx8h G7hx8h N*7g L*2c K3a-4a P*4b K4a-5a B*7c G*6b B7cx9e+ L9ax9c P*9d N7gx8i+ K9ix8i
+ 143 ９七香(98)    (00:59 / 01:11:13)
+*-2814
+*L9hx9g L9dx9g+ L*9h P*9f G7i-8i N*9e S6g-7f R*1i B*2c K1b-2a P*2i L*2b B2cx3d+ R8ax8f P*8h R8fx7f S2dx3c+ R1ix1e+ L9hx9g P9fx9g+
+ 144 同　香成(94)  (00:58 / 01:19:23)
+*3825
+*N*8e P8fx8e L9dx9g+ L*9h N*8f G7i-8h N8fx9h+ G8hx9h L*9f P*1c K1b-2a G9hx9g L9fx9g+ P1c-1b+ K2a-3a +P1b-2b K3a-4a L*9h R*6i N*8i N*8g G7hx8g +L9gx8g B*2c K4a-5a
+ 145 １三歩打      (00:59 / 01:12:12)
+*-2992
+*P*1c K1b-2a L*9h P*9f P1c-1b+ K2ax1b G7i-8i N*9e P*1c K1b-2a S6g-7f R*1i P1c-1b+ K2ax1b B*2c K1b-2a P*2i R8ax8f P*8g R1ix1e+ S2dx1e R8fx7f B2cx3d+ G*2b S1e-2d N9ex8g+
+ 146 ２一玉(12)    (00:58 / 01:20:21)
+*2876
+*K1b-1a L*9h P*9f B*8i N*9e S6g-7f K1a-2b S2dx3c+ K2bx1c +S3cx3d G*2c +S3dx2c K1cx2c P9c-9b+ R8ax8f L9hx9g R8fx7f G*2d K2c-3b G2d-3c K3b-4a L*4c G5bx4c G3cx4c
+ 147 ９八香打      (00:59 / 01:13:11)
+*-2953
+*L*9h P*9f G7i-8i N*9e S6g-7f R*1i P1c-1b+ K2ax1b P*2i R1ix1e+ S2dx1e P*7g P*1c K1b-2a B*2c K2a-3a R*3b K3a-4a R3bx3c+ K4a-5a +R3c-3a K5a-6b +R3ax8a P7gx7h+ R*6a K6b-5c G8ix7h N*8g
+ 148 ９六歩打      (00:58 / 01:21:19)
+*3854
+*N*8e P1c-1b+ K2a-3a +P1b-2b K3a-4b S2dx3c K4b-5c N*8i P*9f S3cx4d+ K5cx4d B*3c K4d-4e G7i-8h P*7g N8ix9g P7gx7h+ S6gx7h P9fx9g+ P8fx8e
+ 149 ８九金(79)    (00:59 / 01:14:10)
+*-3277
+*G7i-8i N*9e S6g-7f R*1i B*5i P*7g P1c-1b+ K2ax1b G7hx7g R1i-1h+ P*2h +R1hx2h P*4h P*8h G8ix8h +R2h-3i P4h-4g S*7i G7g-7h +L9gx8h G7hx8h P*8g S7fx8g
+ 150 ６九飛打      (00:58 / 01:22:17)
+*5095
+*N*9e
+ 151 ９七香(98)    (00:59 / 01:15:09)
+*-4720
+*L9hx9g P9fx9g+ P1c-1b+ K2ax1b B*2c K1b-2a P*2b K2a-3a L*7i R6ix6g+ P2b-2a+ K3ax2a B2c-3b+ K2ax3b S2dx3c+ K3b-4a N*5c K4a-5a +S3c-4c K5a-6b +S4cx5b S6cx5b N5c-6a+ R8ax6a
+ 152 ９八香打      (00:58 / 01:23:15)
+*9192
+*P9fx9g+ P1c-1b+
+ 153 同　玉(99)    (00:59 / 01:16:08)
+*-Mate:16
+*K9ix9h P9fx9g+ K9hx9g P*9f K9g-8g N*9e K8g-7f N*8d K7f-8e N*7c K8ex9e L*9d K9ex9d S*8c K9d-9e G*9d
+ 154 ９七歩成(96)  (00:58 / 01:24:13)
+*4177
+*N*8e
+ 155 同　玉(98)    (00:59 / 01:17:07)
+*-Mate:14
+*K9hx9g P*9f K9g-8g N*9e K8g-7f N*8d K7f-8e N*7c K8ex9e L*9d K9ex9d S*8c K9d-9e G*9d
+ 156 ９六香打      (00:58 / 01:25:11)
+*+Mate:13
+*P*9f K9g-8g N*9e K8g-7g G*8g G7hx8g N9ex8g+ K7gx8g R6ix6g+ K8gx9f L*9d L*9e G*9g
+ 157 同　玉(97)    (00:59 / 01:18:06)
+*-Mate:12
+*K9gx9f S*9e K9fx9e L9ax9c P*9d L9cx9d K9ex9d G*8d K9d-9c G8d-8c K9c-9b G8c-8b
+ 158 ９五銀打      (00:58 / 01:26:09)
+*+Mate:13
+*P*9e K9f-8g G*9f K8g-7g G9fx8f K7g-8h S*9g K8h-9i R6ix8i+ K9ix8i N*7g G7hx7g G*8h
+ 159 同　玉(96)    (00:59 / 01:19:05)
+*-Mate:10
+*K9fx9e L9ax9c P*9d L9cx9d K9ex9d G*8d K9d-9c G8d-8c K9c-9b G8c-8b
+ 160 ９三香(91)    (00:58 / 01:27:07)
+*+Mate:19
+*P*9d K9e-9f G*9e K9f-9g G9ex8f K9g-9h G8f-8g G7hx8g R6ix8i+ K9hx8i R8ax8g+ K8i-7i +R8g-7g G*7h G*6h K7i-8i G6hx7h S6gx7h G*8h
+ 161 ９四歩打      (00:59 / 01:20:04)
+*-Mate:8
+*P*9d L9cx9d K9ex9d G*8d K9d-9c G8d-8c K9c-9b G8c-8b
+ 162 同　香(93)    (00:58 / 01:28:05)
+*136
+*N*8c
+ 163 同　玉(95)    (00:59 / 01:21:03)
+*-Mate:6
+*K9ex9d G*8d K9d-9c G8d-8c K9c-9b G8c-8b
+ 164 ８四金打      (00:58 / 01:29:03)
+*803
+*P*9c
+ 165 ９三玉(94)    (00:01 / 01:21:04)
+*-Mate:4
+*K9d-9c G8d-8c K9c-9b G8c-8b
+ 166 ８三金(84)    (00:58 / 01:30:01)
+*516
+*R8a-8c K9c-9b
+ 167 ９二玉(93)    (00:01 / 01:21:05)
+*-Mate:2
+*K9c-9b G8c-8b
+ 168 ８二金(83)    (00:58 / 01:30:59)
+*1201
+*R8a-8b
+ 169 投了          (00:01 / 01:21:06)
+まで168手で後手の勝ち
+"""
+
+val kif9 = """
+# KIF形式棋譜ファイル
+# Generated by Shogidokoro
+手合割：平手
+先手：elmo YaneuraOu 4.57
+後手：yaselmo YaneuraOu 4.73
+手数----指手---------消費時間--
+   1 ７六歩(77)    (04:35 / 00:04:35)
+*63
+*P7g-7f G4a-3b G6i-7h P3c-3d P2g-2f P8c-8d P2f-2e P8d-8e P2e-2d P2cx2d R2hx2d P8e-8f P8gx8f R8bx8f S3i-3h S7a-7b K5i-6h R8f-8b P*8g P*2c R2d-2f P7c-7d P3g-3f P1c-1d N2i-3g S7b-7c P9g-9f S7c-6d R2f-2e N2a-3c R2e-2i
+   2 ３四歩(33)    (02:50 / 00:02:50)
+*72
+*P3c-3d P2g-2f P8c-8d P2f-2e P8d-8e G6i-7h G4a-3b P2e-2d P2cx2d R2hx2d P8e-8f P8gx8f R8bx8f K5i-5h R8f-8b P*8g P1c-1d P3g-3f B2bx8h+ S7ix8h S3a-2b N8i-7g P*2c R2d-2f B*4d R2f-2h K5a-4b S3i-3h N2a-3c K5h-6h
+   3 ２六歩(27)    (01:25 / 00:06:00)
+*38
+*P2g-2f G4a-3b P2f-2e P8c-8d K5i-6h P8d-8e P2e-2d P2cx2d R2hx2d P8e-8f P8gx8f R8bx8f G6i-7h R8f-8d R2d-2h P*2c B8hx2b+ S3ax2b S7i-8h K5a-4b P9g-9f R8d-8b P*8g S7a-7b S3i-3h P7c-7d P3g-3f S2b-3c N2i-3g P1c-1d S8h-7g P6c-6d R2h-2i N8a-7c P6g-6f
+   4 ８四歩(83)    (03:10 / 00:06:00)
+*78--
+*G4a-3b P2f-2e P8c-8d G6i-7h P8d-8e P2e-2d P2cx2d R2hx2d P8e-8f P8gx8f R8bx8f K5i-5h R8f-8b P*8g B2bx8h+ S7ix8h S3a-2b R2d-2h N2a-3c S3i-4h P3d-3e P5g-5f R8b-8d S4h-5g K5a-6b S5g-4f S7a-7b K5h-6i K6b-7a
+   5 ２五歩(26)    (01:00 / 00:07:00)
+*31
+*P2f-2e P8d-8e K5i-6h G4a-3b G6i-7h P8e-8f P8gx8f R8bx8f P2e-2d P2cx2d R2hx2d R8f-8b P*8g P*2c R2d-2f S7a-7b S3i-3h P7c-7d P9g-9f K5a-4b P3g-3f P1c-1d N2i-3g S7b-7c P*2d P2cx2d P3f-3e P3dx3e R2fx2d P3e-3f
+   6 ８五歩(84)    (01:00 / 00:07:00)
+*56
+*P8d-8e G6i-7h K5a-4b P2e-2d P2cx2d R2hx2d G4a-3b K5i-5h S7a-7b R2d-2h P*2c B8h-7g B2bx7g+ N8ix7g S3a-2b S7i-8h P7c-7d S3i-3h P1c-1d P3g-3f P8e-8f P8gx8f R8bx8f N2i-3g P3d-3e S8h-8g R8f-8b B*4f S7b-7c B4fx3e S2b-3c B3e-4f P*8f S8g-9f
+   7 ７八金(69)    (01:00 / 00:08:00)
+*48
+*K5i-6h G4a-3b G6i-7h P8e-8f P8gx8f R8bx8f P2e-2d P2cx2d R2hx2d R8f-8b P*8g P*2c R2d-2e P7c-7d S3i-3h S7a-7b P3g-3f N8a-7c N2i-3g P*8f P8gx8f R8bx8f P*2d P2cx2d R2ex2d B2bx8h+ S7ix8h B*3c R2dx2a+ B3cx8h+
+   8 ８六歩(85)    (01:00 / 00:08:00)
+*83
+*G4a-3b P2e-2d P2cx2d R2hx2d K5a-4b R2dx3d P8e-8f P8gx8f R8bx8f R3d-2d R8fx7f K5i-6h R7f-8f P*8g R8f-8b S3i-3h P*2c R2d-2f S7a-7b P3g-3f P7c-7d K6h-5h B2bx8h+ S7ix8h S3a-2b N2i-3g S7b-7c S8h-7g P1c-1d R2f-2i S2b-3c P9g-9f B*5d S7g-6f P6c-6d
+   9 同　歩(87)    (01:00 / 00:09:00)
+*70
+*P8gx8f R8bx8f P*8g R8f-8b K5i-6h G4a-3b S3i-3h S3a-4b P2e-2d P2cx2d R2hx2d P4c-4d R2d-2f P*2c P3g-3f S4b-4c S3h-3g G6a-5b P3f-3e P3dx3e P9g-9f P1c-1d S3g-4f S4c-3d B8h-7g K5a-4b S7i-8h B2b-3c
+  10 同　飛(82)    (01:00 / 00:09:00)
+*46
+*R8bx8f P*8g R8f-8d P2e-2d P2cx2d R2hx2d G4a-3b K5i-6h S7a-7b S3i-3h P*2c R2d-2g P9c-9d P9g-9f P1c-1d P3g-3f K5a-4b N2i-3g P7c-7d R2g-2i N8a-7c G4i-4h K4b-5b P4g-4f R8d-8a B8hx2b+ S3ax2b B*6f
+  11 ８七歩打      (01:00 / 00:10:00)
+*67
+*P*8g R8f-8d K5i-6h G4a-3b S3i-3h B2b-3c B8hx3c+ N2ax3c S7i-8h S7a-7b P4g-4f S3a-2b P3g-3f K5a-5b P9g-9f P7c-7d P2e-2d P2cx2d R2hx2d P7d-7e P7fx7e N8a-7c S8h-7g S2b-2c R2d-2g P*2d R2g-2h K5b-4b N2i-3g R8d-5d
+  12 ８四飛(86)    (01:00 / 00:10:00)
+*54--
+*R8f-8d P2e-2d P2cx2d R2hx2d G4a-3b R2d-2h P*2c S3i-4h S7a-7b B8hx2b+ S3ax2b S7i-8h K5a-4b P3g-3f P7c-7d S4h-3g N8a-7c P9g-9f S2b-3c
+  13 ６八玉(59)    (01:00 / 00:11:00)
+*107
+*K5i-6h G4a-3b P2e-2d P2cx2d R2hx2d P*2c R2d-2h S7a-7b S3i-3h B2b-3c P3g-3f S3a-4b P9g-9f K5a-5b N2i-3g K5b-6b P4g-4f K6b-7a N3g-4e B3cx8h+ S7ix8h P4c-4d P*2d P2cx2d R2hx2d P*2c R2dx3d
+  14 ３二金(41)    (01:00 / 00:11:00)
+*86++
+*G4a-3b P9g-9f B2b-3c B8hx3c+ N2ax3c S7i-8h K5a-6b S3i-3h S7a-7b P4g-4f S3a-4b S3h-4g K6b-7a S8h-7g R8d-8e S4g-3f P3d-3e S3f-4g
+  15 ３八銀(39)    (01:00 / 00:12:00)
+*77
+*S3i-3h S7a-7b P9g-9f P3d-3e P4g-4f P1c-1d S3h-4g P9c-9d P1g-1f K5a-4b G4i-5h K4b-5b B8hx2b+ S3ax2b S7i-8h S2b-3c P3g-3f P3ex3f S4gx3f B*5e G5h-4g P7c-7d N2i-3g N8a-7c N3g-4e S3c-4d P2e-2d
+  16 ７二銀(71)    (01:00 / 00:12:00)
+*98++
+*S7a-7b P2e-2d P2cx2d R2hx2d P*2c R2d-2f P9c-9d P9g-9f K5a-5b P3g-3f P1c-1d N2i-3g P*8f P8gx8f R8dx8f P3f-3e P3dx3e R2f-5f P4c-4d R5f-2f K5b-6b P*8g R8f-8b B8h-5e P6c-6d B5ex6d S7b-6c B6d-4f P*6d
+  17 ２四歩(25)    (01:00 / 00:13:00)
+*105
+*P2e-2d P2cx2d R2hx2d P*2c R2d-2h K5a-4b P3g-3f B2bx8h+ S7ix8h S3a-2b P9g-9f P7c-7d P4g-4f N8a-7c N2i-3g P6c-6d P*2d P2cx2d R2hx2d R8d-8a R2d-2i P3d-3e B*6f P*2c S3h-4g P3ex3f S4gx3f
+  18 同　歩(23)    (01:00 / 00:13:00)
+*73++
+*P2cx2d R2hx2d P*2c R2d-2f P9c-9d P9g-9f K5a-6b P3g-3f P*8f P8gx8f R8dx8f P3f-3e R8f-8b P*8g R8b-8d R2f-5f B2b-4d B8hx4d R8dx4d B*5e B*6d B5ex6d P6cx6d B*5e P3dx3e B5ex4d P4cx4d N8i-7g B*2h R*1h
+  19 同　飛(28)    (01:00 / 00:14:00)
+*84
+*R2hx2d P*2c R2d-2h K5a-5b P3g-3f P1c-1d P9g-9f P7c-7d P*2d P2cx2d R2hx2d P7d-7e P7fx7e P*2c R2d-2f P*8f P8gx8f R8dx8f P*8g R8f-7f B8hx2b+ S3ax2b S7i-8h B*4d R2f-2h N8a-7c S8h-7g R7fx7e S7g-6f
+  20 ２三歩打      (01:00 / 00:14:00)
+*42
+*P*2c R2d-2f K5a-4b P3g-3f P7c-7d P*2d P2cx2d R2fx2d P*2c R2dx3d S7b-7c R3d-3e S7c-6d R3e-2e N8a-7c N2i-3g P7d-7e P7fx7e K4b-5b K6h-5h G6a-7b K5h-4h N2a-3c R2e-3e S3a-4b S7i-6h P1c-1d B8h-6f
+  21 ２六飛(24)    (01:00 / 00:15:00)
+*52
+*R2d-2f R8d-8b P9g-9f P1c-1d P1g-1f K5a-4b P*2d P2cx2d R2fx2d B2bx8h+ S7ix8h S3a-2b P3g-3f P*2c R2d-2f P7c-7d N2i-3g P6c-6d P4g-4f N8a-7c R2f-2i S7b-6c G4i-4h R8b-8a S3h-4g G6a-7b
+  22 ４二玉(51)    (01:00 / 00:15:00)
+*48--
+*K5a-4b P3g-3f P7c-7d S3h-3g P7d-7e P7fx7e S7b-7c S3g-4f S7c-6d K6h-5h S6dx7e P3f-3e P3dx3e S4fx3e B2bx8h+ S7ix8h S3a-2b P*7f P*3d P7fx7e P3dx3e P7e-7d P3e-3f B*5f B*6d
+  23 ３六歩(37)    (01:00 / 00:16:00)
+*62
+*P3g-3f P*8f P8gx8f R8dx8f P*2d P2cx2d R2fx2d R8f-8b P*8g P*2c R2dx3d B2bx8h+ S7ix8h B*2h B*3g B2hx3g+ S3hx3g S3a-2b R3d-3e P2c-2d P*2e S2b-3c N8i-7g P1c-1d P2ex2d S3cx2d R3e-6e P7c-7d P*2c G3bx2c
+  24 ７四歩(73)    (01:00 / 00:16:00)
+*72++
+*P7c-7d S3h-3g N8a-7c S3g-4f B2bx8h+ S7ix8h S3a-2b P9g-9f P6c-6d N2i-3g S7b-6c B*4e S6c-5d B4ex3d P7d-7e P7fx7e G6a-5b G4i-4h P*3c B3d-5f S5d-6e B5f-4e
+  25 ２四歩打      (01:00 / 00:17:00)
+*117
+*P*2d P2cx2d R2fx2d B2bx8h+ S7ix8h P*2c R2dx3d B*2h B*3g B2hx3g+ S3hx3g B*4d R3dx4d P4cx4d B*6f R8d-8b B6fx4d G3b-3c B4d-6f S7b-7c P3f-3e P7d-7e P7fx7e S7c-6d S8h-7g
+  26 同　歩(23)    (01:00 / 00:17:00)
+*83
+*P2cx2d R2fx2d P*2c R2dx3d S7b-7c R3d-3e S7c-6d P*2d R8d-8b P2dx2c+ G3bx2c R3e-2e P*2d R2e-2h B2b-3c S3h-3g S3a-3b B8hx3c+ N2ax3c S7i-8h P7d-7e S3g-4f P1c-1d P3f-3e P7ex7f P3e-3d G2cx3d P*3e G3d-4d R2hx2d
+  27 同　飛(26)    (01:00 / 00:18:00)
+*104
+*R2fx2d P*2c R2dx3d S7b-7c R3d-3e S7c-6d P9g-9f B2bx8h+ S7ix8h N2a-3c S8h-7g S3a-2b S7g-6f K4b-3a P4g-4f R8d-8b N8i-7g N8a-7c P7f-7e P*3d R3ex3d P7dx7e P*7d P7e-7f P7dx7c+ P7fx7g+ S6fx7g S6dx7c R3d-3e P*7f S7gx7f S7c-6d P*7d
+  28 ２三歩打      (01:00 / 00:18:00)
+*130
+*P*2c R2dx3d B2bx8h+ S7ix8h B*2h R3d-3e B2h-7c+ N8i-7g N2a-3c N2i-3g P6c-6d B*9e R8d-8c B9ex7c+ N8ax7c P7f-7e S7b-6c B*5f R8c-8d P8g-8f P7dx7e S8h-8g P7e-7f S8gx7f R8dx8f S7f-8g R8f-8a P*8e
+  29 ３四飛(24)    (01:00 / 00:19:00)
+*158
+*R2dx3d S7b-7c R3d-3e S7c-6d P9g-9f R8d-8b R3e-2e P1c-1d N2i-3g B2b-3c P4g-4f S3a-2b R2e-2i P7d-7e B8hx3c+ N2ax3c P7fx7e S6dx7e S7i-8h K4b-3a G4i-4h P*3e S3h-4g B*5d P4f-4e N3cx4e N3g-2e
+  30 ７三銀(72)    (01:00 / 00:19:00)
+*60--
+*S7b-7c R3d-3e S7c-6d P9g-9f B2bx8h+ S7ix8h N2a-3c S8h-7g S3a-2b S7g-8f R8d-8b R3e-8e P*8d R8e-3e G6a-5b S8f-7g P8d-8e S7g-6f B*2h B*4f B2hx4f+ P4gx4f B*2h B*3g B2hx3g+ S3hx3g P2c-2d B*5f S2b-2c B5fx7d N8a-7c B7d-5f B*4d
+  31 ３五飛(34)    (01:00 / 00:20:00)
+*124
+*R3d-3e S7c-6d P9g-9f R8d-8b R3e-2e B2b-3c N2i-3g S3a-2b R2e-2i K4b-3a P1g-1f P7d-7e P7fx7e S6dx7e B8hx3c+ N2ax3c S7i-8h B*5d P1f-1e S7e-6d G4i-4h P*8f P8gx8f R8bx8f P*8g R8f-8b P*7d
+  32 ６四銀(73)    (01:00 / 00:20:00)
+*67++
+*S7c-6d P9g-9f B2bx8h+ S7ix8h N2a-3c N2i-3g S3a-2b N3g-4e N3cx4e R3ex4e S2b-3c R4e-3e B*4d R3e-2e P2c-2d R2e-2i P7d-7e N*5f B4d-5e N5fx6d P6cx6d B*4f
+  33 ９六歩(97)    (01:00 / 00:21:00)
+*133
+*P9g-9f R8d-8b R3e-2e B2bx8h+ S7ix8h S3a-2b P4g-4f B*5d S8h-7g P7d-7e S3h-4g S2b-3c P5g-5f P4c-4d R2e-2h P1c-1d G4i-5h G6a-5b P3f-3e P7ex7f S7g-6f K4b-3a P5f-5e B5d-4c N2i-3g G5b-4b
+  34 ８三飛(84)    (01:00 / 00:21:00)
+*127++
+*B2bx8h+ S7ix8h N2a-3c R3e-1e B*2h B*3g B2hx3g+ N2ix3g B*2h R1e-1f B2hx1i+ P3f-3e P*3f R1fx3f +B1i-1h B*2g
+  35 ２五飛(35)    (01:00 / 00:22:00)
+*103
+*R3e-2e N8a-7c P1g-1f R8c-8a P3f-3e G6a-7b P1f-1e B2bx8h+ S7ix8h S3a-2b R2e-2f S2b-3c S3h-3g S6d-5e P7f-7e P7dx7e P*7d N7c-6e N8i-7g S5e-6d P6g-6f N6ex7g+ S8hx7g S3c-2d
+  36 ７三桂(81)    (01:00 / 00:22:00)
+*85--
+*N8a-7c N2i-3g G6a-6b P4g-4f P1c-1d K6h-5h S6d-6e G7h-7g K4b-5b P6g-6f S6e-5d G4i-4h P6c-6d R2e-2i P6d-6e P6fx6e P*6f P6e-6d S5d-5e S3h-4g S5ex6d S4g-5f S6d-6e P*6d K5b-4b
+  37 ３五歩(36)    (01:00 / 00:23:00)
+*63
+*B8hx2b+ S3ax2b S7i-8h R8c-8a S8h-7g P1c-1d P6g-6f G6a-6b S3h-3g S2b-3c S3g-4f P4c-4d R2e-2h S3c-3d P*2d P2cx2d R2hx2d S3d-2c R2d-2h P*2d G4i-5h P7d-7e P7fx7e S6dx7e P*7f S7e-6d
+  38 ６二金(61)    (01:00 / 00:23:00)
+*64++
+*G6a-6b R2e-2f R8c-8a S3h-3g P1c-1d P9f-9e K4b-5b G4i-3h B2bx8h+ S7ix8h S3a-2b S3g-4f S2b-3c S8h-7g S3c-2d N2i-3g B*4d R2f-2i S2dx3e S4fx3e B4dx3e S*4f B3e-4d P6g-6f
+  39 １六歩(17)    (01:00 / 00:24:00)
+*104
+*R2e-2f R8c-8a P1g-1f P1c-1d S3h-3g K4b-5b B8hx2b+ S3ax2b S7i-8h S2b-3c S3g-4f S6d-6e S8h-7g P7d-7e P7fx7e P*7f S7g-6f S6ex6f P6gx6f N7c-8e S*8h S3c-2d P7e-7d
+  40 ８一飛(83)    (01:00 / 00:24:00)
+*52
+*R8c-8a P*2d P2cx2d R2ex2d P*2c R2d-2f B2b-4d B8hx4d P4cx4d S7i-8h S3a-2b S3h-3g S2b-3c P6g-6f B*4c S8h-7g P7d-7e S7g-8f S3c-2d S3g-4f P*8h G7hx8h N2a-3c R2f-2h P4d-4e
+  41 ２四歩打      (01:00 / 00:25:00)
+*94
+*P*2d B2bx8h+ S7ix8h S3a-2b P2dx2c+ G3bx2c R2e-2h P*2d S3h-3g B*6e P5g-5f B6ex7f S3g-4f P1c-1d G4i-5h P4c-4d P5f-5e B7f-4c K6h-7i N2a-3c P3e-3d N3c-4e S4fx4e P4dx4e N*3e B4cx3d N3ex2c+
+  42 同　歩(23)    (01:00 / 00:25:00)
+*57++
+*P2cx2d R2ex2d P*2c R2d-2f P1c-1d S3h-3g P9c-9d K6h-5h B2bx8h+ S7ix8h S3a-2b S3g-4f S2b-3c S8h-7g B*4d S7g-6f S3c-2d S4f-4e S2dx3e R2f-2h B4d-2b S4e-3d S3e-2d N8i-7g
+  43 同　飛(25)    (01:00 / 00:26:00)
+*66
+*R2ex2d P1c-1d R2d-2f P*2c S3h-3g P9c-9d P3e-3d K4b-5b K6h-5h G6b-7b S3g-4f B2b-4d B8hx4d P4cx4d S7i-8h S3a-4b N8i-7g S4b-4c S4f-3e K5b-6b K5h-6h P7d-7e P7fx7e P*7f R2fx7f B*2g K6h-5h
+  44 １四歩(13)    (01:00 / 00:26:00)
+*65++
+*P1c-1d R2d-2f P*2c P9f-9e P7d-7e K6h-5h P7ex7f R2fx7f B2bx8h+ S7ix8h B*2h B*3g B2hx3g+ N2ix3g B*5d R7f-2f P*3f
+  45 ２六飛(24)    (01:00 / 00:27:00)
+*73
+*R2d-2f P*2c S3h-3g P9c-9d K6h-5h B2bx8h+ S7ix8h S3a-2b S3g-4f S2b-3c S8h-7g B*5d P3e-3d S3c-4d P6g-6f P9d-9e P9fx9e N7c-8e S7g-6h P7d-7e P9e-9d P*9h L9ix9h P7ex7f P*2b G3bx2b P9d-9c+ P*9g P3d-3c+ S4dx3c L9hx9g P4c-4d
+  46 ２三歩打      (01:00 / 00:27:00)
+*48
+*P*2c P9f-9e K4b-5b S3h-3g P5c-5d G4i-5h P*8f P8gx8f R8ax8f P*8g R8f-8a G5h-4h S3a-4b B8hx2b+ G3bx2b S7i-8h S4b-5c S3g-4f G2b-3b P6g-6f S6d-5e S4fx5e P5dx5e B*6g S*2d S8h-7g S2dx3e R2f-2h P*3f B6gx2c+ G3bx2c R2hx2c+
+  47 ３七銀(38)    (01:00 / 00:28:00)
+*82
+*S3h-3g K4b-5b K6h-5h P9c-9d S3g-4f G6b-7b B8hx2b+ S3ax2b S7i-8h S2b-3c S8h-7g S3c-2d P3e-3d B*4d R2f-3f S2d-2e R3f-3i P*3f K5h-6h S6d-6e G4i-5h P2c-2d P8g-8f G7b-6b R3i-3h S6ex7f S7gx7f B4dx9i+ N8i-7g S2ex3d R3hx3f P*3c
+  48 ９四歩(93)    (01:00 / 00:28:00)
+*50++
+*P9c-9d K6h-5h B2b-4d P1f-1e B4dx8h+ S7ix8h P1dx1e P7f-7e S6dx7e B*5f S3a-2b P9f-9e P9dx9e P*9b L9ax9b B5fx7d R8a-8b P*9d L9bx9d B7d-5f
+  49 ２二角成(88)  (01:00 / 00:29:00)
+*74
+*B8hx2b+ S3ax2b S7i-8h S2b-3c S3g-4f B*4d G4i-5h P7d-7e P6g-6f B4dx6f G5h-6g B6f-4d R2f-2h P*3f P7fx7e S6dx7e P*7d N7c-8e P7d-7c+ G6bx7c P*7f S7e-6f G6g-5f P*7g G7h-7i
+  50 同　銀(31)    (01:00 / 00:29:00)
+*10++
+*S3ax2b S3g-4f S6d-6e S7i-8h S6ex7f S4f-5e P*3f P3e-3d K4b-5b K6h-5h S7f-6e G4i-3h S6e-5d S5ex5d P5cx5d R2fx3f B*4d B*3g
+  51 ８八銀(79)    (01:00 / 00:30:00)
+*31
+*S7i-8h S2b-3c S3g-4f S3c-2d P3e-3d P7d-7e P6g-6f B*4d R2f-2h B4dx6f P*2e S2d-1c G4i-5h P7ex7f G5h-6g B6f-4d P*7d N7c-6e B*5f P7f-7g+ N8ix7g N6ex7g+ G7hx7g S6d-7e K6h-5i P*7f G7gx7f S7ex7f
+  52 １三銀(22)    (01:00 / 00:30:00)
+*21++
+*S2b-1c S3g-4f S1c-2d G4i-4h B*4d R2f-3f S6d-5e S4f-4e B4d-2b R3f-3i S5e-6d S8h-7g N7c-8e S7g-8h B2b-5e N2i-3g S2dx3e S4e-5f B5e-4d N3g-4e P*3d P8g-8f
+  53 ４六銀(37)    (01:00 / 00:31:00)
+*18
+*S3g-4f S1c-2d P3e-3d B*4d R2f-2h P7d-7e B*6f P7ex7f P*7d N7c-6e P*2b G3bx2b B6fx4d P4cx4d P6g-6f P4d-4e P6fx6e P4ex4f P6ex6d P4fx4g+ B*5e P*4d B5ex4d B*4f B4dx2b+ B4fx2h+ P6dx6c+ P*6g G7hx6g G6bx6c S*7b
+  54 ２四銀(13)    (01:00 / 00:31:00)
+*72++
+*S1c-2d P3e-3d B*4d R2f-3f P7d-7e P7fx7e S6dx7e P*7g S2d-2e R3f-3i P*3f P3d-3c+ N2ax3c B*5f S2e-2f R3ix3f S2f-2g R3f-3g S2g-2h+ N2i-1g +S2hx1i S4f-3e L*5e
+  55 ６六歩(67)    (01:00 / 00:32:00)
+*-1
+*P6g-6f B*4d R2f-2h S6d-5e S4f-4e B4d-2b S4e-3d B2b-4d S3d-4e
+  56 ４四角打      (01:00 / 00:32:00)
+*1
+*B*4d G4i-5h S6d-5e S4f-4e B4d-2b R2f-3f S5e-4d S4e-5f S4d-5e S5f-4e rep_draw
+  57 ２八飛(26)    (01:00 / 00:33:00)
+*-1
+*R2f-2h S6d-5e S4f-4e B4d-2b S4e-3d B2b-4d S3d-4e
+  58 ５五銀(64)    (01:00 / 00:33:00)
+*-66--
+*S6d-5e S4f-4e B4dx3e G4i-5h S5ex6f P*3f N2a-3c P3fx3e N3cx4e P4g-4f S*3g N2ix3g N4ex3g+ R2h-2i N*5d P*6g S6f-5e K6h-7i N5dx4f G5h-6h +N3g-4g S8h-7g N4f-5h+ G6hx5h +N4gx5h K7i-8h N7c-6e S7g-6f S5ex6f P6gx6f N6ex5g+
+  59 ４五銀(46)    (01:00 / 00:34:00)
+*-1
+*S4f-4e B4dx3e G4i-5h S5ex6f S8h-7g S6fx7g+ N8ix7g N2a-3c S4e-3f B3e-4d P*2e N3cx2e S3fx2e S*8i G7h-8h N7c-8e N*6i N8ex7g N6ix7g N*8e
+  60 ３五角(44)    (01:00 / 00:34:00)
+*1
+*B4dx3e S8h-7g P*8h G7hx8h N7c-8e S7g-8f S5ex6f G4i-5h N2a-3c S4e-5f P*3f P*3d N3c-2e R2h-3h B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  61 ７七銀(88)    (01:00 / 00:35:00)
+*-1
+*S8h-7g P*8h G7hx8h N7c-8e S7g-8f S5ex6f G4i-5h N2a-3c S4e-5f P*3f P*3d N3c-2e R2h-3h B3e-4d K6h-7i B4d-3e K7i-6h
+  62 ８八歩打      (01:00 / 00:35:00)
+*1
+*P*8h G7hx8h N7c-8e S7g-8f S5ex6f G4i-5h N2a-3c S4e-5f P*3f P*3d N3c-2e R2h-2g B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  63 同　金(78)    (01:00 / 00:36:00)
+*-101
+*G7hx8h N7c-8e S7g-8f S5ex6f G4i-5h N2a-3c S4e-5f P*3f P*3d N3c-2e R2h-3h B3e-4d K6h-7i N2e-3g+ N2ix3g B4d-2f N3g-4e P3f-3g+ P*2g +P3gx3h P2gx2f R*4i P*6i +P3h-4h G5h-6h +P4hx4g N*7c G6bx7c B*6b +P4gx5g G8h-7h +P5gx6h G7hx6h K4b-3a B6bx7c+ G*5g G*7h N*6d
+  64 ８五桂(73)    (01:00 / 00:36:00)
+*1
+*N7c-8e S7g-8f S5ex6f G4i-5h N2a-3c S4e-5f P*3f P*3d N3c-2e R2h-3h B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  65 ８六銀(77)    (01:00 / 00:37:00)
+*-140
+*S7g-8f S5ex6f G4i-5h N2a-3c S4e-5f P*3f P*3d N3c-2e R2h-2g B3e-4d K6h-7i S6f-5e S5f-4e P3f-3g+ N2ix3g N2ex3g+ R2gx3g N*6f G5h-6h B4d-2f R3g-3h B2f-5i+ P*6g P4c-4d S4e-3f P*3e S3f-2g +B5i-4i B*3g S5e-6d P6gx6f +B4ix7f P*7g +B7f-5d R3h-2h P3e-3f B3g-4f S6d-5e
+  66 ６六銀(55)    (01:00 / 00:37:00)
+*1
+*S5ex6f G4i-5h N2a-3c S4e-5f P*3f P*3d N3c-2e R2h-3h B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  67 ５八金(49)    (01:00 / 00:38:00)
+*68
+*G4i-5h N2a-3c S4e-5f B3e-4d K6h-7i P*3f P*3d N3c-2e R2h-2g P1d-1e P*6g S6f-5e S5f-4e P1ex1f P*1h P3f-3g+ N2ix3g N2ex3g+ R2gx3g B4d-2b P1h-1g N*6d B*6e P1fx1g+ P*2e S2dx2e L1ix1g S5e-4d S4ex4d B2bx4d N*4e
+  68 ３三桂(21)    (01:00 / 00:38:00)
+*1
+*N2a-3c S4e-5f P*3f P*3d N3c-2e R2h-3h B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  69 ５六銀(45)    (01:00 / 00:39:00)
+*-1
+*S4e-5f P*3f P*3d N3c-2e R2h-2g B3e-4d K6h-7i S6f-5e S5f-4e P3f-3g+ N2ix3g N2ex3g+ R2gx3g N*6f G5h-6h B4d-2f R3g-3h B2f-5i+ P*6g P4c-4d S4e-3f P*3e S3f-2g +B5i-4i B*3g P5c-5d P6gx6f K4b-4c R3h-2h +B4i-3i R2h-5h +B3i-4i R5h-2h
+  70 ３六歩打      (01:00 / 00:39:00)
+*1
+*P*3f P*3d N3c-2e R2h-3h B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  71 ３四歩打      (01:00 / 00:40:00)
+*-1
+*P*3d N3c-2e R2h-3h B3e-4d K6h-7i B4d-3e K7i-6h
+  72 ２五桂(33)    (01:00 / 00:40:00)
+*1
+*N3c-2e R2h-3h B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  73 ２七飛(28)    (01:00 / 00:41:00)
+*-85
+*R2h-2g B3e-4d K6h-7i P7d-7e P*6g S6f-7g N8ix7g N8ex7g+ S8fx7g P7ex7f S7g-6f N*7d N*5e N7dx6f P6gx6f S*2f R2g-2h P3f-3g+ N2ix3g S2fx3g+ R2h-2i +S3g-3h R2i-6i N2e-3g+ N*4e +S3h-4h G5h-6h P*8f P8gx8f N*7e P*2e P*8g G8h-7h S2dx2e
+  74 ４四角(35)    (01:00 / 00:41:00)
+*1
+*B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  75 ７九玉(68)    (01:00 / 00:42:00)
+*15
+*K6h-7i P7d-7e P*6g S6f-7g N8ix7g N8ex7g+ S8fx7g P7ex7f S7g-6f N*7d P*7h N7dx6f P6gx6f S*2f R2g-2h P3f-3g+ N2ix3g S2fx3g R2h-2i S3g-3h+ S*3c G3bx3c P3dx3c+ B4dx3c R2i-6i P*8f P8gx8f P*8g G8h-9h N*7e N*3d K4b-5b N*4e
+  76 ３五角(44)    (01:00 / 00:42:00)
+*1
+*B4d-3e K7i-6h B3e-4d K6h-7i rep_draw
+  77 ６八玉(79)    (01:00 / 00:43:00)
+*-1
+*K7i-6h
+  78 ４四角(35)    (01:00 / 00:43:00)
+*1
+*B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  79 ７九玉(68)    (01:00 / 00:44:00)
+*-1
+*K6h-7i
+  80 ３五角(44)    (01:00 / 00:44:00)
+*1
+*B4d-3e K7i-6h B3e-4d K6h-7i rep_draw
+  81 ６八玉(79)    (01:00 / 00:45:00)
+*-1
+*K7i-6h
+  82 ４四角(35)    (01:00 / 00:45:00)
+*1
+*B3e-4d K6h-7i B4d-3e K7i-6h rep_draw
+  83 ７九玉(68)    (01:00 / 00:46:00)
+*-1
+*K6h-7i
+  84 ３五角(44)    (01:00 / 00:46:00)
+*1
+*B4d-3e K7i-6h B3e-4d K6h-7i rep_draw
+  85 ６八玉(79)    (01:00 / 00:47:00)
+*-1
+*K7i-6h
+  86 千日手        (00:01 / 00:46:01)
+まで85手で千日手
+"""
+
+val kif12 = """
+# --- 棋譜解説 V1.70 棋譜ファイル ---
+開始日時：2018/08/05 19:00
+終了日時：2018/08/05 21:32
+棋戦：第4期叡王戦段位別予選九段戦
+戦型：その他の戦型
+持ち時間：1時間
+場所：東京・将棋会館
+振り駒：あり
+計測時方式：チェスクロック
+秒読み：60秒
+封じ手手数：0
+手合割：平手　　
+先手：深浦康市九段
+後手：谷川浩司九段
+手数----指手---------消費時間--
+   1 ２六歩(27)   ( 0:15/00:00:15)
+   2 ８四歩(83)   ( 0:27/00:00:27)
+   3 ７六歩(77)   ( 0:48/00:01:03)
+   4 ３二金(41)   ( 0:13/00:00:40)
+   5 ２五歩(26)   ( 0:14/00:01:17)
+   6 ８五歩(84)   ( 0:17/00:00:57)
+   7 ７七角(88)   ( 0:06/00:01:23)
+   8 ３四歩(33)   ( 0:12/00:01:09)
+   9 ６六歩(67)   ( 0:08/00:01:31)
+  10 ３三角(22)   ( 0:14/00:01:23)
+  11 ６八銀(79)   ( 0:09/00:01:40)
+  12 ４二銀(31)   ( 0:27/00:01:50)
+  13 ７八金(69)   ( 0:10/00:01:50)
+  14 ６二銀(71)   ( 0:15/00:02:05)
+  15 ４八銀(39)   ( 0:26/00:02:16)
+  16 ６四歩(63)   ( 0:40/00:02:45)
+  17 ６七銀(68)   ( 4:47/00:07:03)
+  18 ６三銀(62)   ( 0:23/00:03:08)
+  19 ３六歩(37)   ( 0:08/00:07:11)
+  20 ５四銀(63)   ( 1:18/00:04:26)
+  21 ３七銀(48)   ( 0:07/00:07:18)
+  22 ４四歩(43)   ( 1:32/00:05:58)
+  23 ５八金(49)   ( 0:41/00:07:59)
+  24 ４三銀(42)   ( 0:24/00:06:22)
+  25 ５六銀(67)   ( 0:51/00:08:50)
+  26 ４一玉(51)   ( 5:22/00:11:44)
+  27 ６七金(58)   ( 0:09/00:08:59)
+  28 ５一角(33)   ( 2:04/00:13:48)
+  29 ４六銀(37)   ( 1:41/00:10:40)
+  30 ３三金(32)   ( 4:18/00:18:06)
+  31 ６九玉(59)   ( 1:06/00:11:46)
+  32 ３二玉(41)   ( 0:09/00:18:15)
+  33 ５五銀(46)   ( 3:58/00:15:44)
+  34 同　銀(54)   ( 0:54/00:19:09)
+  35 同　銀(56)   ( 0:50/00:16:34)
+  36 ６二飛(82)   ( 0:10/00:19:19)
+  37 ７九玉(69)   ( 1:15/00:17:49)
+  38 ５二金(61)   ( 0:14/00:19:33)
+  39 ４六銀(55)   ( 1:31/00:19:20)
+  40 ５四歩(53)   ( 0:50/00:20:23)
+  41 ９六歩(97)   ( 1:02/00:20:22)
+  42 ４二角(51)   ( 0:36/00:20:59)
+  43 ３七桂(29)   ( 0:51/00:21:13)
+  44 １四歩(13)   ( 0:38/00:21:37)
+  45 １六歩(17)   ( 0:19/00:21:32)
+  46 ９四歩(93)   ( 0:37/00:22:14)
+  47 ５六歩(57)   ( 0:34/00:22:06)
+  48 ７四歩(73)   ( 1:22/00:23:36)
+  49 ５五歩(56)   ( 0:31/00:22:37)
+  50 同　歩(54)   ( 1:25/00:25:01)
+  51 同　銀(46)   ( 0:14/00:22:51)
+  52 ５四歩打     ( 1:31/00:26:32)
+  53 ４六銀(55)   ( 1:04/00:23:55)
+  54 ８二飛(62)   ( 0:13/00:26:45)
+  55 ６八角(77)   ( 4:17/00:28:12)
+  56 ７三桂(81)   ( 1:34/00:28:19)
+  57 ２四歩(25)   ( 2:59/00:31:11)
+  58 同　歩(23)   ( 0:10/00:28:29)
+  59 ２五歩打     ( 0:13/00:31:24)
+  60 ６五歩(64)   ( 5:34/00:34:03)
+  61 同　歩(66)   ( 1:43/00:33:07)
+  62 ２五歩(24)   ( 0:10/00:34:13)
+  63 ３五歩(36)   ( 1:30/00:34:37)
+  64 ２四金(33)   ( 0:32/00:34:45)
+  65 ３四歩(35)   ( 0:53/00:35:30)
+  66 同　金(24)   ( 2:56/00:37:41)
+  67 ３五銀打     (11:37/00:47:07)
+  68 ８六歩(85)   ( 5:36/00:43:17)
+  69 ３四銀(35)   ( 7:48/00:54:55)
+  70 同　銀(43)   ( 0:38/00:43:55)
+  71 ８六角(68)   ( 0:14/00:55:09)
+  72 ６六歩打     ( 1:39/00:45:34)
+  73 ６八金(67)   ( 0:31/00:55:40)
+  74 ６七銀打     ( 0:24/00:45:58)
+  75 ５三歩打     ( 1:15/00:56:55)
+  76 同　金(52)   ( 3:52/00:49:50)
+  77 ２五桂(37)   ( 0:07/00:57:02)
+  78 ２七歩打     ( 0:58/00:50:48)
+  79 ３八飛(28)   ( 0:47/00:57:49)
+  80 ３三歩打     ( 0:22/00:51:10)
+  81 ２二歩打     ( 0:40/00:58:29)
+  82 ６八銀成(67) ( 7:23/00:58:33)
+  83 同　金(78)   ( 0:15/00:58:44)
+  84 ６七銀打     ( 1:27/01:00:00)
+  85 ７八金打     ( 0:42/00:59:26)
+  86 ６八銀成(67) ( 0:00/01:00:00)
+  87 同　飛(38)   ( 0:10/00:59:36)
+  88 ６七金打     ( 0:00/01:00:00)
+  89 同　金(78)   ( 0:09/00:59:45)
+  90 同　歩成(66) ( 0:00/01:00:00)
+  91 同　飛(68)   ( 0:07/00:59:52)
+  92 ５六金打     ( 0:00/01:00:00)
+  93 ６九飛(67)   ( 0:08/01:00:00)
+  94 ２五銀(34)   ( 0:00/01:00:00)
+  95 ２一歩成(22) ( 0:00/01:00:00)
+  96 ６六桂打     ( 0:00/01:00:00)
+  97 ２二と(21)   ( 0:00/01:00:00)
+  98 同　玉(32)   ( 0:00/01:00:00)
+  99 ６六飛(69)   ( 0:00/01:00:00)
+ 100 同　金(56)   ( 0:00/01:00:00)
+ 101 ３五桂打     ( 0:00/01:00:00)
+ 102 ３四銀(25)   ( 0:00/01:00:00)
+ 103 ２四歩打     ( 0:00/01:00:00)
+ 104 ３二玉(22)   ( 0:00/01:00:00)
+ 105 ２三歩成(24) ( 0:00/01:00:00)
+ 106 同　銀(34)   ( 0:00/01:00:00)
+ 107 同　桂成(35) ( 0:00/01:00:00)
+ 108 同　玉(32)   ( 0:00/01:00:00)
+ 109 ４一銀打     ( 0:00/01:00:00)
+ 110 ６七桂打     ( 0:00/01:00:00)
+ 111 ８八玉(79)   ( 0:00/01:00:00)
+ 112 ３八飛打     ( 0:00/01:00:00)
+ 113 ５八歩打     ( 0:00/01:00:00)
+ 114 ８六飛(82)   ( 0:00/01:00:00)
+ 115 ３二銀打     ( 0:00/01:00:00)
+ 116 ２四玉(23)   ( 0:00/01:00:00)
+ 117 ３五銀打     ( 0:00/01:00:00)
+ 118 同　飛成(38) ( 0:00/01:00:00)
+ 119 同　銀(46)   ( 0:00/01:00:00)
+ 120 同　玉(24)   ( 0:00/01:00:00)
+ 121 ４六金打     ( 0:00/01:00:00)
+ 122 投了         ( 0:00/01:00:00)
+ 123 中断         ( 0:00/01:00:00)
+まで122手で中断
+"""
+
+val kif16 = """
+手合割：平手
+先手：
+後手：
+# 「全,圭,杏」を含む 
+
+手数----指手----消費時間--
+   1 ７六歩(77)
+   2 ３四歩(33)
+   3 ２二角成(88)
+   4 ３二飛(82)
+   5 同　馬(22)
+   6 ５二金(41)
+   7 ３一馬(32)
+   8 ７二金(61)
+   9 ２一馬(31)
+  10 ６二金(52)
+  11 １一馬(21)
+  12 ６一玉(51)
+  13 ３三桂打
+  14 ８二銀(71)
+  15 ２一桂成(33)
+  16 ７一金(72)
+  17 ２二圭(21)
+  18 ７二金(62)
+  19 ３三香打
+  20 ８四歩(83)
+  21 ３二香成(33)
+  22 ８三金(72)
+  23 ４一杏(32)
+  24 ７二金(71)
+  25 ３二飛打
+  26 ７一玉(61)
+  27 ５二飛成(32)
+  28 ９四歩(93)
+  29 ５一杏(41)
+  30 ９三香(91)
+  31 ３三銀打
+  32 ７四歩(73)
+  33 ４二銀成(33)
+  34 ７三桂(81)
+  35 ４一全(42)
+  36 ９五歩(94)
+  37 ６一竜(52)
+"""
+
+val chushogiKif1 = """
+1手目 ▲7八歩兵 （←7九）
+2手目 △7五獅子 （←6三）
+3手目 ▲6八獅子 （←7十）
+4手目 △6五歩兵 （←6四）
+5手目 ▲10八歩兵 （←10九）
+6手目 △5五歩兵 （←5四）
+7手目 ▲3八歩兵 （←3九）
+8手目 △5四鳳凰 （←7二）
+9手目 ▲4十一銅将 （←3十二）
+10手目 △7六獅子 （←7五）
+11手目 ▲10九龍馬 （←9十）
+12手目 △7五歩兵 （←7四）
+13手目 ▲9七仲人 （←9八）
+14手目 △7四獅子 （←7六）
+15手目 ▲8八歩兵 （←8九）
+16手目 △10五歩兵 （←10四）
+17手目 ▲8九鳳凰 （←6十一）
+18手目 △11五龍馬 （←9三）
+19手目 ▲7七獅子 （←6八）
+20手目 △3五歩兵 （←3四）
+21手目 ▲2八龍馬 （←4十）
+22手目 △12五歩兵 （←12四）
+23手目 ▲12八歩兵 （←12九）
+24手目 △12四横行 （←12三）
+25手目 ▲5八歩兵 （←5九）
+26手目 △1五歩兵 （←1四）
+27手目 ▲6十一奔王 （←6十）
+28手目 △1四横行 （←1三）
+29手目 ▲4十銅将 （←4十一）
+30手目 △9二銅将 （←10一）
+31手目 ▲5九銅将 （←4十）
+32手目 △9三銅将 （←9二）
+33手目 ▲6八歩兵 （←6九）
+34手目 △8五歩兵 （←8四）
+35手目 ▲6七鳳凰 （←8九）
+36手目 △8四銅将 （←9三）
+37手目 ▲5七歩兵 （←5八）
+38手目 △2五龍馬 （←4三）
+39手目 ▲5八銅将 （←5九）
+40手目 △7二龍王 （←8三）
+41手目 ▲9十一銀将 （←9十二）
+42手目 △8三奔王 （←7三）
+43手目 ▲4七銅将 （←5八）
+44手目 △10一奔王 （←8三）
+45手目 ▲8九角行 （←10十一）
+46手目 △9二銀将 （←9一）
+47手目 ▲11八歩兵 （←11九）
+48手目 △11二猛豹 （←11一）
+49手目 ▲11七歩兵 （←11八）
+50手目 △12六歩兵 （←12五）
+51手目 ▲11六歩兵 （←11七）
+52手目 △9三龍馬 （←11五）
+53手目 ▲5六歩兵 （←5七）
+54手目 △6四鳳凰 （←5四）
+55手目 ▲5五歩兵 （←5六）
+56手目 △6六歩兵 （←6五）
+57手目一歩目 ▲仝獅子 （←7七）
+57手目二歩目 ▲7七獅子（居食い） （←6六）
+58手目 △10九角行成 （←3二）
+59手目 ▲仝飛車 （←10十）
+60手目 △4三龍馬 （←2五）
+61手目 ▲9八角行 （←8九）
+62手目 △6五鳳凰 （←6四）
+63手目 ▲5六銅将 （←4七）
+64手目 △7六歩兵 （←7五）
+65手目 ▲仝角行 （←9八）
+66手目 △6四獅子 （←7四）
+67手目 ▲5四歩兵成 （←5五）
+68手目一歩目 △仝獅子 （←6四）
+68手目二歩目 △6三獅子 （←5四）
+69手目 ▲6五銅将 （←5六）
+70手目 △7五獅子 （←6三）
+71手目 ▲5三龍王成 （←5十）
+72手目 △仝麒麟 （←6二）
+73手目 ▲9八角行 （←7六）
+74手目 △6五龍馬 （←4三）
+75手目 ▲仝角行 （←9八）
+76手目一歩目 △仝獅子 （←7五）
+76手目二歩目 △6四獅子 （←6五）
+77手目 ▲5七獅子 （←7七）
+78手目 △8三銅将 （←8四）
+79手目 ▲4七獅子 （←5七）
+80手目 △7八龍王 （←7二）
+81手目 ▲9八奔王 （←6十一）
+82手目 △7五獅子 （←6四）
+83手目 ▲8七奔王 （←9八）
+84手目 △7六龍王 （←7八）
+85手目 ▲5七鳳凰 （←6七）
+86手目 △6五獅子 （←7五）
+87手目 ▲9八奔王 （←8七）
+88手目 △6六獅子 （←6五）
+89手目 ▲3五鳳凰 （←5七）
+90手目 △仝飛車 （←3三）
+91手目 ▲仝獅子 （←4七）
+92手目 △4二麒麟 （←5三）
+93手目 ▲5十飛車 （←3十）
+94手目 △3三竪行 （←2三）
+95手目一歩目 ▲4五獅子 （←3五）
+95手目二歩目 ▲4六獅子 （←4五）
+96手目 △7七獅子 （←6六）
+97手目 ▲7六奔王 （←9八）
+98手目一歩目 △仝獅子 （←7七）
+98手目二歩目 △8六獅子 （←7六）
+99手目 ▲9八歩兵 （←9九）
+100手目 △6二醉象 （←7一）
+101手目 ▲7十飛車 （←5十）
+102手目一歩目 △9七獅子 （←8六）
+102手目二歩目 △9八獅子 （←9七）
+103手目 ▲5四獅子 （←4六）
+104手目 △6六龍馬 （←9三）
+105手目 ▲7三飛車成 （←7十）
+106手目 △仝盲虎 （←8二）
+107手目 ▲仝龍馬成 （←2八）
+108手目 △8二銅将 （←8三）
+109手目 ▲仝角鷹 （←7三）
+110手目 △9三角行 （←10二）
+111手目 ▲6四角鷹 （←8二）
+112手目 △8八龍馬 （←6六）
+113手目 ▲7十龍王 （←8十）
+114手目 △7一金将 （←8一）
+115手目 ▲7三龍王成 （←7十）
+116手目 △8二角行 （←9三）
+117手目 ▲仝飛鷲 （←7三）
+118手目 △仝金将 （←7一）
+119手目 ▲仝角鷹 （←6四）
+120手目 △8七龍馬 （←8八）
+121手目 ▲7四獅子 （←5四）
+122手目 △5十龍馬成 （←8七）
+123手目 ▲6十一金将 （←5十二）
+124手目 △7八獅子 （←9八）
+125手目 ▲9二角鷹 （←8二）
+126手目 △7一奔王 （←10一）
+127手目 ▲8三角鷹 （←9二）
+128手目 △7二醉象 （←6二）
+129手目 ▲7三獅子まで （←7四）
+"""
 }

@@ -1,4 +1,5 @@
 package shogi
+package pieces
 
 import Pos._
 
@@ -6,10 +7,12 @@ class KnightTest extends ShogiTest {
 
   "a knight" should {
 
-    val knight = Sente - Knight
+    val knight     = Sente - Knight
+    val knightGote = Gote - Knight
 
     "move in any of 2 positions" in {
       pieceMoves(knight, SQ5E) must bePoss(SQ6C, SQ4C)
+      pieceMoves(knightGote, SQ5E) must bePoss(SQ6G, SQ4G)
     }
 
     "move in 1 one position when at the edges" in {

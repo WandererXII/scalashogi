@@ -6,7 +6,7 @@ import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
 
-import scala.annotation.nowarn
+//import scala.annotation.nowarn
 
 import format.forsyth.{ Sfen, Visual }
 import format.usi.Usi
@@ -14,7 +14,11 @@ import variant._
 
 trait ShogiTest extends Specification with ValidatedMatchers {
 
-  implicit def stringToSituation(str: String): Situation = (Visual parse str).get
+  implicit def stringToSituation(str: String): Situation =
+    ((Visual parse str)
+      .orElse(Visual.parse(str, shogi.variant.Chushogi))
+      .orElse(Visual.parse(str, shogi.variant.Minishogi)))
+      .get
 
   implicit def colorChanger(str: String) =
     new {
@@ -27,8 +31,8 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       actor.piece.eyes(actor.pos, to) && {
         (actor.piece.projectionDirs.isEmpty) ||
         (actor.piece.directDirs.exists(_(actor.pos).contains(to))) ||
-        actor.piece.role.dir(actor.pos, to).exists {
-          actor.situation.variant.longRangeThreatens(actor.situation.board, actor.pos, _, to)
+        Pos.findDirection(actor.pos, to).exists { dir =>
+          actor.situation.variant.longRangeThreatens(actor.situation.board, actor.pos, dir, to)
         }
       }
   }
@@ -41,12 +45,14 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
     def playMoves(moves: (Pos, Pos, Boolean)*): Validated[String, Game] = playMoveList(moves)
 
-    @nowarn def playMoveList(moves: Seq[(Pos, Pos, Boolean)]): Validated[String, Game] = {
+    def playMoveList(moves: Seq[(Pos, Pos, Boolean)]): Validated[String, Game] = {
       val vg = moves.foldLeft[Validated[String, Game]](Validated.valid(game)) {
         case (vg, (orig, dest, prom)) =>
-          vg.foreach { _.situation.moveDestinations }
+          vg.foreach { g =>
+            val _ = g.situation.moveDestinations
+          }
           val ng = vg flatMap { g =>
-            g(Usi.Move(orig, dest, prom))
+            g(Usi.Move(orig, dest, prom, None))
           }
           ng
       }
@@ -56,12 +62,13 @@ trait ShogiTest extends Specification with ValidatedMatchers {
     def playMove(
         orig: Pos,
         dest: Pos,
-        promotion: Boolean = false
+        promotion: Boolean = false,
+        midStep: Option[Pos] = None
     ): Validated[String, Game] =
-      game.apply(Usi.Move(orig, dest, promotion))
+      game.apply(Usi.Move(orig, dest, promotion, midStep))
 
     def playDrop(
-        role: Role,
+        role: DroppableRole,
         dest: Pos
     ): Validated[String, Game] =
       game.apply(Usi.Drop(role, dest))
@@ -84,6 +91,8 @@ trait ShogiTest extends Specification with ValidatedMatchers {
   def makeSituation: Situation = Situation(shogi.variant.Standard)
 
   def makeEmptySituation: Situation = Situation(shogi.variant.Standard).withBoard(Board.empty)
+  def makeEmptySituation(variant: shogi.variant.Variant): Situation =
+    Situation(variant).withBoard(Board.empty)
 
   def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>
@@ -109,8 +118,12 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
 
-  def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] = {
-    val sit = makeEmptySituation
+  def pieceMoves(
+      piece: Piece,
+      pos: Pos,
+      variant: shogi.variant.Variant = shogi.variant.Standard
+  ): Option[List[Pos]] = {
+    val sit = makeEmptySituation(variant)
     sit.withBoard(sit.board.place(piece, pos).get).moveActorAt(pos) map (_.destinations)
   }
 }

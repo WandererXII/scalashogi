@@ -23,7 +23,10 @@ case class Kif(
   def renderMovesAndVariations(moveline: List[NotationMove]): String = {
     val mainline = moveline
       .foldLeft[(List[String], Option[Pos])]((Nil, None)) { case ((acc, lastDest), cur) =>
-        ((Kif.renderNotationMove(cur, lastDest) :: acc), cur.usiWithRole.usi.positions.lastOption)
+        (
+          (Kif.renderNotationMove(cur, lastDest, tags.variant | Standard) :: acc),
+          cur.usiWithRole.usi.positions.lastOption
+        )
       }
       ._1
       .reverse mkString "\n"
@@ -50,29 +53,53 @@ case class Kif(
 
 object Kif {
 
-  def renderNotationMove(cur: NotationMove, lastDest: Option[Pos]): String = {
+  def renderNotationMove(cur: NotationMove, lastDest: Option[Pos], variant: Variant): String = {
     val resultStr   = cur.result.fold("")(r => s"\n${moveNumberOffset(cur.moveNumber + 1)}$offset$r")
-    val kifMove     = renderKifMove(cur.usiWithRole, lastDest)
     val timeStr     = clockString(cur) | ""
     val glyphsNames = cur.glyphs.toList.map(_.name)
     val commentsStr = (glyphsNames ::: cur.comments).map { text => s"\n* ${fixComment(text)}" }.mkString("")
-    s"${moveNumberOffset(cur.moveNumber)}$offset$kifMove$timeStr$commentsStr$resultStr"
+    cur.usiWithRole.usi match {
+      case Usi.Move(orig, dest, prom, Some(midStep)) => {
+        val m1 = Usi.WithRole(Usi.Move(orig, midStep, false, None), cur.usiWithRole.role)
+        val m2 = Usi.WithRole(Usi.Move(midStep, dest, prom, None), cur.usiWithRole.role)
+        val s1 = s"${s"${moveNumberOffset(cur.moveNumber)}一歩目"} ${renderMove(m1, lastDest, variant)}"
+        val s2 =
+          s"${s"${moveNumberOffset(cur.moveNumber)}二歩目"} ${renderMove(m2, None, variant)}$timeStr$commentsStr$resultStr"
+        List(s1, s2) mkString "\n"
+      }
+      case _ =>
+        s"${moveNumberOffset(cur.moveNumber)}$offset${renderMove(cur.usiWithRole, lastDest, variant)}$timeStr$commentsStr$resultStr"
+    }
   }
 
-  def renderKifMove(usiWithRole: Usi.WithRole, lastDest: Option[Pos]): String =
+  private def renderDest(dest: Pos, lastDest: Option[Pos], variant: Variant): String = {
+    val useLastDest = lastDest.fold(false)(_ == dest)
+    variant match {
+      case Chushogi => if (useLastDest) "仝" else dest.kanjiKey
+      case _        => if (useLastDest) "同　" else dest.kanjiFullWidthKey
+    }
+  }
+
+  private def renderOrig(orig: Pos, variant: Variant): String =
+    variant match {
+      case Chushogi => s" （←${orig.kanjiKey}）"
+      case _        => s"(${orig.hexKey})"
+    }
+
+  def renderMove(usiWithRole: Usi.WithRole, lastDest: Option[Pos], variant: Variant): String =
     usiWithRole.usi match {
       case Usi.Drop(role, pos) =>
-        s"${makeDestSquare(pos)}${role.kif.head}打"
-      case Usi.Move(orig, dest, prom) => {
-        val destStr = if (lastDest.fold(false)(_ == dest)) "同　" else makeDestSquare(dest)
+        val roleStr = KifUtils.toKif(role, variant).map(_.head) | ""
+        s"${pos.kanjiFullWidthKey}${roleStr}打"
+      case Usi.Move(orig, dest, prom, _) => {
         val promStr = if (prom) "成" else ""
-        val roleStr = usiWithRole.role.kif.head
-        s"$destStr$roleStr$promStr(${orig.numberKey})"
+        val roleStr = KifUtils.toKif(usiWithRole.role, variant).map(_.head) | ""
+        s"${renderDest(dest, lastDest, variant)}$roleStr$promStr${renderOrig(orig, variant)}"
       }
     }
 
   def renderHeader(tags: Tags): String =
-    kifHeaderTags
+    headerTags
       .map { tag =>
         // we need these even empty
         if (tag == Tag.Sente || tag == Tag.Gote) {
@@ -99,7 +126,7 @@ object Kif {
     sfen
       .filterNot(f => variant.initialSfen.truncate == f.truncate)
       .fold {
-        val handicapName = KifUtils.defaultHandicaps.get(variant).flatMap(_.headOption) | ""
+        val handicapName = KifUtils.defaultHandicaps.get(variant).map(_.head) | ""
         s"${Tag.Handicap.kifName}：$handicapName"
       } { sf =>
         getHandicapName(sf).fold(sf.toSituation(variant).fold("")(renderSituation _))(hc =>
@@ -111,37 +138,50 @@ object Kif {
     val kifBoard = new scala.collection.mutable.StringBuilder(256)
     val nbRanks  = sit.variant.numberOfRanks - 1
     val nbFiles  = sit.variant.numberOfFiles - 1
+    val space    = if (sit.variant == Chushogi) 5 else 3
+    val padder   = if (sit.variant == Chushogi) "  ・ " else " ・"
     for (y <- 0 to nbRanks) {
       kifBoard append "|"
       for (x <- nbFiles to 0 by -1) {
-        sit.board(x, y) match {
-          case None => kifBoard append " ・"
-          case Some(piece) =>
-            kifBoard append piece.kif
+        sit.board(x, y).flatMap(p => KifUtils.toKifBoard(p, sit.variant)) match {
+          case None => kifBoard append padder
+          case Some(kif) =>
+            kifBoard append String
+              .format("%1$" + (space / 2 + 1) + "s", kif)
+              .padTo(space - 1, " ")
+              .mkString("")
         }
       }
       kifBoard append s"|${KifUtils.intToKanji(y + 1)}"
       if (y < nbRanks) kifBoard append '\n'
     }
     List(
-      s"後手の持駒：${renderHand(sit.hands(Gote))}",
-      s" ${" ９ ８ ７ ６ ５ ４ ３ ２ １".takeRight((nbFiles + 1) * 2)}",
-      s"+${"-" * ((nbFiles + 1) * 3)}+",
+      if (sit.variant.supportsDrops) s"後手の持駒：${renderHand(sit.hands(Gote), sit.variant)}" else "",
+      fileNums(sit.variant),
+      s"+${"-" * ((nbFiles + 1) * space)}+",
       kifBoard.toString,
-      s"+${"-" * ((nbFiles + 1) * 3)}+",
-      s"先手の持駒：${renderHand(sit.hands(Sente))}",
+      s"+${"-" * ((nbFiles + 1) * space)}+",
+      if (sit.variant.supportsDrops) s"先手の持駒：${renderHand(sit.hands(Sente), sit.variant)}" else "",
       if (sit.color.gote) "後手番" else ""
     ).filter(_.nonEmpty).mkString("\n")
   }
 
-  private def renderHand(hand: Hand): String = {
+  private def fileNums(variant: Variant): String =
+    variant match {
+      case Standard  => "  ９ ８ ７ ６ ５ ４ ３ ２ １"
+      case Minishogi => "  ５ ４ ３ ２ １"
+      case Chushogi  => "  １２ １１ １０  ９   ８   ７   ６   ５   ４   ３   ２   １"
+    }
+
+  private def renderHand(hand: Hand, variant: Variant): String = {
     if (hand.isEmpty) "なし"
     else
       Standard.handRoles
         .map { r =>
           val cnt = hand(r)
-          if (cnt == 1) r.kif.head
-          else if (cnt > 1) r.kif.head + KifUtils.intToKanji(cnt)
+          val kif = KifUtils.toKif(r, variant).map(_.head) | ""
+          if (cnt == 1) kif
+          else if (cnt > 1) kif + KifUtils.intToKanji(cnt)
           else ""
         }
         .filter(_.nonEmpty)
@@ -151,21 +191,20 @@ object Kif {
   def createTerminationMove(status: Status, winnerTurn: Boolean): Option[String] = {
     import Status._
     status match {
-      case Aborted | NoStart                                                         => "中断".some
-      case Timeout | Outoftime                                                       => "切れ負け".some
-      case Resign if !winnerTurn                                                     => "投了".some
-      case PerpetualCheck                                                            => "反則勝ち".some
-      case Mate if winnerTurn                                                        => "反則勝ち".some // pawn checkmate
-      case Mate | Stalemate                                                          => "詰み".some
-      case Draw                                                                      => "千日手".some
-      case Impasse27                                                                 => "入玉勝ち".some
-      case Created | Started | UnknownFinish | VariantEnd | TryRule | Cheat | Resign => None
-      case _                                                                         => None
+      case Aborted | NoStart     => "中断".some
+      case Timeout | Outoftime   => "切れ負け".some
+      case Resign if !winnerTurn => "投了".some
+      case PerpetualCheck        => "反則勝ち".some
+      case Mate if winnerTurn    => "反則勝ち".some // pawn checkmate
+      case Mate | Stalemate      => "詰み".some
+      case Draw                  => "千日手".some
+      case Impasse27             => "入玉勝ち".some
+      case _                     => None
     }
   }
 
   // tags we render in header
-  private val kifHeaderTags = Tag.tsumeTypes ++ List(
+  private val headerTags = Tag.tsumeTypes ++ List(
     Tag.Start,
     Tag.End,
     Tag.Event,
@@ -178,9 +217,6 @@ object Kif {
     Tag.GoteTeam,
     Tag.Opening
   )
-
-  private def makeDestSquare(pos: Pos): String =
-    s"${((pos.file.index) + 49 + 65248).toChar}${KifUtils.intToKanji(pos.rank.index + 1)}"
 
   private def getHandicapName(sfen: Sfen): Option[String] =
     StartingPosition.handicaps.positions.find(_.sfen.truncate == sfen.truncate).map(t => t.japanese)

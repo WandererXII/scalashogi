@@ -9,9 +9,9 @@ class BinaryTest extends ShogiTest {
 
   import BinaryTestUtils._
 
-  def compareStrAndBin(usisStr: String) = {
-    val bin = Binary.encodeMoves(Usi.readList(usisStr).get, Standard).toVector
-    Binary.decodeMoves(bin, Standard, 600).map(_.usi).mkString(" ") must_== usisStr
+  def compareStrAndBin(usisStr: String, variant: Variant) = {
+    val bin = Binary.encodeMoves(Usi.readList(usisStr).get, variant).toVector
+    Binary.decodeMoves(bin, variant, 600).map(_.usi).mkString(" ") must_== usisStr
   }
 
   "binary encoding" should {
@@ -54,6 +54,47 @@ class BinaryTest extends ShogiTest {
         encodeMove("5a1e", Minishogi) must_== "00000100,00010100"
         encodeMove("B*3d", Minishogi) must_== "10000110,00010001"
       }
+      "simple move chushogi" in {
+        encodeMove("1a12l", Chushogi) must_== "00000000,10001111"
+        encodeMove("12l1a", Chushogi) must_== "10001111,00000000"
+        encodeMove("12a1l", Chushogi) must_== "00001011,10000100"
+        encodeMove("1l12a", Chushogi) must_== "10000100,00001011"
+      }
+      "simple move chushogi with promotion" in {
+        encodeMove("1a2a+", Chushogi) must_== "10010000,10010001"
+        encodeMove("2a1a+", Chushogi) must_== "10010001,10010000"
+        encodeMove("1a5e+", Chushogi) must_== "10010000,00110100"
+        encodeMove("5e1a+", Chushogi) must_== "00110100,10010000"
+        encodeMove("12d11d+", Chushogi) must_== "10111111,10111110"
+        encodeMove("11d12d+", Chushogi) must_== "10111110,10111111"
+        encodeMove("12l11l+", Chushogi) must_== "11101111,11101110"
+        encodeMove("11l12l+", Chushogi) must_== "11101110,11101111"
+        encodeMove("1i2i+", Chushogi) must_== "11000000,11000001"
+        encodeMove("2i1i+", Chushogi) must_== "11000001,11000000"
+      }
+      // 1 2 3
+      // 7 x 0
+      // 4 5 6
+      "lion move" in {
+        encodeMove("5e4e4f", Chushogi) must_== "11111111,00110100,00000101"
+        encodeMove("5e6d6e", Chushogi) must_== "11111111,00110100,00001101"
+        encodeMove("5e5d4d", Chushogi) must_== "11111111,00110100,00010000"
+        encodeMove("5e4d5d", Chushogi) must_== "11111111,00110100,00011111"
+        encodeMove("5e6f6e", Chushogi) must_== "11111111,00110100,00100010"
+        encodeMove("5e5f6e", Chushogi) must_== "11111111,00110100,00101001"
+        encodeMove("5e4f3g", Chushogi) must_== "11111111,00110100,00110110"
+        encodeMove("5e6e7e", Chushogi) must_== "11111111,00110100,00111111"
+      }
+      "igui/jitto" in {
+        encodeMove("5e4e5e", Chushogi) must_== "00110100,11110000"
+        encodeMove("5e6d5e", Chushogi) must_== "00110100,11110001"
+        encodeMove("5e5d5e", Chushogi) must_== "00110100,11110010"
+        encodeMove("5e4d5e", Chushogi) must_== "00110100,11110011"
+        encodeMove("5e6f5e", Chushogi) must_== "00110100,11110100"
+        encodeMove("5e5f5e", Chushogi) must_== "00110100,11110101"
+        encodeMove("5e4f5e", Chushogi) must_== "00110100,11110110"
+        encodeMove("5e6e5e", Chushogi) must_== "00110100,11110111"
+      }
     }
     "write many moves" in {
       "all games" in {
@@ -79,29 +120,82 @@ class BinaryTest extends ShogiTest {
         decodeMove("10000011,00011101") must_== "N*3d"
         decodeMove("10000111,01010000") must_== "R*9i"
       }
+      "chushogi move" in {
+        decodeMove("00000000,00000000", Chushogi) must_== "1a1a"
+        decodeMove("00000000,10001111", Chushogi) must_== "1a12l"
+        decodeMove("10001111,00000000", Chushogi) must_== "12l1a"
+        decodeMove("00001011,10000100", Chushogi) must_== "12a1l"
+        decodeMove("10000100,00001011", Chushogi) must_== "1l12a"
+      }
+      "lion move" in {
+        decodeMove("11111111,00110100,00000101", Chushogi) must_== "5e4e4f"
+        decodeMove("11111111,00110100,00001101", Chushogi) must_== "5e6d6e"
+        decodeMove("11111111,00110100,00010000", Chushogi) must_== "5e5d4d"
+        decodeMove("11111111,00110100,00011111", Chushogi) must_== "5e4d5d"
+        decodeMove("11111111,00110100,00100010", Chushogi) must_== "5e6f6e"
+        decodeMove("11111111,00110100,00101001", Chushogi) must_== "5e5f6e"
+        decodeMove("11111111,00110100,00110110", Chushogi) must_== "5e4f3g"
+        decodeMove("11111111,00110100,00111111", Chushogi) must_== "5e6e7e"
+      }
+      "igui/jitto" in {
+        decodeMove("00110100,11110000", Chushogi) must_== "5e4e5e"
+        decodeMove("00110100,11110001", Chushogi) must_== "5e6d5e"
+        decodeMove("00110100,11110010", Chushogi) must_== "5e5d5e"
+        decodeMove("00110100,11110011", Chushogi) must_== "5e4d5e"
+        decodeMove("00110100,11110100", Chushogi) must_== "5e6f5e"
+        decodeMove("00110100,11110101", Chushogi) must_== "5e5f5e"
+        decodeMove("00110100,11110110", Chushogi) must_== "5e4f5e"
+        decodeMove("00110100,11110111", Chushogi) must_== "5e6e5e"
+      }
     }
     "be isomorphic" in {
       "for one" in {
-        compareStrAndBin(format.usi.Fixtures.prod500standard.head)
+        compareStrAndBin(format.usi.Fixtures.prod500standard.head, Standard)
+        compareStrAndBin("1a12l 12d11d+ 12l1a 2i1i+ 1a5e+", Chushogi)
       }
       "for all" in {
-        forall(format.usi.Fixtures.prod500standard)(compareStrAndBin)
+        forall(format.usi.Fixtures.prod500standard)(compareStrAndBin(_, Standard))
       }
     }
-    "for all move combinations" in {
+    "for all move combinations (standard)" in {
       val allMoves = for {
-        orig <- Pos.all
-        dest <- Pos.all
-      } yield Usi.Move(orig, dest, true)
-      forall(allMoves.map(_.usiKeys))(compareStrAndBin)
-      forall(allMoves.map(_.usi))(compareStrAndBin)
+        orig <- Standard.allPositions
+        dest <- Standard.allPositions
+      } yield Usi.Move(orig, dest, true, None)
+      forall(allMoves.map(_.keys))(compareStrAndBin(_, Standard)) // no promotion
+      forall(allMoves.map(_.usi))(compareStrAndBin(_, Standard))
     }
-    "for all drop combinations" in {
+    "for all drop combinations (standard)" in {
       val allDrops = for {
-        role <- Role.all
-        pos  <- Pos.all
+        role <- Standard.handRoles
+        pos  <- Standard.allPositions
       } yield Usi.Drop(role, pos)
-      forall(allDrops.map(_.usi))(compareStrAndBin)
+      forall(allDrops.map(_.usi))(compareStrAndBin(_, Standard))
+    }
+    "for all moves chushogi" in {
+      val promRanks = Chushogi.promotionRanks(Sente) ::: Chushogi.promotionRanks(Gote)
+      val allMoves = for {
+        orig <- Chushogi.allPositions
+        dest <- Chushogi.allPositions
+      } yield Usi.Move(orig, dest, false, None)
+      // Based around 5E
+      val allIguis = for {
+        dir <- Pos.allDirections
+      } yield Usi.Move(Pos.SQ5E, Pos.SQ5E, false, dir(Pos.SQ5E))
+      val allLionMoves = for {
+        dir1    <- Pos.allDirections
+        dir2    <- Pos.allDirections
+        midStep <- dir1(Pos.SQ5E)
+        dest    <- dir2(midStep).filterNot(_ == Pos.SQ5E)
+      } yield Usi.Move(Pos.SQ5E, dest, false, Some(midStep))
+      forall(allMoves.map(_.usi))(compareStrAndBin(_, Chushogi))
+      forall(
+        allMoves
+          .withFilter(m => promRanks.contains(m.orig.rank) || promRanks.contains(m.dest.rank))
+          .map(m => s"${m.usi}+")
+      )(compareStrAndBin(_, Chushogi))
+      forall(allIguis.map(_.usi))(compareStrAndBin(_, Chushogi))
+      forall(allLionMoves.map(_.usi))(compareStrAndBin(_, Chushogi))
     }
   }
 

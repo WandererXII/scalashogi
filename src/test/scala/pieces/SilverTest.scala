@@ -1,4 +1,5 @@
 package shogi
+package pieces
 
 import Pos._
 
@@ -6,10 +7,12 @@ class SilverTest extends ShogiTest {
 
   "a silver general" should {
 
-    val silver = Sente - Silver
+    val silver     = Sente - Silver
+    val silverGote = Gote - Silver
 
     "move in 6 directions" in {
       pieceMoves(silver, SQ5E) must bePoss(SQ5D, SQ4D, SQ4F, SQ6F, SQ6D)
+      pieceMoves(silverGote, SQ5E) must bePoss(SQ5F, SQ4F, SQ4D, SQ6D, SQ6F)
     }
 
     "move in 2 directions, when at the edges" in {

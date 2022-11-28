@@ -13,11 +13,16 @@ case class Board(pieces: PieceMap) {
       case piece if piece is c => piece
     }.toList
 
-  lazy val kingPos: Map[Color, Pos] = pieces.collect { case (pos, Piece(color, King)) =>
-    color -> pos
-  }
+  lazy val royalPoss: Map[Color, List[Pos]] =
+    pieces.foldLeft[Map[Color, List[Pos]]](Map(Sente -> Nil, Gote -> Nil)) { case (acc, (pos, piece)) =>
+      if (List(King, Prince) contains piece.role) acc.updated(piece.color, pos :: acc(piece.color))
+      else acc
+    }
 
-  def kingPosOf(c: Color): Option[Pos] = kingPos get c
+  def royalPossOf(c: Color): List[Pos] = royalPoss(c)
+
+  def singleRoyalPosOf(c: Color): Option[Pos] =
+    Some(royalPoss(c)).withFilter(_.size == 1).map(_.head)
 
   def seq(actions: Board => Option[Board]*): Option[Board] =
     actions.foldLeft[Option[Board]](Some(this))(_ flatMap _)

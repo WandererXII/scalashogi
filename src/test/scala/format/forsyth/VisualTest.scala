@@ -27,6 +27,13 @@ class VisualTest extends ShogiTest {
       f.addNewLines(f render ((f parse handInBoard).get)) must_== fullHandInBoard
     }
 
+    "bigger board" in {
+      f.addNewLines(f render ((f.parse(chushogiBoard, shogi.variant.Chushogi)).get)) must_== chushogiBoard
+      f.addNewLines(
+        f render ((f.parse(chushogiPartial, shogi.variant.Chushogi)).get)
+      ) must_== chushogiPartialFull
+    }
+
     "export with special marks" in {
       val situation = Visual parse """
 k . B . . . . . .
@@ -118,6 +125,42 @@ P P P P P P P P P
 . B . . . . . R .
 L N S G K G S N L
 Hands:B2l
+Turn:Sente
+"""
+
+  val chushogiBoard = """
+l f c s g e k g s c f l
+a . b . t x o t . b . a
+m v r h d q n d h r v m
+p p p p p p p p p p p p
+. . . i . . . . i . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . I . . . . I . . .
+P P P P P P P P P P P P
+M V R H D N Q D H R V M
+A . B . T O X T . B . A
+L F C S G K E G S C F L
+Turn:Sente
+"""
+
+  val chushogiPartial     = """
+P P P P P P P P P P P P
+L N . G+E . . . . . N L
+"""
+  val chushogiPartialFull = """
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+. . . . . . . . . . . .
+P P P P P P P P P P P P
+L N . G+E . . . . . N L
 Turn:Sente
 """
 
