@@ -138,8 +138,8 @@ object Kif {
     val kifBoard = new scala.collection.mutable.StringBuilder(256)
     val nbRanks  = sit.variant.numberOfRanks - 1
     val nbFiles  = sit.variant.numberOfFiles - 1
-    val space    = if (sit.variant == Chushogi) 5 else 3
-    val padder   = if (sit.variant == Chushogi) "  ・ " else " ・"
+    val space    = if (sit.variant.chushogi) 3 else 2
+    val padder   = if (sit.variant.chushogi) "  ・" else " ・"
     for (y <- 0 to nbRanks) {
       kifBoard append "|"
       for (x <- nbFiles to 0 by -1) {
@@ -147,8 +147,7 @@ object Kif {
           case None => kifBoard append padder
           case Some(kif) =>
             kifBoard append String
-              .format("%1$" + (space / 2 + 1) + "s", kif)
-              .padTo(space - 1, " ")
+              .format("%1$" + space + "s", kif)
               .mkString("")
         }
       }
@@ -158,9 +157,9 @@ object Kif {
     List(
       if (sit.variant.supportsDrops) s"後手の持駒：${renderHand(sit.hands(Gote), sit.variant)}" else "",
       fileNums(sit.variant),
-      s"+${"-" * ((nbFiles + 1) * space)}+",
+      s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
       kifBoard.toString,
-      s"+${"-" * ((nbFiles + 1) * space)}+",
+      s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
       if (sit.variant.supportsDrops) s"先手の持駒：${renderHand(sit.hands(Sente), sit.variant)}" else "",
       if (sit.color.gote) "後手番" else ""
     ).filter(_.nonEmpty).mkString("\n")
@@ -170,7 +169,7 @@ object Kif {
     variant match {
       case Standard  => "  ９ ８ ７ ６ ５ ４ ３ ２ １"
       case Minishogi => "  ５ ４ ３ ２ １"
-      case Chushogi  => "  １２ １１ １０  ９   ８   ７   ６   ５   ４   ３   ２   １"
+      case Chushogi  => " １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １"
     }
 
   private def renderHand(hand: Hand, variant: Variant): String = {
