@@ -39,11 +39,10 @@ object Visual {
       .map(ic => s"${if (ic._2 == '.') ic._1 else ""}${ic._2}")
       .mkString("")
       .filter(_ != '.')
-    val pad = sfenReversed.size + variant.numberOfRanks - sfenReversed.count(_ == '/') - 1
+    val padStr = s"${variant.numberOfFiles}/" * (variant.numberOfRanks - sfenReversed.count(_ == '/') - 1)
     val finalSfen =
-      (sfenReversed.padTo(pad, s"${variant.numberOfFiles}/").reverse.mkString + " " + turn + " " + hands)
-        .replace("01", "10")
-        .replace("21", "12")
+      List((padStr + sfenReversed.reverse), turn, hands)
+        .mkString(" ")
     Sfen(finalSfen).toSituation(variant)
   }
 

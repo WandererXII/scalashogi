@@ -78,9 +78,9 @@ object Sfen {
   }
 
   def situationToString(sit: Situation): String =
-    List(
+    List[String](
       boardToString(sit.board, sit.variant),
-      sit.color.letter,
+      sit.color.letter.toString,
       if (sit.variant == shogi.variant.Chushogi) lastLionCaptureDestToString(sit.history)
       else handsToString(sit.hands, sit.variant)
     ) mkString " "
