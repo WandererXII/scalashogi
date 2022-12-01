@@ -82,6 +82,10 @@ case class ConsecutiveAttacks(sente: Int, gote: Int) {
 
   def apply(color: Color) = color.fold(sente, gote)
 
+  def nonEmpty = sente > 0 || gote > 0
+
+  def empty = !nonEmpty
+
   override def toString =
     s"($sente, $gote)"
 }
