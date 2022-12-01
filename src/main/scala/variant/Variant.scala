@@ -307,6 +307,7 @@ abstract class Variant private[variant] (
 
   def standard  = this == Standard
   def minishogi = this == Minishogi
+  def chushogi  = this == Chushogi
 
   override def toString = s"Variant($name)"
 

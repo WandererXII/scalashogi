@@ -15,7 +15,7 @@ object Binary {
   private object Reader {
 
     def decode(bs: Seq[Byte], variant: Variant, nb: Int): Vector[Usi] =
-      if (variant == Chushogi) ChushogiDecoder.decodeMoves(bs map toInt, nb)
+      if (variant.chushogi) ChushogiDecoder.decodeMoves(bs map toInt, nb)
       else BaseDecoder.decodeMovesAndDrops(bs map toInt, nb, variant)
 
     private object BaseDecoder {
@@ -133,7 +133,7 @@ object Binary {
   private object Writer {
 
     def encode(usis: Seq[Usi], variant: Variant): Array[Byte] =
-      if (variant == Chushogi)
+      if (variant.chushogi)
         usis.flatMap(ChushogiEncoder.encode).toArray
       else usis.flatMap(BaseEncoder.encode(_, variant)).toArray
 

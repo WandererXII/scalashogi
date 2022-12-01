@@ -127,7 +127,7 @@ object KifParser {
               MoveDropParser(
                 moveStr,
                 lastDest,
-                if (variant == Chushogi && secondLionMove)
+                if (variant.chushogi && secondLionMove)
                   parsedMoves.headOption.flatMap(_.positions.headOption)
                 else None,
                 variant
@@ -144,7 +144,7 @@ object KifParser {
               } match {
                 case Valid(move) => {
                   val newMoves =
-                    if (variant == Chushogi && secondLionMove && parsedMoves.nonEmpty)
+                    if (variant.chushogi && secondLionMove && parsedMoves.nonEmpty)
                       move :: parsedMoves.tail
                     else move :: parsedMoves
                   mk(newMoves, rest, move.positions.lastOption, ply + 1)
