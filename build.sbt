@@ -2,7 +2,7 @@ name := "scalashogi"
 
 version := "3.0.0"
 
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
@@ -15,7 +15,7 @@ libraryDependencies ++= List(
   "org.specs2"             %% "specs2-core"              % "4.17.0" % Test,
   "org.specs2"             %% "specs2-cats"              % "4.17.0" % Test,
   "com.github.ornicar"     %% "scalalib"                 % "7.0.2",
-  "joda-time"              % "joda-time"                 % "2.12.0",
+  "joda-time"              % "joda-time"                 % "2.12.1",
   "org.typelevel"          %% "cats-core"                % "2.8.0"
 )
 
