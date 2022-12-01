@@ -277,7 +277,6 @@ case object Chushogi
 
   // from color's side - was color king bared
   override def bareKing(sit: Situation, color: Color): Boolean = {
-    val ourKing = sit.board.royalPossOf(color)
     val ourPiecesFiltered = sit.board.pieces.collect {
       case (pos, piece)
           if (piece is color) && !(((piece is Pawn) || (piece is Lance)) && backrank(
@@ -285,14 +284,16 @@ case object Chushogi
           ) == pos.rank) =>
         pos
     }
-    val theirKing = sit.board.royalPossOf(!color)
-    val theirPiecesFiltered = sit.board.pieces.collect {
+    lazy val ourKing = sit.board.royalPossOf(color)
+    lazy val theirPiecesFiltered = sit.board.pieces.collect {
       case (pos, piece)
           if (piece is !color) && !((piece is Pawn) || (piece is GoBetween)) && !((piece is Lance) && backrank(
             piece.color
           ) == pos.rank) =>
         pos
     }
+    lazy val theirKing = sit.board.royalPossOf(!color)
+
     ourPiecesFiltered.size == 1 &&  // we have to have only a single piece
     ourKing.size == 1 &&            // and that piece is royal
     theirPiecesFiltered.size > 1 && // opponent has to have more than just a single royal
