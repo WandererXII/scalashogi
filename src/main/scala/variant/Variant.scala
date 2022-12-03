@@ -69,9 +69,9 @@ abstract class Variant private[variant] (
     board.pieces exists {
       case (from, piece) if piece.color == color && filter(piece) && piece.eyes(from, pos) =>
         piece.projectionDirs.isEmpty || piece.directDirs.exists(dir => dir(from).contains(pos)) ||
-          Pos.findDirection(from, pos).exists { dir =>
-            longRangeThreatens(board, from, dir, pos)
-          }
+        Pos.findDirection(from, pos).exists { dir =>
+          longRangeThreatens(board, from, dir, pos)
+        }
       case _ => false
     }
 
@@ -80,7 +80,7 @@ abstract class Variant private[variant] (
   def moveFilter(a: MoveActor): List[Pos] = {
     // only long range roles, since you can only unpin a check from a role with projection
     val filter: Piece => Boolean =
-      if ((a.piece is King) || a.situation.check) (_ => true) else (_.projectionDirs.nonEmpty)
+      if ((a.piece is King) || a.situation.check) _ => true else (_.projectionDirs.nonEmpty)
     val stableRoyalPos = if (a.piece is King) None else a.situation.board.singleRoyalPosOf(a.color)
     a.unfilteredDestinations filterNot { dest =>
       (stableRoyalPos orElse Option.when(a.piece is King)(dest)) exists {
@@ -112,7 +112,7 @@ abstract class Variant private[variant] (
               a.situation.board.forceTake(a.pos),
               !a.color,
               d,
-              p => ((p is Pawn) || (p is GoBetween))
+              p => (p is Pawn) || (p is GoBetween)
             ))
         }
       }
@@ -128,8 +128,8 @@ abstract class Variant private[variant] (
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     dir(p) exists { next =>
-      (next == to || (isInsideBoard(next) && !board.pieces
-        .contains(next) && longRangeThreatens(board, next, dir, to)))
+      next == to || (isInsideBoard(next) && !board.pieces
+        .contains(next) && longRangeThreatens(board, next, dir, to))
     }
 
   // For example, can't drop a pawn on a file with another pawn of the same color

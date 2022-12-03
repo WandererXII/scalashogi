@@ -28,9 +28,9 @@ class VisualTest extends ShogiTest {
     }
 
     "bigger board" in {
-      f.addNewLines(f render ((f.parse(chushogiBoard, shogi.variant.Chushogi)).get)) must_== chushogiBoard
+      f.addNewLines(f render (f.parse(chushogiBoard, shogi.variant.Chushogi).get)) must_== chushogiBoard
       f.addNewLines(
-        f render ((f.parse(chushogiPartial, shogi.variant.Chushogi)).get)
+        f render (f.parse(chushogiPartial, shogi.variant.Chushogi).get)
       ) must_== chushogiPartialFull
     }
 

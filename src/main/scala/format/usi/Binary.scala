@@ -147,7 +147,7 @@ object Binary {
       private def encodeMove(orig: Pos, dest: Pos, prom: Boolean, variant: Variant): Seq[Byte] =
         Seq(
           posInt(orig, variant.numberOfFiles),
-          (if (prom) (1 << 7) else 0) | posInt(dest, variant.numberOfFiles)
+          (if (prom) 1 << 7 else 0) | posInt(dest, variant.numberOfFiles)
         ).map(_.toByte)
 
       private def encodeDrop(role: DroppableRole, pos: Pos, variant: Variant): Seq[Byte] =

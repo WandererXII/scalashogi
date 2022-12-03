@@ -40,7 +40,7 @@ object KifParserHelper {
         goteHandStr  = lines.find(l => l.startsWith("後手の持駒:") || l.startsWith("上手の持駒:"))
         hands <- parseHands(senteHandStr, goteHandStr, variant)
         color = Color.fromSente(!lines.exists(l => l.startsWith("後手番") || l.startsWith("上手番")))
-      } yield (Situation(board, hands, color, variant))
+      } yield Situation(board, hands, color, variant)
     else
       invalid(
         s"Cannot parse board setup (wrong number of ranks provided ${ranks.size}/${variant.numberOfRanks})"
@@ -94,7 +94,7 @@ object KifParserHelper {
               (),
               s"${piece.role} is not valid in $variant variant"
             )
-          } yield (pos -> piece :: pieces)) match {
+          } yield pos -> piece :: pieces) match {
             case cats.data.Validated.Valid(ps) => makePiecesList(ps, rest, "", x - 1, y)
             case e                             => e
           }
@@ -103,7 +103,7 @@ object KifParserHelper {
       for {
         pieces     <- acc
         nextPieces <- makePiecesList(Nil, cur._1.toList, "", variant.numberOfFiles - 1, cur._2)
-      } yield (pieces ::: nextPieces)
+      } yield pieces ::: nextPieces
     } map (_.toMap)
   }
 
@@ -124,7 +124,7 @@ object KifParserHelper {
           role <- variant.handRoles.find(
             rolesBase contains _
           ) toValid s"Cannot place ${rolesBase mkString ","} in hand in $variant variant"
-        } yield (hand.store(role, num))
+        } yield hand.store(role, num)
       val values = (str.split(":").lastOption | "").trim
       if (values == "なし" || values == "") valid(Hand.empty)
       else

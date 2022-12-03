@@ -183,7 +183,7 @@ case class ClockPlayer(
 
   def recordLag(l: Centis) = copy(lag = lag.recordLag(l))
 
-  def periodsLeft = math.max((periodsTotal - spentPeriods), 0)
+  def periodsLeft = math.max(periodsTotal - spentPeriods, 0)
 
   def remaining = limit - elapsed
 
@@ -197,7 +197,7 @@ case class ClockPlayer(
 
   def spendPeriods(p: Int) = copy(spentPeriods = spentPeriods + p)
 
-  def refundPeriods(p: Int) = spendPeriods(-(math.min(p, spentPeriods)))
+  def refundPeriods(p: Int) = spendPeriods(-math.min(p, spentPeriods))
 
   def increment = if (berserk) Centis(0) else config.increment
 

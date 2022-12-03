@@ -145,7 +145,7 @@ object Sfen {
             pos   <- Pos.at(x, y)
             _     <- Option.when(variant.isInsideBoard(pos))(())
             piece <- SfenUtils.toPiece("+" + c, variant)
-          } yield (pos -> piece :: pieces)) match {
+          } yield pos -> piece :: pieces) match {
             case Some(ps) => piecesListRec(ps, rest, x - 1, y)
             case _        => None
           }
@@ -154,7 +154,7 @@ object Sfen {
             pos   <- Pos.at(x, y)
             _     <- Option.when(variant.isInsideBoard(pos))(())
             piece <- SfenUtils.toPiece(c.toString, variant)
-          } yield (pos -> piece :: pieces)) match {
+          } yield pos -> piece :: pieces) match {
             case Some(ps) => piecesListRec(ps, rest, x - 1, y)
             case _        => None
           }

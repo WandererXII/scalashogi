@@ -15,15 +15,15 @@ import variant._
 trait ShogiTest extends Specification with ValidatedMatchers {
 
   implicit def stringToSituation(str: String): Situation =
-    ((Visual parse str)
+    (Visual parse str)
       .orElse(Visual.parse(str, shogi.variant.Chushogi))
-      .orElse(Visual.parse(str, shogi.variant.Minishogi)))
+      .orElse(Visual.parse(str, shogi.variant.Minishogi))
       .get
 
   implicit def colorChanger(str: String) =
     new {
 
-      def as(color: Color): Situation = ((Visual parse str).get).copy(color = color)
+      def as(color: Color): Situation = (Visual parse str).get.copy(color = color)
     }
 
   case class RichActor(actor: MoveActor) {
@@ -108,12 +108,12 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   def beSituation(visual: String): Matcher[Validated[String, Situation]] =
     beValid.like { case s =>
-      s.visual must_== ((Visual parse visual).get).visual
+      s.visual must_== (Visual parse visual).get.visual
     }
 
   def beGame(visual: String): Matcher[Validated[String, Game]] =
     beValid.like { case g =>
-      g.situation.visual must_== ((Visual parse visual).get).visual
+      g.situation.visual must_== (Visual parse visual).get.visual
     }
 
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)

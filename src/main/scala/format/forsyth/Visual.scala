@@ -41,7 +41,7 @@ object Visual {
       .filter(_ != '.')
     val padStr = s"${variant.numberOfFiles}/" * (variant.numberOfRanks - sfenReversed.count(_ == '/') - 1)
     val finalSfen =
-      List((padStr + sfenReversed.reverse), turn, hands)
+      List(padStr + sfenReversed.reverse, turn, hands)
         .mkString(" ")
     Sfen(finalSfen).toSituation(variant)
   }

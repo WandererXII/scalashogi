@@ -282,7 +282,7 @@ object CsaParser {
 
   private def splitHeaderAndMoves(csa: String): Validated[String, (String, String)] =
     augmentString(csa).linesIterator.toList.map(_.trim).filter(_.nonEmpty) span { line =>
-      !(moveOrDropRegex.matches(line))
+      !moveOrDropRegex.matches(line)
     } match {
       case (headerLines, moveLines) => valid(headerLines.mkString("\n") -> moveLines.mkString("\n"))
     }

@@ -54,8 +54,8 @@ case class History(
   override def toString = {
     val positions = (positionHashes grouped Hash.size).toList
     s"${lastMove.fold("-")(_.usi)} ${lastLionCapture.fold("-")(_.key)} $consecutiveAttacks ${positions
-      .map(Hash.debug)
-      .mkString(" ")} ${initialSfen.fold("-")(_.value)}"
+        .map(Hash.debug)
+        .mkString(" ")} ${initialSfen.fold("-")(_.value)}"
   }
 }
 

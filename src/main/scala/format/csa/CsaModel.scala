@@ -22,7 +22,7 @@ case class Csa(
   private def renderMainline(moveline: List[NotationMove], turn: Color): String =
     moveline
       .foldLeft[(List[String], Color)]((Nil, turn)) { case ((acc, curTurn), cur) =>
-        ((Csa.renderNotationMove(cur, curTurn.some) :: acc), !curTurn)
+        (Csa.renderNotationMove(cur, curTurn.some) :: acc, !curTurn)
       }
       ._1
       .reverse mkString "\n"

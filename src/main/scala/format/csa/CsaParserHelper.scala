@@ -49,7 +49,7 @@ object CsaParserHelper {
         _ <-
           if (pieces.get(pos).exists(_.role == role)) valid(role)
           else invalid(s"$role not present on $posStr in handicap setup")
-      } yield (pieces - pos)
+      } yield pieces - pos
     }
 
     handicap.drop(2).grouped(4).foldLeft[Validated[String, PieceMap]](valid(Standard.pieces)) {
@@ -63,10 +63,10 @@ object CsaParserHelper {
       for {
         pos <- Pos.at(
           8 - i % 9,
-          (i / 9)
+          i / 9
         ) toValid s"Invalid board setup - too many squares"
         piece <- CsaUtils.toPiece(sq) toValid s"Non existent piece (${sq}) in board setup"
-      } yield (pieces + (pos -> piece))
+      } yield pieces + (pos -> piece)
 
     val squares = ranks.flatMap(_.drop(2).grouped(3)).zipWithIndex
     if (ranks.size != 9) invalid("Incorrect number of board ranks in board setup: %d/9".format(ranks.size))
@@ -117,7 +117,7 @@ object CsaParserHelper {
             roleStr = str.slice(2, 4)
             roleBase <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
             role     <- Standard.handRoles.find(_ == roleBase) toValid s"Can't have $roleBase in hand: $line"
-          } yield (sit.withHands(sit.hands.store(color, role)))
+          } yield sit.withHands(sit.hands.store(color, role))
       }
       def parseBoardAddition(str: String, color: Color, sit: Situation): Validated[String, Situation] = {
         for {
@@ -164,9 +164,9 @@ object CsaParserHelper {
     termination.map(_.value.toUpperCase) match {
       case Some("TORYO") | Some("TIME_UP") | Some("ILLEGAL_MOVE") =>
         Tag(_.Result, color.fold("0-1", "1-0")).some
-      case Some("+ILLEGAL_ACTION")                                 => Tag(_.Result, "1-0").some
-      case Some("-ILLEGAL_ACTION")                                 => Tag(_.Result, "0-1").some
-      case Some("KACHI") | Some("TSUMI")                           => Tag(_.Result, color.fold("1-0", "0-1")).some
+      case Some("+ILLEGAL_ACTION")       => Tag(_.Result, "1-0").some
+      case Some("-ILLEGAL_ACTION")       => Tag(_.Result, "0-1").some
+      case Some("KACHI") | Some("TSUMI") => Tag(_.Result, color.fold("1-0", "0-1")).some
       case Some("JISHOGI") | Some("SENNICHITE") | Some("HIKIWAKE") => Tag(_.Result, "1/2-1/2").some
       case _                                                       => None
     }

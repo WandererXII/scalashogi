@@ -24,7 +24,7 @@ case class Kif(
     val mainline = moveline
       .foldLeft[(List[String], Option[Pos])]((Nil, None)) { case ((acc, lastDest), cur) =>
         (
-          (Kif.renderNotationMove(cur, lastDest, tags.variant | Standard) :: acc),
+          Kif.renderNotationMove(cur, lastDest, tags.variant | Standard) :: acc,
           cur.usiWithRole.usi.positions.lastOption
         )
       }

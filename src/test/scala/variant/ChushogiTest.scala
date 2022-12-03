@@ -123,7 +123,7 @@ class ChushogiTest extends ShogiTest {
       sit(Usi("7g6f5e").get).isValid must beTrue
       sit(Usi("7g6f6e").get).isValid must beTrue
 
-      val sit2    = Sfen("12/12/12/12/4B2l4/4S7/5N6/7n4/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
+      val sit2 = Sfen("12/12/12/12/4B2l4/4S7/5N6/7n4/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
       val sit2opp = sit2.switch
       sit2(Usi("7g5h").get).isValid must beFalse
       sit2(Usi("7g5e").get).isValid must beTrue

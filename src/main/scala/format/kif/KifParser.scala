@@ -24,13 +24,13 @@ object KifParser {
   val colorsS  = """▲|△|☗|☖"""
   val numbersS = """[1-9１-９一二三四五六七八九十百][0-9０-９一二三四五六七八九十百]*"""
   val filesS = s"""${(Pos.MaxFiles to 1 by -1)
-    .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}")
-    .toList
-    .mkString("|")}"""
+      .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}")
+      .toList
+      .mkString("|")}"""
   val ranksS = s"""${(Pos.MaxRanks to 1 by -1)
-    .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}|${('a' + i - 1).toChar}")
-    .toList
-    .mkString("|")}"""
+      .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}|${('a' + i - 1).toChar}")
+      .toList
+      .mkString("|")}"""
   val positionS     = s"""(?:(?:(?:${filesS})(?:${ranksS}))|同|仝)"""
   val piecesJPS     = s"""${KifUtils.allKif mkString "|"}"""
   val handPiecesJPS = s"""${KifUtils.allKifDroppable mkString "|"}"""
@@ -405,7 +405,7 @@ object KifParser {
             destOpt =
               if (destS == "同" || destS == "仝") lastDest
               else
-                (Pos.fromKey(destS) orElse Pos.allHexKeys.get(augmentString(destS).map(KifUtils.toDigit _)))
+                Pos.fromKey(destS) orElse Pos.allHexKeys.get(augmentString(destS).map(KifUtils.toDigit _))
             dest <- destOpt toValid s"Cannot parse destination square in move: $str"
             orig <- Pos.fromKey(origS) toValid s"Cannot parse origin square in move: $str"
           } yield KifMove(
@@ -492,7 +492,7 @@ object KifParser {
 
   private def splitKif(kif: String): Validated[String, (String, String, String)] = {
     augmentString(kif).linesIterator.toList.map(_.trim).filter(_.nonEmpty) span { line =>
-      !(moveOrDropLineRegex.matches(line))
+      !moveOrDropLineRegex.matches(line)
     } match {
       case (headerLines, rest) => {
         rest span { line =>
