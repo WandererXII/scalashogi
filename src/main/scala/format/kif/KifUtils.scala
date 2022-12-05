@@ -72,7 +72,7 @@ object KifUtils {
   val defaultHandicaps: Map[Variant, NonEmptyList[String]] = Map(
     Minishogi -> NonEmptyList.of("5五将棋", "五々将棋", "５五将棋"),
     Standard  -> NonEmptyList.of("平手"),
-    Chushogi  -> NonEmptyList.of("中将棋")
+    Chushogi  -> NonEmptyList.of("平手", "中将棋")
   )
 
   def toKif(role: Role, variant: Variant): Option[NonEmptyList[String]] =
