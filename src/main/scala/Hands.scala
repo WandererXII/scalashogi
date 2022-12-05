@@ -1,6 +1,6 @@
 package shogi
 
-case class Hands(sente: Hand, gote: Hand) {
+final case class Hands(sente: Hand, gote: Hand) {
   def apply(color: Color) = color.fold(sente, gote)
 
   def has(color: Color, role: DroppableRole): Boolean =
@@ -52,7 +52,7 @@ object Hands {
   def empty: Hands = Hands(Nil, Nil)
 }
 
-case class Hand(handMap: HandMap) extends AnyVal {
+final case class Hand(handMap: HandMap) extends AnyVal {
 
   def apply(role: DroppableRole): Int =
     handMap.getOrElse(role, 0)

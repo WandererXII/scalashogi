@@ -6,7 +6,7 @@ import shogi.format.forsyth.Sfen
 import shogi.format.ParsedMove
 import shogi.format.usi.Usi
 
-case class Game(
+final case class Game(
     situation: Situation,
     usiMoves: Vector[Usi] = Vector.empty,
     clock: Option[Clock] = None,

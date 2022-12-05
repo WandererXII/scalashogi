@@ -1,6 +1,6 @@
 package shogi
 
-case class MoveMetrics(
+final case class MoveMetrics(
     clientLag: Option[Centis] = None,
     clientMoveTime: Option[Centis] = None
 ) {

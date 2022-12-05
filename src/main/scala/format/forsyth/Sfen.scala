@@ -72,7 +72,7 @@ object Sfen {
   def apply(sit: Situation): Sfen =
     Sfen(s"${situationToString(sit)}")
 
-  case class SituationPlus(situation: Situation, moveNumber: Int) {
+  final case class SituationPlus(situation: Situation, moveNumber: Int) {
     def plies        = moveNumber - (if ((moveNumber % 2 == 1) == situation.color.sente) 1 else 0)
     def toSfen: Sfen = apply(this)
   }

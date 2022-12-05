@@ -1,6 +1,6 @@
 package shogi
 
-case class Rank private (val index: Int) extends AnyVal with Ordered[Rank] {
+final case class Rank private (val index: Int) extends AnyVal with Ordered[Rank] {
   @inline def -(that: Rank): Int           = index - that.index
   @inline override def compare(that: Rank) = this - that
 

@@ -3,7 +3,7 @@ package shogi
 import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
 
-case class History(
+final case class History(
     lastMove: Option[Usi],
     lastLionCapture: Option[Pos],
     consecutiveAttacks: ConsecutiveAttacks,
@@ -66,7 +66,7 @@ object History {
 }
 
 // attacks made in a row
-case class ConsecutiveAttacks(sente: Int, gote: Int) {
+final case class ConsecutiveAttacks(sente: Int, gote: Int) {
 
   def add(color: Color) =
     copy(

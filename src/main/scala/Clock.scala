@@ -5,10 +5,10 @@ import java.text.DecimalFormat
 
 import Clock.Config
 
-case class CurrentClockInfo(time: Centis, periods: Int)
+final case class CurrentClockInfo(time: Centis, periods: Int)
 
 // All unspecified durations are expressed in seconds
-case class Clock(
+final case class Clock(
     config: Config,
     color: Color,
     players: Color.Map[ClockPlayer],
@@ -168,7 +168,7 @@ case class Clock(
   def limitSeconds         = config.limitSeconds
 }
 
-case class ClockPlayer(
+final case class ClockPlayer(
     config: Clock.Config,
     lag: LagTracker,
     elapsed: Centis = Centis(0),
@@ -218,7 +218,7 @@ object Clock {
   private val limitFormatter = new DecimalFormat("#.##")
 
   // All unspecified durations are expressed in seconds
-  case class Config(limitSeconds: Int, incrementSeconds: Int, byoyomiSeconds: Int, periods: Int) {
+  final case class Config(limitSeconds: Int, incrementSeconds: Int, byoyomiSeconds: Int, periods: Int) {
 
     def berserkable = (incrementSeconds == 0 && byoyomiSeconds == 0) || limitSeconds > 0
 

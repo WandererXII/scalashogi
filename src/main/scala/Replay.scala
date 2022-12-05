@@ -9,7 +9,7 @@ import shogi.format.{ Reader, Tag, Tags }
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
-case class Replay(setup: Game, state: Game) {
+final case class Replay(setup: Game, state: Game) {
   def apply(game: Game) = copy(state = game)
 }
 

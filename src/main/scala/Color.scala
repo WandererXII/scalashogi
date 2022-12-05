@@ -63,7 +63,7 @@ sealed trait Color {
 
 object Color {
 
-  case class Map[A](sente: A, gote: A) {
+  final case class Map[A](sente: A, gote: A) {
     def apply(color: Color) = if (color.sente) sente else gote
 
     def update(color: Color, f: A => A) = {

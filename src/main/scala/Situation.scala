@@ -8,7 +8,7 @@ import shogi.format.ParsedMove
 import shogi.format.usi.Usi
 import shogi.variant.Variant
 
-case class Situation(
+final case class Situation(
     board: Board,
     hands: Hands,
     color: Color,

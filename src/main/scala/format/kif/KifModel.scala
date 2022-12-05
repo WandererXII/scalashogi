@@ -8,7 +8,7 @@ import shogi.variant._
 import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
 
-case class Kif(
+final case class Kif(
     tags: Tags,
     moves: List[NotationMove],
     initial: Initial = Initial.empty

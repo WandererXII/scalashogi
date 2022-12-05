@@ -7,7 +7,7 @@ import cats.syntax.option._
 import shogi.variant.Standard
 import shogi.format.usi.Usi
 
-case class Csa(
+final case class Csa(
     tags: Tags,
     moves: List[NotationMove],
     initial: Initial = Initial.empty

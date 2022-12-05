@@ -1,6 +1,6 @@
 package shogi
 
-case class Timestamp(value: Long) extends AnyVal with Ordered[Timestamp] {
+final case class Timestamp(value: Long) extends AnyVal with Ordered[Timestamp] {
 
   def -(o: Timestamp) = Centis.ofMillis(value - o.value)
 

@@ -16,5 +16,5 @@ final class FullOpening(
 
 object FullOpening {
 
-  case class AtPly(opening: FullOpening, ply: Int)
+  final case class AtPly(opening: FullOpening, ply: Int)
 }

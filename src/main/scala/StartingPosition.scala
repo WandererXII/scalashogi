@@ -2,7 +2,7 @@ package shogi
 
 import format.forsyth.Sfen
 
-case class StartingPosition(
+final case class StartingPosition(
     japanese: String,
     english: String,
     sfen: Sfen,
@@ -22,7 +22,7 @@ case class StartingPosition(
 
 object StartingPosition {
 
-  case class Category(name: String, positions: List[StartingPosition])
+  final case class Category(name: String, positions: List[StartingPosition])
 
   val handicaps = Category(
     "Handicaps",

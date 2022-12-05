@@ -2,7 +2,7 @@ package shogi
 
 import shogi.variant.Variant
 
-case class Board(pieces: PieceMap) {
+final case class Board(pieces: PieceMap) {
 
   def apply(at: Pos): Option[Piece] = pieces get at
 

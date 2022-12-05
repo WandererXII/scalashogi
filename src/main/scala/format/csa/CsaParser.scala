@@ -22,7 +22,7 @@ object CsaParser {
   val moveOrDropRegex =
     raw"""($colorsS)?($positionS|$dropOriginS)($positionS)($piecesS)""".r
 
-  case class StrMove(
+  final case class StrMove(
       move: String,
       comments: List[String],
       timeSpent: Option[Centis] = None

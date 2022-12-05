@@ -4,7 +4,7 @@ import scala.math.{ abs, max, min }
 
 // Coordinate system starts at top right
 // Directions are given from sente POV
-case class Pos private (index: Int) extends AnyVal {
+final case class Pos private (index: Int) extends AnyVal {
 
   def xDist(other: Pos) = abs(file - other.file)
   def yDist(other: Pos) = abs(rank - other.rank)

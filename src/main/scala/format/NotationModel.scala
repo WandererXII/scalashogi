@@ -32,13 +32,13 @@ trait Notation {
   override def toString = render
 }
 
-case class Initial(comments: List[String] = Nil)
+final case class Initial(comments: List[String] = Nil)
 
 object Initial {
   val empty = Initial(Nil)
 }
 
-case class NotationMove(
+final case class NotationMove(
     moveNumber: Int,
     usiWithRole: Usi.WithRole,
     comments: List[String] = Nil,

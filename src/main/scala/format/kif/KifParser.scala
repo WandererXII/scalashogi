@@ -52,7 +52,7 @@ object KifParser {
   val commentRegex =
     raw"""\*|＊""".r
 
-  case class StrMove(
+  final case class StrMove(
       turnNumber: Option[Int],
       move: String,
       comments: List[String],
@@ -61,7 +61,7 @@ object KifParser {
       timeTotal: Option[Centis] = None
   )
 
-  case class StrVariation(
+  final case class StrVariation(
       variationStart: Int,
       moves: List[StrMove],
       variations: List[StrVariation]

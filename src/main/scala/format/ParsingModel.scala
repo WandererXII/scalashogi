@@ -7,13 +7,13 @@ import cats.data.Validated.valid
 
 import shogi.format.usi.Usi
 
-case class ParsedNotation(
+final case class ParsedNotation(
     initialPosition: InitialPosition,
     tags: Tags,
     parsedMoves: ParsedMoves
 )
 
-case class ParsedMoves(value: List[ParsedMove]) extends AnyVal
+final case class ParsedMoves(value: List[ParsedMove]) extends AnyVal
 
 object ParsedMoves {
   val empty = ParsedMoves(Nil)
@@ -46,7 +46,7 @@ sealed trait ParsedMove {
 
 }
 
-case class KifMove(
+final case class KifMove(
     dest: Pos,
     orig: Pos,
     roles: NonEmptyList[Role], // in chushogi some kanji map to many roles
@@ -63,7 +63,7 @@ case class KifMove(
 
 }
 
-case class CsaMove(
+final case class CsaMove(
     dest: Pos,
     orig: Pos,
     role: Role,
@@ -82,7 +82,7 @@ case class CsaMove(
 }
 
 // All notations can share drop
-case class Drop(
+final case class Drop(
     role: DroppableRole,
     pos: Pos,
     metas: Metas = Metas.empty
@@ -96,11 +96,11 @@ case class Drop(
   def positions = List(pos)
 }
 
-case class InitialPosition(
+final case class InitialPosition(
     comments: List[String]
 )
 
-case class Metas(
+final case class Metas(
     comments: List[String],
     glyphs: Glyphs,
     variations: List[ParsedMoves],
@@ -128,7 +128,7 @@ object Metas {
   val empty = Metas(Nil, Glyphs.empty, Nil, None, None)
 }
 
-case class Suffixes(
+final case class Suffixes(
     promotion: Boolean,
     glyphs: Glyphs
 )

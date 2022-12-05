@@ -6,7 +6,7 @@ case class Glyph(id: Int, symbol: String, name: String) {
   override def toString = s"$symbol ($$$id $name)"
 }
 
-case class Glyphs(
+final case class Glyphs(
     move: Option[Glyph.MoveAssessment],
     position: Option[Glyph.PositionAssessment],
     observations: List[Glyph.Observation]

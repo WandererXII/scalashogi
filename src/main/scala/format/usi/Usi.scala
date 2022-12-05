@@ -13,7 +13,7 @@ sealed trait Usi {
 
 object Usi {
 
-  case class Move(
+  final case class Move(
       orig: Pos,
       dest: Pos,
       promotion: Boolean = false,
@@ -47,7 +47,7 @@ object Usi {
 
   }
 
-  case class Drop(role: DroppableRole, pos: Pos) extends Usi {
+  final case class Drop(role: DroppableRole, pos: Pos) extends Usi {
 
     def usi = s"${Drop.roleToUsi(role)}*${pos.key}"
 
@@ -76,7 +76,7 @@ object Usi {
 
   }
 
-  case class WithRole(usi: Usi, role: Role)
+  final case class WithRole(usi: Usi, role: Role)
 
   def apply(usiStr: String): Option[Usi] =
     if (usiStr contains '*')

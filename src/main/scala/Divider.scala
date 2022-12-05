@@ -1,6 +1,6 @@
 package shogi
 
-case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
+final case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
 
   def openingSize: Int = middle | plies
   def middleSize: Option[Int] =

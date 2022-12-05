@@ -4,7 +4,7 @@ package format
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 
-case class Tag(name: TagType, value: String) {
+final case class Tag(name: TagType, value: String) {
 
   override def toString = s"""$name：$value"""
 }
@@ -17,7 +17,7 @@ sealed trait TagType {
   val isUnknown      = false
 }
 
-case class Tags(value: List[Tag]) extends AnyVal {
+final case class Tags(value: List[Tag]) extends AnyVal {
 
   def apply(name: String): Option[String] = {
     val tagType = Tag tagType name
@@ -103,7 +103,7 @@ object Tag {
   case object Annotator   extends TagType
   case object Handicap    extends TagType
   case object Byoyomi     extends TagType
-  case class Unknown(n: String) extends TagType {
+  final case class Unknown(n: String) extends TagType {
     override def toString  = n
     override val isUnknown = true
   }

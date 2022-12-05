@@ -12,10 +12,10 @@ object Reader {
   }
 
   object Result {
-    case class Complete(replay: Replay) extends Result {
+    final case class Complete(replay: Replay) extends Result {
       def valid = Validated.valid(replay)
     }
-    case class Incomplete(replay: Replay, failures: String) extends Result {
+    final case class Incomplete(replay: Replay, failures: String) extends Result {
       def valid = Validated.invalid(failures)
     }
   }
