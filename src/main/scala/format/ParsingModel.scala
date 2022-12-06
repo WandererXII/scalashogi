@@ -59,7 +59,7 @@ final case class KifMove(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def positions = List(orig, dest)
+  def positions = midStep.fold(List(orig, dest))(ms => List(orig, ms, dest))
 
 }
 
