@@ -37,7 +37,7 @@ final case class Csa(
       (tags.sfen | Standard.initialSfen).toSituation(Standard).fold("")(Csa renderSituation _)
     val startColor: Color = tags.sfen.flatMap(_.color) | Sente
     val movesStr          = renderMainline(moves, startColor)
-    List(
+    List[String](
       header,
       setup,
       initStr,
@@ -105,7 +105,7 @@ object Csa {
       }
       if (y < 8) csaBoard append '\n'
     }
-    List(
+    List[String](
       csaBoard.toString,
       renderHand(sit.hands(Sente), "P+"),
       renderHand(sit.hands(Gote), "P-"),
@@ -147,7 +147,7 @@ object Csa {
   }
 
   // tags we render in header
-  private val csaHeaderTags = List(
+  private val csaHeaderTags = List[TagType](
     Tag.Sente,
     Tag.Gote,
     Tag.Event,

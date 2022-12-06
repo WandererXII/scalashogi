@@ -81,7 +81,7 @@ object CsaParser {
         Color.fromSente((nbMoves + { if (sit.color.gote) 1 else 0 }) % 2 == 0)
       )
 
-    List(sfenTag, resultTag, termTag).flatten.foldLeft(tags)(_ + _)
+    List[Option[Tag]](sfenTag, resultTag, termTag).flatten.foldLeft(tags)(_ + _)
   }
 
   trait Logging { self: Parsers =>

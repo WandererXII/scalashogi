@@ -609,7 +609,7 @@ case object WhiteHorse extends Role {
 
 object Role {
 
-  val all: List[Role] = List(
+  val all = List[Role](
     Bishop,
     BishopPromoted,
     Boar,
@@ -656,7 +656,7 @@ object Role {
     WhiteHorse
   )
 
-  val allDroppable: List[DroppableRole] = List(
+  val allDroppable = List[DroppableRole](
     Bishop,
     Gold,
     Knight,
@@ -664,6 +664,11 @@ object Role {
     Pawn,
     Rook,
     Silver
+  )
+
+  val allRoyal = List[Role](
+    King,
+    Prince
   )
 
   val allByName: Map[String, Role] = all map { r =>

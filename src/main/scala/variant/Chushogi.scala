@@ -226,7 +226,7 @@ case object Chushogi
       (pRanks
         .contains(dest.rank) && !pRanks.contains(orig.rank)) ||
         (capture && (pRanks.exists(r => r == dest.rank || r == orig.rank))) ||
-        (List(Pawn, Lance).contains(piece.role) && backrank(piece.color) == dest.rank)
+        (List[Role](Pawn, Lance).contains(piece.role) && backrank(piece.color) == dest.rank)
     )
   }
 
@@ -257,7 +257,7 @@ case object Chushogi
       case Usi.Move(_, dest, prom, _) => {
         prom || after
           .board(dest)
-          .exists(List(Pawn, Lance) contains _.role) || before.board.pieces.size != after.board.pieces.size
+          .exists(List[Role](Pawn, Lance) contains _.role) || before.board.pieces.size != after.board.pieces.size
       }
       case _ => false
     }

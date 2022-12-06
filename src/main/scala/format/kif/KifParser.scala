@@ -213,7 +213,7 @@ object KifParser {
         Tag(_.Variant, sit.variant.name).some
       else None
 
-    List(sfenTag, resultTag, termTag, variantTag).flatten.foldLeft(tags)(_ + _)
+    List[Option[Tag]](sfenTag, resultTag, termTag, variantTag).flatten.foldLeft(tags)(_ + _)
   }
 
   object VariationParser extends RegexParsers with Logging {
@@ -252,7 +252,7 @@ object KifParser {
       }
 
     def number: Parser[Int] = raw"""${numbersS}[\s\.。(?:手目)]{1,}""".r ^^ { case n =>
-      KifUtils.kanjiToInt(n.filterNot(c => List('.', '。', '手', '目').contains(c)).trim)
+      KifUtils.kanjiToInt(n.filterNot(c => List[Char]('.', '。', '手', '目').contains(c)).trim)
     }
 
     def clock: Parser[String] =
@@ -321,7 +321,7 @@ object KifParser {
       }
 
     def number: Parser[Int] = raw"""${numbersS}[\s\.。(?:手目)]{1,}""".r ^^ { case n =>
-      KifUtils.kanjiToInt(n.filterNot(c => List('.', '。', '手', '目').contains(c)).trim)
+      KifUtils.kanjiToInt(n.filterNot(c => List[Char]('.', '。', '手', '目').contains(c)).trim)
     }
 
     private val clockMinuteSecondRegex     = """(\d++):(\d+(?:\.\d+)?)""".r

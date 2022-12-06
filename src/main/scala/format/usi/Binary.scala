@@ -212,7 +212,7 @@ object Binary {
     )
     val intToRole: Map[Int, DroppableRole] = roleToInt map { case (k, v) => v -> k }
     val directions: Directions =
-      List(_.right, _.upLeft, _.up, _.upRight, _.downLeft, _.down, _.downRight, _.left)
+      List[Direction](_.right, _.upLeft, _.up, _.upRight, _.downLeft, _.down, _.downRight, _.left)
   }
 
 }

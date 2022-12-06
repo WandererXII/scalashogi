@@ -15,7 +15,7 @@ final case class Board(pieces: PieceMap) {
 
   lazy val royalPoss: Map[Color, List[Pos]] =
     pieces.foldLeft[Map[Color, List[Pos]]](Map(Sente -> Nil, Gote -> Nil)) { case (acc, (pos, piece)) =>
-      if (List(King, Prince) contains piece.role) acc.updated(piece.color, pos :: acc(piece.color))
+      if (Role.allRoyal contains piece.role) acc.updated(piece.color, pos :: acc(piece.color))
       else acc
     }
 

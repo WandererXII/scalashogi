@@ -81,9 +81,9 @@ abstract class Variant private[variant] (
     // only long range roles, since you can only unpin a check from a role with projection
     val filter: Piece => Boolean =
       if ((a.piece is King) || a.situation.check) _ => true else (_.projectionDirs.nonEmpty)
-    val stableRoyalPos = if (a.piece is King) None else a.situation.board.singleRoyalPosOf(a.color)
+    val stableKingPos = if (a.piece is King) None else a.situation.board.singleRoyalPosOf(a.color)
     a.unfilteredDestinations filterNot { dest =>
-      (stableRoyalPos orElse Option.when(a.piece is King)(dest)) exists {
+      (stableKingPos orElse Option.when(a.piece is King)(dest)) exists {
         posThreatened(
           a.situation.board.forceMove(a.piece, a.pos, dest),
           !a.color,
@@ -319,21 +319,21 @@ abstract class Variant private[variant] (
 
 object Variant {
 
-  val all = List(
+  val all = List[Variant](
     Standard,
     Minishogi,
     Chushogi
   )
 
-  val byId = all map { v =>
+  val byId: Map[Int, Variant] = all map { v =>
     (v.id, v)
   } toMap
 
-  val byKey = all map { v =>
+  val byKey: Map[String, Variant] = all map { v =>
     (v.key, v)
   } toMap
 
-  val default = Standard
+  val default: Variant = Standard
 
   def apply(id: Int): Option[Variant]     = byId get id
   def apply(key: String): Option[Variant] = byKey get key

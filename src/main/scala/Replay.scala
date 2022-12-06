@@ -25,7 +25,7 @@ object Replay {
     Reader.fromUsi(
       usis,
       Tags(
-        List(
+        List[Option[Tag]](
           initialSfen map { sfen =>
             Tag(_.Sfen, sfen.value)
           },
@@ -131,7 +131,7 @@ object Replay {
               roleMap.get(orig) match {
                 case Some(role) => {
                   val maybePromoted = variant.promote(role).filter(_ => prom) | role
-                  val toRemove      = List(Some(orig), midStep).flatten
+                  val toRemove      = List[Option[Pos]](Some(orig), midStep).flatten
                   mk(roleMap -- toRemove + (dest -> maybePromoted), rest, Usi.WithRole(usi, role) :: roles)
                 }
                 case None => roles

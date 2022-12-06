@@ -26,7 +26,7 @@ object CsaParserHelper {
         pieces <- initPieces
         board     = Board(pieces)
         color     = Color.fromSente(!lines.contains("-"))
-        additions = lines.filter(l => l.startsWith("P") && l.lift(1).exists(List('+', '-') contains _))
+        additions = lines.filter(l => l.startsWith("P") && l.lift(1).exists(List[Char]('+', '-') contains _))
         sit       = Situation(board, Hands.empty, color, Standard)
         sit2 <- parseAdditions(additions, sit)
       } yield sit2

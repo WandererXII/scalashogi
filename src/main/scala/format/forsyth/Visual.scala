@@ -41,7 +41,7 @@ object Visual {
       .filter(_ != '.')
     val padStr = s"${variant.numberOfFiles}/" * (variant.numberOfRanks - sfenReversed.count(_ == '/') - 1)
     val finalSfen =
-      List(padStr + sfenReversed.reverse, turn, hands)
+      List[String](padStr + sfenReversed.reverse, turn, hands)
         .mkString(" ")
     Sfen(finalSfen).toSituation(variant)
   }
@@ -61,7 +61,7 @@ object Visual {
       }
     } mkString
   } map (_.trim) mkString "\n" pipe { board =>
-    List(
+    List[String](
       board,
       if (sit.variant.supportsDrops) s"Hands:${Sfen.handsToString(sit.hands, sit.variant).filterNot('-' ==)}"
       else "",

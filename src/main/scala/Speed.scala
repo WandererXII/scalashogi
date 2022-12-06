@@ -29,18 +29,18 @@ object Speed {
         "Correspondence games: one or several days per move"
       )
 
-  val all     = List(UltraBullet, Bullet, Blitz, Rapid, Classical, Correspondence)
-  val limited = List(Bullet, Blitz, Rapid, Classical)
+  val all     = List[Speed](UltraBullet, Bullet, Blitz, Rapid, Classical, Correspondence)
+  val limited = List[Speed](Bullet, Blitz, Rapid, Classical)
 
-  val byId = all map { v =>
+  val byId: Map[Int, Speed] = all map { v =>
     (v.id, v)
   } toMap
 
   def apply(id: Int): Option[Speed] = byId get id
 
-  def apply(clock: Clock.Config) = byTime(clock.estimateTotalSeconds)
+  def apply(clock: Clock.Config): Speed = byTime(clock.estimateTotalSeconds)
 
-  def apply(clock: Option[Clock.Config]) = byTime(clock.fold(Int.MaxValue)(_.estimateTotalSeconds))
+  def apply(clock: Option[Clock.Config]): Speed = byTime(clock.fold(Int.MaxValue)(_.estimateTotalSeconds))
 
   def byTime(seconds: Int): Speed = all.find(_.range contains seconds) | Correspondence
 

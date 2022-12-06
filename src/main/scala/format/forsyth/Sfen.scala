@@ -120,7 +120,7 @@ object Sfen {
     } mkString ""
 
   def handsToString(hands: Hands, variant: Variant): String =
-    List(
+    List[String](
       handToString(hands.sente, variant).toUpperCase,
       handToString(hands.gote, variant)
     ).mkString("").some.filterNot(_.isEmpty) | "-"

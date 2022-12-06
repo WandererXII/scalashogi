@@ -31,7 +31,7 @@ object Status {
   case object RoyalsLost     extends Status(42)
   case object BareKing       extends Status(43)
 
-  val all = List(
+  val all = List[Status](
     Created,
     Started,
     Aborted,
@@ -51,12 +51,12 @@ object Status {
     BareKing
   )
 
-  val finishedNotCheated = all filter { s =>
+  val finishedNotCheated: List[Status] = all filter { s =>
     s.id >= Mate.id && s.id != Cheat.id
   }
 
   val finishedWithWinner =
-    List(
+    List[Status](
       Mate,
       Resign,
       Timeout,
@@ -71,7 +71,7 @@ object Status {
       PerpetualCheck
     )
 
-  val byId = all map { v =>
+  val byId: Map[Int, Status] = all map { v =>
     (v.id, v)
   } toMap
 

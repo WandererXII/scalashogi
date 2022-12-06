@@ -26,7 +26,7 @@ object StartingPosition {
 
   val handicaps = Category(
     "Handicaps",
-    List(
+    List[StartingPosition](
       StartingPosition(
         "香落ち",
         "Lance",
@@ -214,15 +214,15 @@ object StartingPosition {
     )
   )
 
-  val categories: List[Category] = List(handicaps)
+  val categories = List[Category](handicaps)
 
   val all: List[StartingPosition] = categories.flatMap(_.positions)
 
   val initial = StartingPosition("平手", "Initial position", variant.Standard.initialSfen, "Shogi", "")
 
-  def allWithInitial = initial :: all
+  def allWithInitial: List[StartingPosition] = initial :: all
 
-  lazy val handicapSfens = handicaps.positions.map(_.sfen)
+  lazy val handicapSfens: List[Sfen] = handicaps.positions.map(_.sfen)
 
   def isHandicap(sfen: Sfen) =
     handicapSfens.exists(_.truncate == sfen.truncate)

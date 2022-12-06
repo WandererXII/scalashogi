@@ -38,6 +38,6 @@ object Rank {
   val K = new Rank(10)
   val L = new Rank(11)
 
-  val all                     = List(A, B, C, D, E, F, G, H, I, J, K, L)
+  val all                     = List[Rank](A, B, C, D, E, F, G, H, I, J, K, L)
   val allReversed: List[Rank] = all.reverse
 }

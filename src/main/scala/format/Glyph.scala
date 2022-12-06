@@ -66,7 +66,7 @@ object Glyph {
     val only        = new Glyph(7, "□", "Only move") with MoveAssessment
     val zugzwang    = new Glyph(22, "⨀", "Zugzwang") with MoveAssessment
 
-    val all = List(good, mistake, brillant, blunder, interesting, dubious, only, zugzwang)
+    val all = List[Glyph](good, mistake, brillant, blunder, interesting, dubious, only, zugzwang)
     val byId: Map[Int, Glyph] = all.map { g =>
       g.id -> g
     }.toMap
@@ -86,7 +86,7 @@ object Glyph {
     val senteMuchBetter     = new Glyph(18, "+−", "Sente is winning") with PositionAssessment
     val goteMuchBetter      = new Glyph(19, "-+", "Gote is winning") with PositionAssessment
 
-    val all = List(
+    val all = List[Glyph](
       equal,
       unclear,
       senteSlightlyBetter,
@@ -115,7 +115,7 @@ object Glyph {
     val compensation = new Glyph(44, "=∞", "With compensation") with Observation
     val withIdea     = new Glyph(140, "∆", "With the idea") with Observation
 
-    val all = List(novelty, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
+    val all = List[Glyph](novelty, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
     val byId: Map[Int, Glyph] = all.map { g =>
       g.id -> g
     }.toMap

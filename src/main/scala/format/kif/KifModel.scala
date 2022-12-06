@@ -65,7 +65,7 @@ object Kif {
         val s1 = s"${s"${moveNumberOffset(cur.moveNumber)}一歩目"} ${renderMove(m1, lastDest, variant)}"
         val s2 =
           s"${s"${moveNumberOffset(cur.moveNumber)}二歩目"} ${renderMove(m2, None, variant)}$timeStr$commentsStr$resultStr"
-        List(s1, s2) mkString "\n"
+        List[String](s1, s2) mkString "\n"
       }
       case _ =>
         s"${moveNumberOffset(cur.moveNumber)}$offset${renderMove(cur.usiWithRole, lastDest, variant)}$timeStr$commentsStr$resultStr"
@@ -154,7 +154,7 @@ object Kif {
       kifBoard append s"|${KifUtils.intToKanji(y + 1)}"
       if (y < nbRanks) kifBoard append '\n'
     }
-    List(
+    List[String](
       if (sit.variant.supportsDrops) s"後手の持駒：${renderHand(sit.hands(Gote), sit.variant)}" else "",
       fileNums(sit.variant),
       s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
@@ -203,7 +203,7 @@ object Kif {
   }
 
   // tags we render in header
-  private val headerTags = Tag.tsumeTypes ++ List(
+  private val headerTags = Tag.tsumeTypes ++ List[TagType](
     Tag.Start,
     Tag.End,
     Tag.Event,

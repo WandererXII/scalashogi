@@ -127,7 +127,7 @@ object Color {
   val sente: Color = Sente
   val gote: Color  = Gote
 
-  val all = List(Sente, Gote)
+  val all = List[Color](Sente, Gote)
 
   def showResult(color: Option[Color]) =
     color match {

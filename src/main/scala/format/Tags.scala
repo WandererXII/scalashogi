@@ -117,7 +117,7 @@ object Tag {
   case object Length            extends TagType
   case object Prize             extends TagType
 
-  val tsumeTypes = List(
+  val tsumeTypes = List[TagType](
     ProblemName,
     ProblemId,
     DateOfPublication,
@@ -128,7 +128,7 @@ object Tag {
     Prize
   )
 
-  val tagTypes = List(
+  val tagTypes = List[TagType](
     Event,
     Site,
     Start,

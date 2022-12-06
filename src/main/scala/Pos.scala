@@ -275,7 +275,7 @@ object Pos {
   }
 
   val allDirections: Directions =
-    List(_.up, _.down, _.left, _.right, _.upLeft, _.upRight, _.downLeft, _.downRight)
+    List[Direction](_.up, _.down, _.left, _.right, _.upLeft, _.upRight, _.downLeft, _.downRight)
 
   val allKeys: Map[String, Pos] = all.map { pos =>
     pos.key -> pos
