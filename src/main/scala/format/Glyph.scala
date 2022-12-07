@@ -115,7 +115,8 @@ object Glyph {
     val compensation = new Glyph(44, "=∞", "With compensation") with Observation
     val withIdea     = new Glyph(140, "∆", "With the idea") with Observation
 
-    val all = List[Glyph](novelty, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
+    val all =
+      List[Glyph](novelty, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
     val byId: Map[Int, Glyph] = all.map { g =>
       g.id -> g
     }.toMap

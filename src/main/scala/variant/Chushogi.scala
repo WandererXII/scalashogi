@@ -257,7 +257,9 @@ case object Chushogi
       case Usi.Move(_, dest, prom, _) => {
         prom || after
           .board(dest)
-          .exists(List[Role](Pawn, Lance) contains _.role) || before.board.pieces.size != after.board.pieces.size
+          .exists(
+            List[Role](Pawn, Lance) contains _.role
+          ) || before.board.pieces.size != after.board.pieces.size
       }
       case _ => false
     }
