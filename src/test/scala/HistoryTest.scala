@@ -24,4 +24,10 @@ class HistoryTest extends ShogiTest {
       history.fourfoldRepetition must_== true
     }
   }
+//  Doesn't work - Array == Array will always be false
+//  ArraySeq could be used, but with java Array I can be sure primitives are used
+//  And since this is not really an issue, let's leave it for now
+//  "equals" in {
+//    History.empty must_== History.empty
+//  }
 }
