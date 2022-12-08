@@ -59,6 +59,7 @@ class PosTest extends ShogiTest {
     "be a string" in {
       "SQ6E" in { SQ6E.toString must_== "6e" }
     }
+
     "USI" in {
       "be correctly converted" in {
         SQ9I.key must_== "9i"
@@ -71,10 +72,6 @@ class PosTest extends ShogiTest {
         SQ6E.key must_== "6e"
         SQ4E.key must_== "4e"
 
-        SQ1A.hexKey must_== "11"
-        SQ10A.hexKey must_== "a1"
-        SQ1L.hexKey must_== "1c"
-
         SQ1A.kanjiKey must_== "1一"
         SQ10A.kanjiKey must_== "10一"
         SQ10L.kanjiKey must_== "10十二"
@@ -84,6 +81,12 @@ class PosTest extends ShogiTest {
         SQ10L.kanjiFullWidthKey must_== "１０十二"
 
       }
+    }
+
+    "all" in {
+      Pos.all.map(_.key).map(k => Pos.fromKey(k).get) must_== Pos.all
+      Pos.all.map(_.kanjiKey).map(k => Pos.fromKey(k).get) must_== Pos.all
+      Pos.all.map(_.kanjiFullWidthKey).map(k => Pos.fromKey(k).get) must_== Pos.all
     }
 
     "board sizes" in {

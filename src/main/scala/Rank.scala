@@ -7,9 +7,8 @@ final case class Rank private (index: Int) extends AnyVal with Ordered[Rank] {
   def offset(delta: Int): Option[Rank] =
     Rank(index + delta)
 
-  def key: String    = (97 + index).toChar.toString
-  def hexKey: String = (index + 1).toHexString
-
+  def key: String      = (97 + index).toChar.toString
+  def number: String   = (index + 1).toString
   def kanjiKey: String = Rank.kanjiKeys(index % Rank.kanjiKeys.size)
 
   override def toString = key

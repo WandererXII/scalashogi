@@ -53,7 +53,6 @@ final case class Pos private (index: Int) extends AnyVal {
   @inline def rank = Rank of this
 
   def key               = file.key + rank.key
-  def hexKey            = file.hexKey + rank.hexKey
   def kanjiKey          = file.key + rank.kanjiKey
   def kanjiFullWidthKey = file.kanjiFullWidthKey + rank.kanjiKey
 
@@ -78,9 +77,7 @@ object Pos {
     else None
 
   def fromKey(key: String): Option[Pos] =
-    allKeys.get(key) orElse allHexKeys.get(key) orElse allKanjiKeys.get(key) orElse allKanjiFullWidthKeys.get(
-      key
-    )
+    allKeys.get(key) orElse allKanjiKeys.get(key) orElse allKanjiFullWidthKeys.get(key)
 
   val all: List[Pos] = (0 until (MaxFiles * MaxRanks)).map(new Pos(_)).toList
 
@@ -279,10 +276,6 @@ object Pos {
 
   val allKeys: Map[String, Pos] = all.map { pos =>
     pos.key -> pos
-  }.toMap
-
-  val allHexKeys: Map[String, Pos] = all.map { pos =>
-    pos.hexKey -> pos
   }.toMap
 
   val allKanjiKeys: Map[String, Pos] = all.map { pos =>
