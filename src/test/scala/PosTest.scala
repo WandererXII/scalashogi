@@ -83,6 +83,13 @@ class PosTest extends ShogiTest {
       }
     }
 
+    "UCI" in {
+      Pos.fromKey("i9") must_== Some(SQ1A)
+      Pos.fromKey("a1") must_== Some(SQ9I)
+      Pos.fromKey("e5") must_== Some(SQ5E)
+      Pos.fromKey("d7") must_== Some(SQ6C)
+    }
+
     "all" in {
       Pos.all.map(_.key).map(k => Pos.fromKey(k).get) must_== Pos.all
       Pos.all.map(_.kanjiKey).map(k => Pos.fromKey(k).get) must_== Pos.all

@@ -76,8 +76,19 @@ object Pos {
       Some(new Pos(y * MaxFiles + x))
     else None
 
+  private[shogi] def fromUciMap(c: Char): Char =
+    c match {
+      case letter if letter >= 'a' && letter <= 'i' =>
+        (-letter.toInt + 'i' + '1').toChar
+      case digit if digit >= '1' && digit <= '9' =>
+        (-digit.toInt + '9' + 'a').toChar
+      case _ => c
+    }
+
   def fromKey(key: String): Option[Pos] =
-    allKeys.get(key) orElse allKanjiKeys.get(key) orElse allKanjiFullWidthKeys.get(key)
+    allKeys.get(key) orElse allKanjiKeys.get(key) orElse allKanjiFullWidthKeys.get(key) orElse {
+      allKeys get key.map(fromUciMap)
+    }
 
   val all: List[Pos] = (0 until (MaxFiles * MaxRanks)).map(new Pos(_)).toList
 
