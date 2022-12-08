@@ -10,6 +10,18 @@ import shogi.format.forsyth.SfenUtils
 import shogi.format.csa.CsaUtils
 
 object KifUtils {
+
+  def parseKifPos(str: String): Option[Pos] = {
+    Pos.fromKey(str) orElse {
+      for {
+        numStr <- if (str.size == 2) str.map(toDigit).some else none
+        x      <- numStr.take(1).toIntOption
+        y      <- numStr.drop(1).toIntOption
+        pos    <- Pos.at(x - 1, y - 1)
+      } yield pos
+    }
+  }
+
   // supporting max 999
   def kanjiToInt(str: String): Int = {
     def orderHelper(ord: String): Int = {

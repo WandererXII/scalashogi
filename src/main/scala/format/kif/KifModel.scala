@@ -83,7 +83,7 @@ object Kif {
   private def renderOrig(orig: Pos, variant: Variant): String =
     variant match {
       case Chushogi => s" （←${orig.kanjiKey}）"
-      case _        => s"(${orig.hexKey})"
+      case _        => s"(${orig.file.key}${orig.rank.number})"
     }
 
   def renderMove(usiWithRole: Usi.WithRole, lastDest: Option[Pos], variant: Variant): String =
@@ -126,8 +126,11 @@ object Kif {
     sfen
       .filterNot(f => variant.initialSfen.truncate == f.truncate)
       .fold {
-        val handicapName = KifUtils.defaultHandicaps.get(variant).map(_.head) | ""
-        s"${Tag.Handicap.kifName}：$handicapName"
+        if (variant.chushogi) ""
+        else {
+          val handicapName = KifUtils.defaultHandicaps.get(variant).map(_.head) | ""
+          s"${Tag.Handicap.kifName}：$handicapName"
+        }
       } { sf =>
         getHandicapName(sf).fold(sf.toSituation(variant).fold("")(renderSituation _))(hc =>
           s"${Tag.Handicap.kifName}：$hc"

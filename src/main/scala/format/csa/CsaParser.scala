@@ -192,8 +192,8 @@ object CsaParser {
             _ <-
               if (Standard.allRoles contains role) valid(role)
               else invalid(s"$role not supported in standard shogi")
-            dest <- Pos.allHexKeys get destS toValid s"Cannot parse destination sqaure in move: $str"
-            orig <- Pos.allHexKeys get origS toValid s"Cannot parse origin sqaure in move: $str"
+            dest <- CsaUtils.parseCsaPos(destS) toValid s"Cannot parse destination sqaure in move: $str"
+            orig <- CsaUtils.parseCsaPos(origS) toValid s"Cannot parse origin sqaure in move: $str"
           } yield CsaMove(
             dest = dest,
             role = role,
@@ -213,7 +213,7 @@ object CsaParser {
             role <- Standard.handRoles.find(
               _ == roleBase
             ) toValid s"$roleBase can't be dropped in standard shogi"
-            pos <- Pos.allHexKeys get posS toValid s"Cannot parse destination sqaure in drop: $str"
+            pos <- CsaUtils.parseCsaPos(posS) toValid s"Cannot parse destination sqaure in drop: $str"
           } yield Drop(
             role = role,
             pos = pos,

@@ -90,8 +90,7 @@ class KifModelTest extends ShogiTest {
         )
       ),
       moves
-    ).render must_== """手合割：中将棋
-先手：
+    ).render must_== """先手：
 後手：
 手数----指手---------消費時間--
    1   7七金将 （←7八）

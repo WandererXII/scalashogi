@@ -3,6 +3,17 @@ package format
 package csa
 
 object CsaUtils {
+
+  def parseCsaPos(str: String): Option[Pos] =
+    for {
+      x   <- str.take(1).toIntOption
+      y   <- str.drop(1).toIntOption
+      pos <- Pos.at(x - 1, y - 1)
+    } yield pos
+
+  def makeCsaPos(pos: Pos): String =
+    s"${pos.file.key}${pos.rank.number}"
+
   def toPiece(s: String): Option[Piece] =
     toRole(s.drop(1)) map {
       Piece(Color.fromSente(s.take(1) == "+"), _)

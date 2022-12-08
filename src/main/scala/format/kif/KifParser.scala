@@ -404,10 +404,9 @@ object KifParser {
             ) toValid s"Unknown role in move: $str (variant - $variant)"
             destOpt =
               if (destS == "同" || destS == "仝") lastDest
-              else
-                Pos.fromKey(destS) orElse Pos.allHexKeys.get(augmentString(destS).map(KifUtils.toDigit _))
+              else KifUtils.parseKifPos(destS)
             dest <- destOpt toValid s"Cannot parse destination square in move: $str"
-            orig <- Pos.fromKey(origS) toValid s"Cannot parse origin square in move: $str"
+            orig <- KifUtils.parseKifPos(origS) toValid s"Cannot parse origin square in move: $str"
           } yield KifMove(
             dest = dest,
             roles = roles,
@@ -430,9 +429,7 @@ object KifParser {
             role <- variant.handRoles.find(
               rolesBase contains _
             ) toValid s"${rolesBase mkString ","} can't be dropped in $variant variant"
-            pos <- Pos.fromKey(posS) orElse Pos.allHexKeys.get(
-              augmentString(posS).map(KifUtils.toDigit _)
-            ) toValid s"Cannot parse destination square in drop: $str"
+            pos <- KifUtils.parseKifPos(posS) toValid s"Cannot parse destination square in drop: $str"
           } yield Drop(
             role = role,
             pos = pos,
