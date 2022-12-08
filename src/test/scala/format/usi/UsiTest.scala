@@ -13,6 +13,20 @@ class UsiTest extends ShogiTest {
       u.promotion must beFalse
       u.usi must_== "9i1a"
     }
+    // not really valid usi, but we allow it
+    Usi("9i1a=") must beSome.like { case u: Usi.Move =>
+      u.orig must_== SQ9I
+      u.dest must_== SQ1A
+      u.promotion must beFalse
+      u.usi must_== "9i1a"
+    }
+    // Definitely not valid usi, but the plan is to use '?' for moves in puzzles, where we don't care about promotions
+    Usi("9i1a?") must beSome.like { case u: Usi.Move =>
+      u.orig must_== SQ9I
+      u.dest must_== SQ1A
+      u.promotion must beFalse
+      u.usi must_== "9i1a"
+    }
     Usi("8h2b+") must beSome.like { case u: Usi.Move =>
       u.orig must_== SQ8H
       u.dest must_== SQ2B
