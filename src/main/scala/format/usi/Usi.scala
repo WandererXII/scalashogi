@@ -37,10 +37,10 @@ object Usi {
       str match {
         case MoveRegex(origS, midStepS, destS, promS) =>
           for {
-            orig <- Pos.fromKey(origS)
-            dest <- Pos.fromKey(destS)
+            orig <- Pos.allKeys get origS
+            dest <- Pos.allKeys get destS
             prom    = promS == "+"
-            midStep = Option(midStepS).flatMap(Pos.fromKey(_))
+            midStep = Option(midStepS).flatMap(Pos.allKeys get _)
           } yield Move(orig, dest, prom, midStep)
         case _ => None
       }
@@ -60,7 +60,7 @@ object Usi {
     def apply(str: String): Option[Drop] =
       for {
         role <- usiToRole get str.take(1)
-        pos  <- Pos.fromKey(str.drop(2))
+        pos  <- Pos.allKeys get (str.drop(2))
       } yield Drop(role, pos)
 
     val roleToUsi: Map[DroppableRole, String] = Map(
