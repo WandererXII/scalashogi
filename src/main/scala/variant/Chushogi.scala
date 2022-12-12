@@ -217,6 +217,49 @@ case object Chushogi
   def promotionRanks(color: Color) =
     if (color.sente) List(Rank.A, Rank.B, Rank.C, Rank.D) else List(Rank.I, Rank.J, Rank.K, Rank.L)
 
+  def valueOfRole(r: Role): Int =
+    r match {
+      case Bishop                => 5
+      case BishopPromoted        => 5
+      case Boar                  => 8
+      case Chariot               => 3
+      case Copper                => 2
+      case Dragon                => 8
+      case DragonPromoted        => 8
+      case Eagle                 => 11
+      case Elephant              => 3
+      case ElephantPromoted      => 3
+      case Falcon                => 10
+      case Gold                  => 3
+      case GoBetween             => 1
+      case Horse                 => 7
+      case HorsePromoted         => 7
+      case Kirin                 => 3
+      case Lance                 => 3
+      case Leopard               => 3
+      case Lion                  => 20
+      case LionPromoted          => 20
+      case Ox                    => 8
+      case Phoenix               => 3
+      case Queen                 => 12
+      case QueenPromoted         => 12
+      case Rook                  => 6
+      case RookPromoted          => 6
+      case Pawn                  => 1
+      case Prince                => 4
+      case PromotedPawn          => 3
+      case SideMover             => 4
+      case SideMoverPromoted     => 4
+      case Silver                => 2
+      case Stag                  => 6
+      case Tiger                 => 3
+      case VerticalMover         => 4
+      case VerticalMoverPromoted => 4
+      case Whale                 => 5
+      case WhiteHorse            => 7
+      case _                     => 0
+    }
+
   override def pieceInDeadZone(piece: Piece, pos: Pos): Boolean = false
 
   override def canPromote(piece: Piece, orig: Pos, dest: Pos, capture: Boolean): Boolean = {

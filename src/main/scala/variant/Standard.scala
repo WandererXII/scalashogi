@@ -119,6 +119,20 @@ case object Standard
   def promotionRanks(color: Color) =
     if (color.sente) List(Rank.A, Rank.B, Rank.C) else List(Rank.G, Rank.H, Rank.I)
 
+  def valueOfRole(r: Role): Int =
+    r match {
+      case Pawn                                                           => 1
+      case Lance                                                          => 3
+      case Knight                                                         => 4
+      case Silver                                                         => 5
+      case Gold | Tokin | PromotedSilver | PromotedLance | PromotedKnight => 6
+      case Bishop                                                         => 8
+      case Rook                                                           => 10
+      case Horse                                                          => 10
+      case Dragon                                                         => 12
+      case _                                                              => 0
+    }
+
   private def impasseValueOf(r: Role): Int =
     r match {
       case Bishop | Rook | Horse | Dragon => 5

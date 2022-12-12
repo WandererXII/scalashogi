@@ -65,4 +65,16 @@ case object Minishogi
 
   def promotionRanks(color: Color) = List(backrank(color))
 
+  def valueOfRole(r: Role): Int =
+    r match {
+      case Pawn                          => 1
+      case Silver                        => 3
+      case Gold | Tokin | PromotedSilver => 4
+      case Bishop                        => 5
+      case Rook                          => 6
+      case Horse                         => 6
+      case Dragon                        => 7
+      case _                             => 0
+    }
+
 }

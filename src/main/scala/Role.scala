@@ -675,19 +675,4 @@ object Role {
     (r.name, r)
   } toMap
 
-  def valueOf(r: Role): Int =
-    r match {
-      case Pawn                                                   => 1
-      case Lance                                                  => 3
-      case Knight                                                 => 4
-      case Silver                                                 => 5
-      case Gold | PromotedSilver | PromotedLance | PromotedKnight => 6
-      case Tokin                                                  => 7
-      case Bishop                                                 => 8
-      case Rook                                                   => 10
-      case Horse                                                  => 10
-      case Dragon                                                 => 12
-      case King                                                   => 0
-      case _                                                      => 0
-    }
 }

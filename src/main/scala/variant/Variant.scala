@@ -45,6 +45,8 @@ abstract class Variant private[variant] (
   // Ranks where pieces of color can promote
   def promotionRanks(color: Color): List[Rank]
 
+  def valueOfRole(role: Role): Int
+
   // True if piece will never be able to move from pos
   // Used both for drops and moves without promotion
   def pieceInDeadZone(piece: Piece, pos: Pos): Boolean =
@@ -262,8 +264,8 @@ abstract class Variant private[variant] (
   // Returns the material imbalance in pawns
   def materialImbalance(sit: Situation): Int =
     sit.board.pieces.values.foldLeft(0) { case (acc, Piece(color, role)) =>
-      acc + Role.valueOf(role) * color.fold(1, -1)
-    } + (sit.hands(Sente).sum(Role.valueOf) - sit.hands(Gote).sum(Role.valueOf))
+      acc + valueOfRole(role) * color.fold(1, -1)
+    } + (sit.hands(Sente).sum(valueOfRole) - sit.hands(Gote).sum(valueOfRole))
 
   // Returns true if neither player can win. The game should end immediately.
   def isInsufficientMaterial(sit: Situation) =
