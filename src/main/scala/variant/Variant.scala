@@ -99,7 +99,7 @@ abstract class Variant private[variant] (
   def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] =
     if ((a.piece is Lion) || (a.piece is LionPromoted))
       a.shortUnfilteredDestinations filter { d =>
-        d.dist(midStep) == 1 && a.situation.board(d).fold(true) { capture =>
+        d.dist(midStep) == 1 && a.situation.board(d).filter(_.color == !a.color).fold(true) { capture =>
           d.dist(a.pos) == 1 || (!(capture is Lion) && !(capture is LionPromoted)) ||
           a.situation
             .board(midStep)
@@ -167,7 +167,9 @@ abstract class Variant private[variant] (
       .withLastMove(usi)
       .withLastLionCapture {
         if (
-          usi.positions.lastOption.flatMap(beforeSit.board(_)).exists(p => (p is Lion) || (p is LionPromoted))
+          usi.positions.lastOption
+            .flatMap(beforeSit.board(_))
+            .exists(p => (p is newSit.color) && ((p is Lion) || (p is LionPromoted)))
         )
           usi.positions.lastOption
         else None

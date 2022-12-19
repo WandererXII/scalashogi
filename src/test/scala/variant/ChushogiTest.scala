@@ -117,7 +117,7 @@ class ChushogiTest extends ShogiTest {
       sit3(Usi("11g11i").get).isValid must beTrue
       sit3(Usi("11g11h11i").get).isValid must beTrue
     }
-    "wiki" in {
+    "wiki and more" in {
       val sit = Sfen("12/12/12/12/7g4/6n5/5N6/12/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
       sit(Usi("7g6f").get).isValid must beTrue
       sit(Usi("7g6f5e").get).isValid must beTrue
@@ -159,18 +159,21 @@ class ChushogiTest extends ShogiTest {
       sit6(Usi("6g7f").get).isValid must beTrue
       sit6(Usi("6g7f8f").get).isValid must beTrue
 
-      val sit7Base = Sfen("12/12/12/12/12/4r7/12/12/5o3n2/4N7/12/6B5 w")
+      val sit7Base = Sfen("12/12/12/12/12/4r7/12/12/5o3n1n/4N6P/12/6B5 w - 1")
         .toSituation(shogi.variant.Chushogi)
         .get
       val sit7     = sit7Base(Usi("8f8j").get).toOption.get
       val sit7Alt  = sit7Base(Usi("7i8j+").get).toOption.get
       val sit7Alt2 = sit7Base(Usi("7i8j").get).toOption.get
+      val sit7Alt3 = sit7Base(Usi("3i4i3i").get).toOption.get
       sit7(Usi("6l8j").get).isValid must beTrue
       sit7(Usi("6l3i").get).isValid must beFalse
       sit7Alt(Usi("6l8j").get).isValid must beTrue
       sit7Alt(Usi("6l3i").get).isValid must beFalse
       sit7Alt2(Usi("6l8j").get).isValid must beTrue
       sit7Alt2(Usi("6l3i").get).isValid must beFalse
+      sit7Alt3(Usi("6l3i").get).isValid must beTrue
+      sit7Alt3(Usi("1j1i").get).isValid must beTrue
 
       val sit8 =
         Sfen("12/12/3l8/12/3b4+o3/6n5/4N7/6R5/7K4/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
