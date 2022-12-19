@@ -181,6 +181,18 @@ class ChushogiTest extends ShogiTest {
     }
   }
 
+  "isAttacked" in {
+    val sit = Sfen("12/12/12/12/12/4r7/11n/12/5o5n/4N6P/12/6B5 w - 1")
+      .toSituation(shogi.variant.Chushogi)
+      .get
+    val sitMove     = sit(Usi("1g2g1g").get).toOption.get
+    val sitMoveAlt  = sit(Usi("1i2i1i").get).toOption.get
+    val sitMoveAlt2 = sit(Usi("8f8g").get).toOption.get
+    sitMove.history.consecutiveAttacks must_== ConsecutiveAttacks.empty
+    sitMoveAlt.history.consecutiveAttacks must_== ConsecutiveAttacks(0, 1)
+    sitMoveAlt2.history.consecutiveAttacks must_== ConsecutiveAttacks(0, 1)
+  }
+
   "bare king" in {
     val sit = Sfen("12/12/12/12/6k5/4g7/4G7/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
     sit.bareKing(Gote) must beFalse

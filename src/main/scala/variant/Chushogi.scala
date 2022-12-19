@@ -311,7 +311,9 @@ case object Chushogi
     after.check || {
       usi match {
         case Usi.Move(_, dest, _, _) =>
-          after.moveActorAt(dest).exists(a => a.destinations.exists(d => after.board(d).isDefined))
+          after
+            .moveActorAt(dest)
+            .exists(a => a.destinations.exists(d => after.board(d).exists(_.color == after.color)))
         case _ => false
       }
     }

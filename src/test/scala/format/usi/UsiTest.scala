@@ -33,6 +33,12 @@ class UsiTest extends ShogiTest {
       u.promotion must beTrue
       u.usi must_== "8h2b+"
     }
+    Usi("6l5k") must beSome.like { case u: Usi.Move =>
+      u.orig must_== SQ6L
+      u.dest must_== SQ5K
+      u.promotion must beFalse
+      u.usi must_== "6l5k"
+    }
     Usi("G*8b") must beSome.like { case u: Usi.Drop =>
       u.role must_== Gold
       u.pos must_== SQ8B

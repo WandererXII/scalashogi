@@ -99,7 +99,7 @@ abstract class Variant private[variant] (
   def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] =
     if ((a.piece is Lion) || (a.piece is LionPromoted))
       a.shortUnfilteredDestinations filter { d =>
-        d.dist(midStep) == 1 && a.situation.board(d).filter(_.color == !a.color).fold(true) { capture =>
+        d.dist(midStep) == 1 && a.situation.board(d).filter(_.color != a.color).fold(true) { capture =>
           d.dist(a.pos) == 1 || (!(capture is Lion) && !(capture is LionPromoted)) ||
           a.situation
             .board(midStep)
@@ -193,7 +193,7 @@ abstract class Variant private[variant] (
     for {
       actor <- sit.moveActorAt(usi.orig) toValid s"No piece on ${usi.orig}"
       _     <- Validated.cond(actor is sit.color, (), s"Not my piece on ${usi.orig}")
-      capture = sit.board(usi.dest)
+      capture = sit.board(usi.dest).filter(_.color != sit.color)
       _ <- Validated.cond(
         !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined),
         (),
