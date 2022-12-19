@@ -20,7 +20,7 @@ object Status {
   case object Resign         extends Status(31)
   case object Stalemate      extends Status(32)
   case object Timeout        extends Status(33) // when player leaves the game
-  case object Draw           extends Status(34)
+  case object Draw           extends Status(34) // todo - separate draw by repetition and other draws
   case object Outoftime      extends Status(35) // clock flag
   case object Cheat          extends Status(36)
   case object NoStart        extends Status(37) // the player did not make the first move in time

@@ -378,7 +378,8 @@ object KifParser {
         }
       }
 
-    val termValue: Parser[String] = "中断" | "投了" | "持将棋" | "千日手" | "詰み" | "切れ負け" | "反則勝ち" | "入玉勝ち" | "Time-up"
+    val termValue: Parser[String] =
+      "中断" | "投了" | "持将棋" | "千日手" | "引き分け" | "引分け" | "詰み" | "切れ負け" | "反則勝ち" | "入玉勝ち" | "Time-up"
   }
 
   object MoveDropParser extends RegexParsers with Logging {
