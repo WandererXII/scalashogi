@@ -79,7 +79,6 @@ K . . . . N .""".autoDraw must_== false
       sfenToGame(position, Standard) must beValid.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end(true) must beFalse
-        game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
     "on a single pawn" in {
@@ -92,7 +91,6 @@ K . . . . N .""".autoDraw must_== false
       newGame must beValid.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end(true) must beFalse
-        game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
   }

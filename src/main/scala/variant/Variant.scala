@@ -274,12 +274,6 @@ abstract class Variant private[variant] (
     ((sit.hands.size + sit.board.pieces.size) <= 2) &&
       sit.board.pieces.forall { p => p._2 is King }
 
-  // Returns true if the other player cannot win. This is relevant when the
-  // side to move times out or disconnects. Instead of losing on time,
-  // the game should be drawn.
-  def opponentHasInsufficientMaterial(sit: Situation) =
-    (sit.hands(!sit.color).size + sit.board.piecesOf(!sit.color).size) <= 2
-
   protected def hasUnmovablePieces(board: Board) =
     board.pieces.exists { case (pos, piece) =>
       pieceInDeadZone(piece, pos)

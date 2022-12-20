@@ -118,8 +118,6 @@ final case class Situation(
     (history.fourfoldRepetition && !perpetualCheck) ||
       variant.isInsufficientMaterial(this)
 
-  def opponentHasInsufficientMaterial: Boolean = variant opponentHasInsufficientMaterial this
-
   def impasse = variant impasse this
 
   def end(withImpasse: Boolean): Boolean =
