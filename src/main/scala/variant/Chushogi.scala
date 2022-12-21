@@ -293,7 +293,7 @@ case object Chushogi
     } else
       a.situation.history.lastLionCapture.fold(a.unfilteredDestinations) { lionCaptureDest =>
         a.unfilteredDestinations filterNot { d =>
-          lionCaptureDest != d && a.situation.board(d).exists(Role.allLions.contains(_.role))
+          lionCaptureDest != d && a.situation.board(d).exists(p => Role.allLions.contains(p.role))
         }
       }
 
@@ -372,4 +372,12 @@ case object Chushogi
     !sit.check &&
     !sit.switch.check
   }
+
+
+  // Unmovable pieces are allowed
+  override def hasUnmovablePieces(@unused board: Board) = false
+
+  // We don't care about double pawns
+  override def hasDoublePawns(@unused board: Board, @unused color: Color) = false
+
 }
