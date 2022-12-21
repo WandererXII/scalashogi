@@ -271,7 +271,7 @@ abstract class Variant private[variant] (
 
   // Returns true if neither player can win. The game should end immediately.
   def isInsufficientMaterial(sit: Situation) =
-    ((sit.hands.size + sit.board.pieces.size) <= 2) &&
+    sit.hands.isEmpty && sit.board.pieces.size <= 2 &&
       sit.board.pieces.forall { p => p._2 is King }
 
   protected def hasUnmovablePieces(board: Board) =
@@ -290,11 +290,11 @@ abstract class Variant private[variant] (
   protected def validBoardSide(board: Board, strict: Boolean)(color: Color) = {
     val roles = board.piecesOf(color).map(_.role)
     roles.nonEmpty && roles.forall(allRoles contains _) &&
-    (!strict || {
-      roles.size <= pieces.size && roles.count(_ == King) == 1
-    }) &&
+    roles.count(_ == King) <= 1 && roles.count(_ == Prince) <= 1 &&
     !hasUnmovablePieces(board) && !hasDoublePawns(board, color) &&
-    roles.count(_ == King) <= 1
+    (!strict || {
+      roles.size <= pieces.size && (roles.count(_ == King) == 1 || roles.count(_ == Prince) == 1)
+    })
   }
 
   protected def validHands(hands: Hands) =
