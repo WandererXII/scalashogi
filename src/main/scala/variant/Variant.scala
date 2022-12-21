@@ -166,9 +166,11 @@ abstract class Variant private[variant] (
     val h = beforeSit.history
       .withLastMove(usi)
       .withLastLionCapture {
+        val roleOpt = usi.positions.headOption.flatMap(beforeSit.board(_).map(_.role))
         if (
+          roleOpt.exists(!Role.allLions.contains(_)) &&
           usi.positions.lastOption
-            .flatMap(beforeSit.board(_))
+            .flatMap(beforeSit board _)
             .exists(p => (p is newSit.color) && Role.allLions.contains(p.role))
         )
           usi.positions.lastOption

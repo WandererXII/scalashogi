@@ -373,7 +373,6 @@ case object Chushogi
     !sit.switch.check
   }
 
-
   // Unmovable pieces are allowed
   override def hasUnmovablePieces(@unused board: Board) = false
 

@@ -116,6 +116,20 @@ class ChushogiTest extends ShogiTest {
       sit3(Usi("7k7j8k").get).isValid must beTrue
       sit3(Usi("11g11i").get).isValid must beTrue
       sit3(Usi("11g11h11i").get).isValid must beTrue
+
+      val sit4Base = Sfen("11k/12/12/10bm/9N2/12/5n6/6N5/5r6/12/9K2/12 b")
+        .toSituation(shogi.variant.Chushogi)
+        .get
+      val sit4     = sit4Base(Usi("6h7g").get).toOption.get
+      val sit4Alt  = sit4Base(Usi("6h7i6h").get).toOption.get
+      val sit4Alt2 = sit4Base(Usi("6h5g6h").get).toOption.get
+
+      sit4.history.lastLionCapture must beNone
+      sit4(Usi("2d3e").get).isValid must beTrue
+      sit4Alt.history.lastLionCapture must beNone
+      sit4Alt(Usi("2d3e").get).isValid must beTrue
+      sit4Alt2.history.lastLionCapture must beNone
+      sit4Alt2(Usi("2d3e").get).isValid must beTrue
     }
     "wiki and more" in {
       val sit = Sfen("12/12/12/12/7g4/6n5/5N6/12/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
@@ -242,6 +256,12 @@ class ChushogiTest extends ShogiTest {
     val sit5 = Sfen("12/12/12/12/6k5/5K6/12/4G7/12/12/12/12 w - 1").toSituation(shogi.variant.Chushogi).get
     sit5.bareKing(Sente) must beFalse
     sit5.bareKing(Gote) must beFalse
+
+    val sit6 =
+      Sfen("5P3P2/12/12/12/6k2i2/12/12/6K1I3/12/12/12/5p5p b").toSituation(shogi.variant.Chushogi).get
+    sit6.bareKing(Gote) must beFalse
+    sit6.bareKing(Sente) must beFalse
+    sit6.autoDraw must beFalse
   }
 
   // format: off
