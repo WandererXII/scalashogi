@@ -97,10 +97,10 @@ abstract class Variant private[variant] (
   }
 
   def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] =
-    if ((a.piece is Lion) || (a.piece is LionPromoted))
+    if (Role.allLions.contains(a.piece.role))
       a.shortUnfilteredDestinations filter { d =>
         d.dist(midStep) == 1 && a.situation.board(d).filter(_.color != a.color).fold(true) { capture =>
-          d.dist(a.pos) == 1 || (!(capture is Lion) && !(capture is LionPromoted)) ||
+          d.dist(a.pos) == 1 || !Role.allLions.contains(capture.role) ||
           a.situation
             .board(midStep)
             .exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween)) ||
@@ -169,7 +169,7 @@ abstract class Variant private[variant] (
         if (
           usi.positions.lastOption
             .flatMap(beforeSit.board(_))
-            .exists(p => (p is newSit.color) && ((p is Lion) || (p is LionPromoted)))
+            .exists(p => (p is newSit.color) && Role.allLions.contains(p.role))
         )
           usi.positions.lastOption
         else None

@@ -3,6 +3,8 @@ package variant
 
 import cats.syntax.option._
 
+import scala.annotation.unused
+
 import shogi.Pos._
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
@@ -276,9 +278,9 @@ case object Chushogi
   override def supportsDrops = false
 
   override def moveFilter(a: MoveActor): List[Pos] =
-    if ((a.piece is Lion) || (a.piece is LionPromoted)) {
+    if (Role.allLions.contains(a.piece.role)) {
       val oppLions = a.situation.board.pieces.collect {
-        case (pos, piece) if ((piece is Lion) || (piece is LionPromoted)) && (piece is !a.color) => pos
+        case (pos, piece) if Role.allLions.contains(piece.role) && (piece is !a.color) => pos
       }.toList
       a.unfilteredDestinations filterNot { dest =>
         oppLions.contains(dest) && a.pos.dist(dest) > 1 && posThreatened(
@@ -291,7 +293,7 @@ case object Chushogi
     } else
       a.situation.history.lastLionCapture.fold(a.unfilteredDestinations) { lionCaptureDest =>
         a.unfilteredDestinations filterNot { d =>
-          lionCaptureDest != d && a.situation.board(d).exists(p => (p is Lion) || (p is LionPromoted))
+          lionCaptureDest != d && a.situation.board(d).exists(Role.allLions.contains(_.role))
         }
       }
 
@@ -356,12 +358,13 @@ case object Chushogi
 
   override def isInsufficientMaterial(sit: Situation) = {
     // don't count dead pieces
-    val piecesFiltered = sit.board.pieces.collect {
-      case (pos, piece)
-          if !(((piece is Pawn) || (piece is Lance)) && backrank(
-            piece.color
-          ) == pos.rank) =>
-        pos
+    val piecesFiltered = sit.board.pieces.filter { case (pos, piece) =>
+      if (
+        ((piece is Pawn) || (piece is Lance)) && backrank(
+          piece.color
+        ) == pos.rank
+      ) false
+      else true
     }
     piecesFiltered.size == 2 && sit.board.royalPossOf(sit.color).size == 1 && sit.board
       .royalPossOf(!sit.color)

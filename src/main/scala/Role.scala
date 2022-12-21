@@ -666,6 +666,11 @@ object Role {
     Silver
   )
 
+  val allLions = List[Role](
+    Lion,
+    LionPromoted
+  )
+
   val allRoyal = List[Role](
     King,
     Prince
