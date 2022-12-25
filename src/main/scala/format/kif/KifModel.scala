@@ -54,21 +54,23 @@ final case class Kif(
 object Kif {
 
   def renderNotationMove(cur: NotationMove, lastDest: Option[Pos], variant: Variant): String = {
-    val resultStr   = cur.result.fold("")(r => s"\n${moveNumberOffset(cur.moveNumber + 1)}$offset$r")
-    val timeStr     = clockString(cur) | ""
-    val glyphsNames = cur.glyphs.toList.map(_.name)
-    val commentsStr = (glyphsNames ::: cur.comments).map { text => s"\n* ${fixComment(text)}" }.mkString("")
+    val suf           = if (variant.chushogi) "手目" else ""
+    val moveNumberStr = moveNumberOffset(cur.moveNumber, suf)
+    val resultStr     = cur.result.fold("")(r => s"\n${moveNumberOffset(cur.moveNumber + 1, suf)}$offset$r")
+    val timeStr       = clockString(cur) | ""
+    val glyphsNames   = cur.glyphs.toList.map(_.name)
+    val commentsStr   = (glyphsNames ::: cur.comments).map { text => s"\n* ${fixComment(text)}" }.mkString("")
     cur.usiWithRole.usi match {
       case Usi.Move(orig, dest, prom, Some(midStep)) => {
         val m1 = Usi.WithRole(Usi.Move(orig, midStep, false, None), cur.usiWithRole.role)
         val m2 = Usi.WithRole(Usi.Move(midStep, dest, prom, None), cur.usiWithRole.role)
-        val s1 = s"${s"${moveNumberOffset(cur.moveNumber)}一歩目"} ${renderMove(m1, lastDest, variant)}"
+        val s1 = s"${s"${moveNumberStr}一歩目"} ${renderMove(m1, lastDest, variant)}"
         val s2 =
-          s"${s"${moveNumberOffset(cur.moveNumber)}二歩目"} ${renderMove(m2, None, variant)}$timeStr$commentsStr$resultStr"
+          s"${s"${moveNumberStr}二歩目"} ${renderMove(m2, None, variant)}$timeStr$commentsStr$resultStr"
         List[String](s1, s2) mkString "\n"
       }
       case _ =>
-        s"${moveNumberOffset(cur.moveNumber)}$offset${renderMove(cur.usiWithRole, lastDest, variant)}$timeStr$commentsStr$resultStr"
+        s"${moveNumberStr}$offset${renderMove(cur.usiWithRole, lastDest, variant)}$timeStr$commentsStr$resultStr"
     }
   }
 
@@ -232,8 +234,8 @@ object Kif {
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 
-  private def moveNumberOffset(moveNumber: Int) =
-    f"$moveNumber%4d"
+  private def moveNumberOffset(moveNumber: Int, suf: String) =
+    f"$moveNumber%4d${suf}"
 
   private def fixComment(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n").replace("\n", "\n* ")

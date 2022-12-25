@@ -93,10 +93,10 @@ class KifModelTest extends ShogiTest {
     ).render must_== """先手：
 後手：
 手数----指手---------消費時間--
-   1   7七金将 （←7八）
-   2   2八歩兵 （←4九）
-   3一歩目 仝龍馬 （←5九）
-   3二歩目 1一龍馬 （←2八）"""
+   1手目   7七金将 （←7八）
+   2手目   2八歩兵 （←4九）
+   3手目一歩目 仝龍馬 （←5九）
+   3手目二歩目 1一龍馬 （←2八）"""
 
     // not aware of any standard - so not sure about this...
     renderSituation(
