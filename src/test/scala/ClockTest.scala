@@ -21,6 +21,12 @@ class ClockTest extends ShogiTest {
     })
     .start
 
+  val fakeClockByo2 = Clock(60, 0, 10, 1)
+    .copy(timestamper = new Timestamper {
+      val now = Timestamp(0)
+    })
+    .start
+
   val fakeClockZero = Clock(0, 0, 10, 1)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)
@@ -206,6 +212,68 @@ class ClockTest extends ShogiTest {
       cc.time.centis must_== 0
       cc.periods must_== 1
       clock20.outOfTime(Sente, withGrace = false) must beTrue
+    }
+    "entering byoyomi and game not active - with time" in {
+      val clock21 = advance(fakeClockByo2, 65 * 100).step(MoveMetrics.empty, gameActive = false)
+      val cc      = clock21.currentClockFor(Sente)
+
+      cc.time.centis must_== 5 * 100
+      clock21.isRunning must beFalse
+      clock21.outOfTime(Sente, withGrace = false) must beFalse
+    }
+    "entering byoyomi and game active - with time" in {
+      val clock22 = advance(fakeClockByo2, 65 * 100).step(MoveMetrics.empty, gameActive = true)
+      val cc      = clock22.currentClockFor(Sente)
+
+      cc.time.centis must_== 10 * 100
+      clock22.isRunning must beTrue
+      clock22.outOfTime(Sente, withGrace = false) must beFalse
+    }
+    "entering byoyomi and game not active - without time" in {
+      val clock23 = advance(fakeClockByo2, 71 * 100).step(MoveMetrics.empty, gameActive = false)
+      val cc      = clock23.currentClockFor(Sente)
+
+      cc.time.centis must_== 0
+      clock23.isRunning must beFalse
+      clock23.outOfTime(Sente, withGrace = false) must beTrue
+    }
+    "entering byoyomi and game active - without time" in {
+      val clock24 = advance(fakeClockByo2, 71 * 100).step(MoveMetrics.empty, gameActive = true)
+      val cc      = clock24.currentClockFor(Sente)
+
+      cc.time.centis must_== 0
+      clock24.isRunning must beFalse
+      clock24.outOfTime(Sente, withGrace = false) must beTrue
+    }
+    "inside byoyomi" in {
+      val clockSente = advance(fakeClockByo2, 65 * 100).step()
+      clockSente.players(Sente).spentPeriods must_== 1
+      clockSente.outOfTime(Sente, withGrace = false) must beFalse
+
+      val clockGote = advance(clockSente, 65 * 100).step()
+      clockGote.players(Gote).spentPeriods must_== 1
+      clockGote.outOfTime(Gote, withGrace = false) must beFalse
+
+      val clockSente2 = advance(clockGote, 5 * 100).step()
+      clockSente2.players(Sente).spentPeriods must_== 1
+      clockSente2.outOfTime(Sente, withGrace = false) must beFalse
+
+      val clockGote2 = advance(clockSente2, 8 * 100).step()
+      clockGote2.players(Gote).spentPeriods must_== 1
+      clockGote2.outOfTime(Gote, withGrace = false) must beFalse
+
+      val clockSente3 = advance(clockGote2, 11 * 100).step()
+      clockSente3.players(Sente).spentPeriods must_== 1
+      clockSente3.outOfTime(Sente, withGrace = false) must beTrue
+
+      val clockSente3Alt = advance(clockGote2, 11 * 100).step(MoveMetrics.empty, gameActive = false)
+      clockSente3Alt.players(Sente).spentPeriods must_== 1
+      clockSente3Alt.outOfTime(Sente, withGrace = false) must beTrue
+
+      val clockSente3Alt2 = advance(clockGote2, 8 * 100).step(MoveMetrics.empty, gameActive = false)
+      clockSente3Alt2.players(Sente).spentPeriods must_== 1
+      clockSente3Alt2.currentClockFor(Sente).time.centis must_== 2 * 100
+      clockSente3Alt2.outOfTime(Sente, withGrace = false) must beFalse
     }
     "10s stall for zero clock with byo" in {
       val clock10 = advance(fakeClockZero, 10 * 100)

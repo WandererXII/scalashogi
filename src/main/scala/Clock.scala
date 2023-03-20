@@ -102,11 +102,11 @@ final case class Clock(
         val clockActive = gameActive && moveTime < remaining + player.periodsLeft * player.byoyomi
         // The number of periods the move stretched over
         val periodSpan = periodsInUse(color, moveTime)
-        val usingByoyomi =
+        val reloadByoyomi =
           clockActive && player.byoyomi.isPositive && (player.spentPeriods > 0 || periodSpan > 0)
 
         val newC =
-          if (usingByoyomi)
+          if (reloadByoyomi)
             updatePlayer(color) {
               _.setRemaining((remaining - moveTime) atLeast player.byoyomi)
                 .spendPeriods(periodSpan)
@@ -114,7 +114,9 @@ final case class Clock(
             }
           else
             updatePlayer(color) {
-              _.takeTime(moveTime - (clockActive ?? player.increment))
+              _.takeTime(
+                moveTime - (clockActive ?? player.increment) - (player.byoyomi.isPositive ?? player.byoyomi * periodSpan)
+              )
                 .spendPeriods(periodSpan)
                 .copy(lag = lagTrack, lastMoveTime = moveTime)
             }
