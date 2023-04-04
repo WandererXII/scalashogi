@@ -345,10 +345,6 @@ object Variant {
 
   def exists(id: Int): Boolean = byId contains id
 
-  val openingSensibleVariants: Set[Variant] = Set(
-    shogi.variant.Standard
-  )
-
   val divisionSensibleVariants: Set[Variant] = Set(
     shogi.variant.Standard
   )
