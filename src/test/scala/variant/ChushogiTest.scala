@@ -18,6 +18,12 @@ class ChushogiTest extends ShogiTest {
     }
   }
 
+  "default positions" should {
+    "be identical" in {
+      Game(shogi.variant.Chushogi).toSfen must_== shogi.variant.Chushogi.initialSfen
+    }
+  }
+
   val chushogiPerfts = List(
     ("12/12/12/12/12/12/5N6/12/12/12/12/12 b", 88),  // solo lion
     ("12/12/12/12/12/12/5+O6/12/12/12/12/12 b", 88), // solo +lion
