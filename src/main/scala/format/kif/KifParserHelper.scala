@@ -54,7 +54,7 @@ object KifParserHelper {
   private val chushogiKifMoveRegex =
     raw"""^(${KifParser.colorsS})?(${KifParser.positionS})(${chushogiFullKanjiRoles})\s*(${KifParser.parsS})?←?(${KifParser.positionS})(${KifParser.parsS})?""".r.unanchored
   private def isDefaultHandicapOf(handicap: String, variant: Variant): Boolean =
-    KifUtils.defaultHandicaps.get(variant).fold(false)(_.exists(_ == handicap))
+    KifUtils.defaultHandicaps.get(variant).fold(false)(_.exists(_ == handicap.toLowerCase))
   private def detectVariant(
       ranks: List[String],
       handicap: Option[String],
