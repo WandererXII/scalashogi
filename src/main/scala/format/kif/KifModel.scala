@@ -172,9 +172,9 @@ object Kif {
 
   private def fileNums(variant: Variant): String =
     variant match {
-      case Standard  => "  ９ ８ ７ ６ ５ ４ ３ ２ １"
-      case Minishogi => "  ５ ４ ３ ２ １"
-      case Chushogi  => " １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １"
+      case Standard | Annan => "  ９ ８ ７ ６ ５ ４ ３ ２ １"
+      case Minishogi        => "  ５ ４ ３ ２ １"
+      case Chushogi         => " １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １"
     }
 
   private def renderHand(hand: Hand, variant: Variant): String = {
