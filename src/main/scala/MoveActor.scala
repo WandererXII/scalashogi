@@ -10,7 +10,7 @@ final case class MoveActor(
     situation: Situation
 ) {
 
-  lazy val attackingPiece = situation.variant.attackingPiece(this)
+  lazy val attackingPiece = situation.variant.attackingPiece(piece, pos, situation.board)
 
   lazy val destinations: List[Pos] = situation.variant.moveFilter(this)
 

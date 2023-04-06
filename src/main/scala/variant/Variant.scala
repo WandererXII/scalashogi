@@ -77,7 +77,7 @@ abstract class Variant private[variant] (
       case _ => false
     }
 
-  def attackingPiece(a: MoveActor): Piece = a.piece
+  def attackingPiece(piece: Piece, @unused pos: Pos, @unused board: Board): Piece = piece
 
   // Filters out moves that would put the king in danger
   // Critical function - optimize for performance

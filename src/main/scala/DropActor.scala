@@ -27,8 +27,10 @@ final case class DropActor(
 object DropActor {
 
   def blockades(sit: Situation, royalPos: Pos): List[Pos] = {
-    def attacker(piece: Piece, from: Pos) =
+    def attacker(realPiece: Piece, from: Pos) = {
+      val piece = sit.variant.attackingPiece(realPiece, from, sit.board)
       piece.projectionDirs.nonEmpty && piece.eyes(from, royalPos) && piece.color != sit.color
+    }
     @scala.annotation.tailrec
     def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] =
       dir(p) match {

@@ -97,11 +97,11 @@ case object Annan
       filter: Piece => Boolean = _ => true
   ): Boolean = {
     val updatedBoard = Board(toAnnanAttackPieceMap(board.pieces))
-    super.posThreatened(updatedBoard, color, pos, filter)
+    super.posThreatened(updatedBoard, color, pos, _ => true)
   }
 
-  override def attackingPiece(a: MoveActor): Piece =
-    directlyBehind(a.pos, a.color).flatMap(a.situation.board.apply).getOrElse(a.piece)
+  override def attackingPiece(piece: Piece, pos: Pos, board: Board): Piece =
+    directlyBehind(pos, piece.color).flatMap(board.apply).filter(_.color == piece.color).getOrElse(piece)
 
   override def hasDoublePawns(board: Board, color: Color) = false
 
