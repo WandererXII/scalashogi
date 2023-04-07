@@ -62,4 +62,9 @@ class KifParserHelperTest extends ShogiTest {
       Sfen("12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b -")
     )
   }
+
+  "Variants" in {
+    parseAndCompare("", Some("5五将棋"), shogi.variant.Minishogi.initialSfen.truncate)
+    parseAndCompare("", Some("安南将棋"), shogi.variant.Annan.initialSfen.truncate)
+  }
 }
