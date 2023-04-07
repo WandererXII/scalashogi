@@ -48,20 +48,6 @@ class ChushogiTest extends ShogiTest {
     }
   }
 
-  "random chushogi positions" should {
-    "forall" in {
-      forall(randomChushogiPerfts) { line =>
-        line match {
-          case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Chushogi), Some(Sfen(sfenStr)))
-            game.situation.end(false) must beFalse
-            perft(game, 1) must be equalTo d1.toInt
-          }
-        }
-      }
-    }
-  }
-
   "move legaility" should {
     "lion" in {
       val sit = Sfen("12/12/12/12/12/6+O5/12/12/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
@@ -270,8 +256,22 @@ class ChushogiTest extends ShogiTest {
     sit6.autoDraw must beFalse
   }
 
+  "fixture perfts" should {
+    "forall" in {
+      forall(fixturePerfts) { line =>
+        line match {
+          case (sfenStr, d1) => {
+            val game = Game(Some(shogi.variant.Chushogi), Some(Sfen(sfenStr)))
+            game.situation.end(false) must beFalse
+            perft(game, 1) must be equalTo d1.toInt
+          }
+        }
+      }
+    }
+  }
+
   // format: off
-  val randomChushogiPerfts: List[(String, String)] = List(
+  val fixturePerfts: List[(String, String)] = List(
     ("lfcsg2gso1l/a1bdtet2fc1/2r2q1k1r1a/mv1x+P1+Pp1bvm/3p3d2pp/1Q4h1p2h/P1piD5PP/5B2iPV1/2HP1ONPP3/MCVTED1GBT1M/A1S4XH1RA/LF1RGK2SCFL w - 142", "113"),
     ("lt5s1v1l/a1v1q3s2a/f2gge2kcf+A/2bc+H+Pt2+Po1/mpS1P3bOV1/1VD9/5E6/4+iB1PP1M+L/1+p6R3/A1C1K2R3S/L2XGBG2F2/2F2TT1HD2 b - 369", "171"),
     ("l2e1tsg1hbl/avbs1dxtn1ca/f1g2k1d2rm/1r1h1q2ov1f/m3c1p5/P1Pp2OP1P2/RVD2p5p/3P1P4pM/B5PG1B1V/1M2SNQE1R2/AC3TDTHF1A/LF1G1K1H1SCL w - 230", "126"),

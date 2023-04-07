@@ -46,20 +46,6 @@ class AnnanTest extends ShogiTest {
     }
   }
 
-  "random annan positions" should {
-    "forall" in {
-      forall(randomAnnanPerfts) { line =>
-        line match {
-          case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Annan), Some(Sfen(sfenStr)))
-            game.situation.end(false) must beFalse
-            perft(game, 1) must be equalTo d1.toInt
-          }
-        }
-      }
-    }
-  }
-
   "move legaility" should {
     "not checkmate" in {
       val sit = Sfen("4k4/4+R4/4L4/9/9/9/9/7GS/7GK w").toSituation(shogi.variant.Annan).get
@@ -155,8 +141,22 @@ class AnnanTest extends ShogiTest {
     }
   }
 
+  "fixture perfts" should {
+    "forall" in {
+      forall(fixturePerfts) { line =>
+        line match {
+          case (sfenStr, d1) => {
+            val game = Game(Some(shogi.variant.Annan), Some(Sfen(sfenStr)))
+            game.situation.end(false) must beFalse
+            perft(game, 1) must be equalTo d1.toInt
+          }
+        }
+      }
+    }
+  }
+
   // format: off
-  val randomAnnanPerfts: List[(String, String)] = List(
+  val fixturePerfts: List[(String, String)] = List(
     ("3k2s1l/l1g1Rg1+P1/6+P1n/PPn1p1bP1/1pPpppP2/1p3P2p/+s1NSP3N/5G1RL/B2GK1S2 w Plp 66", "101"),
     ("P2p3rb/l6sp/n1pg2k1n/gPnPp4/2pP2p+BP/4pP1l1/L+pS1G1KRL/G1P3P2/1N5P1 w 2sp 138", "103"),
     ("6PG1/P1ks1p1sl/l1ng4n/p2p1n1Pp/p1r1P3B/spP2P2P/N1BP2+p1L/L1S1G1p+p1/3GK2R1 b p 103", "38"),
