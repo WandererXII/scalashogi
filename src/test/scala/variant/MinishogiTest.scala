@@ -24,4 +24,10 @@ class MinishogiTest extends ShogiTest {
     // }
   }
 
+  "default positions" should {
+    "be identical" in {
+      Game(shogi.variant.Minishogi).toSfen must_== shogi.variant.Minishogi.initialSfen
+    }
+  }
+
 }

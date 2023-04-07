@@ -10,14 +10,16 @@ final case class MoveActor(
     situation: Situation
 ) {
 
+  lazy val attackingPiece = situation.variant.attackingPiece(piece, pos, situation.board)
+
   lazy val destinations: List[Pos] = situation.variant.moveFilter(this)
 
   // Destinations where the piece can end up after the entire move
   // without move filter - e.g. not taking defending the king into account
   def unfilteredDestinations: List[Pos] =
-    shortUnfilteredDestinations ::: longRange(piece.projectionDirs)
+    shortUnfilteredDestinations ::: longRange(attackingPiece.projectionDirs)
 
-  lazy val shortUnfilteredDestinations = shortRange(piece.directDirs)
+  lazy val shortUnfilteredDestinations = shortRange(attackingPiece.directDirs)
 
   lazy val lionMoveDestinationsMap: Map[Pos, List[Pos]] =
     if (piece.role.hasLionPower)

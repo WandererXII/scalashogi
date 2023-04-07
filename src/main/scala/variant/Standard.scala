@@ -15,8 +15,8 @@ case object Standard
 
   val initialSfen = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1")
 
-  val numberOfRanks: Int = 9
-  val numberOfFiles: Int = 9
+  val numberOfRanks = 9
+  val numberOfFiles = 9
 
   val allPositions = (SQ9I upTo SQ1A).toList
 

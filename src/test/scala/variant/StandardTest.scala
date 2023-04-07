@@ -50,6 +50,12 @@ class StandardTest extends ShogiTest {
     ("7lk/9/8S/9/9/9/9/7L1/8K b P", "85", "639")
   )
 
+  "default positions" should {
+    "be identical" in {
+      Game(shogi.variant.Standard).toSfen must_== shogi.variant.Standard.initialSfen
+    }
+  }
+
   "random positions" should {
     "forall" in {
       forall(random) { line =>

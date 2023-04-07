@@ -77,6 +77,8 @@ abstract class Variant private[variant] (
       case _ => false
     }
 
+  def attackingPiece(piece: Piece, @unused pos: Pos, @unused board: Board): Piece = piece
+
   // Filters out moves that would put the king in danger
   // Critical function - optimize for performance
   def moveFilter(a: MoveActor): List[Pos] = {
@@ -308,6 +310,7 @@ abstract class Variant private[variant] (
   def standard  = this == Standard
   def minishogi = this == Minishogi
   def chushogi  = this == Chushogi
+  def annan     = this == Annan
 
   override def toString = s"Variant($name)"
 
@@ -322,7 +325,8 @@ object Variant {
   val all = List[Variant](
     Standard,
     Minishogi,
-    Chushogi
+    Chushogi,
+    Annan
   )
 
   val byId: Map[Int, Variant] = all map { v =>
@@ -344,10 +348,6 @@ object Variant {
     all find (_.name.toLowerCase == name.toLowerCase)
 
   def exists(id: Int): Boolean = byId contains id
-
-  val openingSensibleVariants: Set[Variant] = Set(
-    shogi.variant.Standard
-  )
 
   val divisionSensibleVariants: Set[Variant] = Set(
     shogi.variant.Standard
