@@ -77,15 +77,32 @@ class AnnanTest extends ShogiTest {
       val sit = Sfen("5k3/9/9/5l3/5p3/9/2B6/9/5K3 b").toSituation(shogi.variant.Annan).get
       sit(Usi("7g5e").get).isValid must beFalse
       sit(Usi("7g4d").get).isValid must beTrue
+
+      val sit2 = Sfen("5k3/9/9/7b1/5P3/5L3/9/9/5K3 w").toSituation(shogi.variant.Annan).get
+      sit2(Usi("2d4f").get).isValid must beTrue
+      perft(Game(sit2), 1) must_== 5
     }
     "capture move giver to defend from check with king" in {
       val sit = Sfen("9/8k/9/9/9/9/9/p+r7/K8 b").toSituation(shogi.variant.Annan).get
       sit(Usi("9i8e").get).isValid must beFalse
       sit(Usi("9i8h").get).isValid must beTrue
+
+      val sit = Sfen("9/7Pk/7+R1/9/9/9/9/9/8K w").toSituation(shogi.variant.Annan).get
+      sit(Usi("1b2c").get).isValid must beTrue
     }
     "do not allow capturing move givers that prevent check" in {
-      val sit = Sfen("2k5N/3p2+P1G/1+P+P1s2+P+L/1pg1bS3/6Bp1/6G1P/1K1SL+pP2/+ln+pRG1+p1+p/1+lP1+p2R1 b SN2Pnp").toSituation(shogi.variant.Annan).get
+      val sit = Sfen(
+        "2k5N/3p2+P1G/1+P+P1s2+P+L/1pg1bS3/6Bp1/6G1P/1K1SL+pP2/+ln+pRG1+p1+p/1+lP1+p2R1 b SN2Pnp"
+      ).toSituation(shogi.variant.Annan).get
       sit(Usi("4d5c").get).isValid must beFalse
+
+      val sit2 = Sfen("3k5/9/9/3p5/3bG4/9/9/6K2/9 b").toSituation(shogi.variant.Annan).get
+      sit2(Usi("5e6d").get).isValid must beFalse
+      perft(Game(sit2), 1) must_== 13
+
+      val sit3 = Sfen("6k2/p8/9/3Bs4/3R5/9/9/6K2/9 w").toSituation(shogi.variant.Annan).get
+      sit3(Usi("5d6e").get).isValid must beFalse
+      perft(Game(sit), 1) must_== 10
     }
     "king captures protected piece" in {
       val sit = Sfen("k8/9/9/5K3/6g2/6p2/9/9/9 b").toSituation(shogi.variant.Annan).get
@@ -93,7 +110,7 @@ class AnnanTest extends ShogiTest {
     }
     "only friendly pieces give you moves" in {
       val sit = Sfen("9/9/9/4P4/4r4/9/9/9/K7k b").toSituation(shogi.variant.Annan).get
-      perft(Game(sit), 1) must_== 1
+      perft(Game(sit), 1) must_== 5
     }
     "pawn checkmate not valid" in {
       val sit = Sfen("4k4/9/4G4/9/9/9/9/9/9 b P").toSituation(shogi.variant.Annan).get
