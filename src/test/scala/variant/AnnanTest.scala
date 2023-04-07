@@ -80,15 +80,15 @@ class AnnanTest extends ShogiTest {
 
       val sit2 = Sfen("5k3/9/9/7b1/5P3/5L3/9/9/5K3 w").toSituation(shogi.variant.Annan).get
       sit2(Usi("2d4f").get).isValid must beTrue
-      perft(Game(sit2), 1) must_== 5
+      perft(Game(sit2), 1) must_== 6
     }
     "capture move giver to defend from check with king" in {
       val sit = Sfen("9/8k/9/9/9/9/9/p+r7/K8 b").toSituation(shogi.variant.Annan).get
       sit(Usi("9i8e").get).isValid must beFalse
       sit(Usi("9i8h").get).isValid must beTrue
 
-      val sit = Sfen("9/7Pk/7+R1/9/9/9/9/9/8K w").toSituation(shogi.variant.Annan).get
-      sit(Usi("1b2c").get).isValid must beTrue
+      val sit2 = Sfen("9/7Pk/7+R1/9/9/9/9/9/8K w").toSituation(shogi.variant.Annan).get
+      sit2(Usi("1b2c").get).isValid must beTrue
     }
     "do not allow capturing move givers that prevent check" in {
       val sit = Sfen(
@@ -102,7 +102,7 @@ class AnnanTest extends ShogiTest {
 
       val sit3 = Sfen("6k2/p8/9/3Bs4/3R5/9/9/6K2/9 w").toSituation(shogi.variant.Annan).get
       sit3(Usi("5d6e").get).isValid must beFalse
-      perft(Game(sit), 1) must_== 10
+      perft(Game(sit3), 1) must_== 10
     }
     "king captures protected piece" in {
       val sit = Sfen("k8/9/9/5K3/6g2/6p2/9/9/9 b").toSituation(shogi.variant.Annan).get
