@@ -155,5 +155,50 @@ class ImpasseTest extends ShogiTest {
         }
       }
     }
+    "annan" in {
+      "yes" in {
+        "all pieces on the board" in {
+          val g = sfenToGame(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"), shogi.variant.Annan)
+          g must beValid.like { case game =>
+            game.situation.impasse must beTrue
+            game.situation.winner must beSome.like { case color =>
+              color.sente
+            }
+          }
+        }
+        "some from hand" in {
+          val g = sfenToGame(Sfen("G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2R2B 1"), shogi.variant.Annan)
+          g must beValid.like { case game =>
+            game.situation.impasse must beTrue
+            game.situation.winner must beSome.like { case color =>
+              color.sente
+            }
+          }
+        }
+      }
+      "no" in {
+        "position with less than 10 other pieces in promotion zone" in {
+          val g = sfenToGame(Sfen("2SGS4/+B+RGKG2RB/9/9/7pp/8k/9/9/9 b g2s4n4l16p 1"), shogi.variant.Annan)
+          g must beValid.like { case game =>
+            game.situation.impasse must beFalse
+            game.situation.winner must beNone
+          }
+        }
+        "position without the king in promotion zone" in {
+          val g = sfenToGame(Sfen("2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 b - 1"), shogi.variant.Annan)
+          g must beValid.like { case game =>
+            game.situation.impasse must beFalse
+            game.situation.winner must beNone
+          }
+        }
+        "position without enough value" in {
+          val g = sfenToGame(Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"), shogi.variant.Annan)
+          g must beValid.like { case game =>
+            game.situation.impasse must beFalse
+            game.situation.winner must beNone
+          }
+        }
+      }
+    }
   }
 }

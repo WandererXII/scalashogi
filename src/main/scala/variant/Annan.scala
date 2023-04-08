@@ -105,4 +105,6 @@ case object Annan
 
   override def hasDoublePawns(board: Board, color: Color) = false
 
+  override def impasse(sit: Situation): Boolean = Standard.impasse(sit)
+
 }
