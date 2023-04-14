@@ -144,7 +144,7 @@ case object Standard
   // Since this rule applies only to handicap games, only gote/uwate can be affected
   private def missingImpassePoints(sit: Situation): Int =
     sit.history.initialSfen
-      .filter(StartingPosition isHandicap _)
+      .filter(Handicap.isHandicap(_, sit.variant))
       .flatMap(_.toSituation(sit.variant))
       .fold(0) { initSit =>
         math.max(

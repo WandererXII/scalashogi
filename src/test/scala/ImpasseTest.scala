@@ -175,6 +175,20 @@ class ImpasseTest extends ShogiTest {
             }
           }
         }
+        "17 points for gote (uwate), but annan handicap" in {
+          val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), shogi.variant.Annan)
+          g must beValid.like { case game =>
+            val handicapGame = game.withHistory(
+              game.situation.history.withInitialSfen(
+                Sfen("lnsgkgsnl/9/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1")
+              )
+            )
+            handicapGame.situation.impasse must beTrue
+            handicapGame.situation.winner must beSome.like { case color =>
+              color.gote
+            }
+          }
+        }
       }
       "no" in {
         "position with less than 10 other pieces in promotion zone" in {
@@ -192,10 +206,23 @@ class ImpasseTest extends ShogiTest {
           }
         }
         "position without enough value" in {
-          val g = sfenToGame(Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"), shogi.variant.Annan)
+          val g =
+            sfenToGame(Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"), shogi.variant.Annan)
           g must beValid.like { case game =>
             game.situation.impasse must beFalse
             game.situation.winner must beNone
+          }
+        }
+        "17 points for gote (uwate), but standard handicap" in {
+          val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), shogi.variant.Annan)
+          g must beValid.like { case game =>
+            val handicapGame = game.withHistory(
+              game.situation.history.withInitialSfen(
+                Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+              )
+            )
+            handicapGame.situation.impasse must beFalse
+            handicapGame.situation.winner must beNone
           }
         }
       }
