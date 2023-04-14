@@ -10,7 +10,7 @@ case object Annan
       key = "annan",
       name = "Annan shogi",
       shortName = "Annan",
-      title = "Pieces inherit the moves from the friendly piece behind them"
+      title = "Pieces move like the friendly piece behind them"
     ) {
 
   val initialSfen = Sfen("lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1")
