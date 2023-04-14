@@ -38,7 +38,7 @@ final case class Tags(value: List[Tag]) extends AnyVal {
 
   def variant: Option[shogi.variant.Variant] =
     apply(_.Variant).map(_.toLowerCase).flatMap { case name =>
-      shogi.variant.Variant byName name
+      shogi.variant.Variant byAnyName name
     }
 
   def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Start) orElse apply(_.End)

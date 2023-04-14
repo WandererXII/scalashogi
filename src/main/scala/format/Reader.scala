@@ -55,7 +55,7 @@ object Reader {
 
   private def makeGame(tags: Tags) =
     Game(
-      variantOption = tags(_.Variant) flatMap shogi.variant.Variant.byName,
+      variantOption = tags(_.Variant) flatMap shogi.variant.Variant.byAnyName,
       sfen = tags.sfen
     ).copy(
       clock = tags.clockConfig map Clock.apply

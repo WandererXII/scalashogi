@@ -344,8 +344,14 @@ object Variant {
   def orDefault(id: Int): Variant         = apply(id) | default
   def orDefault(key: String): Variant     = apply(key) | default
 
+  def byAnyName(name: String): Option[Variant] =
+    byName(name).orElse(byShortName(name))
+
   def byName(name: String): Option[Variant] =
     all find (_.name.toLowerCase == name.toLowerCase)
+
+  def byShortName(shortName: String): Option[Variant] =
+    all find (_.shortName.toLowerCase == shortName.toLowerCase)
 
   def exists(id: Int): Boolean = byId contains id
 
