@@ -12,14 +12,38 @@ class HandicapTest extends ShogiTest {
       Handicap.allByVariant(shogi.variant.Annan).size must_== 15
     }
     "recognize handicap" in {
-      Handicap.isHandicap(Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"), shogi.variant.Standard) must beTrue
-      Handicap.isHandicap(Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"), shogi.variant.Annan) must beFalse
-      Handicap.isHandicap(Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 2"), shogi.variant.Standard) must beTrue
-      Handicap.isHandicap(Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w -"), shogi.variant.Standard) must beTrue
-      Handicap.isHandicap(Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w P"), shogi.variant.Standard) must beFalse
-      Handicap.isHandicap(Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w"), shogi.variant.Standard) must beFalse
-      Handicap.isHandicap(Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL"), shogi.variant.Standard) must beFalse
-      Handicap.isHandicap(Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b"), shogi.variant.Standard) must beFalse
+      Handicap.isHandicap(
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+        shogi.variant.Standard
+      ) must beTrue
+      Handicap.isHandicap(
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+        shogi.variant.Annan
+      ) must beFalse
+      Handicap.isHandicap(
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 2"),
+        shogi.variant.Standard
+      ) must beTrue
+      Handicap.isHandicap(
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w -"),
+        shogi.variant.Standard
+      ) must beTrue
+      Handicap.isHandicap(
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w P"),
+        shogi.variant.Standard
+      ) must beFalse
+      Handicap.isHandicap(
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w"),
+        shogi.variant.Standard
+      ) must beFalse
+      Handicap.isHandicap(
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL"),
+        shogi.variant.Standard
+      ) must beFalse
+      Handicap.isHandicap(
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b"),
+        shogi.variant.Standard
+      ) must beFalse
     }
   }
 
