@@ -147,7 +147,7 @@ object Handicap {
         Sfen("2sgk/4p/5/P4/KGSBR w - 1")
       ),
       Handicap(
-        "二枚落ち",
+        "三枚落ち",
         "3-piece",
         Sfen("3gk/4p/5/P4/KGSBR w - 1")
       ),
@@ -159,21 +159,21 @@ object Handicap {
     ),
     variant.Chushogi -> List(
       Handicap(
-        "3枚獅子",
+        "三枚獅子",
         "3-piece lion",
         Sfen(
           "lfcsgekgscfl/a1b1txxt1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1T+O+OT1B1A/LFCSGKEGSCFL w - 1"
         )
       ),
       Handicap(
-        "2枚獅子",
+        "二枚獅子",
         "2-lions",
         Sfen(
           "lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1T+OXT1B1A/LFCSGKEGSCFL w - 1"
         )
       ),
       Handicap(
-        "2枚王",
+        "二枚王",
         "2-kings",
         Sfen(
           "lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGK+EGSCFL w - 1"
