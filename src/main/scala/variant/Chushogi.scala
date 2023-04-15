@@ -14,7 +14,6 @@ case object Chushogi
       id = 3,
       key = "chushogi",
       name = "Chushogi",
-      shortName = "Chushogi",
       title = "The most popular historical variant of modern shogi"
     ) {
 

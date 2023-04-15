@@ -9,7 +9,6 @@ case object Standard
       id = 1,
       key = "standard",
       name = "Standard",
-      shortName = "Std",
       title = "Standard rules of shogi"
     ) {
 

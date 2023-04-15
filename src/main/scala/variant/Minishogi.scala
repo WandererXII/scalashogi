@@ -9,7 +9,6 @@ case object Minishogi
       id = 2,
       key = "minishogi",
       name = "Minishogi",
-      shortName = "Minishogi",
       title = "Same rules, smaller board"
     ) {
 

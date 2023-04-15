@@ -13,7 +13,6 @@ abstract class Variant private[variant] (
     val id: Int,
     val key: String,
     val name: String,
-    val shortName: String,
     val title: String
 ) {
 
@@ -307,10 +306,10 @@ abstract class Variant private[variant] (
   def valid(sit: Situation, strict: Boolean) =
     validHands(sit.hands) && Color.all.forall(validBoardSide(sit.board, strict) _)
 
-  def standard  = this == Standard
-  def minishogi = this == Minishogi
-  def chushogi  = this == Chushogi
-  def annan     = this == Annan
+  def standard   = this == Standard
+  def minishogi  = this == Minishogi
+  def chushogi   = this == Chushogi
+  def annanshogi = this == Annanshogi
 
   override def toString = s"Variant($name)"
 
@@ -326,7 +325,7 @@ object Variant {
     Standard,
     Minishogi,
     Chushogi,
-    Annan
+    Annanshogi
   )
 
   val byId: Map[Int, Variant] = all map { v =>
@@ -344,20 +343,17 @@ object Variant {
   def orDefault(id: Int): Variant         = apply(id) | default
   def orDefault(key: String): Variant     = apply(key) | default
 
-  def byAnyName(name: String): Option[Variant] =
-    byName(name).orElse(byShortName(name))
-
   def byName(name: String): Option[Variant] =
     all find (_.name.toLowerCase == name.toLowerCase)
 
-  def byShortName(shortName: String): Option[Variant] =
-    all find (_.shortName.toLowerCase == shortName.toLowerCase)
+  def byKeyOrName(keyOrName: String): Option[Variant] =
+    byKey.get(keyOrName).orElse(byName(keyOrName))
 
   def exists(id: Int): Boolean = byId contains id
 
   val divisionSensibleVariants: Set[Variant] = Set(
     shogi.variant.Standard,
-    shogi.variant.Annan
+    shogi.variant.Annanshogi
   )
 
 }
