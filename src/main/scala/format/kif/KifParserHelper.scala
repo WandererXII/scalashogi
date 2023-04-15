@@ -12,7 +12,7 @@ object KifParserHelper {
 
   def parseSituation(
       str: String,
-      handicap: Option[String],
+      handicapString: Option[String],
       moves: List[String]
   ): Validated[String, Situation] = {
     val lines = augmentString(str).linesIterator.toList.map(_.trim.replace("：", ":").replace("　", " "))
@@ -26,11 +26,11 @@ object KifParserHelper {
       )
       .toList
 
-    val variant = detectVariant(ranks, handicap, moves) | Standard
+    val variant = detectVariant(ranks, handicapString, moves) | Standard
 
     if (ranks.isEmpty)
-      handicap
-        .filterNot(h => KifUtils.defaultHandicaps.exists(_._2.exists(_ == h)))
+      handicapString
+        .filterNot(h => KifUtils.defaultHandicaps.get(variant).exists(_.exists(_ == h)))
         .fold(valid(Situation(variant)): Validated[String, Situation])(parseHandicap(_, variant))
     else if (ranks.size == variant.numberOfRanks)
       for {
@@ -57,16 +57,16 @@ object KifParserHelper {
     KifUtils.defaultHandicaps.get(variant).fold(false)(_.exists(_ == handicap.toLowerCase))
   private def detectVariant(
       ranks: List[String],
-      handicap: Option[String],
+      handicapString: Option[String],
       moves: List[String]
   ): Option[Variant] = {
     if (
       ranks.size == 5 ||
-      handicap.exists(isDefaultHandicapOf(_, Minishogi))
+      handicapString.exists(isDefaultHandicapOf(_, Minishogi))
     ) Minishogi.some
     else if (ranks.size == 12 || moves.exists(m => chushogiKifMoveRegex.matches(m)))
       Chushogi.some
-    else if (handicap.exists(isDefaultHandicapOf(_, Annan)))
+    else if (handicapString.exists(isDefaultHandicapOf(_, Annan)))
       Annan.some
     else None
   }
@@ -145,13 +145,16 @@ object KifParserHelper {
     else valid(Hands(variant))
   }
 
-  // supporting only handicaps for standard shogi
   private def parseHandicap(str: String, variant: Variant): Validated[String, Situation] =
     for {
-      hPosition <- StartingPosition.handicaps.positions.find(
-        _.japanese == str
-      ) toValid s"Unknown handicap: $str"
-      situation <- hPosition.sfen.toSituation(variant) toValid s"Cannot parse handicap: $str"
+      handicap <- Handicap.allByVariant
+        .get(variant)
+        .flatMap(
+          _.find(
+            _.japanese == str
+          )
+        ) toValid s"Unknown handicap: $str"
+      situation <- handicap.sfen.toSituation(variant) toValid s"Cannot parse handicap: $str"
     } yield situation
 
   def createResult(termination: Option[Tag], color: Color): Option[Tag] = {

@@ -100,20 +100,21 @@ object Kif {
       }
     }
 
-  def renderHeader(tags: Tags): String =
+  def renderHeader(tags: Tags): String = {
+    val variant = tags.variant | Standard
     headerTags
       .map { tag =>
         // we need these even empty
         if (tag == Tag.Sente || tag == Tag.Gote) {
           val playerName = tags(tag.name) | ""
           val playerTag = {
-            if (!tags.sfen.exists(StartingPosition isHandicap _)) tag.kifName
+            if (!tags.sfen.exists(Handicap.isHandicap(_, variant))) tag.kifName
             else if (tag == Tag.Sente) "下手"
             else "上手"
           }
           s"$playerTag：${if (playerName == "?") "" else playerName}"
         } else if (tag == Tag.Handicap) {
-          renderSetup(tags.sfen, tags.variant | Standard)
+          renderSetup(tags.sfen, variant)
         } else {
           tags(tag.name).fold("")(tagValue => {
             if (tagValue != "?" && tagValue != "") s"${tag.kifName}：$tagValue"
@@ -123,6 +124,7 @@ object Kif {
       }
       .filter(_.nonEmpty)
       .mkString("\n")
+  }
 
   def renderSetup(sfen: Option[Sfen], variant: Variant): String =
     sfen
@@ -134,9 +136,9 @@ object Kif {
           s"${Tag.Handicap.kifName}：$handicapName"
         }
       } { sf =>
-        getHandicapName(sf).fold(sf.toSituation(variant).fold("")(renderSituation _))(hc =>
-          s"${Tag.Handicap.kifName}：$hc"
-        )
+        getHandicapName(sf, variant)
+          .filter(_ => variant.standard)
+          .fold(sf.toSituation(variant).fold("")(renderSituation _))(hc => s"${Tag.Handicap.kifName}：$hc")
       }
 
   def renderSituation(sit: Situation): String = {
@@ -160,6 +162,7 @@ object Kif {
       if (y < nbRanks) kifBoard append '\n'
     }
     List[String](
+      if (sit.variant.annan) s"手合割：${KifUtils.defaultHandicaps.get(sit.variant).map(_.head) | ""}" else "",
       if (sit.variant.supportsDrops) s"後手の持駒：${renderHand(sit.hands(Gote), sit.variant)}" else "",
       fileNums(sit.variant),
       s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
@@ -222,8 +225,8 @@ object Kif {
     Tag.Opening
   )
 
-  private def getHandicapName(sfen: Sfen): Option[String] =
-    StartingPosition.handicaps.positions.find(_.sfen.truncate == sfen.truncate).map(t => t.japanese)
+  private def getHandicapName(sfen: Sfen, variant: Variant): Option[String] =
+    Handicap.allByVariant.get(variant).flatMap(_.find(_.sfen.truncate == sfen.truncate).map(t => t.japanese))
 
   private def clockString(cur: NotationMove): Option[String] =
     cur.secondsSpent.map(spent =>
