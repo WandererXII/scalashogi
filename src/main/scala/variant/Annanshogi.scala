@@ -4,12 +4,11 @@ package variant
 import shogi.Pos._
 import shogi.format.forsyth.Sfen
 
-case object Annan
+case object Annanshogi
     extends Variant(
       id = 4,
-      key = "annan",
+      key = "annanshogi",
       name = "Annan shogi",
-      shortName = "Annan",
       title = "Pieces move like the friendly piece behind them"
     ) {
 

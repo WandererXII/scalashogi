@@ -162,7 +162,8 @@ object Kif {
       if (y < nbRanks) kifBoard append '\n'
     }
     List[String](
-      if (sit.variant.annan) s"手合割：${KifUtils.defaultHandicaps.get(sit.variant).map(_.head) | ""}" else "",
+      if (sit.variant.annanshogi) s"手合割：${KifUtils.defaultHandicaps.get(sit.variant).map(_.head) | ""}"
+      else "",
       if (sit.variant.supportsDrops) s"後手の持駒：${renderHand(sit.hands(Gote), sit.variant)}" else "",
       fileNums(sit.variant),
       s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
@@ -175,9 +176,9 @@ object Kif {
 
   private def fileNums(variant: Variant): String =
     variant match {
-      case Standard | Annan => "  ９ ８ ７ ６ ５ ４ ３ ２ １"
-      case Minishogi        => "  ５ ４ ３ ２ １"
-      case Chushogi         => " １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １"
+      case Standard | Annanshogi => "  ９ ８ ７ ６ ５ ４ ３ ２ １"
+      case Minishogi             => "  ５ ４ ３ ２ １"
+      case Chushogi              => " １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １"
     }
 
   private def renderHand(hand: Hand, variant: Variant): String = {

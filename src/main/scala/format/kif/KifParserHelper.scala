@@ -66,8 +66,8 @@ object KifParserHelper {
     ) Minishogi.some
     else if (ranks.size == 12 || moves.exists(m => chushogiKifMoveRegex.matches(m)))
       Chushogi.some
-    else if (handicapString.exists(isDefaultHandicapOf(_, Annan)))
-      Annan.some
+    else if (handicapString.exists(isDefaultHandicapOf(_, Annanshogi)))
+      Annanshogi.some
     else None
   }
 

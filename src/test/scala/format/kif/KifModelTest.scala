@@ -121,11 +121,11 @@ class KifModelTest extends ShogiTest {
 
   }
 
-  "render kif situation - default annan" in {
+  "render kif situation - default annanshogi" in {
     renderHeader(
       Tags(
         List(
-          Tag(_.Variant, "Annan"),
+          Tag(_.Variant, "Annanshogi"),
           Tag(_.Sfen, Sfen("lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1")),
           Tag(_.Sente, "A")
         )
@@ -135,11 +135,11 @@ class KifModelTest extends ShogiTest {
 後手："""
   }
 
-  "render kif situation with handicap - annan" in {
+  "render kif situation with handicap - annanshogi" in {
     renderHeader(
       Tags(
         List(
-          Tag(_.Variant, "Annan"),
+          Tag(_.Variant, "Annanshogi"),
           Tag(_.Sfen, Sfen("ln2k2nl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1")),
           Tag(_.Sente, "A")
         )
@@ -164,11 +164,11 @@ class KifModelTest extends ShogiTest {
 上手："""
   }
 
-  "render kif situation - annan" in {
+  "render kif situation - annanshogi" in {
     renderHeader(
       Tags(
         List(
-          Tag(_.Variant, "Annan"),
+          Tag(_.Variant, "Annanshogi"),
           Tag(_.Sfen, Sfen("3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p")),
           Tag(_.Sente, "A")
         )

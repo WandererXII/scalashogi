@@ -180,7 +180,7 @@ object Handicap {
         )
       )
     ),
-    variant.Annan -> List(
+    variant.Annanshogi -> List(
       Handicap(
         "香落ち",
         "Lance",

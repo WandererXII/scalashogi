@@ -82,15 +82,15 @@ object KifUtils {
 
   // head used in kif model
   val defaultHandicaps: Map[Variant, NonEmptyList[String]] = Map(
-    Minishogi -> NonEmptyList.of("5五将棋", "五々将棋", "５五将棋", "5五", "五々", "５五", "minishogi"),
-    Standard  -> NonEmptyList.of("平手"),
-    Chushogi  -> NonEmptyList.of("平手", "中将棋", "chushogi", "chuushogi"),
-    Annan     -> NonEmptyList.of("安南将棋", "安南", "annan")
+    Minishogi  -> NonEmptyList.of("5五将棋", "五々将棋", "５五将棋", "5五", "五々", "５五", "minishogi"),
+    Standard   -> NonEmptyList.of("平手"),
+    Chushogi   -> NonEmptyList.of("平手", "中将棋", "chushogi", "chuushogi"),
+    Annanshogi -> NonEmptyList.of("安南将棋", "安南", "annanshogi")
   )
 
   def toKif(role: Role, variant: Variant): Option[NonEmptyList[String]] =
     variant match {
-      case Standard | Annan =>
+      case Standard | Annanshogi =>
         toKifStandard get role
       case Minishogi =>
         toKifMinishogi get role
@@ -100,7 +100,7 @@ object KifUtils {
 
   def toRole(str: String, variant: Variant): Option[NonEmptyList[Role]] =
     variant match {
-      case Standard | Annan =>
+      case Standard | Annanshogi =>
         toRoleStandard get str
       case Minishogi =>
         toRoleMinishogi get str
@@ -231,7 +231,7 @@ object KifUtils {
 
   private def toKifBoard(role: Role, variant: Variant): Option[String] =
     variant match {
-      case Standard | Annan =>
+      case Standard | Annanshogi =>
         toKifBoardStandard get role
       case Minishogi =>
         toKifBoardMinishogi get role

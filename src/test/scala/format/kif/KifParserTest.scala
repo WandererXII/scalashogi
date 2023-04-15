@@ -684,21 +684,21 @@ class KifParserTest extends ShogiTest {
     }
   }
 
-  "annan" in {
+  "annanshogi" in {
     parser("""
       先手：先手
       手合割：安南将棋
     """) must beValid.like { case a =>
       a.tags.sfen must beSome.like { sfen =>
-        sfen == shogi.variant.Annan.initialSfen.truncate
+        sfen == shogi.variant.Annanshogi.initialSfen.truncate
       }
       a.tags.variant must beSome.like { v =>
-        v === shogi.variant.Annan
+        v === shogi.variant.Annanshogi
       }
     }
   }
 
-  "annan with board" in {
+  "annanshogi with board" in {
     parser("""
       後手：
       手合割：安南将棋
@@ -722,7 +722,7 @@ class KifParserTest extends ShogiTest {
         sfen.value == "3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p"
       }
       a.tags.variant must beSome.like { v =>
-        v === shogi.variant.Annan
+        v === shogi.variant.Annanshogi
       }
     }
   }
