@@ -202,6 +202,7 @@ object Binary {
 
   private object Encoding {
     val roleToInt: Map[DroppableRole, Int] = Map(
+      Tokin  -> 0,
       Pawn   -> 1,
       Lance  -> 2,
       Knight -> 3,

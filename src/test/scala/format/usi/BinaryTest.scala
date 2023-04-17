@@ -54,6 +54,13 @@ class BinaryTest extends ShogiTest {
         encodeMove("5a1e", Minishogi) must_== "00000100,00010100"
         encodeMove("B*3d", Minishogi) must_== "10000110,00010001"
       }
+      "simple kyotoshogi" in {
+        encodeMove("1a1b", Kyotoshogi) must_== "00000000,00000101"
+        encodeMove("1a2a", Kyotoshogi) must_== "00000000,00000001"
+        encodeMove("4e5e", Kyotoshogi) must_== "00010111,00011000"
+        encodeMove("5a1e", Kyotoshogi) must_== "00000100,00010100"
+        encodeMove("T*3d", Kyotoshogi) must_== "10000000,00010001"
+      }
       "simple move chushogi" in {
         encodeMove("1a12l", Chushogi) must_== "00000000,10001111"
         encodeMove("12l1a", Chushogi) must_== "10001111,00000000"
@@ -119,6 +126,20 @@ class BinaryTest extends ShogiTest {
       "drop" in {
         decodeMove("10000011,00011101") must_== "N*3d"
         decodeMove("10000111,01010000") must_== "R*9i"
+      }
+      "simple minishogi" in {
+        decodeMove("00000000,00000101", Minishogi) must_== "1a1b"
+        decodeMove("00000000,00000001", Minishogi) must_== "1a2a"
+        decodeMove("00010111,00011000", Minishogi) must_== "4e5e"
+        decodeMove("00000100,00010100", Minishogi) must_== "5a1e"
+        decodeMove("10000110,00010001", Minishogi) must_== "B*3d"
+      }
+      "simple kyotoshogi" in {
+        decodeMove("00000000,00000101", Kyotoshogi) must_== "1a1b"
+        decodeMove("00000000,00000001", Kyotoshogi) must_== "1a2a"
+        decodeMove("00010111,00011000", Kyotoshogi) must_== "4e5e"
+        decodeMove("00000100,00010100", Kyotoshogi) must_== "5a1e"
+        decodeMove("10000000,00010001", Kyotoshogi) must_== "T*3d"
       }
       "chushogi move" in {
         decodeMove("00000000,00000000", Chushogi) must_== "1a1a"

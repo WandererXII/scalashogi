@@ -39,7 +39,8 @@ final case class History(
     }
   }
 
-  lazy val fourfoldRepetition = isRepetition(4)
+  lazy val threefoldRepetition = isRepetition(3)
+  lazy val fourfoldRepetition  = isRepetition(4)
 
   def withLastMove(u: Usi) = copy(lastMove = Some(u))
 

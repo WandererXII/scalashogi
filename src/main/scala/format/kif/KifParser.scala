@@ -427,7 +427,7 @@ object KifParser {
             rolesBase <- KifUtils
               .anyToRole(roleS, variant)
               .map(_.toList) toValid s"Unknown role in drop: $str"
-            role <- variant.handRoles.find(
+            role <- variant.dropRoles.find(
               rolesBase contains _
             ) toValid s"${rolesBase mkString ","} can't be dropped in $variant variant"
             pos <- KifUtils.parseKifPos(posS) toValid s"Cannot parse destination square in drop: $str"

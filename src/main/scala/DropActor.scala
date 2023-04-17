@@ -11,8 +11,7 @@ final case class DropActor(
   lazy val destinations: List[Pos] =
     if (
       situation.variant.supportsDrops &&
-      situation.variant.handRoles.contains(role) &&
-      situation.hands.has(color, role)
+      situation.variant.dropRoles.contains(role)
     )
       situation.variant.dropFilter(this)
     else Nil

@@ -3,8 +3,6 @@ package variant
 
 import cats.syntax.option._
 
-import scala.annotation.unused
-
 import shogi.Pos._
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
@@ -373,9 +371,9 @@ case object Chushogi
   }
 
   // Unmovable pieces are allowed
-  override def hasUnmovablePieces(@unused board: Board) = false
+  override def hasUnmovablePieces(board: Board) = false
 
   // We don't care about double pawns
-  override def hasDoublePawns(@unused board: Board, @unused color: Color) = false
+  override def hasDoublePawns(board: Board, color: Color) = false
 
 }

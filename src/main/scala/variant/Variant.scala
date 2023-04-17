@@ -59,7 +59,11 @@ abstract class Variant private[variant] (
     promote(piece.role).isDefined &&
       promotionRanks(piece.color).exists(r => r == dest.rank || r == orig.rank)
 
+  def autoPromote = false
+
   def supportsDrops = true
+
+  def supportsDroppingEitherSide = false
 
   def isInsideBoard(pos: Pos): Boolean =
     pos.file.index < numberOfFiles && pos.rank.index < numberOfRanks
@@ -135,6 +139,8 @@ abstract class Variant private[variant] (
         .contains(next) && longRangeThreatens(board, next, dir, to))
     }
 
+  def dropRoles = handRoles
+
   // For example, can't drop a pawn on a file with another pawn of the same color
   def dropFilter(a: DropActor): List[Pos] = {
     def illegalPawn(d: Pos) =
@@ -160,6 +166,14 @@ abstract class Variant private[variant] (
   // for perpetual check
   def isAttacked(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean =
     after.check
+
+  protected def unpromoteRoleForHand(role: Role): Option[DroppableRole] =
+    handRoles
+      .find(_ == role)
+      .orElse(unpromote(role) match {
+        case Some(dRole: DroppableRole) if handRoles.contains(dRole) => dRole.some
+        case _                                                       => none
+      })
 
   // Finalizes situation after usi, used both for moves and drops
   protected def finalizeSituation(beforeSit: Situation, board: Board, hands: Hands, usi: Usi): Situation = {
@@ -198,7 +212,7 @@ abstract class Variant private[variant] (
       _     <- Validated.cond(actor is sit.color, (), s"Not my piece on ${usi.orig}")
       capture = sit.board(usi.dest).filter(_.color != sit.color)
       _ <- Validated.cond(
-        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined),
+        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined) || autoPromote,
         (),
         s"${actor.piece} cannot promote"
       )
@@ -214,14 +228,13 @@ abstract class Variant private[variant] (
         (),
         s"Piece on ${usi.orig} cannot move to ${usi.dest}${usi.midStep.fold("")(ms => s" via $ms")}"
       )
-      unpromotedCapture = capture.map(p => p.updateRole(unpromote) | p)
+      unpromotedRoleCapture = capture.flatMap(p => unpromoteRoleForHand(p.role))
       hands =
-        unpromotedCapture
+        unpromotedRoleCapture
           .filter(_ => supportsDrops)
-          .flatMap(c => handRoles.find(_ == c.role))
           .fold(sit.hands)(sit.hands.store(sit.color, _))
       board <-
-        (if (usi.promotion)
+        (if (usi.promotion || (autoPromote && promote(actor.piece.role).isDefined))
            sit.board.promote(usi.orig, usi.dest, promote)
          else
            sit.board.move(
@@ -235,11 +248,14 @@ abstract class Variant private[variant] (
   def drop(sit: Situation, usi: Usi.Drop): Validated[String, Situation] =
     for {
       _ <- Validated.cond(sit.variant.supportsDrops, (), "Variant doesn't support drops")
-      _ <- Validated.cond(handRoles contains usi.role, (), "Can't drop this role in this variant")
+      _ <- Validated.cond(dropRoles contains usi.role, (), "Can't drop this role in this variant")
       piece = Piece(sit.color, usi.role)
       actor <- sit.dropActorOf(piece) toValid s"No actor of $piece"
       _     <- Validated.cond(actor.destinations.contains(usi.pos), (), s"Dropping $piece is not valid")
-      hands <- sit.hands.take(sit.color, usi.role) toValid s"No ${usi.role} to drop on ${usi.pos}"
+      roleToTake = if (supportsDroppingEitherSide) unpromoteRoleForHand(usi.role) else usi.role.some
+      hands <- roleToTake.flatMap(
+        sit.hands.take(sit.color, _)
+      ) toValid s"No ${usi.role} to drop on ${usi.pos}"
       board <- sit.board.place(piece, usi.pos) toValid s"Can't drop ${usi.role} on ${usi.pos}, it's occupied"
     } yield finalizeSituation(sit, board, hands, usi)
 
@@ -259,6 +275,8 @@ abstract class Variant private[variant] (
   def bareKing(@unused sit: Situation, @unused color: Color): Boolean = false
 
   def royalsLost(@unused sit: Situation): Boolean = false
+
+  def repetition(sit: Situation): Boolean = sit.history.fourfoldRepetition
 
   // Player wins or loses after their move
   def winner(sit: Situation): Option[Color] =

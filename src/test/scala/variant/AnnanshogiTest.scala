@@ -4,7 +4,7 @@ package variant
 import format.forsyth.Sfen
 import format.usi.Usi
 
-class AnnanTest extends ShogiTest {
+class AnnanshogiTest extends ShogiTest {
 
   def perft(game: Game, depth: Int) = Perft.perft(game, depth)
 
@@ -145,6 +145,12 @@ class AnnanTest extends ShogiTest {
         .get
         .valid(true) must beTrue
     }
+  }
+
+  "parse" in {
+    Sfen("lPsgkgLnP/1r5b1/p1ppp1p1p/1p5pp/9/1P3P1P1/P1PP1P2P/1B5n1/lNSGKGpNL b").toSituation(
+      shogi.variant.Annanshogi
+    ) must beSome
   }
 
   "fixture perfts" should {

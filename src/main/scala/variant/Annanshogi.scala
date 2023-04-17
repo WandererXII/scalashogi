@@ -102,6 +102,8 @@ case object Annanshogi
   override def attackingPiece(piece: Piece, pos: Pos, board: Board): Piece =
     directlyBehind(pos, piece.color).flatMap(board.apply).filter(_.color == piece.color).getOrElse(piece)
 
+  override def hasUnmovablePieces(board: Board) = false
+
   override def hasDoublePawns(board: Board, color: Color) = false
 
   override def impasse(sit: Situation): Boolean = Standard.impasse(sit)

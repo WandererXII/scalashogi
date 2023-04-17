@@ -45,7 +45,7 @@ object UsiCharPair {
   }
 
   def roleToChar(role: DroppableRole, variant: Variant): Char =
-    variant.handRoles.zipWithIndex
+    variant.dropRoles.zipWithIndex
       .find(_._1 == role)
       .map { case (_, i) => (charOffset + variant.allPositions.size + i).toChar } | voidChar
 

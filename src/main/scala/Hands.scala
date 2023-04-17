@@ -3,12 +3,6 @@ package shogi
 final case class Hands(sente: Hand, gote: Hand) {
   def apply(color: Color) = color.fold(sente, gote)
 
-  def has(color: Color, role: DroppableRole): Boolean =
-    color.fold(
-      sente.has(role),
-      gote.has(role)
-    )
-
   def take(color: Color, role: DroppableRole, cnt: Int = 1): Option[Hands] =
     color.fold(
       sente.take(role, cnt) map { nh =>
@@ -56,9 +50,6 @@ final case class Hand(handMap: HandMap) extends AnyVal {
 
   def apply(role: DroppableRole): Int =
     handMap.getOrElse(role, 0)
-
-  def has(role: DroppableRole): Boolean =
-    apply(role) > 0
 
   def take(role: DroppableRole, cnt: Int = 1) =
     handMap.get(role).filter(_ - cnt >= 0).map(cur => copy(handMap = handMap + (role -> (cur - cnt))))

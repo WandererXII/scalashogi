@@ -49,7 +49,7 @@ object Usi {
 
   final case class Drop(role: DroppableRole, pos: Pos) extends Usi {
 
-    def usi = s"${Drop.roleToUsi(role)}*${pos.key}"
+    def usi = s"${Drop.roleToUsi.getOrElse(role, "")}*${pos.key}"
 
     def positions = List(pos)
 
@@ -70,7 +70,8 @@ object Usi {
       Silver -> "S",
       Gold   -> "G",
       Bishop -> "B",
-      Rook   -> "R"
+      Rook   -> "R",
+      Tokin  -> "T"
     )
     val usiToRole: Map[String, DroppableRole] = roleToUsi map { case (k, v) => v -> k }
 

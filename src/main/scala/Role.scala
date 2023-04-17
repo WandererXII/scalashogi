@@ -549,7 +549,8 @@ case object Tiger extends Role {
   def goteEyes(from: Pos, to: Pos)  = Elephant.senteEyes(from, to)
 }
 
-case object Tokin extends Role {
+// kyotoshogi
+case object Tokin extends DroppableRole {
   val senteProjectionDirs = Gold.senteProjectionDirs
   val goteProjectionDirs  = Gold.goteProjectionDirs
 
@@ -663,7 +664,8 @@ object Role {
     Lance,
     Pawn,
     Rook,
-    Silver
+    Silver,
+    Tokin
   )
 
   val allLions = List[Role](

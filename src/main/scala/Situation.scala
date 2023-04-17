@@ -51,7 +51,18 @@ final case class Situation(
 
   // Drops
 
-  lazy val dropActors: Map[Piece, DropActor] = hands.rolesOf
+  private def addOtherSide(roles: List[DroppableRole]): List[DroppableRole] =
+    roles.flatMap { role =>
+      variant
+        .promote(role) match {
+        case Some(dRole: DroppableRole) => List(role, dRole)
+        case _                          => List(role)
+      }
+    }
+
+  lazy val dropActors: Map[Piece, DropActor] = (if (variant.supportsDroppingEitherSide)
+                                                  hands.rolesOf.map(addOtherSide)
+                                                else hands.rolesOf)
     .reduce[List[(Piece, DropActor)]] { (sente, gote) =>
       sente.map(role => (Piece(Sente, role), DropActor(Sente, role, this))) :::
         gote.map(role => (Piece(Gote, role), DropActor(Gote, role, this)))
@@ -115,7 +126,7 @@ final case class Situation(
   def bareKing(color: Color): Boolean = variant.bareKing(this, color)
 
   def autoDraw: Boolean =
-    (history.fourfoldRepetition && !perpetualCheck) ||
+    (variant.repetition(this) && !perpetualCheck) ||
       variant.isInsufficientMaterial(this)
 
   def impasse = variant impasse this

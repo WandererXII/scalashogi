@@ -85,7 +85,8 @@ object KifUtils {
     Minishogi  -> NonEmptyList.of("5五将棋", "五々将棋", "５五将棋", "5五", "五々", "５五", "minishogi"),
     Standard   -> NonEmptyList.of("平手"),
     Chushogi   -> NonEmptyList.of("平手", "中将棋", "chushogi", "chuushogi"),
-    Annanshogi -> NonEmptyList.of("安南将棋", "安南", "annanshogi")
+    Annanshogi -> NonEmptyList.of("安南将棋", "安南", "annanshogi"),
+    Kyotoshogi -> NonEmptyList.of("京都将棋", "京都", "kyotoshogi")
   )
 
   def toKif(role: Role, variant: Variant): Option[NonEmptyList[String]] =
@@ -96,6 +97,8 @@ object KifUtils {
         toKifMinishogi get role
       case Chushogi =>
         toKifChushogi get role
+      case Kyotoshogi =>
+        toKifKyotoshogi get role
     }
 
   def toRole(str: String, variant: Variant): Option[NonEmptyList[Role]] =
@@ -106,6 +109,8 @@ object KifUtils {
         toRoleMinishogi get str
       case Chushogi =>
         toRoleChushogi get str
+      case Kyotoshogi =>
+        toRoleKyotoshogi get str
     }
 
   def anyToRole(str: String, variant: Variant): Option[NonEmptyList[Role]] =
@@ -216,6 +221,12 @@ object KifUtils {
       }
     } toMap
 
+  private val toKifKyotoshogi: Map[Role, NonEmptyList[String]] =
+    toKifStandard filter { case (k, _) => Kyotoshogi.allRoles contains k }
+
+  private val toRoleKyotoshogi: Map[String, NonEmptyList[Role]] =
+    toRoleStandard filter { case (_, v) => Kyotoshogi.allRoles contains v.head }
+
   def toKifBoard(piece: Piece, variant: Variant): Option[String] =
     toKifBoard(piece.role, variant) map { k =>
       if (piece.color.sente) k else s"v$k"
@@ -237,6 +248,8 @@ object KifUtils {
         toKifBoardMinishogi get role
       case Chushogi =>
         toKifBoardChushogi get role
+      case Kyotoshogi =>
+        toKifBoardKyotoshogi get role
     }
 
   private val toKifBoardStandard: Map[Role, String] = Map(
@@ -291,6 +304,9 @@ object KifUtils {
     Whale                 -> "鯨",
     WhiteHorse            -> "駒"
   )
+
+  private val toKifBoardKyotoshogi: Map[Role, String] =
+    toKifBoardStandard filter { case (k, _) => Kyotoshogi.allRoles contains k }
 
   val allKif: List[String] = (Role.all flatMap { r: Role =>
     Variant.all flatMap { v =>
