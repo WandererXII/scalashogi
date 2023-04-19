@@ -100,7 +100,7 @@ case object Kyotoshogi
   override def canPromote(piece: Piece, orig: Pos, dest: Pos, capture: Boolean): Boolean =
     false
 
-  override def autoPromote = true
+  override def autoPromote(role: Role) = promote(role).isDefined
 
   override def supportsDroppingEitherSide = true
 

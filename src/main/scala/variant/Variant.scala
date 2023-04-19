@@ -59,7 +59,7 @@ abstract class Variant private[variant] (
     promote(piece.role).isDefined &&
       promotionRanks(piece.color).exists(r => r == dest.rank || r == orig.rank)
 
-  def autoPromote = false
+  def autoPromote(@unused role: Role) = false
 
   def supportsDrops = true
 
@@ -212,7 +212,9 @@ abstract class Variant private[variant] (
       _     <- Validated.cond(actor is sit.color, (), s"Not my piece on ${usi.orig}")
       capture = sit.board(usi.dest).filter(_.color != sit.color)
       _ <- Validated.cond(
-        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined) || autoPromote,
+        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined) || autoPromote(
+          actor.piece.role
+        ),
         (),
         s"${actor.piece} cannot promote"
       )
@@ -234,7 +236,7 @@ abstract class Variant private[variant] (
           .filter(_ => supportsDrops)
           .fold(sit.hands)(sit.hands.store(sit.color, _))
       board <-
-        (if (usi.promotion || (autoPromote && promote(actor.piece.role).isDefined))
+        (if (usi.promotion || autoPromote(actor.piece.role))
            sit.board.promote(usi.orig, usi.dest, promote)
          else
            sit.board.move(
