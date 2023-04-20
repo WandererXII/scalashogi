@@ -77,27 +77,17 @@ object Game {
   def apply(variant: shogi.variant.Variant): Game =
     Game(Situation(variant))
 
-  def apply(variantOption: Option[shogi.variant.Variant], sfenOption: Option[Sfen]): Game = {
-    val variant = variantOption | shogi.variant.Standard
-    val g       = apply(variant)
-    sfenOption
+  def apply(initialSfen: Option[Sfen], variant: shogi.variant.Variant): Game =
+    initialSfen
       .filterNot(_.initialOf(variant))
       .flatMap {
         _.toSituationPlus(variant)
       }
-      .fold(g) { parsed =>
-        g.copy(
-          situation = Situation(
-            board = parsed.situation.board,
-            hands = parsed.situation.hands,
-            color = parsed.situation.color,
-            history = parsed.situation.history,
-            variant = g.variant
-          ),
+      .fold(apply(variant)) { parsed =>
+        apply(parsed.situation).copy(
           plies = parsed.plies,
           startedAtPly = parsed.plies,
           startedAtMove = parsed.moveNumber
         )
       }
-  }
 }

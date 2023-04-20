@@ -149,7 +149,7 @@ class SfenTest extends ShogiTest {
   "make game" should {
     "sente starts - 1" in {
       val sfen = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1")
-      val game = Game(None, sfen.some)
+      val game = Game(sfen.some, shogi.variant.Standard)
       game.plies == 0
       game.startedAtPly == 0
       game.startedAtMove == 1
@@ -157,7 +157,7 @@ class SfenTest extends ShogiTest {
     }
     "sente starts - 2" in {
       val sfen = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 2")
-      val game = Game(None, sfen.some)
+      val game = Game(sfen.some, shogi.variant.Standard)
       game.plies == 2
       game.startedAtPly == 2
       game.startedAtMove == 2
@@ -165,7 +165,7 @@ class SfenTest extends ShogiTest {
     }
     "gote starts - 1" in {
       val sfen = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
-      val game = Game(None, sfen.some)
+      val game = Game(sfen.some, shogi.variant.Standard)
       game.plies == 1
       game.startedAtPly == 1
       game.startedAtMove == 1
@@ -173,7 +173,7 @@ class SfenTest extends ShogiTest {
     }
     "gote starts - 2" in {
       val sfen = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 2")
-      val game = Game(None, sfen.some)
+      val game = Game(sfen.some, shogi.variant.Standard)
       game.plies == 1
       game.startedAtPly == 1
       game.startedAtMove == 2

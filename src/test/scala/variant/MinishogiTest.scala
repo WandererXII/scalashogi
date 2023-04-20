@@ -37,7 +37,7 @@ class MinishogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Minishogi), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Minishogi)
             perft(game, 1) must be equalTo d1.toInt
           }
         }

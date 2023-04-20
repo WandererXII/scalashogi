@@ -38,7 +38,7 @@ class KyotoshogiTest extends ShogiTest {
       forall(kyotoPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Kyotoshogi), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
             perft(game, 1) must be equalTo d1.toInt
           }
         }
@@ -95,7 +95,7 @@ class KyotoshogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Kyotoshogi), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
             perft(game, 1) must be equalTo d1.toInt
           }
         }

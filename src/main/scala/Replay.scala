@@ -34,13 +34,12 @@ object Replay {
       initialSfen: Option[Sfen],
       variant: shogi.variant.Variant
   ): Validated[String, Replay] =
-    usis.foldLeft[Validated[String, Replay]](valid(Replay(makeGame(initialSfen, variant)))) {
-      case (acc, usi) =>
-        acc andThen { replay =>
-          replay.state(usi) andThen { game =>
-            valid(replay(game))
-          }
+    usis.foldLeft[Validated[String, Replay]](valid(Replay(Game(initialSfen, variant)))) { case (acc, usi) =>
+      acc andThen { replay =>
+        replay.state(usi) andThen { game =>
+          valid(replay(game))
         }
+      }
     }
 
   def gamesWhileValid(
@@ -60,7 +59,7 @@ object Replay {
           }
       }
 
-    mk(NonEmptyList.one(makeGame(initialSfen, variant)), usis.toList) match {
+    mk(NonEmptyList.one(Game(initialSfen, variant)), usis.toList) match {
       case (games, err) => (games.reverse, err)
     }
   }
@@ -141,6 +140,4 @@ object Replay {
   private def initialSfenToSituation(initialSfen: Option[Sfen], variant: shogi.variant.Variant): Situation =
     initialSfen.flatMap(_.toSituation(variant)) | Situation(variant)
 
-  private def makeGame(initialSfen: Option[Sfen], variant: shogi.variant.Variant): Game =
-    Game(variant.some, initialSfen)
 }

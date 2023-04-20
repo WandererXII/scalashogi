@@ -2,7 +2,6 @@ package shogi
 package format
 
 import cats.data.Validated
-import cats.implicits._
 
 import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
@@ -62,8 +61,8 @@ object Reader {
 
   private def makeGame(initialSfen: Option[Sfen], variant: shogi.variant.Variant, tags: Tags) =
     Game(
-      variantOption = variant.some,
-      sfenOption = initialSfen
+      initialSfen,
+      variant
     ).copy(
       clock = tags.clockConfig map Clock.apply
     )

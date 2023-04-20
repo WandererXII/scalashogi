@@ -40,7 +40,7 @@ class ChushogiTest extends ShogiTest {
       forall(chushogiPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Chushogi), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
             perft(game, 1) must be equalTo d1.toInt
           }
         }
@@ -261,7 +261,7 @@ class ChushogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Chushogi), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
             game.situation.end(false) must beFalse
             perft(game, 1) must be equalTo d1.toInt
           }

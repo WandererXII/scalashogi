@@ -122,12 +122,12 @@ class PerpetualCheckTest extends ShogiTest {
     }
     "trigger" in {
       val aGame = Game(
-        Some(shogi.variant.Chushogi),
         Some(
           Sfen(
             "lfcsgek1scfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/8i3/3I8/3g8/8I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL w"
           )
-        )
+        ),
+        shogi.variant.Chushogi
       )
       val aMoves = List(
         "1d1e",

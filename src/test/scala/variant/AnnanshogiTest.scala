@@ -38,7 +38,7 @@ class AnnanshogiTest extends ShogiTest {
       forall(annanPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Annanshogi), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Annanshogi)
             perft(game, 1) must be equalTo d1.toInt
           }
         }
@@ -158,7 +158,7 @@ class AnnanshogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Annanshogi), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Annanshogi)
             game.situation.end(false) must beFalse
             perft(game, 1) must be equalTo d1.toInt
           }

@@ -61,7 +61,7 @@ class StandardTest extends ShogiTest {
       forall(random) { line =>
         line match {
           case (sfenStr, d1, d2) => {
-            val game = Game(Some(shogi.variant.Standard), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Standard)
             perft(game, 1) must be equalTo d1.toInt
             perft(game, 2) must be equalTo d2.toInt
           }
@@ -75,7 +75,7 @@ class StandardTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(shogi.variant.Standard), Some(Sfen(sfenStr)))
+            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Standard)
             perft(game, 1) must be equalTo d1.toInt
           }
         }
