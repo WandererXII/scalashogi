@@ -708,4 +708,55 @@ class KifParserTest extends ShogiTest {
     }
   }
 
+  "kyotoshogi" in {
+    parser("""
+手合割：京都将棋
+先手：
+後手：
+手数----指手---------消費時間--
+   1   ３四金(25) * even without 成 should be good
+   2   １二と成(11)
+   3   １四歩成(15)
+   4   同　香成(12)
+   5   ４四玉(35)
+   6   ２二飛打
+   7   同　桂成(34)
+   8   ４三歩打
+    """) must beValid.like { case a =>
+      a.parsedMoves.value.size must_== 8
+      a.initialSfen must beNone
+      a.variant.kyotoshogi must beTrue
+    }
+  }
+
+  "kyotoshogi with handicap" in {
+    parser("""
+手合割：京都将棋
+上手の持駒：なし
+  ５ ４ ３ ２ １
++---------------+
+| ・v金v玉v銀 ・|一
+| ・ ・ ・ ・ ・|二
+| ・ ・ ・ ・ ・|三
+| ・ ・ ・ ・ ・|四
+| と 銀 玉 金 歩|五
++---------------+
+下手の持駒：なし
+上手番
+下手：S
+上手：G
+手数----指手---------消費時間--""") must beValid.like { case a =>
+      a.initialSfen must beSome.like { sfen =>
+        sfen.truncate.value == "1gks1/5/5/5/TSKGP w -"
+      }
+      a.variant.kyotoshogi must beTrue
+      a.tags.value must contain { (tag: Tag) =>
+        tag.name == Tag.Sente && tag.value == """S"""
+      }
+      a.tags.value must contain { (tag: Tag) =>
+        tag.name == Tag.Gote && tag.value == """G"""
+      }
+    }
+  }
+
 }

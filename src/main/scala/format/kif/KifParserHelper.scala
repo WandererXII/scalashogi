@@ -60,7 +60,8 @@ object KifParserHelper {
       handicapString: Option[String],
       moves: List[String]
   ): Option[Variant] = {
-    if (
+    if (handicapString.exists(isDefaultHandicapOf(_, Kyotoshogi))) Kyotoshogi.some
+    else if (
       ranks.size == 5 ||
       handicapString.exists(isDefaultHandicapOf(_, Minishogi))
     ) Minishogi.some

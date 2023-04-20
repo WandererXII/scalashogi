@@ -12,7 +12,7 @@ final case class Csa(
     moves: List[NotationMove],
     initialSfen: Option[Sfen],
     initial: Initial = Initial.empty,
-    tags: Tags
+    tags: Tags = Tags.empty
 ) extends Notation {
 
   def variant = Standard

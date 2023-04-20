@@ -44,7 +44,8 @@ class KifModelTest extends ShogiTest {
   "render kif situation - minishogi" in {
     renderSituation(
       Sfen("rbsgk/4p/P4/5/KGSBR w - 2").toSituation(Minishogi).get
-    ) must_== """後手の持駒：なし
+    ) must_== """手合割：5五将棋
+後手の持駒：なし
   ５ ４ ３ ２ １
 +---------------+
 |v飛v角v銀v金v玉|一
@@ -143,7 +144,7 @@ class KifModelTest extends ShogiTest {
         )
       )
     ) must_== """手合割：安南将棋
-後手の持駒：なし
+上手の持駒：なし
   ９ ８ ７ ６ ５ ４ ３ ２ １
 +---------------------------+
 |v香v桂 ・ ・v玉 ・ ・v桂v香|一
@@ -156,8 +157,8 @@ class KifModelTest extends ShogiTest {
 | ・ 角 ・ ・ ・ ・ ・ 飛 ・|八
 | 香 桂 銀 金 玉 金 銀 桂 香|九
 +---------------------------+
-先手の持駒：なし
-後手番
+下手の持駒：なし
+上手番
 下手：A
 上手："""
   }
@@ -188,6 +189,57 @@ class KifModelTest extends ShogiTest {
 先手の持駒：なし
 先手：A
 後手："""
+  }
+
+  "kif render kyoto" in {
+    val moves = List(
+      NotationMove(1, Usi.WithRole(Usi("2e3d").get, Gold)),
+      NotationMove(2, Usi.WithRole(Usi("1a1b").get, Tokin)),
+      NotationMove(3, Usi.WithRole(Usi("1e1d").get, Pawn)),
+      NotationMove(4, Usi.WithRole(Usi("1b1d+").get, Lance)), // try +
+      NotationMove(5, Usi.WithRole(Usi("3e4d").get, King)),
+      NotationMove(6, Usi.WithRole(Usi("R*2b").get, Rook)),
+      NotationMove(7, Usi.WithRole(Usi("3d2b").get, Knight)),
+      NotationMove(8, Usi.WithRole(Usi("P*4c").get, Pawn))
+    )
+    Kif(
+      moves,
+      None,
+      Kyotoshogi
+    ).render must_== """手合割：京都将棋
+先手：
+後手：
+手数----指手---------消費時間--
+   1   ３四金成(25)
+   2   １二と成(11)
+   3   １四歩成(15)
+   4   同　香成(12)
+   5   ４四玉(35)
+   6   ２二飛打
+   7   同　桂成(34)
+   8   ４三歩打"""
+  }
+
+  "kif render kyoto - handicap" in {
+    Kif(
+      Nil,
+      Some(Sfen("1gks1/5/5/5/TSKGP w - ")),
+      Kyotoshogi
+    ).render must_== """手合割：京都将棋
+上手の持駒：なし
+  ５ ４ ３ ２ １
++---------------+
+| ・v金v玉v銀 ・|一
+| ・ ・ ・ ・ ・|二
+| ・ ・ ・ ・ ・|三
+| ・ ・ ・ ・ ・|四
+| と 銀 玉 金 歩|五
++---------------+
+下手の持駒：なし
+上手番
+下手：
+上手：
+手数----指手---------消費時間--"""
   }
 
 }

@@ -96,7 +96,7 @@ object Kif {
         val roleStr = KifUtils.toKif(role, variant).map(_.head) | ""
         s"${pos.kanjiFullWidthKey}${roleStr}打"
       case Usi.Move(orig, dest, prom, _) => {
-        val promStr = if (prom) "成" else ""
+        val promStr = if (prom || (variant.kyotoshogi && variant.autoPromote(usiWithRole.role))) "成" else ""
         val roleStr = KifUtils.toKif(usiWithRole.role, variant).map(_.head) | ""
         s"${renderDest(dest, lastDest, variant)}$roleStr$promStr${renderOrig(orig, variant)}"
       }
@@ -133,16 +133,18 @@ object Kif {
       .fold {
         if (variant.chushogi) ""
         else {
-          val handicapName = KifUtils.defaultHandicaps.get(variant).map(_.head) | ""
-          s"${Tag.Handicap.kifName}：$handicapName"
+          s"${Tag.Handicap.kifName}：${defaultHandicap(variant)}"
         }
       } { sf =>
-        getHandicapName(sf, variant)
+        val handicap = getHandicapName(sf, variant)
+        handicap
           .filter(_ => variant.standard)
-          .fold(sf.toSituation(variant).fold("")(renderSituation _))(hc => s"${Tag.Handicap.kifName}：$hc")
+          .fold(sf.toSituation(variant).map(sit => renderSituation(sit, handicap.isDefined)) | "") { hc =>
+            s"${Tag.Handicap.kifName}：$hc"
+          }
       }
 
-  def renderSituation(sit: Situation): String = {
+  def renderSituation(sit: Situation, isHandicap: Boolean = false): String = {
     val kifBoard = new scala.collection.mutable.StringBuilder(256)
     val nbRanks  = sit.variant.numberOfRanks - 1
     val nbFiles  = sit.variant.numberOfFiles - 1
@@ -163,17 +165,29 @@ object Kif {
       if (y < nbRanks) kifBoard append '\n'
     }
     List[String](
-      if (sit.variant.annanshogi) s"手合割：${KifUtils.defaultHandicaps.get(sit.variant).map(_.head) | ""}"
+      if (sit.variant.standard || sit.variant.chushogi) ""
+      else
+        s"手合割：${defaultHandicap(sit.variant)}", // we have to indicate the variant somehow
+      if (sit.variant.supportsDrops)
+        s"${colorName(Gote, isHandicap)}の持駒：${renderHand(sit.hands(Gote), sit.variant)}"
       else "",
-      if (sit.variant.supportsDrops) s"後手の持駒：${renderHand(sit.hands(Gote), sit.variant)}" else "",
       fileNums(sit.variant),
       s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
       kifBoard.toString,
       s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
-      if (sit.variant.supportsDrops) s"先手の持駒：${renderHand(sit.hands(Sente), sit.variant)}" else "",
-      if (sit.color.gote) "後手番" else ""
+      if (sit.variant.supportsDrops)
+        s"${colorName(Sente, isHandicap)}の持駒：${renderHand(sit.hands(Sente), sit.variant)}"
+      else "",
+      if (sit.color.gote) s"${colorName(Gote, isHandicap)}番" else ""
     ).filter(_.nonEmpty).mkString("\n")
   }
+
+  private def colorName(color: Color, isHandicap: Boolean): String =
+    if (isHandicap) color.fold("下手", "上手")
+    else color.fold("先手", "後手")
+
+  private def defaultHandicap(variant: Variant): String =
+    KifUtils.defaultHandicaps.get(variant).map(_.head) | variant.name.capitalize
 
   private def fileNums(variant: Variant): String =
     variant match {
