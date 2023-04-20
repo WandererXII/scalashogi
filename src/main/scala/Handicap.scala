@@ -256,6 +256,43 @@ object Handicap {
         "Dragonfly",
         Sfen("4k4/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1")
       )
+    ),
+    variant.Kyotoshogi -> List(
+      Handicap(
+        "と落ち",
+        "Tokin",
+        Sfen("pgks1/5/5/5/TSKGP w - 1")
+      ),
+      Handicap(
+        "銀落ち",
+        "Silver",
+        Sfen("pgk1t/5/5/5/TSKGP w - 1")
+      ),
+      Handicap(
+        "歩落ち",
+        "Pawn",
+        Sfen("1gkst/5/5/5/TSKGP w - 1")
+      ),
+      Handicap(
+        "金落ち",
+        "Gold",
+        Sfen("p1kst/5/5/5/TSKGP w - 1")
+      ),
+      Handicap(
+        "二枚落ち",
+        "2-piece",
+        Sfen("1gks1/5/5/5/TSKGP w - 1")
+      ),
+      Handicap(
+        "三枚落ち",
+        "3-piece",
+        Sfen("1gk2/5/5/5/TSKGP w - 1")
+      ),
+      Handicap(
+        "裸玉",
+        "Naked King",
+        Sfen("2k2/5/5/5/TSKGP w - 1")
+      )
     )
   )
 

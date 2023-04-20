@@ -10,6 +10,16 @@ class HandicapTest extends ShogiTest {
       Handicap.allByVariant(shogi.variant.Minishogi).size must_== 5
       Handicap.allByVariant(shogi.variant.Chushogi).size must_== 3
       Handicap.allByVariant(shogi.variant.Annanshogi).size must_== 15
+      Handicap.allByVariant(shogi.variant.Kyotoshogi).size must_== 7
+    }
+    "parse all" in {
+      Handicap.allByVariant.toList map { case (v, lsh) =>
+        forall(lsh) { h =>
+          val sit = h.sfen.toSituation(v)
+          sit must beSome
+          sit.get.playable(true, true) must beTrue
+        }
+      }
     }
     "recognize handicap" in {
       Handicap.isHandicap(
