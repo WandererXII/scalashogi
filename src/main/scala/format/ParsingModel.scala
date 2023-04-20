@@ -6,11 +6,14 @@ import cats.data.Validated
 import cats.data.Validated.valid
 
 import shogi.format.usi.Usi
+import shogi.format.forsyth.Sfen
 
 final case class ParsedNotation(
+    parsedMoves: ParsedMoves,
+    initialSfen: Option[Sfen],
+    variant: shogi.variant.Variant,
     initialPosition: InitialPosition,
-    tags: Tags,
-    parsedMoves: ParsedMoves
+    tags: Tags
 )
 
 final case class ParsedMoves(value: List[ParsedMove]) extends AnyVal

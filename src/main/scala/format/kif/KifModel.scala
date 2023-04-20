@@ -9,9 +9,11 @@ import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
 
 final case class Kif(
-    tags: Tags,
     moves: List[NotationMove],
-    initial: Initial = Initial.empty
+    initialSfen: Option[Sfen],
+    variant: Variant,
+    initial: Initial = Initial.empty,
+    tags: Tags = Tags.empty
 ) extends Notation {
 
   def withMoves(moves: List[NotationMove]) =
@@ -24,7 +26,7 @@ final case class Kif(
     val mainline = moveline
       .foldLeft[(List[String], Option[Pos])]((Nil, None)) { case ((acc, lastDest), cur) =>
         (
-          Kif.renderNotationMove(cur, lastDest, tags.variant | Standard) :: acc,
+          Kif.renderNotationMove(cur, lastDest, variant) :: acc,
           cur.usiWithRole.usi.positions.lastOption
         )
       }
@@ -42,7 +44,7 @@ final case class Kif(
     val initStr =
       if (initial.comments.nonEmpty) initial.comments.map(Kif.fixComment _).mkString("* ", "\n* ", "\n")
       else ""
-    val header      = Kif renderHeader tags
+    val header      = Kif.renderHeader(initialSfen, variant, tags)
     val movesHeader = "\n手数----指手---------消費時間--\n"
     val movesStr    = renderMovesAndVariations(moves)
     s"$header$movesHeader$initStr$movesStr"
@@ -100,21 +102,20 @@ object Kif {
       }
     }
 
-  def renderHeader(tags: Tags): String = {
-    val variant = tags.variant | Standard
+  def renderHeader(initialSfen: Option[Sfen], variant: Variant, tags: Tags): String = {
     headerTags
       .map { tag =>
         // we need these even empty
         if (tag == Tag.Sente || tag == Tag.Gote) {
           val playerName = tags(tag.name) | ""
           val playerTag = {
-            if (!tags.sfen.exists(Handicap.isHandicap(_, variant))) tag.kifName
+            if (!initialSfen.exists(Handicap.isHandicap(_, variant))) tag.kifName
             else if (tag == Tag.Sente) "下手"
             else "上手"
           }
           s"$playerTag：${if (playerName == "?") "" else playerName}"
         } else if (tag == Tag.Handicap) {
-          renderSetup(tags.sfen, variant)
+          renderSetup(initialSfen, variant)
         } else {
           tags(tag.name).fold("")(tagValue => {
             if (tagValue != "?" && tagValue != "") s"${tag.kifName}：$tagValue"
@@ -211,7 +212,7 @@ object Kif {
     }
   }
 
-  // tags we render in header
+  // tags we render in KIF header
   private val headerTags = Tag.tsumeTypes ++ List[TagType](
     Tag.Start,
     Tag.End,

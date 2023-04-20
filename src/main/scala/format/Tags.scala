@@ -36,11 +36,6 @@ final case class Tags(value: List[Tag]) extends AnyVal {
       .fold(baseClk)(byo => baseClk.map(_.copy(byoyomiSeconds = byo)))
   }
 
-  def variant: Option[shogi.variant.Variant] =
-    apply(_.Variant).map(_.toLowerCase).flatMap { case name =>
-      shogi.variant.Variant byKeyOrName name
-    }
-
   def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Start) orElse apply(_.End)
 
   def year: Option[Int] =
@@ -48,8 +43,6 @@ final case class Tags(value: List[Tag]) extends AnyVal {
       case Tags.DateRegex(y, _, _) => y.toIntOption
       case _                       => None
     }
-
-  def sfen: Option[format.forsyth.Sfen] = apply(_.Sfen) map format.forsyth.Sfen.apply
 
   def exists(which: Tag.type => TagType): Boolean =
     value.exists(_.name == which(Tag))
@@ -96,8 +89,6 @@ object Tag {
   case object SenteTeam   extends TagType
   case object GoteTeam    extends TagType
   case object Result      extends TagType
-  case object Sfen        extends TagType
-  case object Variant     extends TagType
   case object Opening     extends TagType
   case object Termination extends TagType
   case object Annotator   extends TagType
@@ -147,8 +138,6 @@ object Tag {
     SenteTeam,
     GoteTeam,
     Result,
-    Sfen,
-    Variant,
     Opening,
     Termination,
     Annotator,

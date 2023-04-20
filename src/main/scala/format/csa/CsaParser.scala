@@ -47,9 +47,11 @@ object CsaParser {
         (strMoves, terminationOption) = parsedMoves
         init      <- getComments(headerStr)
         situation <- CsaParserHelper.parseSituation(boardStr)
-        tags = createTags(preTags, situation, strMoves.size, terminationOption)
+        variant     = situation.variant
+        initialSfen = situation.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
+        tags        = createTags(preTags, situation.color, strMoves.size, terminationOption)
         parsedMoves <- objMoves(strMoves)
-      } yield ParsedNotation(init, tags, parsedMoves)
+      } yield ParsedNotation(parsedMoves, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>
         sys error "### StackOverflowError ### in CSA parser"
@@ -67,21 +69,18 @@ object CsaParser {
 
   def createTags(
       tags: Tags,
-      sit: Situation,
+      color: Color,
       nbMoves: Int,
       moveTermTag: Option[Tag]
   ): Tags = {
-    val sfenTag = sit.toSfen.some.collect {
-      case sfen if sfen.truncate != sit.variant.initialSfen.truncate => Tag(_.Sfen, sfen.truncate)
-    }
     val termTag = (tags(_.Termination) orElse moveTermTag.map(_.value)).map(t => Tag(_.Termination, t))
     val resultTag = CsaParserHelper
       .createResult(
         termTag,
-        Color.fromSente((nbMoves + { if (sit.color.gote) 1 else 0 }) % 2 == 0)
+        Color.fromSente((nbMoves + { if (color.gote) 1 else 0 }) % 2 == 0)
       )
 
-    List[Option[Tag]](sfenTag, resultTag, termTag).flatten.foldLeft(tags)(_ + _)
+    List[Option[Tag]](resultTag, termTag).flatten.foldLeft(tags)(_ + _)
   }
 
   trait Logging { self: Parsers =>

@@ -89,13 +89,15 @@ object KifParser {
         parsedVariations <- VariationParser(variationStr)
         variations = createVariations(parsedVariations)
         situation <- KifParserHelper.parseSituation(boardStr, preTags(_.Handicap), strMoves.map(_.move))
-        tags = createTags(preTags, situation, strMoves.size, terminationOption)
-        parsedMoves <- objMoves(strMoves, situation.variant, variations)
+        variant     = situation.variant
+        initialSfen = situation.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
+        tags        = createTags(preTags, situation.color, strMoves.size, terminationOption)
+        parsedMoves <- objMoves(strMoves, variant, variations)
         _ <-
           if (kif.isEmpty || parsedMoves.value.nonEmpty || tags.knownTypes.value.nonEmpty)
             valid(true)
           else invalid("No moves, non-standard starting position or valid tags provided")
-      } yield ParsedNotation(init, tags, parsedMoves)
+      } yield ParsedNotation(parsedMoves, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>
         sys error "### StackOverflowError ### in KIF parser"
@@ -193,27 +195,18 @@ object KifParser {
 
   def createTags(
       tags: Tags,
-      sit: Situation,
+      color: Color,
       nbMoves: Int,
       moveTermTag: Option[Tag]
   ): Tags = {
-    val sfenTag = sit.toSfen.some.collect {
-      case sfen if !sit.variant.standard || sfen.truncate != sit.variant.initialSfen.truncate =>
-        Tag(_.Sfen, sfen.truncate.value)
-    }
     val termTag = (tags(_.Termination) orElse moveTermTag.map(_.value)).map(t => Tag(_.Termination, t))
     val resultTag = KifParserHelper
       .createResult(
         termTag,
-        Color.fromSente((nbMoves + { if (sit.color.gote) 1 else 0 }) % 2 == 0)
+        Color.fromSente((nbMoves + { if (color.gote) 1 else 0 }) % 2 == 0)
       )
 
-    val variantTag =
-      if (!sit.variant.standard)
-        Tag(_.Variant, sit.variant.name).some
-      else None
-
-    List[Option[Tag]](sfenTag, resultTag, termTag, variantTag).flatten.foldLeft(tags)(_ + _)
+    List[Option[Tag]](resultTag, termTag).flatten.foldLeft(tags)(_ + _)
   }
 
   object VariationParser extends RegexParsers with Logging {

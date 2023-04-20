@@ -5,7 +5,7 @@ import cats.data.Validated.{ invalid, valid, Invalid, Valid }
 import cats.data.NonEmptyList
 import cats.implicits._
 
-import shogi.format.{ Reader, Tag, Tags }
+import shogi.format.{ Reader, Tags }
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
@@ -24,16 +24,9 @@ object Replay {
   ): Reader.Result =
     Reader.fromUsi(
       usis,
-      Tags(
-        List[Option[Tag]](
-          initialSfen map { sfen =>
-            Tag(_.Sfen, sfen.value)
-          },
-          variant.some.filterNot(_.standard) map { v =>
-            Tag(_.Variant, v.name)
-          }
-        ).flatten
-      )
+      initialSfen,
+      variant,
+      Tags.empty
     )
 
   def replay(

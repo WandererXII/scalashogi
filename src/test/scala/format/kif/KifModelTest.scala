@@ -65,8 +65,9 @@ class KifModelTest extends ShogiTest {
       NotationMove(3, Usi.WithRole(Usi("4i2h").get, Horse))
     )
     Kif(
-      Tags.empty,
-      moves
+      moves,
+      None,
+      Standard
     ).render must_== """手合割：平手
 先手：
 後手：
@@ -84,12 +85,9 @@ class KifModelTest extends ShogiTest {
       NotationMove(3, Usi.WithRole(Usi("5i2h1a").get, Horse))
     )
     Kif(
-      Tags(
-        List(
-          Tag(_.Variant, "Chushogi")
-        )
-      ),
-      moves
+      moves,
+      None,
+      Chushogi
     ).render must_== """先手：
 後手：
 手数----指手---------消費時間--
@@ -123,10 +121,10 @@ class KifModelTest extends ShogiTest {
 
   "render kif situation - default annanshogi" in {
     renderHeader(
+      Some(Sfen("lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1")),
+      Annanshogi,
       Tags(
         List(
-          Tag(_.Variant, "Annanshogi"),
-          Tag(_.Sfen, Sfen("lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1")),
           Tag(_.Sente, "A")
         )
       )
@@ -137,10 +135,10 @@ class KifModelTest extends ShogiTest {
 
   "render kif situation with handicap - annanshogi" in {
     renderHeader(
+      Some(Sfen("ln2k2nl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1")),
+      Annanshogi,
       Tags(
         List(
-          Tag(_.Variant, "Annanshogi"),
-          Tag(_.Sfen, Sfen("ln2k2nl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1")),
           Tag(_.Sente, "A")
         )
       )
@@ -166,10 +164,10 @@ class KifModelTest extends ShogiTest {
 
   "render kif situation - annanshogi" in {
     renderHeader(
+      Some(Sfen("3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p")),
+      Annanshogi,
       Tags(
         List(
-          Tag(_.Variant, "Annanshogi"),
-          Tag(_.Sfen, Sfen("3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p")),
           Tag(_.Sente, "A")
         )
       )

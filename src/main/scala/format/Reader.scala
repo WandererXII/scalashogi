@@ -2,8 +2,10 @@ package shogi
 package format
 
 import cats.data.Validated
+import cats.implicits._
 
 import shogi.format.usi.Usi
+import shogi.format.forsyth.Sfen
 
 object Reader {
 
@@ -21,13 +23,18 @@ object Reader {
   }
 
   def fromParsedNotation(parsed: ParsedNotation, op: ParsedMoves => ParsedMoves): Result =
-    makeReplayFromParsedMoves(makeGame(parsed.tags), op(parsed.parsedMoves))
+    makeReplayFromParsedMoves(
+      makeGame(parsed.initialSfen, parsed.variant, parsed.tags),
+      op(parsed.parsedMoves)
+    )
 
   def fromUsi(
       usis: Seq[Usi],
+      initialSfen: Option[Sfen],
+      variant: shogi.variant.Variant,
       tags: Tags
   ): Result =
-    makeReplayFromUsi(makeGame(tags), usis)
+    makeReplayFromUsi(makeGame(initialSfen, variant, tags), usis)
 
   private def makeReplayFromUsi(game: Game, usis: Seq[Usi]): Result =
     usis.foldLeft[Result](Result.Complete(Replay(game))) {
@@ -53,10 +60,10 @@ object Reader {
       case (r: Result.Incomplete, _) => r
     }
 
-  private def makeGame(tags: Tags) =
+  private def makeGame(initialSfen: Option[Sfen], variant: shogi.variant.Variant, tags: Tags) =
     Game(
-      variantOption = tags(_.Variant) flatMap shogi.variant.Variant.byKeyOrName,
-      sfen = tags.sfen
+      variantOption = variant.some,
+      sfenOption = initialSfen
     ).copy(
       clock = tags.clockConfig map Clock.apply
     )

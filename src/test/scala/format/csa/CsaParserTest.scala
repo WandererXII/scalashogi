@@ -125,7 +125,7 @@ class CsaParserTest extends ShogiTest {
       'such a neat comment
       ' one more, keep com,ma
       '
-      ' drop P*5e""") must beValid.like { case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+      ' drop P*5e""") must beValid.like { case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
         move.metas.comments must_== List("such a neat comment", "one more, keep com,ma", "drop P*5e")
       }
     }
@@ -135,8 +135,9 @@ class CsaParserTest extends ShogiTest {
       'such a neat comment
       ' one more
       %TORYO,T3
-      'comment on termination?""") must beValid.like { case ParsedNotation(_, _, ParsedMoves(List(move))) =>
-        move.metas.comments must_== List("such a neat comment", "one more", "comment on termination?")
+      'comment on termination?""") must beValid.like {
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
+          move.metas.comments must_== List("such a neat comment", "one more", "comment on termination?")
       }
     }
     "comments in header" in {
@@ -148,9 +149,11 @@ class CsaParserTest extends ShogiTest {
       +8483FU
       'Something comments
       +8483FU
-      %CHUDAN""") must beValid.like { case ParsedNotation(InitialPosition(init), Tags(tags), _) =>
-        init must_== List("HEADER COMMENT", "HEADER2", "H3")
-        tags.size must_== 3
+      %CHUDAN""") must beValid.like {
+        case ParsedNotation(_, initialSfen, _, InitialPosition(init), Tags(tags)) =>
+          init must_== List("HEADER COMMENT", "HEADER2", "H3")
+          initialSfen must beSome
+          tags.pp.size must_== 2
       }
     }
   }
@@ -175,11 +178,9 @@ P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
 +
 +7776FU
 -8384FU
-    """) must beValid.like { case ParsedNotation(_, Tags(tags), _) =>
+    """) must beValid.like { case ParsedNotation(_, initialSfen, _, _, Tags(tags)) =>
       tags.size must_== 6
-      tags must not contain { (tag: Tag) =>
-        tag.name == Tag.Sfen
-      }
+      initialSfen must beNone
       tags must contain { (tag: Tag) =>
         tag.name == Tag.Sente && tag.value == "鈴木大介 九段"
       }
@@ -193,14 +194,14 @@ P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
   }
 
   "csa fixture 1" in {
-    parser(csa1) must beValid.like { case ParsedNotation(_, Tags(tags), ParsedMoves(pm)) =>
+    parser(csa1) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, _, _, Tags(tags)) =>
       pm.size must_== 111
       tags.size must_== 8
     }
   }
 
   "csa fixture 2" in {
-    parser(csa2) must beValid.like { case ParsedNotation(_, Tags(tags), ParsedMoves(pm)) =>
+    parser(csa2) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, _, _, Tags(tags)) =>
       pm.size must_== 258
       tags.size must_== 4
     }

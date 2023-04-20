@@ -2,10 +2,15 @@ package shogi
 package format
 
 import shogi.format.usi.Usi
+import shogi.format.forsyth.Sfen
 
 trait Notation {
 
   def moves: List[NotationMove]
+
+  def initialSfen: Option[Sfen]
+
+  def variant: shogi.variant.Variant
 
   def tags: Tags
 

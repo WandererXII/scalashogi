@@ -6,12 +6,16 @@ import cats.syntax.option._
 
 import shogi.variant.Standard
 import shogi.format.usi.Usi
+import shogi.format.forsyth.Sfen
 
 final case class Csa(
-    tags: Tags,
     moves: List[NotationMove],
-    initial: Initial = Initial.empty
+    initialSfen: Option[Sfen],
+    initial: Initial = Initial.empty,
+    tags: Tags
 ) extends Notation {
+
+  def variant = Standard
 
   def withMoves(moves: List[NotationMove]) =
     copy(moves = moves)
@@ -32,10 +36,11 @@ final case class Csa(
       if (initial.comments.nonEmpty)
         initial.comments.map(Csa.fixComment _).mkString("")
       else ""
-    val header = Csa renderHeader tags
+    val header               = Csa renderHeader tags
+    val initialSfenOrDefault = initialSfen | variant.initialSfen
     val setup =
-      (tags.sfen | Standard.initialSfen).toSituation(Standard).fold("")(Csa renderSituation _)
-    val startColor: Color = tags.sfen.flatMap(_.color) | Sente
+      initialSfenOrDefault.toSituation(variant).fold("")(Csa renderSituation _)
+    val startColor: Color = initialSfenOrDefault.color | Sente
     val movesStr          = renderMainline(moves, startColor)
     List[String](
       header,

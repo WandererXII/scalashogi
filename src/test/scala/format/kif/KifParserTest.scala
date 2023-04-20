@@ -2,17 +2,15 @@ package shogi
 package format
 package kif
 
-import variant.{ Chushogi, Standard }
-
 class KifParserTest extends ShogiTest {
 
   import KifFixtures._
 
   val parser = KifParser.full _
   def parseMove(str: String, lastDest: Option[Pos] = None) =
-    KifParser.MoveDropParser(str, lastDest, None, Standard)
+    KifParser.MoveDropParser(str, lastDest, None, shogi.variant.Standard)
   def parseChushogiMove(str: String, lastDest: Option[Pos] = None, firstLionOrig: Option[Pos] = None) =
-    KifParser.MoveDropParser(str, lastDest, firstLionOrig, Chushogi)
+    KifParser.MoveDropParser(str, lastDest, firstLionOrig, shogi.variant.Chushogi)
 
   "drop" in {
     parseMove("６四歩打") must beValid.like { case d: Drop =>
@@ -223,7 +221,7 @@ class KifParserTest extends ShogiTest {
   "comments" should {
     "comment after move" in {
       parser("""７7金(78) *▲7八歩兵 - what a comment""") must beValid.like {
-        case ParsedNotation(_, Tags(tags), ParsedMoves(List(move))) =>
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, Tags(tags)) =>
           move.metas.comments must_== List("▲7八歩兵 - what a comment")
           tags must beEmpty
       }
@@ -233,7 +231,7 @@ class KifParserTest extends ShogiTest {
       *such a neat comment
       * one more
       *
-      * drop P*5e""") must beValid.like { case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+      * drop P*5e""") must beValid.like { case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
         move.metas.comments must_== List("such a neat comment", "one more", "drop P*5e")
       }
     }
@@ -242,8 +240,9 @@ class KifParserTest extends ShogiTest {
       *such a neat comment
       * one more
       2 投了 ( 0:03/ )
-      * comment on termination?""") must beValid.like { case ParsedNotation(_, _, ParsedMoves(List(move))) =>
-        move.metas.comments must_== List("such a neat comment", "one more", "comment on termination?")
+      * comment on termination?""") must beValid.like {
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
+          move.metas.comments must_== List("such a neat comment", "one more", "comment on termination?")
       }
     }
     "comments in header" in {
@@ -256,7 +255,7 @@ class KifParserTest extends ShogiTest {
       1 ７六歩(77)
       * Something comments
       2 ３四歩(33)
-      3 投了""") must beValid.like { case ParsedNotation(InitialPosition(init), _, _) =>
+      3 投了""") must beValid.like { case ParsedNotation(_, _, _, InitialPosition(init), _) =>
         init must_== List("HEADER COMMENT", "HEADER2", "H3")
       }
     }
@@ -264,8 +263,9 @@ class KifParserTest extends ShogiTest {
       parser("""７7金(78)
       * comment with hash # <- works
       *
-      * or amp &, or something""") must beValid.like { case ParsedNotation(_, _, ParsedMoves(List(move))) =>
-        move.metas.comments must_== List("comment with hash # <- works", "or amp &, or something")
+      * or amp &, or something""") must beValid.like {
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
+          move.metas.comments must_== List("comment with hash # <- works", "or amp &, or something")
       }
     }
   }
@@ -273,48 +273,48 @@ class KifParserTest extends ShogiTest {
   "times" should {
     "both times" in {
       parser("""29 ４八玉(59) (2:25/0:8:23)""") must beValid.like {
-        case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
           move.metas.timeSpent must_== Some(Centis(14500))
           move.metas.timeTotal must_== Some(Centis(50300))
       }
     }
     "both times with spaces" in {
       parser("""29 ４八玉(59) ( 2:25 / 0:8:23 )""") must beValid.like {
-        case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
           move.metas.timeSpent must_== Some(Centis(14500))
           move.metas.timeTotal must_== Some(Centis(50300))
       }
     }
     "fractional time" in {
       parser("""29 ４八玉(59) (2:25.006/0:8:23.006)""") must beValid.like {
-        case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
           move.metas.timeSpent must_== Some(Centis(14501))
           move.metas.timeTotal must_== Some(Centis(50301))
       }
     }
     "only move time" in {
       parser("""29 ４八玉(59) ( 2:25/)""") must beValid.like {
-        case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
           move.metas.timeSpent must_== Some(Centis(14500))
           move.metas.timeTotal must_== None
       }
     }
     "no time" in {
-      parser("""29 ４八玉(59)""") must beValid.like { case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+      parser("""29 ４八玉(59)""") must beValid.like { case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
         move.metas.timeSpent must_== None
         move.metas.timeTotal must_== None
       }
     }
     "ignore + at the end?" in {
       parser("""29 ４八玉(59) (2:25/0:8:23)+""") must beValid.like {
-        case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
           move.metas.timeSpent must_== Some(Centis(14500))
           move.metas.timeTotal must_== Some(Centis(50300))
       }
     }
     "ignore zero times" in {
       parser("""29 ４八玉(59) (0:00/0:0:00)""") must beValid.like {
-        case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+        case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
           move.metas.timeSpent must_== None
           move.metas.timeTotal must_== None
       }
@@ -361,8 +361,8 @@ class KifParserTest extends ShogiTest {
       先手：先手
       先手の持駒：なし
     """) must beValid.like { case a =>
-      a.tags.value.size must_== 2
-      a.tags.sfen must beSome.like { sfen =>
+      a.tags.value.size must_== 1
+      a.initialSfen must beSome.like { sfen =>
         sfen.value == "3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p"
       }
       a.tags.value must contain { (tag: Tag) =>
@@ -379,7 +379,7 @@ class KifParserTest extends ShogiTest {
       手数----指手---------消費時間--
       1 ７六歩(77) (00:00/00:00:00)
     """) must beValid.like { case a =>
-      a.tags.sfen must beSome.like { sfen =>
+      a.initialSfen must beSome.like { sfen =>
         sfen.value == "4k4/9/9/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 3p"
       }
     }
@@ -393,9 +393,7 @@ class KifParserTest extends ShogiTest {
       手数----指手---------消費時間--
       1 ７六歩(77) (00:00/00:00:00)
     """) must beValid.like { case a =>
-      a.tags.value must not(contain { (tag: Tag) =>
-        tag.name == Tag.Sfen
-      })
+      a.initialSfen must beNone
     }
   }
 
@@ -409,7 +407,7 @@ class KifParserTest extends ShogiTest {
           1 ７六歩(77)        ( 0:00/00:00:00)
         変化：1手
           1 ２六歩(27)        ( 0:00/00:00:00)
-      """) must beValid.like { case ParsedNotation(_, _, ParsedMoves(List(move))) =>
+      """) must beValid.like { case ParsedNotation(ParsedMoves(List(move)), _, _, _, _) =>
         move.metas.variations.headOption must beSome.like { case variation =>
           variation.value must haveSize(1)
         }
@@ -454,7 +452,7 @@ class KifParserTest extends ShogiTest {
 
     変化：1手
       1 ３六歩(37)        ( 0:00/00:00:00)
-      """) must beValid.like { case ParsedNotation(_, _, ParsedMoves(parsedMoves)) =>
+      """) must beValid.like { case ParsedNotation(ParsedMoves(parsedMoves), _, _, _, _) =>
         parsedMoves(5).metas.variations.headOption must beSome.like { case v =>
           v.value must haveSize(2)
         }
@@ -495,7 +493,7 @@ class KifParserTest extends ShogiTest {
         2 ３四歩(33) ( 0:00/)
         3 投了 ( 0:03/ )
         4 中断 ( 0:03/ )
-      """.trim) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(parsedMoves)) =>
+      """.trim) must beValid.like { case ParsedNotation(ParsedMoves(parsedMoves), _, _, _, tags) =>
         parsedMoves must haveSize(2)
         tags.value must contain { (tag: Tag) =>
           tag.name == Tag.Termination && tag.value == "投了"
@@ -537,7 +535,7 @@ class KifParserTest extends ShogiTest {
 
 変化：7手
    7 ３三歩(34)
-    """) must beValid.like { case ParsedNotation(_, _, ParsedMoves(parsedMoves)) =>
+    """) must beValid.like { case ParsedNotation(ParsedMoves(parsedMoves), _, _, _, _) =>
       parsedMoves(0).metas.variations.headOption must beSome.like { case v =>
         v.value must haveSize(3)
         v.value(2).metas.variations.headOption must beSome.like { case vv =>
@@ -560,61 +558,62 @@ class KifParserTest extends ShogiTest {
   }
 
   "kif fixture 1" in {
-    parser(kif1) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
+    parser(kif1) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, v, _, tags) =>
       pm.size must_== 111
       tags.value.size must_== 9
-      tags.variant must beNone
+      v.standard must beTrue
     }
   }
 
   "kif fixture 2" in {
-    parser(kif2) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
+    parser(kif2) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, v, _, tags) =>
       pm.size must_== 193
       tags.value.size must_== 8
-      tags.variant must beNone
+      v.standard must beTrue
     }
   }
 
   "kif fixture 3" in {
-    parser(kif3) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
+    parser(kif3) must beValid.like { case ParsedNotation(ParsedMoves(pm), initialSfen, v, _, tags) =>
       pm.size must_== 117
-      tags.value.size must_== 10
-      tags.variant must beNone
+      tags.value.size must_== 9
+      initialSfen must beSome
+      v.standard must beTrue
     }
   }
 
   "kif fixture 4" in {
-    parser(kif4) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
+    parser(kif4) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, v, _, _) =>
       pm.size must_== 223
-      tags.variant must beNone
+      v.standard must beTrue
     }
   }
 
   "kif fixture 8" in {
-    parser(kif8) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
+    parser(kif8) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, v, _, _) =>
       pm.size must_== 168
-      tags.variant must beNone
+      v.standard must beTrue
     }
   }
 
   "kif fixture 9" in {
-    parser(kif9) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
+    parser(kif9) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, v, _, _) =>
       pm.size must_== 85
-      tags.variant must beNone
+      v.standard must beTrue
     }
   }
 
   "kif fixture 12" in {
-    parser(kif12) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
+    parser(kif12) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, v, _, _) =>
       pm.size must_== 121
-      tags.variant must beNone
+      v.standard must beTrue
     }
   }
 
   "kif fixture 16" in {
-    parser(kif16) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
+    parser(kif16) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, v, _, _) =>
       pm.size must_== 37
-      tags.variant must beNone
+      v.standard must beTrue
     }
   }
 
@@ -623,12 +622,8 @@ class KifParserTest extends ShogiTest {
       先手：先手
       手合割：五々将棋
     """) must beValid.like { case a =>
-      a.tags.sfen must beSome.like { sfen =>
-        sfen.value == "rbsgk/4p/5/P4/KGSBR b -"
-      }
-      a.tags.variant must beSome.like { v =>
-        v === shogi.variant.Minishogi
-      }
+      a.initialSfen must beNone
+      a.variant.minishogi must beTrue
     }
   }
 
@@ -637,12 +632,8 @@ class KifParserTest extends ShogiTest {
       先手：先手
       手合割：5五将棋
     """) must beValid.like { case a =>
-      a.tags.sfen must beSome.like { sfen =>
-        sfen.value == "rbsgk/4p/5/P4/KGSBR b -"
-      }
-      a.tags.variant must beSome.like { v =>
-        v === shogi.variant.Minishogi
-      }
+      a.initialSfen must beNone
+      a.variant.minishogi must beTrue
     }
   }
 
@@ -662,25 +653,21 @@ class KifParserTest extends ShogiTest {
 先手：先手
 後手番
     """) must beValid.like { case a =>
-      a.tags.value.size must_== 3
+      a.tags.value.size must_== 1
       a.tags.value must contain { (tag: Tag) =>
         tag.name == Tag.Sente && tag.value == "先手"
       }
-      a.tags.sfen must beSome.like { sfen =>
+      a.initialSfen must beSome.like { sfen =>
         sfen.value == "rbsgk/4p/P4/5/KGSBR w -"
       }
-      a.tags.variant must beSome.like { v =>
-        v === shogi.variant.Minishogi
-      }
+      a.variant.minishogi must beTrue
     }
   }
 
   "chushogi kif fixture 1" in {
-    parser(chushogiKif1) must beValid.like { case ParsedNotation(_, tags, ParsedMoves(pm)) =>
-      pm.size must_== 129
-      tags.variant must beSome.like { v =>
-        v === shogi.variant.Chushogi
-      }
+    parser(chushogiKif1) must beValid.like { case a =>
+      a.parsedMoves.value.size must_== 129
+      a.variant.chushogi must beTrue
     }
   }
 
@@ -689,12 +676,8 @@ class KifParserTest extends ShogiTest {
       先手：先手
       手合割：安南将棋
     """) must beValid.like { case a =>
-      a.tags.sfen must beSome.like { sfen =>
-        sfen == shogi.variant.Annanshogi.initialSfen.truncate
-      }
-      a.tags.variant must beSome.like { v =>
-        v === shogi.variant.Annanshogi
-      }
+      a.initialSfen must beNone
+      a.variant.annanshogi must beTrue
     }
   }
 
@@ -718,12 +701,10 @@ class KifParserTest extends ShogiTest {
       先手：先手
       先手の持駒：なし
     """) must beValid.like { case a =>
-      a.tags.sfen must beSome.like { sfen =>
+      a.initialSfen must beSome.like { sfen =>
         sfen.value == "3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p"
       }
-      a.tags.variant must beSome.like { v =>
-        v === shogi.variant.Annanshogi
-      }
+      a.variant.annanshogi must beTrue
     }
   }
 

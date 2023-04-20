@@ -77,10 +77,10 @@ object Game {
   def apply(variant: shogi.variant.Variant): Game =
     Game(Situation(variant))
 
-  def apply(variantOption: Option[shogi.variant.Variant], sfen: Option[Sfen]): Game = {
+  def apply(variantOption: Option[shogi.variant.Variant], sfenOption: Option[Sfen]): Game = {
     val variant = variantOption | shogi.variant.Standard
     val g       = apply(variant)
-    sfen
+    sfenOption
       .filterNot(_.initialOf(variant))
       .flatMap {
         _.toSituationPlus(variant)
