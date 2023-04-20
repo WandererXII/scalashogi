@@ -330,6 +330,7 @@ abstract class Variant private[variant] (
   def minishogi  = this == Minishogi
   def chushogi   = this == Chushogi
   def annanshogi = this == Annanshogi
+  def kyotoshogi = this == Kyotoshogi
 
   override def toString = s"Variant($name)"
 
@@ -345,7 +346,8 @@ object Variant {
     Standard,
     Minishogi,
     Chushogi,
-    Annanshogi
+    Annanshogi,
+    Kyotoshogi
   )
 
   val byId: Map[Int, Variant] = all map { v =>
@@ -365,9 +367,6 @@ object Variant {
 
   def byName(name: String): Option[Variant] =
     all find (_.name.toLowerCase == name.toLowerCase)
-
-  def byKeyOrName(keyOrName: String): Option[Variant] =
-    byKey.get(keyOrName).orElse(byName(keyOrName))
 
   def exists(id: Int): Boolean = byId contains id
 
