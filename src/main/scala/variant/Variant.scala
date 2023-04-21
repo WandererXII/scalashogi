@@ -46,20 +46,16 @@ abstract class Variant private[variant] (
 
   def valueOfRole(role: Role): Int
 
-  // True if piece will never be able to move from pos
-  // Used both for drops and moves without promotion
-  def pieceInDeadZone(piece: Piece, pos: Pos): Boolean =
+  def forcePromote(piece: Piece, to: Pos): Boolean =
     piece.role match {
-      case Pawn | Knight | Lance if backrank(piece.color) == pos.rank            => true
-      case Knight if math.abs(backrank(piece.color).index - pos.rank.index) == 1 => true
-      case _                                                                     => false
+      case Pawn | Knight | Lance if backrank(piece.color) == to.rank            => true
+      case Knight if math.abs(backrank(piece.color).index - to.rank.index) == 1 => true
+      case _                                                                    => false
     }
 
   def canPromote(piece: Piece, orig: Pos, dest: Pos, @unused capture: Boolean): Boolean =
     promote(piece.role).isDefined &&
       promotionRanks(piece.color).exists(r => r == dest.rank || r == orig.rank)
-
-  def autoPromote(@unused role: Role) = false
 
   def supportsDrops = true
 
@@ -156,7 +152,7 @@ abstract class Variant private[variant] (
           }
       )
     a.situation.possibleDropDests.filterNot { d =>
-      pieceInDeadZone(a.piece, d) || illegalPawn(d)
+      forcePromote(a.piece, d) || illegalPawn(d)
     }
   }
 
@@ -212,14 +208,12 @@ abstract class Variant private[variant] (
       _     <- Validated.cond(actor is sit.color, (), s"Not my piece on ${usi.orig}")
       capture = sit.board(usi.dest).filter(_.color != sit.color)
       _ <- Validated.cond(
-        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined) || autoPromote(
-          actor.piece.role
-        ),
+        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined),
         (),
         s"${actor.piece} cannot promote"
       )
       _ <- Validated.cond(
-        usi.promotion || !pieceInDeadZone(actor.piece, usi.dest),
+        usi.promotion || !forcePromote(actor.piece, usi.dest),
         (),
         s"${actor.piece} needs to promote"
       )
@@ -236,7 +230,7 @@ abstract class Variant private[variant] (
           .filter(_ => supportsDrops)
           .fold(sit.hands)(sit.hands.store(sit.color, _))
       board <-
-        (if (usi.promotion || autoPromote(actor.piece.role))
+        (if (usi.promotion)
            sit.board.promote(usi.orig, usi.dest, promote)
          else
            sit.board.move(
@@ -299,7 +293,7 @@ abstract class Variant private[variant] (
 
   protected def hasUnmovablePieces(board: Board) =
     board.pieces.exists { case (pos, piece) =>
-      pieceInDeadZone(piece, pos)
+      forcePromote(piece, pos)
     }
 
   protected def hasDoublePawns(board: Board, color: Color) = {

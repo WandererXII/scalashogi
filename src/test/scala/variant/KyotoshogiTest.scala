@@ -70,22 +70,21 @@ class KyotoshogiTest extends ShogiTest {
       sit(Usi("P*5b").get).isValid must beTrue
       sit(Usi("P*5b").get).toOption.get.checkmate must beTrue
     }
-    "tolerate + in usi" in {
+    "enforce + in usi" in {
       val sit = Situation(shogi.variant.Kyotoshogi)
       val s1  = sit(Usi("2e3d").get)
       val s2  = sit(Usi("2e3d+").get)
-      s1.isValid must beTrue
+      s1.isValid must beFalse
       s2.isValid must beTrue
-      s1.toOption.get.toSfen must_== s2.toOption.get.toSfen
     }
     "move to last rank" in {
       val sit = Sfen("pgkst/R3P/5/5/TSKG1 b P").toSituation(shogi.variant.Kyotoshogi).get
-      sit(Usi("1b1a").get).isValid must beTrue
-      sit(Usi("5b5a").get).isValid must beTrue
+      sit(Usi("1b1a+").get).isValid must beTrue
+      sit(Usi("5b5a+").get).isValid must beTrue
     }
   }
 
-  "parse" in {
+  "parse with pieces in dead zone" in {
     Sfen("PgksL/3N1/5/1n3/pSKGl b").toSituation(shogi.variant.Kyotoshogi) must beSome
     Sfen("PgksL/3N1/5/1n3/pSKGl b").toSituation(shogi.variant.Kyotoshogi).get.valid(true) must beTrue
   }

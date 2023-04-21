@@ -96,7 +96,7 @@ object Kif {
         val roleStr = KifUtils.toKif(role, variant).map(_.head) | ""
         s"${pos.kanjiFullWidthKey}${roleStr}打"
       case Usi.Move(orig, dest, prom, _) => {
-        val promStr = if (prom || (variant.kyotoshogi && variant.autoPromote(usiWithRole.role))) "成" else ""
+        val promStr = if (prom) "成" else ""
         val roleStr = KifUtils.toKif(usiWithRole.role, variant).map(_.head) | ""
         s"${renderDest(dest, lastDest, variant)}$roleStr$promStr${renderOrig(orig, variant)}"
       }

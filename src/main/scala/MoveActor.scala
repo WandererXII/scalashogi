@@ -33,7 +33,7 @@ final case class MoveActor(
 
   def toUsis: List[Usi.Move] = {
     val normalMoves = destinations
-      .withFilter(!situation.variant.pieceInDeadZone(piece, _))
+      .withFilter(!situation.variant.forcePromote(piece, _))
       .map(Usi.Move(pos, _, false, None))
     val promotedMoves = destinations
       .withFilter(d => situation.variant.canPromote(piece, pos, d, situation.board(d).isDefined))

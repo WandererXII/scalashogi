@@ -76,7 +76,7 @@ case object Annanshogi
 
   def valueOfRole(r: Role): Int = Standard.valueOfRole(r)
 
-  override def pieceInDeadZone(piece: Piece, pos: Pos): Boolean = false
+  override def forcePromote(piece: Piece, to: Pos): Boolean = false
 
   private def directlyBehind(pos: Pos, color: Color): Option[Pos] =
     color.fold(pos.down, pos.up)

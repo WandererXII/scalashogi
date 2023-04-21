@@ -193,13 +193,13 @@ class KifModelTest extends ShogiTest {
 
   "kif render kyoto" in {
     val moves = List(
-      NotationMove(1, Usi.WithRole(Usi("2e3d").get, Gold)),
-      NotationMove(2, Usi.WithRole(Usi("1a1b").get, Tokin)),
-      NotationMove(3, Usi.WithRole(Usi("1e1d").get, Pawn)),
-      NotationMove(4, Usi.WithRole(Usi("1b1d+").get, Lance)), // try +
+      NotationMove(1, Usi.WithRole(Usi("2e3d+").get, Gold)),
+      NotationMove(2, Usi.WithRole(Usi("1a1b+").get, Tokin)),
+      NotationMove(3, Usi.WithRole(Usi("1e1d+").get, Pawn)),
+      NotationMove(4, Usi.WithRole(Usi("1b1d+").get, Lance)),
       NotationMove(5, Usi.WithRole(Usi("3e4d").get, King)),
       NotationMove(6, Usi.WithRole(Usi("R*2b").get, Rook)),
-      NotationMove(7, Usi.WithRole(Usi("3d2b").get, Knight)),
+      NotationMove(7, Usi.WithRole(Usi("3d2b+").get, Knight)),
       NotationMove(8, Usi.WithRole(Usi("P*4c").get, Pawn))
     )
     Kif(

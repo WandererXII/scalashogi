@@ -259,7 +259,7 @@ case object Chushogi
       case _                     => 0
     }
 
-  override def pieceInDeadZone(piece: Piece, pos: Pos): Boolean = false
+  override def forcePromote(piece: Piece, to: Pos): Boolean = false
 
   override def canPromote(piece: Piece, orig: Pos, dest: Pos, capture: Boolean): Boolean = {
     val pRanks = promotionRanks(piece.color)

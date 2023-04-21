@@ -94,13 +94,11 @@ case object Kyotoshogi
       case _                     => 3
     }
 
-  override def pieceInDeadZone(piece: Piece, pos: Pos): Boolean = false
+  override def forcePromote(piece: Piece, to: Pos): Boolean =
+    promote(piece.role).isDefined
 
-  // it's not a question of can, we must
   override def canPromote(piece: Piece, orig: Pos, dest: Pos, capture: Boolean): Boolean =
-    false
-
-  override def autoPromote(role: Role) = promote(role).isDefined
+    forcePromote(piece, dest)
 
   override def supportsDroppingEitherSide = true
 
