@@ -153,7 +153,7 @@ class CsaParserTest extends ShogiTest {
         case ParsedNotation(_, initialSfen, _, InitialPosition(init), Tags(tags)) =>
           init must_== List("HEADER COMMENT", "HEADER2", "H3")
           initialSfen must beSome
-          tags.pp.size must_== 2
+          tags.size must_== 2
       }
     }
   }
