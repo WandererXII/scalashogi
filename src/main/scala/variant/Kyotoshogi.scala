@@ -6,7 +6,7 @@ import shogi.format.forsyth.Sfen
 
 case object Kyotoshogi
     extends Variant(
-      id = 2,
+      id = 5,
       key = "kyotoshogi",
       name = "Kyoto shogi",
       title = "Pieces alternate between promoted and demoted state after each time they are moved"
