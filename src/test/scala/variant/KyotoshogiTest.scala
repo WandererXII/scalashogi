@@ -76,6 +76,7 @@ class KyotoshogiTest extends ShogiTest {
       val s2  = sit(Usi("2e3d+").get)
       s1.isValid must beFalse
       s2.isValid must beTrue
+      Usi("2e3d-") must beNone
     }
     "move to last rank" in {
       val sit = Sfen("pgkst/R3P/5/5/TSKG1 b P").toSituation(shogi.variant.Kyotoshogi).get
