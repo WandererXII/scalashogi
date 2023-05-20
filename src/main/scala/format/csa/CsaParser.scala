@@ -273,21 +273,21 @@ object CsaParser {
     Tag.csaNameToTag.get(str).fold(str)(_.lowercase)
 
   private def getComments(csa: String): Validated[String, InitialPosition] =
-    augmentString(csa).linesIterator.toList.map(_.trim).filter(_.nonEmpty) filter { line =>
-      line.startsWith("'")
-    } match {
-      case (comms) => valid(InitialPosition(comms.map(_.drop(1).trim)))
-    }
+    valid(
+      InitialPosition(
+        augmentString(csa).linesIterator.map(_.trim).filter(_.startsWith("'")).map(_.drop(1).trim).toList
+      )
+    )
 
   private def splitHeaderAndMoves(csa: String): Validated[String, (String, String)] =
-    augmentString(csa).linesIterator.toList.map(_.trim).filter(_.nonEmpty) span { line =>
+    augmentString(csa).linesIterator.map(_.trim).filter(_.nonEmpty) span { line =>
       !moveOrDropRegex.matches(line)
     } match {
       case (headerLines, moveLines) => valid(headerLines.mkString("\n") -> moveLines.mkString("\n"))
     }
 
   private def splitMetaAndBoard(csa: String): Validated[String, (String, String)] =
-    augmentString(csa).linesIterator.toList
+    augmentString(csa).linesIterator
       .map(_.trim)
       .filter(l => l.nonEmpty && !l.startsWith("'")) partition { line =>
       !((line startsWith "P") || (line == "+") || (line == "-"))

@@ -15,16 +15,15 @@ object KifParserHelper {
       handicapString: Option[String],
       moves: List[String]
   ): Validated[String, Situation] = {
-    val lines = augmentString(str).linesIterator.toList.map(_.trim.replace("：", ":").replace("　", " "))
-    val ranks = lines.view
-      .filter(l => (l lift 0 contains '|') && (l.size <= 100))
+    val lines = augmentString(str).linesIterator.map(_.trim.replace("：", ":").replace("　", " ")).toList
+    val ranks = lines
+      .withFilter(l => (l lift 0 contains '|') && (l.sizeIs <= 100))
       .map(
         _.replace(".", "・")
           .replace(" ", "")
           .drop(1)
           .takeWhile(_ != '|')
       )
-      .toList
 
     val variant = detectVariant(ranks, handicapString, moves) | Standard
 
@@ -32,7 +31,7 @@ object KifParserHelper {
       handicapString
         .filterNot(h => KifUtils.defaultHandicaps.get(variant).exists(_.exists(_ == h)))
         .fold(valid(Situation(variant)): Validated[String, Situation])(parseHandicap(_, variant))
-    else if (ranks.size == variant.numberOfRanks)
+    else if (ranks.sizeIs == variant.numberOfRanks)
       for {
         pieces <- parseBoard(ranks, variant)
         board        = Board(pieces)
@@ -62,10 +61,10 @@ object KifParserHelper {
   ): Option[Variant] = {
     if (handicapString.exists(isDefaultHandicapOf(_, Kyotoshogi))) Kyotoshogi.some
     else if (
-      ranks.size == 5 ||
+      ranks.sizeIs == 5 ||
       handicapString.exists(isDefaultHandicapOf(_, Minishogi))
     ) Minishogi.some
-    else if (ranks.size == 12 || moves.exists(m => chushogiKifMoveRegex.matches(m)))
+    else if (ranks.sizeIs == 12 || moves.exists(m => chushogiKifMoveRegex.matches(m)))
       Chushogi.some
     else if (handicapString.exists(isDefaultHandicapOf(_, Annanshogi)))
       Annanshogi.some

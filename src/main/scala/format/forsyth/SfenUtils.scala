@@ -126,7 +126,7 @@ object SfenUtils {
   }).distinct
 
   val allForsythDroppable: List[String] = (Role.allDroppable flatMap { r: Role =>
-    Variant.all.filter(_.supportsDrops) flatMap { v =>
+    Variant.all.withFilter(_.supportsDrops) flatMap { v =>
       toForsyth(r, v)
     }
   }).distinct

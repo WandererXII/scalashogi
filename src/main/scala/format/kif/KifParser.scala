@@ -475,14 +475,18 @@ object KifParser {
     comments.map(_.trim.take(2000)).filter(_.nonEmpty)
 
   private def getComments(kif: String): Validated[String, InitialPosition] =
-    augmentString(kif).linesIterator.toList.map(_.trim).filter(_.nonEmpty) filter { line =>
-      line.startsWith("*") || line.startsWith("＊")
-    } match {
-      case (comms) => valid(InitialPosition(comms.map(_.drop(1).trim)))
-    }
+    valid(
+      InitialPosition(
+        augmentString(kif).linesIterator
+          .map(_.trim)
+          .filter(l => l.startsWith("*") || l.startsWith("＊"))
+          .map(_.drop(1).trim)
+          .toList
+      )
+    )
 
   private def splitKif(kif: String): Validated[String, (String, String, String)] = {
-    augmentString(kif).linesIterator.toList.map(_.trim).filter(_.nonEmpty) span { line =>
+    augmentString(kif).linesIterator.map(_.trim).filter(_.nonEmpty) span { line =>
       !moveOrDropLineRegex.matches(line)
     } match {
       case (headerLines, rest) => {
@@ -497,7 +501,7 @@ object KifParser {
   }
 
   private def splitMetaAndBoard(kif: String): Validated[String, (String, String)] =
-    augmentString(kif).linesIterator.toList
+    augmentString(kif).linesIterator
       .map(_.trim)
       .filter(l => l.nonEmpty && !(l.startsWith("*") || l.startsWith("＊"))) partition { line =>
       (line contains ":") && !(line.tail startsWith "手の持駒")

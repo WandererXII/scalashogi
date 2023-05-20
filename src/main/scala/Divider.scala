@@ -63,7 +63,7 @@ object Divider {
           val curSenteInvaders = countInvaders(sit, Sente)
           val curGoteInvaders  = countInvaders(sit, Gote)
           if (
-            (majorsAndMinors(sit) <= 3 && sit.board.pieces.size <= 12) ||
+            (majorsAndMinors(sit) <= 3 && sit.board.pieces.sizeIs <= 12) ||
             (curSenteInvaders >= 2 && lastSenteInvaders >= 2) ||
             (curGoteInvaders >= 2 && lastGoteInvaders >= 2)
           ) Found(index)

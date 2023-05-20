@@ -10,7 +10,7 @@ import shogi.variant.Standard
 
 object CsaParserHelper {
   def parseSituation(str: String): Validated[String, Situation] = {
-    val lines        = augmentString(str.replace(",", "\n")).linesIterator.toList.map(_.trim)
+    val lines        = augmentString(str.replace(",", "\n")).linesIterator.map(_.trim).toList
     val handicap     = lines.find(l => l.startsWith("PI"))
     val isBoardSetup = lines.exists(l => l.startsWith("P1"))
     if (handicap.isDefined && isBoardSetup)
@@ -37,7 +37,7 @@ object CsaParserHelper {
     def parseSquarePiece(squarePiece: String, pieces: PieceMap): Validated[String, PieceMap] = {
       for {
         _ <-
-          if (squarePiece.size == 4) valid(squarePiece)
+          if (squarePiece.sizeIs == 4) valid(squarePiece)
           else invalid(s"Incorrect square and piece format in handicap setup: $squarePiece")
         posStr  = squarePiece.slice(0, 2)
         roleStr = squarePiece.slice(2, 4)
@@ -73,7 +73,7 @@ object CsaParserHelper {
     else if (squares.size != 81)
       invalid(
         "Incorrect number of squares in board setup: %d/81 (%s)"
-          .format(squares.size, ranks.filter(_.size > (2 + 9 * 3)).map(_.take(2)).mkString(","))
+          .format(squares.size, ranks.withFilter(_.size > (2 + 9 * 3)).map(_.take(2)).mkString(","))
       )
     else {
       squares.foldLeft[Validated[String, PieceMap]](valid(Map.empty)) { case (acc, cur) =>
@@ -112,7 +112,7 @@ object CsaParserHelper {
         } else
           for {
             _ <-
-              if (str.size == 4) valid(str)
+              if (str.sizeIs == 4) valid(str)
               else invalid(s"Incorrect format (${str}) in: $line")
             roleStr = str.slice(2, 4)
             roleBase <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
@@ -122,7 +122,7 @@ object CsaParserHelper {
       def parseBoardAddition(str: String, color: Color, sit: Situation): Validated[String, Situation] = {
         for {
           _ <-
-            if (str.size == 4) valid(str)
+            if (str.sizeIs == 4) valid(str)
             else invalid(s"Incorrect square piece format (${str}) in: $line")
           posStr  = str.slice(0, 2)
           roleStr = str.slice(2, 4)

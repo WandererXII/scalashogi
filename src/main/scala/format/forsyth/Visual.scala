@@ -23,7 +23,7 @@ object Visual {
 
   def parse(source: String, variant: Variant = Standard): Option[Situation] = {
     val clean = source.replaceAll("^\n|\n$| ", "")
-    val lines = augmentString(clean).linesIterator.toList.map(_.trim).filter(_.nonEmpty)
+    val lines = augmentString(clean).linesIterator.map(_.trim).filter(_.nonEmpty).toList
     val hands = lines.find(_.toLowerCase.startsWith("hands")).flatMap(_.split(':').lift(1)) | ""
     val turn =
       if (lines.map(_.toLowerCase).exists(l => l.startsWith("turn") && l.contains("gote"))) "w" else "b"

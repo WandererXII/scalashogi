@@ -157,17 +157,17 @@ case object Standard
   override def impasse(sit: Situation): Boolean = !sit.check && {
     val color = sit.color
     val ranks = sit.variant.promotionRanks(color)
-    val enteredRoles = sit.board.pieces.collect {
+    val enteredRoles = sit.board.pieces.view.collect {
       case (pos, piece) if (piece is color) && (ranks contains pos.rank) => piece.role
-    }.toList
+    }
     def impassePoints: Int =
       enteredRoles.map(impasseValueOf).sum + sit
         .hands(color)
         .sum(impasseValueOf)
 
     // more than 10 - including the king
-    enteredRoles.size > 10 && enteredRoles
-      .contains(King) && impassePoints >= color.fold(28, 27 - missingImpassePoints(sit))
+    enteredRoles.sizeIs > 10 && enteredRoles
+      .exists(_ == King) && impassePoints >= color.fold(28, 27 - missingImpassePoints(sit))
   }
 
 }

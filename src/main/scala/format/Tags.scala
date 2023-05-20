@@ -48,7 +48,7 @@ final case class Tags(value: List[Tag]) extends AnyVal {
     value.exists(_.name == which(Tag))
 
   def resultColor: Option[Option[Color]] =
-    apply(_.Result).filter("*" !=) map Color.fromResult
+    apply(_.Result).filter("*" !=).map(Color.fromResult)
 
   def knownTypes: Tags = Tags(value.filter(Tag.tagTypes contains _.name))
 

@@ -291,7 +291,7 @@ abstract class Variant private[variant] (
 
   // Returns true if neither player can win. The game should end immediately.
   def isInsufficientMaterial(sit: Situation) =
-    sit.hands.isEmpty && sit.board.pieces.size <= 2 &&
+    sit.hands.isEmpty && sit.board.pieces.sizeIs <= 2 &&
       sit.board.pieces.forall { p => p._2 is King }
 
   protected def hasUnmovablePieces(board: Board) =

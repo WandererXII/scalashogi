@@ -323,7 +323,7 @@ case object Chushogi
 
   // from color's side - was color king bared
   override def bareKing(sit: Situation, color: Color): Boolean = {
-    val ourPiecesFiltered = sit.board.pieces.collect {
+    val ourPiecesFiltered = sit.board.pieces.view.collect {
       case (pos, piece)
           if (piece is color) && !(((piece is Pawn) || (piece is Lance)) && backrank(
             piece.color
@@ -331,7 +331,7 @@ case object Chushogi
         pos
     }
     lazy val ourKing = sit.board.royalPossOf(color)
-    lazy val theirPiecesFiltered = sit.board.pieces.collect {
+    lazy val theirPiecesFiltered = sit.board.pieces.view.collect {
       case (pos, piece)
           if (piece is !color) && !((piece is Pawn) || (piece is GoBetween)) && !((piece is Lance) && backrank(
             piece.color
@@ -340,12 +340,12 @@ case object Chushogi
     }
     lazy val theirKing = sit.board.royalPossOf(!color)
 
-    ourPiecesFiltered.size == 1 &&  // we have to have only a single piece
-    ourKing.size == 1 &&            // and that piece is royal
-    theirPiecesFiltered.size > 1 && // opponent has to have more than just a single royal
-    theirKing.size >= 1 &&          // but they have to have at least one royal
-    !sit.switch.check &&            // we cannot be threating to capture opponents king/prince
-    (theirPiecesFiltered.size > 2 || !theirPiecesFiltered.exists(p =>
+    ourPiecesFiltered.sizeIs == 1 &&  // we have to have only a single piece
+    ourKing.sizeIs == 1 &&            // and that piece is royal
+    theirPiecesFiltered.sizeIs > 1 && // opponent has to have more than just a single royal
+    theirKing.sizeIs >= 1 &&          // but they have to have at least one royal
+    !sit.switch.check &&              // we cannot be threating to capture opponents king/prince
+    (theirPiecesFiltered.sizeIs > 2 || !theirPiecesFiltered.exists(p =>
       ourKing.headOption.fold(false)(_.dist(p) == 1)
     )) // opponent either has more pieces than we can capture, or we don't threaten to bare their king
   }
@@ -355,7 +355,7 @@ case object Chushogi
 
   override def isInsufficientMaterial(sit: Situation) = {
     // don't count dead pieces
-    val piecesFiltered = sit.board.pieces.filter { case (pos, piece) =>
+    val piecesFiltered = sit.board.pieces.view.filter { case (pos, piece) =>
       if (
         ((piece is Pawn) || (piece is Lance)) && backrank(
           piece.color
@@ -363,9 +363,9 @@ case object Chushogi
       ) false
       else true
     }
-    piecesFiltered.size == 2 && sit.board.royalPossOf(sit.color).size == 1 && sit.board
+    piecesFiltered.sizeIs == 2 && sit.board.royalPossOf(sit.color).sizeIs == 1 && sit.board
       .royalPossOf(!sit.color)
-      .size == 1 &&
+      .sizeIs == 1 &&
     !sit.check &&
     !sit.switch.check
   }
