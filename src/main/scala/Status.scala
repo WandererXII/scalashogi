@@ -20,7 +20,7 @@ object Status {
   case object Resign         extends Status(31)
   case object Stalemate      extends Status(32)
   case object Timeout        extends Status(33) // when player leaves the game
-  case object Draw           extends Status(34) // todo - separate draw by repetition and other draws
+  case object Draw           extends Status(34)
   case object Outoftime      extends Status(35) // clock flag
   case object Cheat          extends Status(36)
   case object NoStart        extends Status(37) // the player did not make the first move in time
@@ -30,6 +30,7 @@ object Status {
   case object Impasse27      extends Status(41)
   case object RoyalsLost     extends Status(42)
   case object BareKing       extends Status(43)
+  case object Repetition     extends Status(44)
 
   val all = List[Status](
     Created,
@@ -48,28 +49,13 @@ object Status {
     Impasse27,
     PerpetualCheck,
     RoyalsLost,
-    BareKing
+    BareKing,
+    Repetition
   )
 
   val finishedNotCheated: List[Status] = all filter { s =>
     s.id >= Mate.id && s.id != Cheat.id
   }
-
-  val finishedWithWinner =
-    List[Status](
-      Mate,
-      Resign,
-      Timeout,
-      Outoftime,
-      Cheat,
-      NoStart,
-      Stalemate,
-      RoyalsLost,
-      BareKing,
-      TryRule,
-      Impasse27,
-      PerpetualCheck
-    )
 
   val byId: Map[Int, Status] = all map { v =>
     (v.id, v)

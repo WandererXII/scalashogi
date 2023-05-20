@@ -121,18 +121,18 @@ final case class Situation(
 
   def perpetualCheck: Boolean = variant perpetualCheck this
 
+  def repetition: Boolean = variant repetition this
+
   def royalsLost: Boolean = variant royalsLost this
 
   def bareKing(color: Color): Boolean = variant.bareKing(this, color)
 
-  def autoDraw: Boolean =
-    (variant.repetition(this) && !perpetualCheck) ||
-      variant.isInsufficientMaterial(this)
+  def draw: Boolean = variant draw this
 
   def impasse = variant impasse this
 
   def end(withImpasse: Boolean): Boolean =
-    checkmate || stalemate || autoDraw || perpetualCheck || (withImpasse && impasse)
+    checkmate || stalemate || perpetualCheck || repetition || draw || (withImpasse && impasse)
 
   def winner: Option[Color] = variant.winner(this)
 
@@ -150,7 +150,8 @@ final case class Situation(
     else if (stalemate) Status.Stalemate.some
     else if (impasse) Status.Impasse27.some
     else if (perpetualCheck) Status.PerpetualCheck.some
-    else if (autoDraw) Status.Draw.some
+    else if (repetition) Status.Repetition.some
+    else if (draw) Status.Draw.some
     else none
 
   // Util

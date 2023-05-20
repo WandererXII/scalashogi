@@ -262,6 +262,9 @@ abstract class Variant private[variant] (
       (dist + 1) <= sit.history.consecutiveAttacks(!sit.color)
     }
 
+  def repetition(sit: Situation): Boolean =
+    sit.history.fourfoldRepetition && !perpetualCheck(sit)
+
   def stalemate(sit: Situation): Boolean =
     !sit.check && !sit.hasMoveDestinations && !sit.hasDropDestinations
 
@@ -272,7 +275,7 @@ abstract class Variant private[variant] (
 
   def royalsLost(@unused sit: Situation): Boolean = false
 
-  def repetition(sit: Situation): Boolean = sit.history.fourfoldRepetition
+  def draw(sit: Situation): Boolean = isInsufficientMaterial(sit)
 
   // Player wins or loses after their move
   def winner(sit: Situation): Option[Color] =

@@ -146,7 +146,7 @@ object Csa {
       case Mate if winnerTurn && winnerColor.contains(Sente) => "%-ILLEGAL_ACTION".some // pawn checkmate
       case Mate if winnerTurn                                => "%+ILLEGAL_ACTION".some // pawn checkmate
       case Mate | Stalemate                                  => "%TSUMI".some
-      case Draw                                              => "%SENNICHITE".some
+      case Repetition                                        => "%SENNICHITE".some
       case Impasse27                                         => "%KACHI".some
       case _                                                 => None
     }
