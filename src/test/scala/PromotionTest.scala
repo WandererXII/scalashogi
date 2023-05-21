@@ -14,7 +14,8 @@ Turn:Gote
 """
     val game      = Game(situation)
     "promote to a tokin" in {
-      game.playMove(SQ7G, SQ7H, true) must beGame("""
+      game.playMove(SQ7G, SQ7H, true) must beGame(
+        """
 . . . . . . . . .
 . . . . . . . . .
 . . . . . . . . .
@@ -26,10 +27,13 @@ Turn:Gote
 K . . . . . . . .
 Hands:
 Turn:Sente
-""")
+""",
+        shogi.variant.Standard
+      )
     }
     "don't force promotion by default" in {
-      game.playMove(SQ7G, SQ7H) must beGame("""
+      game.playMove(SQ7G, SQ7H) must beGame(
+        """
 . . . . . . . . .
 . . . . . . . . .
 . . . . . . . . .
@@ -41,10 +45,13 @@ Turn:Sente
 K . . . . . . . .
 Hands:
 Turn:Sente
-""")
+""",
+        shogi.variant.Standard
+      )
     }
     "don't promote" in {
-      game.playMove(SQ7G, SQ7H, false) must beGame("""
+      game.playMove(SQ7G, SQ7H, false) must beGame(
+        """
 . . . . . . . . .
 . . . . . . . . .
 . . . . . . . . .
@@ -56,7 +63,9 @@ Turn:Sente
 K . . . . . . . .
 Hands:
 Turn:Sente
-""")
+""",
+        shogi.variant.Standard
+      )
     }
     "promotion by killing" in {
       Game(
@@ -64,7 +73,8 @@ Turn:Sente
 . . p . . . . . .
 K . R . . . . . .
 Turn:Gote"""
-      ).playMove(SQ7H, SQ7I, true) must beGame("""
+      ).playMove(SQ7H, SQ7I, true) must beGame(
+        """
 . . . . . . . . .
 . . . . . . . . .
 . . . . . . . . .
@@ -75,7 +85,9 @@ Turn:Gote"""
 . . . . . . . . .
 K .+p . . . . . .
 Hands:r
-Turn:Sente""")
+Turn:Sente""",
+        shogi.variant.Standard
+      )
     }
   }
 }

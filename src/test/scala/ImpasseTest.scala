@@ -2,41 +2,42 @@ package shogi
 
 import Pos._
 import format.forsyth.Sfen
+import shogi.variant._
 
 class ImpasseTest extends ShogiTest {
 
   "Pieces in promotion zone" should {
     "not be enough" in {
       "starting position" in {
-        val g = sfenToGame(Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"))
+        val g = sfenToGame(Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beFalse
           game.situation.winner must beNone
         }
       }
       "position with less than 10 other pieces in promotion zone" in {
-        val g = sfenToGame(Sfen("2SGS4/+B+RGKG2RB/9/9/7pp/8k/9/9/9 b g2s4n4l16p 1"))
+        val g = sfenToGame(Sfen("2SGS4/+B+RGKG2RB/9/9/7pp/8k/9/9/9 b g2s4n4l16p 1"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beFalse
           game.situation.winner must beNone
         }
       }
       "position without the king in promotion zone" in {
-        val g = sfenToGame(Sfen("2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 b - 1"))
+        val g = sfenToGame(Sfen("2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 b - 1"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beFalse
           game.situation.winner must beNone
         }
       }
       "position without enough value" in {
-        val g = sfenToGame(Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"))
+        val g = sfenToGame(Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beFalse
           game.situation.winner must beNone
         }
       }
       "one move away" in {
-        val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/9/9/9 b - 1"))
+        val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/9/9/9 b - 1"), Standard)
         g must beValid.like { case game =>
           game.playMove(SQ8E, SQ8B) must beValid.like { case game2 =>
             game2.situation.impasse must beFalse
@@ -45,7 +46,7 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "opponent prevents impasse" in {
-        val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/6b2/9/9 b - 1"))
+        val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/6b2/9/9 b - 1"), Standard)
         g must beValid.like { case game =>
           game.playMoves((SQ8E, SQ8B, false), (SQ3G, SQ2F, false)) must beValid.like { case game2 =>
             game2.situation.impasse must beFalse
@@ -54,14 +55,14 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "26 points for gote" in {
-        val g = sfenToGame(Sfen("9/9/9/9/9/9/3r1lllg/+P+P1+bkssgg/K+P4ssg w r 2"))
+        val g = sfenToGame(Sfen("9/9/9/9/9/9/3r1lllg/+P+P1+bkssgg/K+P4ssg w r 2"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beFalse
           game.situation.winner must beNone
         }
       }
       "21 points for gote (uwate) plus 1 piece handicap" in {
-        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgr/K+P4ssg w r 2"))
+        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgr/K+P4ssg w r 2"), Standard)
         g must beValid.like { case game =>
           val handicapGame = game.withHistory(
             game.situation.history.withInitialSfen(
@@ -73,7 +74,7 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "17 points for gote (uwate) and pieces in opponent hand - not missing" in {
-        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"))
+        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Standard)
         g must beValid.like { case game =>
           val handicapGame = game.withHistory(
             game.situation.history.withInitialSfen(
@@ -85,7 +86,7 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "27 points for sente" in {
-        val g = sfenToGame(Sfen("G3+R3S/GG5SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 b - 1"))
+        val g = sfenToGame(Sfen("G3+R3S/GG5SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 b - 1"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beFalse
           game.situation.winner must beNone
@@ -94,7 +95,7 @@ class ImpasseTest extends ShogiTest {
     }
     "be enough" in {
       "all pieces on the board" in {
-        val g = sfenToGame(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"))
+        val g = sfenToGame(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beTrue
           game.situation.winner must beSome.like { case color =>
@@ -103,7 +104,7 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "some from hand" in {
-        val g = sfenToGame(Sfen("G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2R2B 1"))
+        val g = sfenToGame(Sfen("G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2R2B 1"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beTrue
           game.situation.winner must beSome.like { case color =>
@@ -112,7 +113,7 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "after moves" in {
-        val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/9/9/9 b - 1"))
+        val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/9/9/9 b - 1"), Standard)
         g must beValid.like { case game =>
           game.playMoves((SQ8E, SQ8B, false), (SQ2E, SQ2F, false)) must beValid.like { case game2 =>
             game2.situation.impasse must beTrue
@@ -123,7 +124,7 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "27 points for gote" in {
-        val g = sfenToGame(Sfen("9/9/9/9/9/9/3r1llll/+P+P1+bkssgg/K+P3ssgg w r 2"))
+        val g = sfenToGame(Sfen("9/9/9/9/9/9/3r1llll/+P+P1+bkssgg/K+P3ssgg w r 2"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beTrue
           game.situation.winner must beSome.like { case color =>
@@ -132,7 +133,7 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "17 points for gote (uwate), but 2 piece handicap" in {
-        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"))
+        val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Standard)
         g must beValid.like { case game =>
           val handicapGame = game.withHistory(
             game.situation.history.withInitialSfen(
@@ -146,7 +147,7 @@ class ImpasseTest extends ShogiTest {
         }
       }
       "28 points for sente" in {
-        val g = sfenToGame(Sfen("G3+R3S/GG2P2SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 b - 1"))
+        val g = sfenToGame(Sfen("G3+R3S/GG2P2SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 b - 1"), Standard)
         g must beValid.like { case game =>
           game.situation.impasse must beTrue
           game.situation.winner must beSome.like { case color =>
@@ -158,7 +159,7 @@ class ImpasseTest extends ShogiTest {
     "annanshogi" in {
       "yes" in {
         "all pieces on the board" in {
-          val g = sfenToGame(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"), shogi.variant.Annanshogi)
+          val g = sfenToGame(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"), Annanshogi)
           g must beValid.like { case game =>
             game.situation.impasse must beTrue
             game.situation.winner must beSome.like { case color =>
@@ -167,7 +168,7 @@ class ImpasseTest extends ShogiTest {
           }
         }
         "some from hand" in {
-          val g = sfenToGame(Sfen("G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2R2B 1"), shogi.variant.Annanshogi)
+          val g = sfenToGame(Sfen("G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2R2B 1"), Annanshogi)
           g must beValid.like { case game =>
             game.situation.impasse must beTrue
             game.situation.winner must beSome.like { case color =>
@@ -176,7 +177,7 @@ class ImpasseTest extends ShogiTest {
           }
         }
         "17 points for gote (uwate), but annanshogi handicap" in {
-          val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), shogi.variant.Annanshogi)
+          val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Annanshogi)
           g must beValid.like { case game =>
             val handicapGame = game.withHistory(
               game.situation.history.withInitialSfen(
@@ -193,14 +194,14 @@ class ImpasseTest extends ShogiTest {
       "no" in {
         "position with less than 10 other pieces in promotion zone" in {
           val g =
-            sfenToGame(Sfen("2SGS4/+B+RGKG2RB/9/9/7pp/8k/9/9/9 b g2s4n4l16p 1"), shogi.variant.Annanshogi)
+            sfenToGame(Sfen("2SGS4/+B+RGKG2RB/9/9/7pp/8k/9/9/9 b g2s4n4l16p 1"), Annanshogi)
           g must beValid.like { case game =>
             game.situation.impasse must beFalse
             game.situation.winner must beNone
           }
         }
         "position without the king in promotion zone" in {
-          val g = sfenToGame(Sfen("2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 b - 1"), shogi.variant.Annanshogi)
+          val g = sfenToGame(Sfen("2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 b - 1"), Annanshogi)
           g must beValid.like { case game =>
             game.situation.impasse must beFalse
             game.situation.winner must beNone
@@ -210,7 +211,7 @@ class ImpasseTest extends ShogiTest {
           val g =
             sfenToGame(
               Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"),
-              shogi.variant.Annanshogi
+              Annanshogi
             )
           g must beValid.like { case game =>
             game.situation.impasse must beFalse
@@ -218,7 +219,7 @@ class ImpasseTest extends ShogiTest {
           }
         }
         "17 points for gote (uwate), but standard handicap" in {
-          val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), shogi.variant.Annanshogi)
+          val g = sfenToGame(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Annanshogi)
           g must beValid.like { case game =>
             val handicapGame = game.withHistory(
               game.situation.history.withInitialSfen(

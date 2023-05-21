@@ -11,8 +11,8 @@ class LanceTest extends ShogiTest {
     val goteRook  = Gote - Lance
 
     "move to any position in front" in {
-      pieceMoves(senteRook, SQ5E) must bePoss(SQ5D, SQ5C, SQ5B, SQ5A)
-      pieceMoves(goteRook, SQ5E) must bePoss(SQ5I, SQ5H, SQ5G, SQ5F)
+      pieceMoves(senteRook, SQ5E, shogi.variant.Standard) must bePoss(SQ5D, SQ5C, SQ5B, SQ5A)
+      pieceMoves(goteRook, SQ5E, shogi.variant.Standard) must bePoss(SQ5I, SQ5H, SQ5G, SQ5F)
     }
 
     "threaten" in {

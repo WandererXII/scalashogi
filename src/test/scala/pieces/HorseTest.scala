@@ -11,7 +11,7 @@ class HorseTest extends ShogiTest {
     val horseGote = Gote - Horse
 
     "move diagonally in 4 directions and all around" in {
-      pieceMoves(horse, SQ5E) must bePoss(
+      pieceMoves(horse, SQ5E, shogi.variant.Standard) must bePoss(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -33,7 +33,7 @@ class HorseTest extends ShogiTest {
         SQ5D,
         SQ5F
       )
-      pieceMoves(horseGote, SQ5E) must bePoss(
+      pieceMoves(horseGote, SQ5E, shogi.variant.Standard) must bePoss(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -58,7 +58,19 @@ class HorseTest extends ShogiTest {
     }
 
     "move in 2 directions, when at the edges" in {
-      pieceMoves(horse, SQ1C) must bePoss(SQ2B, SQ3A, SQ2D, SQ3E, SQ4F, SQ5G, SQ6H, SQ7I, SQ2C, SQ1D, SQ1B)
+      pieceMoves(horse, SQ1C, shogi.variant.Standard) must bePoss(
+        SQ2B,
+        SQ3A,
+        SQ2D,
+        SQ3E,
+        SQ4F,
+        SQ5G,
+        SQ6H,
+        SQ7I,
+        SQ2C,
+        SQ1D,
+        SQ1B
+      )
     }
 
     "not move to positions that are occupied by the same colour" in {

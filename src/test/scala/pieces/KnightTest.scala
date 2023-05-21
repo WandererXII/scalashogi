@@ -11,12 +11,12 @@ class KnightTest extends ShogiTest {
     val knightGote = Gote - Knight
 
     "move in any of 2 positions" in {
-      pieceMoves(knight, SQ5E) must bePoss(SQ6C, SQ4C)
-      pieceMoves(knightGote, SQ5E) must bePoss(SQ6G, SQ4G)
+      pieceMoves(knight, SQ5E, shogi.variant.Standard) must bePoss(SQ6C, SQ4C)
+      pieceMoves(knightGote, SQ5E, shogi.variant.Standard) must bePoss(SQ6G, SQ4G)
     }
 
     "move in 1 one position when at the edges" in {
-      pieceMoves(knight, SQ1D) must bePoss(SQ2B)
+      pieceMoves(knight, SQ1D, shogi.variant.Standard) must bePoss(SQ2B)
     }
 
     "not move to positions that are occupied by the same colour" in {

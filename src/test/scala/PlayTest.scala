@@ -8,7 +8,8 @@ class PlayTest extends ShogiTest {
   "playing a game" should {
     "opening one" in {
       val game =
-        makeGame.playMoves((SQ7G, SQ7F, false), (SQ3C, SQ3D, false), (SQ8H, SQ2B, false))
+        makeGame(shogi.variant.Standard)
+          .playMoves((SQ7G, SQ7F, false), (SQ3C, SQ3D, false), (SQ8H, SQ2B, false))
       "current game" in {
         game must beValid.like { case g =>
           addNewLines(g.situation.visual) must_== """

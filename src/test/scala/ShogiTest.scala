@@ -15,15 +15,18 @@ import variant._
 trait ShogiTest extends Specification with ValidatedMatchers {
 
   implicit def stringToSituation(str: String): Situation =
-    (Visual parse str)
-      .orElse(Visual.parse(str, shogi.variant.Chushogi))
-      .orElse(Visual.parse(str, shogi.variant.Minishogi))
+    Visual
+      .parse(str, Standard)
+      .orElse(Visual.parse(str, Chushogi))
+      .orElse(Visual.parse(str, Minishogi))
+      .orElse(Visual.parse(str, Annanshogi))
+      .orElse(Visual.parse(str, Kyotoshogi))
       .get
 
   implicit def colorChanger(str: String) =
     new {
 
-      def as(color: Color): Situation = (Visual parse str).get.copy(color = color)
+      def as(color: Color): Situation = stringToSituation(str).copy(color = color)
     }
 
   case class RichActor(actor: MoveActor) {
@@ -78,50 +81,44 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   implicit def richGame(game: Game) = RichGame(game)
 
-  def sfenToGame(sfen: Sfen, variant: Variant = shogi.variant.Standard) =
+  def sfenToGame(sfen: Sfen, variant: Variant) =
     sfen.toSituation(variant) toValid "Could not construct situation from SFEN" map { sit =>
       Game(variant).copy(
         situation = sit
       )
     }
 
-  def makeSituation(pieces: (Pos, Piece)*): Situation =
-    Situation(shogi.variant.Standard).withBoard(Board(pieces))
+  def makeSituation(variant: Variant): Situation =
+    Situation(variant)
 
-  def makeSituation: Situation = Situation(shogi.variant.Standard)
+  def makeSituationWithBoard(variant: Variant, pieces: (Pos, Piece)*): Situation =
+    makeSituation(variant).withBoard(Board(pieces))
 
-  def makeEmptySituation: Situation = Situation(shogi.variant.Standard).withBoard(Board.empty)
-  def makeEmptySituation(variant: shogi.variant.Variant): Situation =
+  def makeEmptySituation(variant: Variant): Situation =
     Situation(variant).withBoard(Board.empty)
 
   def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>
-      sortPoss(p.toList) must_== sortPoss(poss.toList)
+      p.toList must containTheSameElementsAs(poss.toList)
     }
 
-  def makeGame: Game = Game(makeSituation)
+  def makeGame(variant: Variant): Game =
+    Game(makeSituation(variant))
 
   def bePoss(situation: Situation, visual: String): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>
       Visual.addNewLines(Visual.render(situation, Map(p -> 'x'))) must_== visual
     }
 
-  def beSituation(visual: String): Matcher[Validated[String, Situation]] =
-    beValid.like { case s =>
-      s.visual must_== (Visual parse visual).get.visual
-    }
-
-  def beGame(visual: String): Matcher[Validated[String, Game]] =
+  def beGame(visual: String, variant: Variant): Matcher[Validated[String, Game]] =
     beValid.like { case g =>
-      g.situation.visual must_== (Visual parse visual).get.visual
+      g.situation.visual must_== Visual.parse(visual, variant).get.visual
     }
-
-  def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
 
   def pieceMoves(
       piece: Piece,
       pos: Pos,
-      variant: shogi.variant.Variant = shogi.variant.Standard
+      variant: Variant
   ): Option[List[Pos]] = {
     val sit = makeEmptySituation(variant)
     sit.withBoard(sit.board.place(piece, pos).get).moveActorAt(pos) map (_.destinations)

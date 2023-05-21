@@ -11,7 +11,7 @@ class RookTest extends ShogiTest {
     val rookGote = Gote - Rook
 
     "move to any position along the same rank or file" in {
-      pieceMoves(rook, SQ5E) must bePoss(
+      pieceMoves(rook, SQ5E, shogi.variant.Standard) must bePoss(
         SQ5D,
         SQ5C,
         SQ5B,
@@ -29,7 +29,7 @@ class RookTest extends ShogiTest {
         SQ8E,
         SQ9E
       )
-      pieceMoves(rookGote, SQ5E) must bePoss(
+      pieceMoves(rookGote, SQ5E, shogi.variant.Standard) must bePoss(
         SQ5D,
         SQ5C,
         SQ5B,
@@ -50,7 +50,7 @@ class RookTest extends ShogiTest {
     }
 
     "move to any position along the same rank or file, even when at the edges" in {
-      pieceMoves(rook, SQ1A) must bePoss(
+      pieceMoves(rook, SQ1A, shogi.variant.Standard) must bePoss(
         SQ1B,
         SQ1C,
         SQ1D,

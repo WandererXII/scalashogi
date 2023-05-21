@@ -12,7 +12,7 @@ class PlayPerfTest extends ShogiTest {
   // val iterations = 1
 
   def runOne =
-    makeGame.playMoves(
+    makeGame(shogi.variant.Standard).playMoves(
       (SQ7G, SQ7F, false),
       (SQ8C, SQ8D, false),
       (SQ7I, SQ6H, false),

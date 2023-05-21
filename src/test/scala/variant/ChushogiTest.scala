@@ -226,24 +226,24 @@ class ChushogiTest extends ShogiTest {
       Sfen("1P3PP3P1/12/12/12/6k5/12/12/6K5/12/12/12/l10l b - 1").toSituation(shogi.variant.Chushogi).get
     sit3.bareKing(Gote) must beFalse
     sit3.bareKing(Sente) must beFalse
-    sit3.autoDraw must beTrue
+    sit3.draw must beTrue
 
     val sit4 = Sfen("12/12/12/12/6k5/5g6/4G7/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
     sit4.bareKing(Sente) must beFalse
     sit4.bareKing(Gote) must beFalse
-    sit4.autoDraw must beFalse
+    sit4.draw must beFalse
     val sit4After1 = sit4(Usi("8g7f").get).toOption.get
     sit4After1.bareKing(Gote) must beFalse
     sit4After1.bareKing(Sente) must beFalse
-    sit4After1.autoDraw must beFalse
+    sit4After1.draw must beFalse
     val sit4After2 = sit4After1(Usi("6e7f").get).toOption.get
     sit4After2.bareKing(Gote) must beFalse
     sit4After2.bareKing(Sente) must beFalse
-    sit4After2.autoDraw must beTrue
+    sit4After2.draw must beTrue
     val sit4After2Alt = sit4After1(Usi("6e6d").get).toOption.get
     sit4After2Alt.bareKing(Gote) must beTrue
     sit4After2Alt.winner must_== Some(Sente)
-    sit4After2Alt.autoDraw must beFalse
+    sit4After2Alt.draw must beFalse
 
     val sit5 = Sfen("12/12/12/12/6k5/5K6/12/4G7/12/12/12/12 w - 1").toSituation(shogi.variant.Chushogi).get
     sit5.bareKing(Sente) must beFalse
@@ -253,7 +253,7 @@ class ChushogiTest extends ShogiTest {
       Sfen("5P3P2/12/12/12/6k2i2/12/12/6K1I3/12/12/12/5p5p b").toSituation(shogi.variant.Chushogi).get
     sit6.bareKing(Gote) must beFalse
     sit6.bareKing(Sente) must beFalse
-    sit6.autoDraw must beFalse
+    sit6.draw must beFalse
   }
 
   "fixture perfts" should {

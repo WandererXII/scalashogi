@@ -11,12 +11,30 @@ class KingTest extends ShogiTest {
     val kingGote = Gote - King
 
     "move 1 position in any direction" in {
-      pieceMoves(king, SQ6F) must bePoss(SQ6G, SQ7G, SQ7F, SQ7E, SQ6E, SQ5E, SQ5F, SQ5G)
-      pieceMoves(kingGote, SQ6F) must bePoss(SQ6G, SQ7G, SQ7F, SQ7E, SQ6E, SQ5E, SQ5F, SQ5G)
+      pieceMoves(king, SQ6F, shogi.variant.Standard) must bePoss(
+        SQ6G,
+        SQ7G,
+        SQ7F,
+        SQ7E,
+        SQ6E,
+        SQ5E,
+        SQ5F,
+        SQ5G
+      )
+      pieceMoves(kingGote, SQ6F, shogi.variant.Standard) must bePoss(
+        SQ6G,
+        SQ7G,
+        SQ7F,
+        SQ7E,
+        SQ6E,
+        SQ5E,
+        SQ5F,
+        SQ5G
+      )
     }
 
     "move 1 position in any direction, even from the edges" in {
-      pieceMoves(king, SQ1A) must bePoss(SQ1B, SQ2B, SQ2A)
+      pieceMoves(king, SQ1A, shogi.variant.Standard) must bePoss(SQ1B, SQ2B, SQ2A)
     }
 
     "move behind pawn barrier" in {

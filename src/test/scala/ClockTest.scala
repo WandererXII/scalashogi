@@ -46,7 +46,7 @@ class ClockTest extends ShogiTest {
 
   "play with a clock" should {
     val clock = Clock(5 * 60 * 1000, 0, 0, 0)
-    val game  = makeGame withClock clock.start
+    val game  = makeGame(shogi.variant.Standard) withClock clock.start
     "new game" in {
       game.clock map { _.color } must_== Some(Sente)
     }

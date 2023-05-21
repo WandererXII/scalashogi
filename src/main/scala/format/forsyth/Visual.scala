@@ -21,7 +21,7 @@ import shogi.variant._
 // for debugging purposes
 object Visual {
 
-  def parse(source: String, variant: Variant = Standard): Option[Situation] = {
+  def parse(source: String, variant: Variant): Option[Situation] = {
     val clean = source.replaceAll("^\n|\n$| ", "")
     val lines = augmentString(clean).linesIterator.map(_.trim).filter(_.nonEmpty).toList
     val hands = lines.find(_.toLowerCase.startsWith("hands")).flatMap(_.split(':').lift(1)) | ""

@@ -11,7 +11,7 @@ class DragonTest extends ShogiTest {
     val dragonGote = Gote - Dragon
 
     "move to any position along the same rank or file and directly around" in {
-      pieceMoves(dragon, SQ5E) must bePoss(
+      pieceMoves(dragon, SQ5E, shogi.variant.Standard) must bePoss(
         SQ5D,
         SQ5C,
         SQ5B,
@@ -33,7 +33,7 @@ class DragonTest extends ShogiTest {
         SQ4F,
         SQ4D
       )
-      pieceMoves(dragonGote, SQ5E) must bePoss(
+      pieceMoves(dragonGote, SQ5E, shogi.variant.Standard) must bePoss(
         SQ5D,
         SQ5C,
         SQ5B,
@@ -58,7 +58,7 @@ class DragonTest extends ShogiTest {
     }
 
     "move to any position along the same rank or file, even when at the edges" in {
-      pieceMoves(dragon, SQ1A) must bePoss(
+      pieceMoves(dragon, SQ1A, shogi.variant.Standard) must bePoss(
         SQ1B,
         SQ1C,
         SQ1D,

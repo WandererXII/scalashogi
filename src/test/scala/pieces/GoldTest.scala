@@ -11,12 +11,12 @@ class GoldTest extends ShogiTest {
     val goldGote = Gote - Gold
 
     "move in 6 directions" in {
-      pieceMoves(gold, SQ5E) must bePoss(SQ5D, SQ4D, SQ4E, SQ5F, SQ6E, SQ6D)
-      pieceMoves(goldGote, SQ5E) must bePoss(SQ5F, SQ4F, SQ4E, SQ5D, SQ6E, SQ6F)
+      pieceMoves(gold, SQ5E, shogi.variant.Standard) must bePoss(SQ5D, SQ4D, SQ4E, SQ5F, SQ6E, SQ6D)
+      pieceMoves(goldGote, SQ5E, shogi.variant.Standard) must bePoss(SQ5F, SQ4F, SQ4E, SQ5D, SQ6E, SQ6F)
     }
 
     "move in 2 directions, when at the edges" in {
-      pieceMoves(gold, SQ1A) must bePoss(SQ1B, SQ2A)
+      pieceMoves(gold, SQ1A, shogi.variant.Standard) must bePoss(SQ1B, SQ2A)
     }
 
     "not move to positions that are occupied by the same colour" in {

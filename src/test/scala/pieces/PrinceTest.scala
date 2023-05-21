@@ -11,12 +11,30 @@ class PrinceTest extends ShogiTest {
     val princeGote = Gote - Prince
 
     "move 1 position in any direction" in {
-      pieceMoves(prince, SQ6F) must bePoss(SQ6G, SQ7G, SQ7F, SQ7E, SQ6E, SQ5E, SQ5F, SQ5G)
-      pieceMoves(princeGote, SQ6F) must bePoss(SQ6G, SQ7G, SQ7F, SQ7E, SQ6E, SQ5E, SQ5F, SQ5G)
+      pieceMoves(prince, SQ6F, shogi.variant.Chushogi) must bePoss(
+        SQ6G,
+        SQ7G,
+        SQ7F,
+        SQ7E,
+        SQ6E,
+        SQ5E,
+        SQ5F,
+        SQ5G
+      )
+      pieceMoves(princeGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+        SQ6G,
+        SQ7G,
+        SQ7F,
+        SQ7E,
+        SQ6E,
+        SQ5E,
+        SQ5F,
+        SQ5G
+      )
     }
 
     "move 1 position in any direction, even from the edges" in {
-      pieceMoves(prince, SQ1A) must bePoss(SQ1B, SQ2B, SQ2A)
+      pieceMoves(prince, SQ1A, shogi.variant.Chushogi) must bePoss(SQ1B, SQ2B, SQ2A)
     }
 
     "move behind pawn barrier" in {

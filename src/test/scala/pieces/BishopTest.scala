@@ -11,7 +11,7 @@ class BishopTest extends ShogiTest {
     val bishopGote = Gote - Bishop
 
     "move in 4 directions" in {
-      pieceMoves(bishop, SQ5E) must bePoss(
+      pieceMoves(bishop, SQ5E, shogi.variant.Standard) must bePoss(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -29,7 +29,7 @@ class BishopTest extends ShogiTest {
         SQ9I,
         SQ9A
       )
-      pieceMoves(bishopGote, SQ5E) must bePoss(
+      pieceMoves(bishopGote, SQ5E, shogi.variant.Standard) must bePoss(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -50,7 +50,16 @@ class BishopTest extends ShogiTest {
     }
 
     "move in 2 directions, when at the edges" in {
-      pieceMoves(bishop, SQ1C) must bePoss(SQ2B, SQ3A, SQ2D, SQ3E, SQ4F, SQ5G, SQ6H, SQ7I)
+      pieceMoves(bishop, SQ1C, shogi.variant.Standard) must bePoss(
+        SQ2B,
+        SQ3A,
+        SQ2D,
+        SQ3E,
+        SQ4F,
+        SQ5G,
+        SQ6H,
+        SQ7I
+      )
     }
 
     "not move to positions that are occupied by the same colour" in {

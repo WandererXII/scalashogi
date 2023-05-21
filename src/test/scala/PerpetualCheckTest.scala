@@ -7,7 +7,7 @@ import format.usi.Usi
 class PerpetualCheckTest extends ShogiTest {
 
   "Perpetual check" should {
-    val g = makeGame.playMoves(
+    val g = makeGame(shogi.variant.Standard).playMoves(
       (SQ5G, SQ5F, false),
       (SQ5C, SQ5D, false),
       (SQ2H, SQ5H, false),
@@ -55,7 +55,8 @@ class PerpetualCheckTest extends ShogiTest {
       "after 2 repetitions" in {
         g must beValid.like { case game =>
           game.playMoveList(m take 5) must beValid.like { case game2 =>
-            game2.situation.autoDraw must beFalse
+            game2.situation.draw must beFalse
+            game2.situation.repetition must beFalse
             game2.situation.perpetualCheck must beFalse
             game2.situation.winner must beNone
           }
@@ -64,7 +65,8 @@ class PerpetualCheckTest extends ShogiTest {
       "after 3 repetitions" in {
         g must beValid.like { case game =>
           game.playMoveList(m take 9) must beValid.like { case game2 =>
-            game2.situation.autoDraw must beFalse
+            game2.situation.draw must beFalse
+            game2.situation.repetition must beFalse
             game2.situation.perpetualCheck must beFalse
             game2.situation.winner must beNone
           }
@@ -73,8 +75,9 @@ class PerpetualCheckTest extends ShogiTest {
       "if the checks weren't consecutive" in {
         g must beValid.like { case game =>
           game.playMoveList(mi) must beValid.like { case game2 =>
+            game2.situation.draw must beFalse
+            game2.situation.repetition must beTrue
             game2.situation.perpetualCheck must beFalse
-            game2.situation.autoDraw must beTrue
             game2.situation.winner must beNone
           }
         }
@@ -84,7 +87,8 @@ class PerpetualCheckTest extends ShogiTest {
       "after 4 repetitions" in {
         g must beValid.like { case game =>
           game.playMoveList(m) must beValid.like { case game2 =>
-            game2.situation.autoDraw must beFalse
+            game2.situation.draw must beFalse
+            game2.situation.repetition must beFalse
             game2.situation.perpetualCheck must beTrue
             game2.situation.winner must_== Some(Gote)
           }
@@ -115,7 +119,8 @@ class PerpetualCheckTest extends ShogiTest {
         "9f9e" // forth repetition
       ).map(Usi.Move(_).get)
       dGame.playMoveList(dMoves.map(u => (u.orig, u.dest, false))) must beValid.like { case game =>
-        game.situation.autoDraw must beTrue
+        game.situation.draw must beFalse
+        game.situation.repetition must beTrue
         game.situation.perpetualCheck must beFalse
         game.situation.winner must beNone
       }
@@ -150,7 +155,8 @@ class PerpetualCheckTest extends ShogiTest {
         "9f9e"
       ).map(Usi.Move(_).get)
       aGame.playMoveList(aMoves.map(u => (u.orig, u.dest, false))) must beValid.like { case game =>
-        game.situation.autoDraw must beFalse
+        game.situation.draw must beFalse
+        game.situation.repetition must beFalse
         game.situation.perpetualCheck must beTrue
         game.situation.winner must_== Some(Gote)
       }
