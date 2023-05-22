@@ -331,7 +331,7 @@ case object Chushogi
         pos
     }
     lazy val ourKing = sit.board.royalPossOf(color)
-    lazy val theirPiecesFiltered = sit.board.pieces.view.collect {
+    lazy val theirPiecesFiltered = sit.board.pieces.collect {
       case (pos, piece)
           if (piece is !color) && !((piece is Pawn) || (piece is GoBetween)) && !((piece is Lance) && backrank(
             piece.color
