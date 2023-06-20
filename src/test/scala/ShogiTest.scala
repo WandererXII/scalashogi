@@ -62,6 +62,21 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       vg
     }
 
+    // todo - get rid of `playMoveList` and `playMoves`
+    def playUsiMoveList(moves: Seq[Usi]): Validated[String, Game] = {
+      val vg = moves.foldLeft[Validated[String, Game]](Validated.valid(game)) { case (vg, usi) =>
+        vg.foreach { g =>
+          val _ = g.situation.moveDestinations
+          val _ = g.situation.dropDestinations
+        }
+        val ng = vg flatMap { g =>
+          g(usi)
+        }
+        ng
+      }
+      vg
+    }
+
     def playMove(
         orig: Pos,
         dest: Pos,

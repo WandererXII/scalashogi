@@ -2,12 +2,12 @@ package shogi
 
 class HistoryTest extends ShogiTest {
 
+  def toHash(a: Int) = Array(a.toByte, 0.toByte, 0.toByte)
+  def makeHistory(positions: List[Int]) =
+    (positions map toHash).foldLeft(History.empty) { case (history, hash) =>
+      history.copy(positionHashes = hash ++ history.positionHashes)
+    }
   "fourfold repetition" should {
-    def toHash(a: Int) = Array(a.toByte, 0.toByte, 0.toByte)
-    def makeHistory(positions: List[Int]) =
-      (positions map toHash).foldLeft(History.empty) { case (history, hash) =>
-        history.copy(positionHashes = hash ++ history.positionHashes)
-      }
     "empty history" in {
       History.empty.fourfoldRepetition must_== false
     }
@@ -22,6 +22,20 @@ class HistoryTest extends ShogiTest {
     "positive" in {
       val history = makeHistory(List(1, 2, 3, 4, 5, 6, 7, 2, 5, 6, 3, 2, 6, 2))
       history.fourfoldRepetition must_== true
+    }
+  }
+  "repetition distance" should {
+    "no repetition" in {
+      val history = makeHistory(List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+      history.firstRepetitionDistance must_== None
+    }
+    "half" in {
+      val history = makeHistory(List(0, 1, 2, 3, 4, 5, 12, 7, 8, 9, 10, 11, 12))
+      history.firstRepetitionDistance must_== Some(3)
+    }
+    "last" in {
+      val history = makeHistory(List(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+      history.firstRepetitionDistance must_== Some(6)
     }
   }
 //  Doesn't work - Array == Array will always be false

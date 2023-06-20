@@ -27,6 +27,7 @@ final case class History(
       }
     }
 
+  // number of moves each player made since the repeated position first occured
   lazy val firstRepetitionDistance: Option[Int] = {
     val positions = currentTurnHashes
     positions.headOption match {
@@ -34,7 +35,7 @@ final case class History(
         Some(positions lastIndexWhere {
           case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
           case _                 => false
-        }).filterNot(_ == -1)
+        }).filter(_ > 0)
       case _ => None
     }
   }

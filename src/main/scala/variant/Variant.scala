@@ -257,10 +257,18 @@ abstract class Variant private[variant] (
 
   def impasse(@unused sit: Situation): Boolean = false
 
-  def perpetualCheck(sit: Situation): Boolean =
-    sit.history.fourfoldRepetition && sit.history.firstRepetitionDistance.exists { dist =>
-      (dist + 1) <= sit.history.consecutiveAttacks(!sit.color)
+  private def perpetualCheckAttacker(sit: Situation): Option[Color] =
+    sit.history.firstRepetitionDistance flatMap { dist =>
+      val senteAttacks = sit.history.consecutiveAttacks(Sente) >= dist
+      val goteAttacks  = sit.history.consecutiveAttacks(Gote) >= dist
+      if (senteAttacks && goteAttacks) none
+      else if (senteAttacks) Sente.some
+      else if (goteAttacks) Gote.some
+      else none
     }
+
+  def perpetualCheck(sit: Situation): Boolean =
+    sit.history.fourfoldRepetition && perpetualCheckAttacker(sit).isDefined
 
   def repetition(sit: Situation): Boolean =
     sit.history.fourfoldRepetition && !perpetualCheck(sit)
@@ -280,7 +288,8 @@ abstract class Variant private[variant] (
   // Player wins or loses after their move
   def winner(sit: Situation): Option[Color] =
     if (sit.checkmate || sit.stalemate || sit.bareKing(sit.color) || sit.royalsLost) Some(!sit.color)
-    else if (sit.bareKing(!sit.color) || sit.impasse || sit.perpetualCheck) Some(sit.color)
+    else if (sit.bareKing(!sit.color) || sit.impasse) Some(sit.color)
+    else if (sit.perpetualCheck) perpetualCheckAttacker(sit).map(!_)
     else None
 
   // Returns the material imbalance in pawns
