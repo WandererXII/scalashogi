@@ -2,6 +2,7 @@ package shogi
 
 import Pos._
 import variant.{ Kyotoshogi, Minishogi, Standard }
+import format.forsyth.Sfen
 
 class RepetitionTest extends ShogiTest {
 
@@ -61,6 +62,10 @@ class RepetitionTest extends ShogiTest {
           g.situation.repetition must beTrue
           g.situation.perpetualCheck must beFalse
           g.situation.winner must_== Some(Gote)
+          val gNoInitialSfen = g.withHistory(g.history.copy(initialSfen = None))
+          gNoInitialSfen.situation.winner must_== Some(Gote)
+          val gOppositeColorSfen = g.withHistory(g.history.withInitialSfen(Sfen("rbsgk/4p/5/P4/KGSBR w - 1")))
+          gOppositeColorSfen.situation.winner must_== Some(Sente)
         }
       }
       "should not be fourfold" in {
