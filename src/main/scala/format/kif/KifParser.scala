@@ -93,10 +93,6 @@ object KifParser {
         initialSfen = situation.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
         tags        = createTags(preTags, situation.color, strMoves.size, terminationOption)
         parsedMoves <- objMoves(strMoves, variant, variations)
-        _ <-
-          if (kif.isEmpty || parsedMoves.value.nonEmpty || tags.knownTypes.value.nonEmpty)
-            valid(true)
-          else invalid("No moves, non-standard starting position or valid tags provided")
       } yield ParsedNotation(parsedMoves, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>

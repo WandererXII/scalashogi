@@ -552,11 +552,6 @@ class KifParserTest extends ShogiTest {
     }
   }
 
-  "known tags are enough" in {
-    parser("""先手：whatever""") must beValid
-    parser("""what：whatever""") must beInvalid
-  }
-
   "kif fixture 1" in {
     parser(kif1) must beValid.like { case ParsedNotation(ParsedMoves(pm), _, v, _, tags) =>
       pm.size must_== 111
