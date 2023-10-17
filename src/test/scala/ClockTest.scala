@@ -86,7 +86,7 @@ class ClockTest extends ShogiTest {
 
     def clockStep(clock: Clock, wait: Int, lags: Int*) = {
       (lags.foldLeft(clock) { (clk, lag) =>
-        advance(clk.step(), wait + lag) step durOf(lag)
+        advance(clk.step().value, wait + lag) step durOf(lag) value
       } currentClockFor Gote).time.centis
     }
 
@@ -95,7 +95,7 @@ class ClockTest extends ShogiTest {
 
     def clockStart(lag: Int) = {
       val clock = fakeClock60.step()
-      ((clock step durOf(lag)) currentClockFor Sente).time.centis
+      ((clock.value step durOf(lag)).value currentClockFor Sente).time.centis
     }
 
     "start" in {
@@ -159,10 +159,10 @@ class ClockTest extends ShogiTest {
         clockStep60(0, 0, 0) must_== 60 * 100
       }
       "no -> medium lag" in {
-        clockStep60(0, 0, 300) must_== 5940
+        clockStep60(0, 0, 300) must_== 5880
       }
       "no x4 -> big lag" in {
-        clockStep60(0, 0, 0, 0, 0, 700) must_== 5720
+        clockStep60(0, 0, 0, 0, 0, 700) must_== 5615
       }
     }
   }

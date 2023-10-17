@@ -15,28 +15,45 @@ final case class Game(
     startedAtMove: Int = 1
 ) {
 
-  private def applySituation(sit: Situation, metrics: MoveMetrics = MoveMetrics.empty): Game =
-    copy(
-      situation = sit,
-      plies = plies + 1,
-      usiMoves = sit.history.lastMove.fold(usiMoves)(usiMoves :+ _),
-      clock = clock map { c =>
-        val newC = c.step(metrics, sit.status.isEmpty)
-        if (plies - startedAtPly == 1) newC.start else newC
-      }
+  private def applySituation(
+      sit: Situation,
+      metrics: MoveMetrics = MoveMetrics.empty
+  ): Clock.WithCompensatedLag[Game] = {
+    val newClock = applyClock(metrics, sit.status.isEmpty)
+    Clock.WithCompensatedLag(
+      copy(
+        situation = sit,
+        plies = plies + 1,
+        usiMoves = sit.history.lastMove.fold(usiMoves)(usiMoves :+ _),
+        clock = newClock.map(_.value)
+      ),
+      newClock.flatMap(_.compensated)
     )
+  }
 
-  def apply(usi: Usi, metrics: MoveMetrics): Validated[String, Game] =
+  private def applyClock(
+      metrics: MoveMetrics,
+      gameActive: => Boolean
+  ): Option[Clock.WithCompensatedLag[Clock]] =
+    clock.map { prev =>
+      {
+        val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
+        val c2 = c1.step(metrics, gameActive)
+        if (plies - startedAtPly == 1) c2.map(_.start) else c2
+      }
+    }
+
+  def apply(usi: Usi, metrics: MoveMetrics): Validated[String, Clock.WithCompensatedLag[Game]] =
     situation(usi).map(applySituation(_, metrics))
 
   def apply(usi: Usi): Validated[String, Game] =
-    situation(usi).map(applySituation(_))
+    situation(usi).map(applySituation(_).value)
 
-  def apply(parsedMove: ParsedMove, metrics: MoveMetrics): Validated[String, Game] =
+  def apply(parsedMove: ParsedMove, metrics: MoveMetrics): Validated[String, Clock.WithCompensatedLag[Game]] =
     situation(parsedMove).map(applySituation(_, metrics))
 
   def apply(parsedMove: ParsedMove): Validated[String, Game] =
-    situation(parsedMove).map(applySituation(_))
+    situation(parsedMove).map(applySituation(_).value)
 
   def board = situation.board
 
