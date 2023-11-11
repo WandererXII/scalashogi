@@ -10,7 +10,7 @@ final case class Sfen(value: String) extends AnyVal {
 
   def toSituationPlus(variant: Variant): Option[Sfen.SituationPlus] =
     toSituation(variant) map { sit =>
-      val mn = moveNumber map (_ max 1 min 500)
+      val mn = moveNumber map (_ max 1 min 9999)
       Sfen.SituationPlus(sit, mn | 1)
     }
 
