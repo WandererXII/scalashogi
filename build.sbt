@@ -2,7 +2,7 @@ name := "scalashogi"
 
 version := "8.0.3"
 
-ThisBuild / scalaVersion := "2.13.10"
+ThisBuild / scalaVersion := "2.13.12"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
@@ -12,8 +12,8 @@ ThisBuild / versionPolicyIntention := Compatibility.BinaryAndSourceCompatible
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "org.specs2"             %% "specs2-core"              % "4.20.0" % Test,
-  "org.specs2"             %% "specs2-cats"              % "4.20.0" % Test,
+  "org.specs2"             %% "specs2-core"              % "4.20.3" % Test,
+  "org.specs2"             %% "specs2-cats"              % "4.20.3" % Test,
   "com.github.ornicar"     %% "scalalib"                 % "7.0.2",
   "joda-time"              % "joda-time"                 % "2.12.5",
   "org.typelevel"          %% "cats-core"                % "2.9.0"
