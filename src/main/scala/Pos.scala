@@ -35,10 +35,13 @@ final case class Pos private (index: Int) extends AnyVal {
 
   def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
   def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
-  def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] =
-    (dir(this) map { p =>
-      p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
-    }) | Nil
+
+  @scala.annotation.tailrec
+  def |<>|(stop: Pos => Boolean, dir: Direction, acc: List[Pos] = Nil): List[Pos] =
+    dir(this) match {
+      case Some(p) => if (stop(p)) (p :: acc).reverse else p.|<>|(stop, dir, p :: acc)
+      case _       => acc.reverse
+    }
 
   def <->(other: Pos): Seq[Pos] =
     min(file.index, other.file.index) to max(file.index, other.file.index) flatMap { Pos.at(_, rank.index) }
