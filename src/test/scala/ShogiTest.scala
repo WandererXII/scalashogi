@@ -23,7 +23,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       .orElse(Visual.parse(str, Kyotoshogi))
       .get
 
-  implicit def colorChanger(str: String) =
+  implicit def colorChanger(str: String): AnyRef { def as(color: shogi.Color): shogi.Situation } =
     new {
 
       def as(color: Color): Situation = stringToSituation(str).copy(color = color)
@@ -40,7 +40,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       }
   }
 
-  implicit def richActor(actor: MoveActor) = RichActor(actor)
+  implicit def richActor(actor: MoveActor): RichActor = RichActor(actor)
 
   case class RichGame(game: Game) {
 
@@ -94,7 +94,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
     def withClock(c: Clock) = game.copy(clock = Some(c))
   }
 
-  implicit def richGame(game: Game) = RichGame(game)
+  implicit def richGame(game: Game): RichGame = RichGame(game)
 
   def sfenToGame(sfen: Sfen, variant: Variant) =
     sfen.toSituation(variant) toValid "Could not construct situation from SFEN" map { sit =>
