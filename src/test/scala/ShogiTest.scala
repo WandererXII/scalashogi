@@ -20,6 +20,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       .orElse(Visual.parse(str, Chushogi))
       .orElse(Visual.parse(str, Minishogi))
       .orElse(Visual.parse(str, Annanshogi))
+      .orElse(Visual.parse(str, Checkshogi))
       .orElse(Visual.parse(str, Kyotoshogi))
       .get
 

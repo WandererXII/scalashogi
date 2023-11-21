@@ -68,6 +68,8 @@ object KifParserHelper {
       Chushogi.some
     else if (handicapString.exists(isDefaultHandicapOf(_, Annanshogi)))
       Annanshogi.some
+    else if (handicapString.exists(isDefaultHandicapOf(_, Checkshogi)))
+      Checkshogi.some
     else None
   }
 

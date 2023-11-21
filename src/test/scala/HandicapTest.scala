@@ -11,6 +11,7 @@ class HandicapTest extends ShogiTest {
       Handicap.allByVariant(shogi.variant.Chushogi).size must_== 3
       Handicap.allByVariant(shogi.variant.Annanshogi).size must_== 15
       Handicap.allByVariant(shogi.variant.Kyotoshogi).size must_== 7
+      Handicap.allByVariant(shogi.variant.Checkshogi).size must_== 10
     }
     "parse all" in {
       Handicap.allByVariant.toList map { case (v, lsh) =>

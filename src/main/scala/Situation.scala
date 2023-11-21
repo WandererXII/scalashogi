@@ -129,10 +129,12 @@ final case class Situation(
 
   def draw: Boolean = variant draw this
 
+  def specialVariantEnd = variant specialVariantEnd this
+
   def impasse = variant impasse this
 
   def end(withImpasse: Boolean): Boolean =
-    checkmate || stalemate || perpetualCheck || repetition || draw || (withImpasse && impasse)
+    checkmate || stalemate || perpetualCheck || repetition || draw || specialVariantEnd || (withImpasse && impasse)
 
   def winner: Option[Color] = variant.winner(this)
 
@@ -152,6 +154,7 @@ final case class Situation(
     else if (perpetualCheck) Status.PerpetualCheck.some
     else if (repetition) Status.Repetition.some
     else if (draw) Status.Draw.some
+    else if (specialVariantEnd) Status.SpecialVariantEnd.some
     else none
 
   // Util

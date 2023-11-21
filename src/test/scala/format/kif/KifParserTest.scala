@@ -754,4 +754,14 @@ class KifParserTest extends ShogiTest {
     }
   }
 
+  "checkshogi" in {
+    parser("""
+      先手：先手
+      手合割：王手将棋
+    """) must beValid.like { case a =>
+      a.initialSfen must beNone
+      a.variant.checkshogi must beTrue
+    }
+  }
+
 }

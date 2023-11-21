@@ -285,6 +285,8 @@ abstract class Variant private[variant] (
 
   def draw(sit: Situation): Boolean = isInsufficientMaterial(sit)
 
+  def specialVariantEnd(@unused sit: Situation): Boolean = false
+
   // Player wins or loses after their move
   def winner(sit: Situation): Option[Color] =
     if (sit.checkmate || sit.stalemate || sit.bareKing(sit.color) || sit.royalsLost) Some(!sit.color)
@@ -337,6 +339,7 @@ abstract class Variant private[variant] (
   def chushogi   = this == Chushogi
   def annanshogi = this == Annanshogi
   def kyotoshogi = this == Kyotoshogi
+  def checkshogi = this == Checkshogi
 
   override def toString = s"Variant($name)"
 
@@ -353,7 +356,8 @@ object Variant {
     Minishogi,
     Chushogi,
     Annanshogi,
-    Kyotoshogi
+    Kyotoshogi,
+    Checkshogi
   )
 
   val byId: Map[Int, Variant] = all map { v =>
@@ -378,7 +382,8 @@ object Variant {
 
   val divisionSensibleVariants: Set[Variant] = Set(
     shogi.variant.Standard,
-    shogi.variant.Annanshogi
+    shogi.variant.Annanshogi,
+    shogi.variant.Checkshogi
   )
 
 }

@@ -2,13 +2,13 @@ package shogi
 package format
 package forsyth
 
-import shogi.variant.{ Annanshogi, Chushogi, Kyotoshogi, Minishogi, Standard, Variant }
+import shogi.variant.{ Annanshogi, Checkshogi, Chushogi, Kyotoshogi, Minishogi, Standard, Variant }
 
 object SfenUtils {
 
   def toForsyth(role: Role, variant: Variant): Option[String] =
     variant match {
-      case Standard | Annanshogi =>
+      case Standard | Annanshogi | Checkshogi =>
         toForsythStandard get role
       case Minishogi =>
         toForsythMinishogi get role
@@ -20,7 +20,7 @@ object SfenUtils {
 
   def toRole(str: String, variant: Variant): Option[Role] =
     variant match {
-      case Standard | Annanshogi =>
+      case Standard | Annanshogi | Checkshogi =>
         toRoleStandard get str
       case Minishogi =>
         toRoleMinishogi get str

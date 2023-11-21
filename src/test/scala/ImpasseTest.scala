@@ -232,5 +232,18 @@ class ImpasseTest extends ShogiTest {
         }
       }
     }
+    "checkshogi" in {
+      "yes" in {
+        "all pieces on the board" in {
+          val g = sfenToGame(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"), Checkshogi)
+          g must beValid.like { case game =>
+            game.situation.impasse must beTrue
+            game.situation.winner must beSome.like { case color =>
+              color.sente
+            }
+          }
+        }
+      }
+    }
   }
 }

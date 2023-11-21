@@ -86,12 +86,13 @@ object KifUtils {
     Standard   -> NonEmptyList.of("平手"),
     Chushogi   -> NonEmptyList.of("平手", "中将棋", "chushogi", "chuushogi"),
     Annanshogi -> NonEmptyList.of("安南将棋", "安南", "annanshogi"),
-    Kyotoshogi -> NonEmptyList.of("京都将棋", "京都", "kyotoshogi")
+    Kyotoshogi -> NonEmptyList.of("京都将棋", "京都", "kyotoshogi"),
+    Checkshogi -> NonEmptyList.of("王手将棋", "王手", "checkshogi")
   )
 
   def toKif(role: Role, variant: Variant): Option[NonEmptyList[String]] =
     variant match {
-      case Standard | Annanshogi =>
+      case Standard | Annanshogi | Checkshogi =>
         toKifStandard get role
       case Minishogi =>
         toKifMinishogi get role
@@ -103,7 +104,7 @@ object KifUtils {
 
   def toRole(str: String, variant: Variant): Option[NonEmptyList[Role]] =
     variant match {
-      case Standard | Annanshogi =>
+      case Standard | Annanshogi | Checkshogi =>
         toRoleStandard get str
       case Minishogi =>
         toRoleMinishogi get str
@@ -242,7 +243,7 @@ object KifUtils {
 
   private def toKifBoard(role: Role, variant: Variant): Option[String] =
     variant match {
-      case Standard | Annanshogi =>
+      case Standard | Annanshogi | Checkshogi =>
         toKifBoardStandard get role
       case Minishogi =>
         toKifBoardMinishogi get role

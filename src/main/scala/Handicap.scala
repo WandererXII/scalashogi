@@ -293,6 +293,58 @@ object Handicap {
         "Naked King",
         Sfen("2k2/5/5/5/TSKGP w - 1")
       )
+    ),
+    variant.Checkshogi -> List(
+      Handicap(
+        "香落ち",
+        "Lance",
+        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "右香落ち",
+        "Right Lance",
+        Sfen("1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "角落ち",
+        "Bishop",
+        Sfen("lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "飛車落ち",
+        "Rook",
+        Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "飛香落ち",
+        "Rook-Lance",
+        Sfen("lnsgkgsn1/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "二枚落ち",
+        "2-piece",
+        Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "四枚落ち",
+        "4-piece",
+        Sfen("1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "六枚落ち",
+        "6-piece",
+        Sfen("2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "八枚落ち",
+        "8-piece",
+        Sfen("3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      ),
+      Handicap(
+        "十枚落ち",
+        "10-piece",
+        Sfen("4k4/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      )
     )
   )
 
