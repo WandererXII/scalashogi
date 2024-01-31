@@ -277,9 +277,10 @@ object Clock {
 
     def periodsString: String = if (periodsTotal > 1) s"(${periodsTotal}x)" else ""
 
-    def show: String = if (hasByoyomi) s"${baseString}|${byoyomiSeconds}${periodsString}"
-    else if (hasIncrement) baseString
-    else s"${baseString}|0"
+    def show: String =
+      if (hasByoyomi) s"${baseString}|${byoyomiSeconds}${periodsString}"
+      else if (hasIncrement) baseString
+      else s"${baseString}|0"
 
     override def toString = s"${limitSeconds}.${incrementSeconds}.${byoyomiSeconds}.${periodsTotal}"
   }
