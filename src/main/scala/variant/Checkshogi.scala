@@ -1,6 +1,9 @@
 package shogi
 package variant
 
+import scala.annotation.unused
+import shogi.format.usi.Usi
+
 case object Checkshogi
     extends Variant(
       id = 6,
@@ -31,7 +34,12 @@ case object Checkshogi
 
   def valueOfRole(r: Role): Int = Standard.valueOfRole(r)
 
+  override def isAttacked(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean =
+    false
+
   override def impasse(sit: Situation): Boolean = Standard.impasse(sit)
+
+  override def perpetualCheck(@unused sit: Situation): Boolean = false
 
   override def specialVariantEnd(sit: Situation): Boolean =
     sit.check
