@@ -134,7 +134,7 @@ final case class Situation(
   def impasse = variant impasse this
 
   def end(withImpasse: Boolean): Boolean =
-    checkmate || stalemate || perpetualCheck || repetition || draw || specialVariantEnd || (withImpasse && impasse)
+    specialVariantEnd || checkmate || stalemate || perpetualCheck || repetition || draw || (withImpasse && impasse)
 
   def winner: Option[Color] = variant.winner(this)
 
@@ -146,7 +146,8 @@ final case class Situation(
     valid(strict) && !end(withImpasse) && !copy(color = !color).check
 
   lazy val status: Option[Status] =
-    if (checkmate) Status.Mate.some
+    if (specialVariantEnd) Status.SpecialVariantEnd.some
+    else if (checkmate) Status.Mate.some
     else if (royalsLost) Status.RoyalsLost.some
     else if (bareKing(Sente) || bareKing(Gote)) Status.BareKing.some
     else if (stalemate) Status.Stalemate.some
@@ -154,7 +155,6 @@ final case class Situation(
     else if (perpetualCheck) Status.PerpetualCheck.some
     else if (repetition) Status.Repetition.some
     else if (draw) Status.Draw.some
-    else if (specialVariantEnd) Status.SpecialVariantEnd.some
     else none
 
   // Util
