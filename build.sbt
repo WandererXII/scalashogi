@@ -13,10 +13,10 @@ ThisBuild / versionPolicyIntention := Compatibility.None
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "org.specs2"             %% "specs2-core"              % "4.20.3" % Test,
-  "org.specs2"             %% "specs2-cats"              % "4.20.3" % Test,
+  "org.specs2"             %% "specs2-core"              % "4.20.5" % Test,
+  "org.specs2"             %% "specs2-cats"              % "4.20.5" % Test,
   "com.github.ornicar"     %% "scalalib"                 % "7.0.2",
-  "joda-time"              % "joda-time"                 % "2.12.5",
+  "joda-time"              % "joda-time"                 % "2.12.7",
   "org.typelevel"          %% "cats-core"                % "2.10.0"
 )
 
