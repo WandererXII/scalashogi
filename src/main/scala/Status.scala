@@ -15,6 +15,7 @@ object Status {
 
   case object Created           extends Status(10)
   case object Started           extends Status(20)
+  case object Paused            extends Status(21)
   case object Aborted           extends Status(25) // from this point the game is finished
   case object Mate              extends Status(30)
   case object Resign            extends Status(31)
@@ -36,6 +37,7 @@ object Status {
   val all = List[Status](
     Created,
     Started,
+    Paused,
     Aborted,
     Mate,
     Resign,
