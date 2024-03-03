@@ -82,7 +82,7 @@ class ClockTest extends ShogiTest {
     }
   }
   "lag compensation" should {
-    def durOf(lag: Int) = MoveMetrics(clientLag = Some(Centis(lag)))
+    def durOf(lag: Int) = LagMetrics(clientLag = Some(Centis(lag)))
 
     def clockStep(clock: Clock, wait: Int, lags: Int*) = {
       (lags.foldLeft(clock) { (clk, lag) =>
@@ -214,7 +214,7 @@ class ClockTest extends ShogiTest {
       clock20.outOfTime(Sente, withGrace = false) must beTrue
     }
     "entering byoyomi and game not active - with time" in {
-      val clock21 = advance(fakeClockByo2, 65 * 100).step(MoveMetrics.empty, gameActive = false)
+      val clock21 = advance(fakeClockByo2, 65 * 100).step(LagMetrics.empty, gameActive = false)
       val cc      = clock21.currentClockFor(Sente)
 
       cc.time.centis must_== 5 * 100
@@ -222,7 +222,7 @@ class ClockTest extends ShogiTest {
       clock21.outOfTime(Sente, withGrace = false) must beFalse
     }
     "entering byoyomi and game active - with time" in {
-      val clock22 = advance(fakeClockByo2, 65 * 100).step(MoveMetrics.empty, gameActive = true)
+      val clock22 = advance(fakeClockByo2, 65 * 100).step(LagMetrics.empty, gameActive = true)
       val cc      = clock22.currentClockFor(Sente)
 
       cc.time.centis must_== 10 * 100
@@ -230,7 +230,7 @@ class ClockTest extends ShogiTest {
       clock22.outOfTime(Sente, withGrace = false) must beFalse
     }
     "entering byoyomi and game not active - without time" in {
-      val clock23 = advance(fakeClockByo2, 71 * 100).step(MoveMetrics.empty, gameActive = false)
+      val clock23 = advance(fakeClockByo2, 71 * 100).step(LagMetrics.empty, gameActive = false)
       val cc      = clock23.currentClockFor(Sente)
 
       cc.time.centis must_== 0
@@ -238,7 +238,7 @@ class ClockTest extends ShogiTest {
       clock23.outOfTime(Sente, withGrace = false) must beTrue
     }
     "entering byoyomi and game active - without time" in {
-      val clock24 = advance(fakeClockByo2, 71 * 100).step(MoveMetrics.empty, gameActive = true)
+      val clock24 = advance(fakeClockByo2, 71 * 100).step(LagMetrics.empty, gameActive = true)
       val cc      = clock24.currentClockFor(Sente)
 
       cc.time.centis must_== 0
@@ -266,11 +266,11 @@ class ClockTest extends ShogiTest {
       clockSente3.players(Sente).spentPeriods must_== 1
       clockSente3.outOfTime(Sente, withGrace = false) must beTrue
 
-      val clockSente3Alt = advance(clockGote2, 11 * 100).step(MoveMetrics.empty, gameActive = false)
+      val clockSente3Alt = advance(clockGote2, 11 * 100).step(LagMetrics.empty, gameActive = false)
       clockSente3Alt.players(Sente).spentPeriods must_== 1
       clockSente3Alt.outOfTime(Sente, withGrace = false) must beTrue
 
-      val clockSente3Alt2 = advance(clockGote2, 8 * 100).step(MoveMetrics.empty, gameActive = false)
+      val clockSente3Alt2 = advance(clockGote2, 8 * 100).step(LagMetrics.empty, gameActive = false)
       clockSente3Alt2.players(Sente).spentPeriods must_== 1
       clockSente3Alt2.currentClockFor(Sente).time.centis must_== 2 * 100
       clockSente3Alt2.outOfTime(Sente, withGrace = false) must beFalse

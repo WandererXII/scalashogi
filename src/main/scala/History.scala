@@ -4,7 +4,7 @@ import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
 
 final case class History(
-    lastMove: Option[Usi],
+    lastUsi: Option[Usi],
     lastLionCapture: Option[Pos],
     consecutiveAttacks: ConsecutiveAttacks,
     positionHashes: PositionHash,
@@ -43,7 +43,7 @@ final case class History(
   lazy val threefoldRepetition = isRepetition(3)
   lazy val fourfoldRepetition  = isRepetition(4)
 
-  def withLastMove(u: Usi) = copy(lastMove = Some(u))
+  def withLastUsi(u: Usi) = copy(lastUsi = Some(u))
 
   def withLastLionCapture(op: Option[Pos]) = copy(lastLionCapture = op)
 
@@ -55,7 +55,7 @@ final case class History(
 
   override def toString = {
     val positions = (positionHashes grouped Hash.size).toList
-    s"${lastMove.fold("-")(_.usi)} ${lastLionCapture.fold("-")(_.key)} $consecutiveAttacks ${positions
+    s"${lastUsi.fold("-")(_.usi)} ${lastLionCapture.fold("-")(_.key)} $consecutiveAttacks ${positions
         .map(Hash.debug)
         .mkString(" ")} ${initialSfen.fold("-")(_.value)}"
   }

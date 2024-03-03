@@ -1,6 +1,6 @@
 package shogi
 
-final case class MoveMetrics(
+final case class LagMetrics(
     clientLag: Option[Centis] = None,
     clientMoveTime: Option[Centis] = None
 ) {
@@ -10,6 +10,6 @@ final case class MoveMetrics(
     clientMoveTime.fold(clientLag)(mt => Some(elapsed - mt))
 }
 
-object MoveMetrics {
-  def empty = MoveMetrics(None, None)
+object LagMetrics {
+  def empty = LagMetrics(None, None)
 }

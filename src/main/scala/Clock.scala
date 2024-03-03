@@ -63,7 +63,7 @@ final case class Clock(
           _.takeTime(curT)
             .giveTime(byoyomiOf(color) * periods)
             .spendPeriods(periods)
-            .copy(lastMoveTime = curT)
+            .copy(lastTime = curT)
         ),
         timer = None
       )
@@ -81,7 +81,7 @@ final case class Clock(
     )
 
   def step(
-      metrics: MoveMetrics = MoveMetrics.empty,
+      metrics: LagMetrics = LagMetrics.empty,
       gameActive: Boolean = true
   ) =
     (timer match {
@@ -110,7 +110,7 @@ final case class Clock(
             updatePlayer(color) {
               _.setRemaining((remaining - moveTime) atLeast player.byoyomi)
                 .spendPeriods(periodSpan)
-                .copy(lag = lagTrack, lastMoveTime = moveTime)
+                .copy(lag = lagTrack, lastTime = moveTime)
             }
           else
             updatePlayer(color) {
@@ -118,7 +118,7 @@ final case class Clock(
                 moveTime - (clockActive ?? player.increment) - (player.byoyomi.isPositive ?? player.byoyomi * periodSpan)
               )
                 .spendPeriods(periodSpan)
-                .copy(lag = lagTrack, lastMoveTime = moveTime)
+                .copy(lag = lagTrack, lastTime = moveTime)
             }
 
         if (clockActive) newC else newC.hardStop
@@ -148,7 +148,7 @@ final case class Clock(
   def byoyomiOf(c: Color)      = players(c).byoyomi
   def spentPeriodsOf(c: Color) = players(c).spentPeriods
 
-  def lastMoveTimeOf(c: Color) = players(c).lastMoveTime
+  def lastTimeOf(c: Color) = players(c).lastTime
 
   def berserked(c: Color) = players(c).berserk
   def lag(c: Color)       = players(c).lag
@@ -176,7 +176,7 @@ final case class ClockPlayer(
     elapsed: Centis = Centis(0),
     spentPeriods: Int = 0,
     berserk: Boolean = false,
-    lastMoveTime: Centis = Centis(0)
+    lastTime: Centis = Centis(0)
 ) {
 
   def limit =

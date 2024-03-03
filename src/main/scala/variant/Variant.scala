@@ -175,7 +175,7 @@ abstract class Variant private[variant] (
   protected def finalizeSituation(beforeSit: Situation, board: Board, hands: Hands, usi: Usi): Situation = {
     val newSit = beforeSit.copy(board = board, hands = hands).switch
     val h = beforeSit.history
-      .withLastMove(usi)
+      .withLastUsi(usi)
       .withLastLionCapture {
         val roleOpt = usi.positions.headOption.flatMap(beforeSit.board(_).map(_.role))
         if (

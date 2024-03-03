@@ -170,7 +170,7 @@ final case class Situation(
 
   def toSfen: Sfen = Sfen(this)
 
-  override def toString = s"${variant.name}\n$visual\nLast Move: ${history.lastMove.fold("-")(_.usi)}\n"
+  override def toString = s"${variant.name}\n$visual\nLast Move: ${history.lastUsi.fold("-")(_.usi)}\n"
 }
 
 object Situation {
