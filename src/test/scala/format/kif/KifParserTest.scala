@@ -612,6 +612,10 @@ class KifParserTest extends ShogiTest {
     }
   }
 
+  "kif fixture 17" in {
+    parser(kif17) must beValid
+  }
+
   "minishogi" in {
     parser("""
       先手：先手
