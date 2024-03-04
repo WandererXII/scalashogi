@@ -28,6 +28,9 @@ final case class Hands(sente: Hand, gote: Hand) {
   def size: Int =
     sente.size + gote.size
 
+  def count(role: DroppableRole): Int =
+    sente(role) + gote(role)
+
   def isEmpty: Boolean =
     sente.isEmpty && gote.isEmpty
 
