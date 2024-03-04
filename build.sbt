@@ -1,6 +1,6 @@
 name := "scalashogi"
 
-version := "11.0.0"
+version := "12.0.0"
 
 ThisBuild / scalaVersion := "2.13.12"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
@@ -8,8 +8,6 @@ ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
 )
-
-ThisBuild / versionPolicyIntention := Compatibility.None
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
