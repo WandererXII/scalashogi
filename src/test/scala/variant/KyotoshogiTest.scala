@@ -52,7 +52,7 @@ class KyotoshogiTest extends ShogiTest {
     }
   }
 
-  "move legality" should {
+  "move/drop legality" should {
     "drops" in {
       val sit = Sfen("5/5/5/5/k3K b PTGS").toSituation(shogi.variant.Kyotoshogi).get
       sit(Usi("T*3a").get).isValid must beTrue

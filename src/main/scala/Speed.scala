@@ -26,7 +26,7 @@ object Speed {
         "correspondence",
         21600 to Int.MaxValue,
         "Correspondence",
-        "Correspondence games: one or several days per move"
+        "Correspondence games: one or several days per move or drop"
       )
 
   val all     = List[Speed](UltraBullet, Bullet, Blitz, Rapid, Classical, Correspondence)

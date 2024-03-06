@@ -1,7 +1,5 @@
 package shogi
 
-import Pos._
-
 class ClockTest extends ShogiTest {
   val fakeClock60 = Clock(60, 0, 0, 0)
     .copy(timestamper = new Timestamper {
@@ -50,8 +48,8 @@ class ClockTest extends ShogiTest {
     "new game" in {
       game.clock map { _.color } must_== Some(Sente)
     }
-    "one move played" in {
-      game.playMoves((SQ7G, SQ7F, false)) must beValid.like { case g: Game =>
+    "one step played" in {
+      game.playUsiStr("7g7f") must beValid.like { case g: Game =>
         g.clock map { _.color } must_== Some(Gote)
       }
     }
@@ -110,28 +108,28 @@ class ClockTest extends ShogiTest {
       }
     }
 
-    "1 move" in {
-      "premove, no lag" in {
+    "1 step" in {
+      "pre-step, no lag" in {
         clockStep600(0, 0) must_== 600 * 100
       }
-      "premove, small lag" in {
+      "pre-step, small lag" in {
         clockStep600(0, 20) must_== 600 * 100
       }
-      "premove, big lag" in {
+      "pre-step, big lag" in {
         clockStep600(0, 400) must_== 599 * 100
       }
-      "1s move, no lag" in {
+      "1s step, no lag" in {
         clockStep600(100, 0) must_== 599 * 100
       }
-      "1s move, small lag" in {
+      "1s step, small lag" in {
         clockStep600(100, 20) must_== 599 * 100
       }
-      "1s move, big lag" in {
+      "1s step, big lag" in {
         clockStep600(100, 400) must_== 598 * 100
       }
     }
 
-    "multiple premoves" in {
+    "multiple pre-steps" in {
       "no lag" in {
         clockStep600(0, 0, 0) must_== 600 * 100
       }
@@ -154,7 +152,7 @@ class ClockTest extends ShogiTest {
       }
     }
 
-    "multiple premoves with fast clock" in {
+    "multiple pre-step with fast clock" in {
       "no lag" in {
         clockStep60(0, 0, 0) must_== 60 * 100
       }

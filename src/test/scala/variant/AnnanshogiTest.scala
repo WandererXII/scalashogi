@@ -47,7 +47,7 @@ class AnnanshogiTest extends ShogiTest {
     }
   }
 
-  "move legaility" should {
+  "move/drop legaility" should {
     "not checkmate" in {
       val sit = Sfen("4k4/4+R4/4L4/9/9/9/9/7GS/7GK w").toSituation(shogi.variant.Annanshogi).get
       sit.check must beTrue

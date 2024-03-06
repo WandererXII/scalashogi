@@ -9,7 +9,7 @@ final case class UsiCharPair(a: Char, b: Char) {
   override def toString = s"$a$b"
 }
 
-// Assumes usi is a legal move
+// Assumes usi is a legal move/drop
 // We don't want to go above one byte
 // Keep 251-255 reserved for some special cases
 object UsiCharPair {

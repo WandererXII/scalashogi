@@ -3,13 +3,13 @@ package format.usi
 
 import shogi.variant.{ Chushogi, Variant }
 
-// Assumes moves are valid - no moves outside of variant board size or promotions not touching the promotion zone
+// Assumes usis are valid - no positions outside of variant board size or promotions not touching the promotion zone
 object Binary {
 
-  def decodeMoves(bs: Seq[Byte], variant: Variant, nb: Int): Vector[Usi] =
+  def decode(bs: Seq[Byte], variant: Variant, nb: Int): Vector[Usi] =
     Reader.decode(bs, variant, nb)
 
-  def encodeMoves(ms: Seq[Usi], variant: Variant): Array[Byte] =
+  def encode(ms: Seq[Usi], variant: Variant): Array[Byte] =
     Writer.encode(ms, variant)
 
   private object Reader {

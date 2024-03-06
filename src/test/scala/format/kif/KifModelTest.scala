@@ -8,10 +8,10 @@ import Kif._
 import usi._
 
 class KifModelTest extends ShogiTest {
-  "render moves" in {
-    Kif.renderMove(Usi.WithRole(Usi("7h7g").get, Gold), None, Standard) must_== "７七金(78)"
-    Kif.renderMove(Usi.WithRole(Usi("P*6d").get, Pawn), None, Standard) must_== "６四歩打"
-    Kif.renderMove(Usi.WithRole(Usi("4j2h").get, Horse), None, Chushogi) must_== "2八龍馬 （←4十）"
+  "render steps" in {
+    Kif.renderStep(Usi.WithRole(Usi("7h7g").get, Gold), None, Standard) must_== "７七金(78)"
+    Kif.renderStep(Usi.WithRole(Usi("P*6d").get, Pawn), None, Standard) must_== "６四歩打"
+    Kif.renderStep(Usi.WithRole(Usi("4j2h").get, Horse), None, Chushogi) must_== "2八龍馬 （←4十）"
   }
 
   "render kif situation - board, hands, turn, from random sfen" in {
@@ -60,13 +60,13 @@ class KifModelTest extends ShogiTest {
 
   "kif render" in {
     // random bs
-    val moves = List(
-      NotationMove(1, Usi.WithRole(Usi("7h7g").get, Gold)),
-      NotationMove(2, Usi.WithRole(Usi("P*6d").get, Pawn)),
-      NotationMove(3, Usi.WithRole(Usi("4i2h").get, Horse))
+    val steps = List(
+      NotationStep(1, Usi.WithRole(Usi("7h7g").get, Gold)),
+      NotationStep(2, Usi.WithRole(Usi("P*6d").get, Pawn)),
+      NotationStep(3, Usi.WithRole(Usi("4i2h").get, Horse))
     )
     Kif(
-      moves,
+      steps,
       None,
       Standard
     ).render must_== """手合割：平手
@@ -80,13 +80,13 @@ class KifModelTest extends ShogiTest {
 
   "chushogi kif render" in {
     // random bs
-    val moves = List(
-      NotationMove(1, Usi.WithRole(Usi("7h7g").get, Gold)),
-      NotationMove(2, Usi.WithRole(Usi("4i2h").get, Pawn)),
-      NotationMove(3, Usi.WithRole(Usi("5i2h1a").get, Horse))
+    val steps = List(
+      NotationStep(1, Usi.WithRole(Usi("7h7g").get, Gold)),
+      NotationStep(2, Usi.WithRole(Usi("4i2h").get, Pawn)),
+      NotationStep(3, Usi.WithRole(Usi("5i2h1a").get, Horse))
     )
     Kif(
-      moves,
+      steps,
       None,
       Chushogi
     ).render must_== """先手：
@@ -192,18 +192,18 @@ class KifModelTest extends ShogiTest {
   }
 
   "kif render kyoto" in {
-    val moves = List(
-      NotationMove(1, Usi.WithRole(Usi("2e3d+").get, Gold)),
-      NotationMove(2, Usi.WithRole(Usi("1a1b+").get, Tokin)),
-      NotationMove(3, Usi.WithRole(Usi("1e1d+").get, Pawn)),
-      NotationMove(4, Usi.WithRole(Usi("1b1d+").get, Lance)),
-      NotationMove(5, Usi.WithRole(Usi("3e4d").get, King)),
-      NotationMove(6, Usi.WithRole(Usi("R*2b").get, Rook)),
-      NotationMove(7, Usi.WithRole(Usi("3d2b+").get, Knight)),
-      NotationMove(8, Usi.WithRole(Usi("P*4c").get, Pawn))
+    val steps = List(
+      NotationStep(1, Usi.WithRole(Usi("2e3d+").get, Gold)),
+      NotationStep(2, Usi.WithRole(Usi("1a1b+").get, Tokin)),
+      NotationStep(3, Usi.WithRole(Usi("1e1d+").get, Pawn)),
+      NotationStep(4, Usi.WithRole(Usi("1b1d+").get, Lance)),
+      NotationStep(5, Usi.WithRole(Usi("3e4d").get, King)),
+      NotationStep(6, Usi.WithRole(Usi("R*2b").get, Rook)),
+      NotationStep(7, Usi.WithRole(Usi("3d2b+").get, Knight)),
+      NotationStep(8, Usi.WithRole(Usi("P*4c").get, Pawn))
     )
     Kif(
-      moves,
+      steps,
       None,
       Kyotoshogi
     ).render must_== """手合割：京都将棋

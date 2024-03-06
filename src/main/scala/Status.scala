@@ -24,7 +24,7 @@ object Status {
   case object Draw              extends Status(34)
   case object Outoftime         extends Status(35) // clock flag
   case object Cheat             extends Status(36)
-  case object NoStart           extends Status(37) // the player did not make the first move in time
+  case object NoStart           extends Status(37) // the player did not make the first move/drop in time
   case object UnknownFinish     extends Status(38) // we don't know why the game ended
   case object TryRule           extends Status(39)
   case object PerpetualCheck    extends Status(40)

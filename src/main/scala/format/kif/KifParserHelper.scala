@@ -13,7 +13,7 @@ object KifParserHelper {
   def parseSituation(
       str: String,
       handicapString: Option[String],
-      moves: List[String]
+      steps: List[String]
   ): Validated[String, Situation] = {
     val lines = augmentString(str).linesIterator.map(_.trim.replace("：", ":").replace("　", " ")).toList
     val ranks = lines
@@ -25,7 +25,7 @@ object KifParserHelper {
           .takeWhile(_ != '|')
       )
 
-    val variant = detectVariant(ranks, handicapString, moves) | Standard
+    val variant = detectVariant(ranks, handicapString, steps) | Standard
 
     if (ranks.isEmpty)
       handicapString
@@ -57,14 +57,14 @@ object KifParserHelper {
   private def detectVariant(
       ranks: List[String],
       handicapString: Option[String],
-      moves: List[String]
+      steps: List[String]
   ): Option[Variant] = {
     if (handicapString.exists(isDefaultHandicapOf(_, Kyotoshogi))) Kyotoshogi.some
     else if (
       ranks.sizeIs == 5 ||
       handicapString.exists(isDefaultHandicapOf(_, Minishogi))
     ) Minishogi.some
-    else if (ranks.sizeIs == 12 || moves.exists(m => chushogiKifMoveRegex.matches(m)))
+    else if (ranks.sizeIs == 12 || steps.exists(s => chushogiKifMoveRegex.matches(s)))
       Chushogi.some
     else if (handicapString.exists(isDefaultHandicapOf(_, Annanshogi)))
       Annanshogi.some

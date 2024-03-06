@@ -47,50 +47,24 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
     def as(color: Color): Game = game.withColor(color)
 
-    def playMoves(moves: (Pos, Pos, Boolean)*): Validated[String, Game] = playMoveList(moves)
-
-    def playMoveList(moves: Seq[(Pos, Pos, Boolean)]): Validated[String, Game] = {
-      val vg = moves.foldLeft[Validated[String, Game]](Validated.valid(game)) {
-        case (vg, (orig, dest, prom)) =>
-          vg.foreach { g =>
-            val _ = g.situation.moveDestinations
-          }
-          val ng = vg flatMap { g =>
-            g(Usi.Move(orig, dest, prom, None))
-          }
-          ng
-      }
-      vg
-    }
-
-    // todo - get rid of `playMoveList` and `playMoves`
-    def playUsiMoveList(moves: Seq[Usi]): Validated[String, Game] = {
-      val vg = moves.foldLeft[Validated[String, Game]](Validated.valid(game)) { case (vg, usi) =>
+    def playUsisStr(usisStr: Seq[String]): Validated[String, Game] = {
+      val vg = usisStr.foldLeft[Validated[String, Game]](Validated.valid(game)) { case (vg, usiStr) =>
         vg.foreach { g =>
           val _ = g.situation.moveDestinations
           val _ = g.situation.dropDestinations
         }
         val ng = vg flatMap { g =>
-          g(usi)
+          g(Usi(usiStr).get)
         }
         ng
       }
       vg
     }
 
-    def playMove(
-        orig: Pos,
-        dest: Pos,
-        promotion: Boolean = false,
-        midStep: Option[Pos] = None
+    def playUsiStr(
+        usiStr: String
     ): Validated[String, Game] =
-      game.apply(Usi.Move(orig, dest, promotion, midStep))
-
-    def playDrop(
-        role: DroppableRole,
-        dest: Pos
-    ): Validated[String, Game] =
-      game.apply(Usi.Drop(role, dest))
+      game.apply(Usi(usiStr).get)
 
     def withClock(c: Clock) = game.copy(clock = Some(c))
   }

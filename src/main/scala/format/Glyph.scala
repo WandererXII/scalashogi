@@ -7,7 +7,7 @@ case class Glyph(id: Int, symbol: String, name: String) {
 }
 
 final case class Glyphs(
-    move: Option[Glyph.MoveAssessment],
+    moveOrDrop: Option[Glyph.MoveOrDropAssessment],
     position: Option[Glyph.PositionAssessment],
     observations: List[Glyph.Observation]
 ) {
@@ -18,8 +18,8 @@ final case class Glyphs(
 
   def toggle(glyph: Glyph) =
     glyph match {
-      case g: Glyph.MoveAssessment     => copy(move = !move.contains(g) option g)
-      case g: Glyph.PositionAssessment => copy(position = !position.contains(g) option g)
+      case g: Glyph.MoveOrDropAssessment => copy(moveOrDrop = !moveOrDrop.contains(g) option g)
+      case g: Glyph.PositionAssessment   => copy(position = !position.contains(g) option g)
       case g: Glyph.Observation =>
         copy(observations =
           if (observations contains g) observations.filter(g !=)
@@ -33,12 +33,12 @@ final case class Glyphs(
     else if (g.isEmpty) this
     else
       Glyphs(
-        g.move orElse move,
+        g.moveOrDrop orElse moveOrDrop,
         g.position orElse position,
         (g.observations ::: observations).distinct
       )
 
-  def toList: List[Glyph] = move.toList ::: position.toList ::: observations
+  def toList: List[Glyph] = moveOrDrop.toList ::: position.toList ::: observations
 }
 
 object Glyphs {
@@ -46,7 +46,7 @@ object Glyphs {
 
   def fromList(glyphs: List[Glyph]) =
     Glyphs(
-      move = glyphs.collectFirst { case g: Glyph.MoveAssessment => g },
+      moveOrDrop = glyphs.collectFirst { case g: Glyph.MoveOrDropAssessment => g },
       position = glyphs.collectFirst { case g: Glyph.PositionAssessment => g },
       observations = glyphs.collect { case g: Glyph.Observation => g }
     )
@@ -54,17 +54,17 @@ object Glyphs {
 
 object Glyph {
 
-  sealed trait MoveAssessment extends Glyph
+  sealed trait MoveOrDropAssessment extends Glyph
 
-  object MoveAssessment {
-    val good        = new Glyph(1, "!", "Good move") with MoveAssessment
-    val mistake     = new Glyph(2, "?", "Mistake") with MoveAssessment
-    val brillant    = new Glyph(3, "!!", "Brillant move") with MoveAssessment
-    val blunder     = new Glyph(4, "??", "Blunder") with MoveAssessment
-    val interesting = new Glyph(5, "!?", "Interesting move") with MoveAssessment
-    val dubious     = new Glyph(6, "?!", "Dubious move") with MoveAssessment
-    val only        = new Glyph(7, "□", "Only move") with MoveAssessment
-    val zugzwang    = new Glyph(22, "⨀", "Zugzwang") with MoveAssessment
+  object MoveOrDropAssessment {
+    val good        = new Glyph(1, "!", "Good move/drop") with MoveOrDropAssessment
+    val mistake     = new Glyph(2, "?", "Mistake") with MoveOrDropAssessment
+    val brillant    = new Glyph(3, "!!", "Brillant move/drop") with MoveOrDropAssessment
+    val blunder     = new Glyph(4, "??", "Blunder") with MoveOrDropAssessment
+    val interesting = new Glyph(5, "!?", "Interesting move/drop") with MoveOrDropAssessment
+    val dubious     = new Glyph(6, "?!", "Dubious move/drop") with MoveOrDropAssessment
+    val only        = new Glyph(7, "□", "Only move/drop") with MoveOrDropAssessment
+    val zugzwang    = new Glyph(22, "⨀", "Zugzwang") with MoveOrDropAssessment
 
     val all = List[Glyph](good, mistake, brillant, blunder, interesting, dubious, only, zugzwang)
     val byId: Map[Int, Glyph] = all.map { g =>
@@ -125,7 +125,7 @@ object Glyph {
   }
 
   def find(id: Int): Option[Glyph] =
-    MoveAssessment.byId.get(id) orElse
+    MoveOrDropAssessment.byId.get(id) orElse
       PositionAssessment.byId.get(id) orElse
       Observation.byId.get(id)
 }

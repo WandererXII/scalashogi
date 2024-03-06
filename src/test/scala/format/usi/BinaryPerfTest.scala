@@ -8,7 +8,7 @@ class BinaryPerfTest extends ShogiTest {
   val iterations = 15
 
   def runOne(usis: List[Usi]) =
-    Binary.decodeMoves(Binary.encodeMoves(usis, variant.Standard).toVector, variant.Standard, 600)
+    Binary.decode(Binary.encode(usis, variant.Standard).toVector, variant.Standard, 600)
   def run(): Unit = { usis foreach runOne }
 
   "reading a game" should {
@@ -23,10 +23,10 @@ class BinaryPerfTest extends ShogiTest {
         println(s"${usis.size} games in $duration ms")
         duration
       }
-      val nbGames    = iterations * usis.size
-      val moveMicros = (1000 * durations.sum) / nbGames
-      println(s"Average = $moveMicros microseconds per game")
-      println(s"          ${1000000 / moveMicros} games per second")
+      val nbGames       = iterations * usis.size
+      val microsPerGame = (1000 * durations.sum) / nbGames
+      println(s"Average = $microsPerGame microseconds per game")
+      println(s"          ${1000000 / microsPerGame} games per second")
       true === true
     }
   }

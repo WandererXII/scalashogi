@@ -23,10 +23,10 @@ class UsiPerfTest extends ShogiTest {
         println(s"${usis.size} games in $duration ms")
         duration
       }
-      val nbGames    = iterations * usis.size
-      val moveMicros = (1000 * durations.sum) / nbGames
-      println(s"Average = $moveMicros microseconds per game")
-      println(s"          ${1000000 / moveMicros} games per second")
+      val nbGames       = iterations * usis.size
+      val microsPerGame = (1000 * durations.sum) / nbGames
+      println(s"Average = $microsPerGame microseconds per game")
+      println(s"          ${1000000 / microsPerGame} games per second")
       true === true
     }
   }

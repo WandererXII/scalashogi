@@ -3,7 +3,7 @@ package shogi
 import cats.data.Validated
 
 import shogi.format.forsyth.Sfen
-import shogi.format.ParsedMove
+import shogi.format.ParsedStep
 import shogi.format.usi.Usi
 
 final case class Game(
@@ -12,7 +12,7 @@ final case class Game(
     clock: Option[Clock] = None,
     plies: Int = 0,
     startedAtPly: Int = 0,
-    startedAtMove: Int = 1
+    startedAtStep: Int = 1
 ) {
 
   private def applySituation(sit: Situation, metrics: LagMetrics = LagMetrics.empty): Game =
@@ -32,11 +32,11 @@ final case class Game(
   def apply(usi: Usi): Validated[String, Game] =
     situation(usi).map(applySituation(_))
 
-  def apply(parsedMove: ParsedMove, metrics: LagMetrics): Validated[String, Game] =
-    situation(parsedMove).map(applySituation(_, metrics))
+  def apply(parsedStep: ParsedStep, metrics: LagMetrics): Validated[String, Game] =
+    situation(parsedStep).map(applySituation(_, metrics))
 
-  def apply(parsedMove: ParsedMove): Validated[String, Game] =
-    situation(parsedMove).map(applySituation(_))
+  def apply(parsedStep: ParsedStep): Validated[String, Game] =
+    situation(parsedStep).map(applySituation(_))
 
   def board = situation.board
 
@@ -48,12 +48,12 @@ final case class Game(
 
   def variant = situation.variant
 
-  // It starts at 1, and is incremented after Gote's move.
+  // It starts at 1, and is incremented after Gote's move/drop.
   def fullTurnNumber: Int = 1 + plies / 2
 
   def playedPlies: Int = plies - startedAtPly
 
-  def moveNumber: Int = startedAtMove + playedPlies
+  def stepNumber: Int = startedAtStep + playedPlies
 
   def withBoard(b: Board) = copy(situation = situation.copy(board = b))
 
@@ -87,7 +87,7 @@ object Game {
         apply(parsed.situation).copy(
           plies = parsed.plies,
           startedAtPly = parsed.plies,
-          startedAtMove = parsed.moveNumber
+          startedAtStep = parsed.stepNumber
         )
       }
 }

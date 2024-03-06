@@ -11,7 +11,7 @@ final case class History(
     initialSfen: Option[Sfen]
 ) {
 
-  // only hashes for positions with the same side to move
+  // only hashes for positions with the same side to play
   private def currentTurnHashes = positionHashes.sliding(Hash.size, 2 * Hash.size).toList
 
   private def isRepetition(times: Int): Boolean =
@@ -27,7 +27,7 @@ final case class History(
       }
     }
 
-  // number of moves each player made since the repeated position first occured
+  // number of moves/drops each player made since the repeated position first occured
   lazy val firstRepetitionDistance: Option[Int] = {
     val positions = currentTurnHashes
     positions.headOption match {

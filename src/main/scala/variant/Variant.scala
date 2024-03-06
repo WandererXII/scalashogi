@@ -156,7 +156,7 @@ abstract class Variant private[variant] (
     }
   }
 
-  // Could the position before the move occur ever again
+  // Could the position before the usi occur ever again
   def isIrreversible(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean = false
 
   // for perpetual check
@@ -287,7 +287,7 @@ abstract class Variant private[variant] (
 
   def specialVariantEnd(@unused sit: Situation): Boolean = false
 
-  // Player wins or loses after their move
+  // Player wins or loses after their move/drop
   def winner(sit: Situation): Option[Color] =
     if (sit.checkmate || sit.stalemate || sit.bareKing(sit.color) || sit.royalsLost) Some(!sit.color)
     else if (sit.bareKing(!sit.color) || sit.impasse) Some(sit.color)

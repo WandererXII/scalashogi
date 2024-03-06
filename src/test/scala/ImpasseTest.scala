@@ -1,6 +1,5 @@
 package shogi
 
-import Pos._
 import format.forsyth.Sfen
 import shogi.variant._
 
@@ -39,7 +38,7 @@ class ImpasseTest extends ShogiTest {
       "one move away" in {
         val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/9/9/9 b - 1"), Standard)
         g must beValid.like { case game =>
-          game.playMove(SQ8E, SQ8B) must beValid.like { case game2 =>
+          game.playUsiStr("8e8b") must beValid.like { case game2 =>
             game2.situation.impasse must beFalse
             game2.situation.winner must beNone
           }
@@ -48,7 +47,7 @@ class ImpasseTest extends ShogiTest {
       "opponent prevents impasse" in {
         val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/6b2/9/9 b - 1"), Standard)
         g must beValid.like { case game =>
-          game.playMoves((SQ8E, SQ8B, false), (SQ3G, SQ2F, false)) must beValid.like { case game2 =>
+          game.playUsisStr(List("8e8b", "3g2f")) must beValid.like { case game2 =>
             game2.situation.impasse must beFalse
             game2.situation.winner must beNone
           }
@@ -115,7 +114,7 @@ class ImpasseTest extends ShogiTest {
       "after moves" in {
         val g = sfenToGame(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/9/9/9 b - 1"), Standard)
         g must beValid.like { case game =>
-          game.playMoves((SQ8E, SQ8B, false), (SQ2E, SQ2F, false)) must beValid.like { case game2 =>
+          game.playUsisStr(List("8e8b", "2e2f")) must beValid.like { case game2 =>
             game2.situation.impasse must beTrue
             game2.situation.winner must beSome.like { case color =>
               color.sente

@@ -1,6 +1,5 @@
 package shogi
 
-import Pos._
 import variant.{ Kyotoshogi, Minishogi, Standard }
 import format.forsyth.Sfen
 
@@ -9,22 +8,22 @@ class RepetitionTest extends ShogiTest {
   "detect repetition" should {
     val game = makeGame(Standard)
     "standard fourfold" in {
-      val moves = List(
-        (SQ2H, SQ3H, false),
-        (SQ8B, SQ7B, false),
-        (SQ3H, SQ2H, false),
-        (SQ7B, SQ8B, false),
-        (SQ2H, SQ3H, false),
-        (SQ8B, SQ7B, false),
-        (SQ3H, SQ2H, false),
-        (SQ7B, SQ8B, false),
-        (SQ2H, SQ3H, false),
-        (SQ8B, SQ7B, false),
-        (SQ3H, SQ2H, false),
-        (SQ7B, SQ8B, false)
+      val usis = List(
+        "2h3h",
+        "8b7b",
+        "3h2h",
+        "7b8b",
+        "2h3h",
+        "8b7b",
+        "3h2h",
+        "7b8b",
+        "2h3h",
+        "8b7b",
+        "3h2h",
+        "7b8b"
       )
       "should be fourfold" in {
-        game.playMoves(moves: _*) must beValid.like { case g =>
+        game.playUsisStr(usis) must beValid.like { case g =>
           g.situation.draw must beFalse
           g.situation.repetition must beTrue
           g.situation.perpetualCheck must beFalse
@@ -32,7 +31,7 @@ class RepetitionTest extends ShogiTest {
         }
       }
       "should not be fourfold" in {
-        game.playMoves(moves.dropRight(1): _*) must beValid.like { case g =>
+        game.playUsisStr(usis.dropRight(1)) must beValid.like { case g =>
           g.situation.draw must beFalse
           g.situation.repetition must beFalse
           g.situation.perpetualCheck must beFalse
@@ -42,22 +41,22 @@ class RepetitionTest extends ShogiTest {
     }
     "minishogi repetition" in {
       val game = makeGame(Minishogi).withHistory(History.empty.withInitialSfen(Minishogi.initialSfen))
-      val moves = List(
-        (SQ4E, SQ4D, false),
-        (SQ2A, SQ2B, false),
-        (SQ4D, SQ4E, false),
-        (SQ2B, SQ2A, false),
-        (SQ4E, SQ4D, false),
-        (SQ2A, SQ2B, false),
-        (SQ4D, SQ4E, false),
-        (SQ2B, SQ2A, false),
-        (SQ4E, SQ4D, false),
-        (SQ2A, SQ2B, false),
-        (SQ4D, SQ4E, false),
-        (SQ2B, SQ2A, false)
+      val usis = List(
+        "4e4d",
+        "2a2b",
+        "4d4e",
+        "2b2a",
+        "4e4d",
+        "2a2b",
+        "4d4e",
+        "2b2a",
+        "4e4d",
+        "2a2b",
+        "4d4e",
+        "2b2a"
       )
       "should be fourfold" in {
-        game.playMoves(moves: _*) must beValid.like { case g =>
+        game.playUsisStr(usis) must beValid.like { case g =>
           g.situation.draw must beFalse
           g.situation.repetition must beTrue
           g.situation.perpetualCheck must beFalse
@@ -69,7 +68,7 @@ class RepetitionTest extends ShogiTest {
         }
       }
       "should not be fourfold" in {
-        game.playMoves(moves.dropRight(1): _*) must beValid.like { case g =>
+        game.playUsisStr(usis.dropRight(1)) must beValid.like { case g =>
           g.situation.draw must beFalse
           g.situation.repetition must beFalse
           g.situation.perpetualCheck must beFalse
@@ -79,18 +78,18 @@ class RepetitionTest extends ShogiTest {
     }
     "kyotoshogi threefold" in {
       val game = makeGame(Kyotoshogi)
-      val moves = List(
-        (SQ4E, SQ3D, true),
-        (SQ2A, SQ3B, true),
-        (SQ3D, SQ4E, true),
-        (SQ3B, SQ2A, true),
-        (SQ4E, SQ3D, true),
-        (SQ2A, SQ3B, true),
-        (SQ3D, SQ4E, true),
-        (SQ3B, SQ2A, true)
+      val usis = List(
+        "4e3d+",
+        "2a3b+",
+        "3d4e+",
+        "3b2a+",
+        "4e3d+",
+        "2a3b+",
+        "3d4e+",
+        "3b2a+"
       )
       "should be threefold" in {
-        game.playMoves(moves: _*) must beValid.like { case g =>
+        game.playUsisStr(usis) must beValid.like { case g =>
           g.situation.draw must beFalse
           g.situation.repetition must beTrue
           g.situation.perpetualCheck must beFalse
@@ -98,7 +97,7 @@ class RepetitionTest extends ShogiTest {
         }
       }
       "should not be threefold" in {
-        game.playMoves(moves.dropRight(1): _*) must beValid.like { case g =>
+        game.playUsisStr(usis.dropRight(1)) must beValid.like { case g =>
           g.situation.draw must beFalse
           g.situation.repetition must beFalse
           g.situation.perpetualCheck must beFalse

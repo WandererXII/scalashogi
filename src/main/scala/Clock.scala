@@ -95,30 +95,30 @@ final case class Clock(
 
         val player              = players(color)
         val remaining           = player.remaining
-        val (lagComp, lagTrack) = player.lag.onMove(lag)
-        val moveTime            = (elapsed - lagComp) nonNeg
+        val (lagComp, lagTrack) = player.lag.onStep(lag)
+        val stepTime            = (elapsed - lagComp) nonNeg
 
         // As long as game is still in progress, and we have enough time left (including byoyomi and periods)
-        val clockActive = gameActive && moveTime < remaining + player.periodsLeft * player.byoyomi
-        // The number of periods the move stretched over
-        val periodSpan = periodsInUse(color, moveTime)
+        val clockActive = gameActive && stepTime < remaining + player.periodsLeft * player.byoyomi
+        // The number of periods the step stretched over
+        val periodSpan = periodsInUse(color, stepTime)
         val reloadByoyomi =
           clockActive && player.byoyomi.isPositive && (player.spentPeriods > 0 || periodSpan > 0)
 
         val newC =
           if (reloadByoyomi)
             updatePlayer(color) {
-              _.setRemaining((remaining - moveTime) atLeast player.byoyomi)
+              _.setRemaining((remaining - stepTime) atLeast player.byoyomi)
                 .spendPeriods(periodSpan)
-                .copy(lag = lagTrack, lastTime = moveTime)
+                .copy(lag = lagTrack, lastTime = stepTime)
             }
           else
             updatePlayer(color) {
               _.takeTime(
-                moveTime - (clockActive ?? player.increment) - (player.byoyomi.isPositive ?? player.byoyomi * periodSpan)
+                stepTime - (clockActive ?? player.increment) - (player.byoyomi.isPositive ?? player.byoyomi * periodSpan)
               )
                 .spendPeriods(periodSpan)
-                .copy(lag = lagTrack, lastTime = moveTime)
+                .copy(lag = lagTrack, lastTime = stepTime)
             }
 
         if (clockActive) newC else newC.hardStop
@@ -155,7 +155,7 @@ final case class Clock(
 
   def lagCompAvg = players map { ~_.lag.compAvg } reduce (_ avg _)
 
-  // Lowball estimate of next move's lag comp for UI butter.
+  // Lowball estimate of next step's lag comp for UI butter.
   def lagCompEstimate(c: Color) = players(c).lag.compEstimate
 
   def estimateTotalSeconds = config.estimateTotalSeconds
@@ -227,7 +227,7 @@ object Clock {
     // Activate low time warning when between 10 and 90 seconds remain
     def emergSeconds = math.min(90, math.max(10, limitSeconds / 8))
 
-    // Estimate 60 moves (per player) per game
+    // Estimate 60 moves/drops (per player) per game
     def estimateTotalSeconds = limitSeconds + 60 * incrementSeconds + 25 * periodsTotal * byoyomiSeconds
 
     def estimateTotalTime = Centis.ofSeconds(estimateTotalSeconds)

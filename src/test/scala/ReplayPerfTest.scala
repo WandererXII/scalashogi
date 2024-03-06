@@ -26,10 +26,10 @@ class ReplayPerfTest extends ShogiTest {
         println(s"$nb games in $duration ms")
         duration
       }
-      val nbGames    = iterations * nb
-      val moveMicros = (1000 * durations.sum) / nbGames
-      println(s"Average = $moveMicros microseconds per game")
-      println(s"          ${1000000 / moveMicros} games per second")
+      val nbGames       = iterations * nb
+      val microsPerGame = (1000 * durations.sum) / nbGames
+      println(s"Average = $microsPerGame microseconds per game")
+      println(s"          ${1000000 / microsPerGame} games per second")
       true === true
     }
   }

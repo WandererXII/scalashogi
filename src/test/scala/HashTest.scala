@@ -11,38 +11,38 @@ class HashTest extends ShogiTest {
     "be consistent" in {
       val sfen          = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
       val situation     = sfen.toSituation(Standard).get
-      val sitAfter      = situation(Usi.Move(Pos.SQ8H, Pos.SQ2B, false, None)).toOption.get
-      val hashAfterMove = Hash(sitAfter)
+      val sitAfterMove  = situation(Usi.Move(Pos.SQ8H, Pos.SQ2B, false, None)).toOption.get
+      val hashAfterMove = Hash(sitAfterMove)
 
-      val sfenAfter      = Sfen("lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4")
-      val situationAfter = sfenAfter.toSituation(Standard).get
-      val hashAfter      = Hash(situationAfter)
+      val sfenAfter = Sfen("lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4")
+      val sitAfter  = sfenAfter.toSituation(Standard).get
+      val hashAfter = Hash(sitAfter)
 
       hashAfterMove mustEqual hashAfter
     }
 
     "board diffs" in {
-      val sfen          = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
-      val sit           = sfen.toSituation(Standard).get
-      val hashAfterMove = Hash(sit)
+      val sfen = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
+      val sit  = sfen.toSituation(Standard).get
+      val hash = Hash(sit)
 
-      val sfenAfter = Sfen("nnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
-      val sitAfter  = sfenAfter.toSituation(Standard).get
-      val hashAfter = Hash(sitAfter)
+      val sfenDiff = Sfen("nnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
+      val sitDiff  = sfenDiff.toSituation(Standard).get
+      val hashDiff = Hash(sitDiff)
 
-      hashAfterMove mustNotEqual hashAfter
+      hash mustNotEqual hashDiff
     }
 
     "color diffs" in {
-      val sfen          = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL w - 3")
-      val sit           = sfen.toSituation(Standard).get
-      val hashAfterMove = Hash(sit)
+      val sfenGote = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL w - 3")
+      val sitGote  = sfenGote.toSituation(Standard).get
+      val hashGote = Hash(sitGote)
 
-      val sfenAfter = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
-      val sitAfter  = sfenAfter.toSituation(Standard).get
-      val hashAfter = Hash(sitAfter)
+      val sfenSente = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
+      val sitSente  = sfenSente.toSituation(Standard).get
+      val hashSente = Hash(sitSente)
 
-      hashAfterMove mustNotEqual hashAfter
+      hashGote mustNotEqual hashSente
     }
 
     "hash hands" in {

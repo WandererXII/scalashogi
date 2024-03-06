@@ -9,7 +9,7 @@ import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
 
 final case class Csa(
-    moves: List[NotationMove],
+    steps: List[NotationStep],
     initialSfen: Option[Sfen],
     initial: Initial = Initial.empty,
     tags: Tags = Tags.empty
@@ -17,16 +17,16 @@ final case class Csa(
 
   def variant = Standard
 
-  def withMoves(moves: List[NotationMove]) =
-    copy(moves = moves)
+  def withSteps(steps: List[NotationStep]) =
+    copy(steps = steps)
 
   def withTags(tags: Tags) =
     copy(tags = tags)
 
-  private def renderMainline(moveline: List[NotationMove], turn: Color): String =
-    moveline
+  private def renderMainline(steps: List[NotationStep], turn: Color): String =
+    steps
       .foldLeft[(List[String], Color)]((Nil, turn)) { case ((acc, curTurn), cur) =>
-        (Csa.renderNotationMove(cur, curTurn.some) :: acc, !curTurn)
+        (Csa.renderNotationStep(cur, curTurn.some) :: acc, !curTurn)
       }
       ._1
       .reverse mkString "\n"
@@ -41,12 +41,12 @@ final case class Csa(
     val setup =
       initialSfenOrDefault.toSituation(variant).fold("")(Csa renderSituation _)
     val startColor: Color = initialSfenOrDefault.color | Sente
-    val movesStr          = renderMainline(moves, startColor)
+    val stepsStr          = renderMainline(steps, startColor)
     List[String](
       header,
       setup,
       initStr,
-      movesStr
+      stepsStr
     ).filter(_.nonEmpty).mkString("\n")
   }.trim
 
@@ -55,15 +55,15 @@ final case class Csa(
 
 object Csa {
 
-  def renderNotationMove(cur: NotationMove, turn: Option[Color]) = {
-    val csaMove     = renderCsaMove(cur.usiWithRole, turn)
+  def renderNotationStep(cur: NotationStep, turn: Option[Color]) = {
+    val csaStep     = renderCsaStep(cur.usiWithRole, turn)
     val timeStr     = clockString(cur) | ""
     val commentsStr = cur.comments.map { text => s"\n'${fixComment(text)}" }.mkString("")
     val resultStr   = cur.result.fold("")(t => s"\n$t")
-    s"$csaMove$timeStr$commentsStr$resultStr"
+    s"$csaStep$timeStr$commentsStr$resultStr"
   }
 
-  def renderCsaMove(usiWithRole: Usi.WithRole, turn: Option[Color]) =
+  def renderCsaStep(usiWithRole: Usi.WithRole, turn: Option[Color]) =
     usiWithRole.usi match {
       case Usi.Drop(role, pos) =>
         s"${turn.fold("")(_.fold("+", "-"))}00${CsaUtils.makeCsaPos(pos)}${CsaUtils.toCsa(role) | ""}"
@@ -131,7 +131,7 @@ object Csa {
         .mkString(prefix, "", "")
   }
 
-  def createTerminationMove(
+  def createTerminationStep(
       status: Status,
       winnerTurn: Boolean,
       winnerColor: Option[Color]
@@ -166,7 +166,7 @@ object Csa {
     Tag.Opening
   )
 
-  private def clockString(cur: NotationMove): Option[String] =
+  private def clockString(cur: NotationStep): Option[String] =
     cur.secondsSpent.map(spent => s",T$spent")
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r

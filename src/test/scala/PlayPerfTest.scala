@@ -1,7 +1,5 @@
 package shogi
 
-import Pos._
-
 class PlayPerfTest extends ShogiTest {
 
   // args(skipAll = true)
@@ -12,19 +10,8 @@ class PlayPerfTest extends ShogiTest {
   // val iterations = 1
 
   def runOne =
-    makeGame(shogi.variant.Standard).playMoves(
-      (SQ7G, SQ7F, false),
-      (SQ8C, SQ8D, false),
-      (SQ7I, SQ6H, false),
-      (SQ3C, SQ3D, false),
-      (SQ6H, SQ7G, false),
-      (SQ7A, SQ6B, false),
-      (SQ2G, SQ2F, false),
-      (SQ3A, SQ4B, false),
-      (SQ3I, SQ4H, false),
-      (SQ4A, SQ3B, false),
-      (SQ6I, SQ7H, false),
-      (SQ5A, SQ4A, false)
+    makeGame(shogi.variant.Standard).playUsisStr(
+      List("7g7f", "8c8d", "7i6h", "3c3d", "6h7g", "7a6b", "2g2f", "3a4b", "3i4h", "4a3b", "6i7h", "5a4a")
     )
   def run(): Unit = { for (_ <- 1 to nb) runOne }
 
@@ -43,10 +30,10 @@ class PlayPerfTest extends ShogiTest {
         println(s"$nb games in $duration ms")
         duration
       }
-      val nbGames    = iterations * nb
-      val moveMicros = (1000 * durations.sum) / nbGames
-      println(s"Average = $moveMicros microseconds per game")
-      println(s"          ${1000000 / moveMicros} games per second")
+      val nbGames       = iterations * nb
+      val microsPerGame = (1000 * durations.sum) / nbGames
+      println(s"Average = $microsPerGame microseconds per game")
+      println(s"          ${1000000 / microsPerGame} games per second")
       true === true
     }
   }

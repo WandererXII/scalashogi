@@ -2,7 +2,6 @@ package shogi
 package format
 package forsyth
 
-import Pos._
 import format.usi.Usi
 import variant.{ Chushogi, Minishogi, Standard }
 
@@ -13,7 +12,7 @@ class SfenTest extends ShogiTest {
   "the forsyth notation" should {
     "export" in {
       "game opening" in {
-        val moves = List((SQ7G, SQ7F, false), (SQ3C, SQ3D, false), (SQ8H, SQ2B, false), (SQ3A, SQ2B, false))
+        val steps = List("7g7f", "3c3d", "8h2b", "3a2b")
         val game  = makeGame(Standard)
         "new game" in {
           game.toSfen must_== Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1")
@@ -23,29 +22,29 @@ class SfenTest extends ShogiTest {
             "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL"
           )
         }
-        "one move" in {
-          game.playMoveList(moves take 1) must beValid.like { case g =>
+        "one step" in {
+          game.playUsisStr(steps take 1) must beValid.like { case g =>
             g.toSfen must_== Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL w - 2")
           }
         }
-        "2 moves" in {
-          game.playMoveList(moves take 2) must beValid.like { case g =>
+        "2 steps" in {
+          game.playUsisStr(steps take 2) must beValid.like { case g =>
             g.toSfen must_== Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
           }
         }
-        "3 moves" in {
-          game.playMoveList(moves take 3) must beValid.like { case g =>
+        "3 steps" in {
+          game.playUsisStr(steps take 3) must beValid.like { case g =>
             g.toSfen must_== Sfen("lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4")
           }
         }
-        "4 moves" in {
-          game.playMoveList(moves take 4) must beValid.like { case g =>
+        "4 steps" in {
+          game.playUsisStr(steps take 4) must beValid.like { case g =>
             g.toSfen must_== Sfen("lnsgkg1nl/1r5s1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL b Bb 5")
           }
         }
         "5 drop" in {
-          game.playMoveList(moves take 4) must beValid.like { case g =>
-            g.playDrop(Bishop, SQ5E) must beValid.like { case g2 =>
+          game.playUsisStr(steps take 4) must beValid.like { case g =>
+            g.playUsiStr("B*5e") must beValid.like { case g2 =>
               g2.toSfen must_== Sfen("lnsgkg1nl/1r5s1/pppppp1pp/6p2/4B4/2P6/PP1PPPPPP/7R1/LNSGKGSNL w b 6")
             }
           }
@@ -54,9 +53,9 @@ class SfenTest extends ShogiTest {
 
     }
     "import" in {
-      val moves = List((SQ7G, SQ7F, false), (SQ3C, SQ3D, false), (SQ8H, SQ2B, false), (SQ3A, SQ2B, false))
-      def compare(ms: List[(Pos, Pos, Boolean)], sfen: Sfen) =
-        makeGame(Standard).playMoveList(ms) must beValid.like { case g =>
+      val steps = List("7g7f", "3c3d", "8h2b", "3a2b")
+      def compare(u: List[String], sfen: Sfen) =
+        makeGame(Standard).playUsisStr(u) must beValid.like { case g =>
           sfen must_== g.toSfen
         }
       "new game" in {
@@ -65,27 +64,27 @@ class SfenTest extends ShogiTest {
           Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1")
         )
       }
-      "one move" in {
+      "one step" in {
         compare(
-          moves take 1,
+          steps take 1,
           Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL w - 2")
         )
       }
-      "2 moves" in {
+      "2 steps" in {
         compare(
-          moves take 2,
+          steps take 2,
           Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
         )
       }
-      "3 moves" in {
+      "3 steps" in {
         compare(
-          moves take 3,
+          steps take 3,
           Sfen("lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4")
         )
       }
-      "4 moves" in {
+      "4 steps" in {
         compare(
-          moves take 4,
+          steps take 4,
           Sfen("lnsgkg1nl/1r5s1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL b Bb 5")
         )
       }
@@ -115,7 +114,7 @@ class SfenTest extends ShogiTest {
         ) must beSome.like { case s =>
           s.situation.color must_== Sente
           s.plies must_== 0
-          s.moveNumber must_== 1
+          s.stepNumber must_== 1
         }
       }
       "sente to play" in {
@@ -124,7 +123,7 @@ class SfenTest extends ShogiTest {
         ) must beSome.like { case s =>
           s.situation.color must_== Sente
           s.plies must_== 10
-          s.moveNumber must_== 11
+          s.stepNumber must_== 11
         }
       }
       "gote to play" in {
@@ -133,7 +132,7 @@ class SfenTest extends ShogiTest {
         ) must beSome.like { case s =>
           s.situation.color must_== Gote
           s.plies must_== 1
-          s.moveNumber must_== 2
+          s.stepNumber must_== 2
         }
       }
       "gote to play starting at 1" in {
@@ -142,7 +141,7 @@ class SfenTest extends ShogiTest {
         ) must beSome.like { case s =>
           s.situation.color must_== Gote
           s.plies must_== 1
-          s.moveNumber must_== 1
+          s.stepNumber must_== 1
         }
       }
     }
@@ -153,7 +152,7 @@ class SfenTest extends ShogiTest {
       val game = Game(sfen.some, shogi.variant.Standard)
       game.plies == 0
       game.startedAtPly == 0
-      game.startedAtMove == 1
+      game.startedAtStep == 1
       game.toSfen must_== sfen
     }
     "sente starts - 2" in {
@@ -161,7 +160,7 @@ class SfenTest extends ShogiTest {
       val game = Game(sfen.some, shogi.variant.Standard)
       game.plies == 2
       game.startedAtPly == 2
-      game.startedAtMove == 2
+      game.startedAtStep == 2
       game.toSfen must_== sfen
     }
     "gote starts - 1" in {
@@ -169,7 +168,7 @@ class SfenTest extends ShogiTest {
       val game = Game(sfen.some, shogi.variant.Standard)
       game.plies == 1
       game.startedAtPly == 1
-      game.startedAtMove == 1
+      game.startedAtStep == 1
       game.toSfen must_== sfen
     }
     "gote starts - 2" in {
@@ -177,7 +176,7 @@ class SfenTest extends ShogiTest {
       val game = Game(sfen.some, shogi.variant.Standard)
       game.plies == 1
       game.startedAtPly == 1
-      game.startedAtMove == 2
+      game.startedAtStep == 2
       game.toSfen must_== sfen
     }
   }

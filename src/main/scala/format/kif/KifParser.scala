@@ -52,9 +52,9 @@ object KifParser {
   val commentRegex =
     raw"""\*|＊""".r
 
-  final case class StrMove(
+  final case class StrStep(
       turnNumber: Option[Int],
-      move: String,
+      step: String,
       comments: List[String],
       secondLionMove: Boolean, // only for chushogi
       timeSpent: Option[Centis] = None,
@@ -63,7 +63,7 @@ object KifParser {
 
   final case class StrVariation(
       variationStart: Int,
-      moves: List[StrMove],
+      steps: List[StrStep],
       variations: List[StrVariation]
   )
 
@@ -79,73 +79,73 @@ object KifParser {
         .mkString("\n")
       for {
         splitted <- splitKif(preprocessed)
-        (headerStr, movesStr, variationStr) = splitted
+        (headerStr, stepsStr, variationStr) = splitted
         splitted2 <- splitMetaAndBoard(headerStr)
         (metaStr, boardStr) = splitted2
         preTags     <- TagParser(metaStr)
-        parsedMoves <- MovesParser(movesStr)
-        (strMoves, terminationOption) = parsedMoves
+        parsedSteps <- StepsParser(stepsStr)
+        (strSteps, terminationOption) = parsedSteps
         init             <- getComments(headerStr)
         parsedVariations <- VariationParser(variationStr)
         variations = createVariations(parsedVariations)
-        situation <- KifParserHelper.parseSituation(boardStr, preTags(_.Handicap), strMoves.map(_.move))
+        situation <- KifParserHelper.parseSituation(boardStr, preTags(_.Handicap), strSteps.map(_.step))
         variant     = situation.variant
         initialSfen = situation.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
-        tags        = createTags(preTags, situation.color, strMoves.size, terminationOption)
-        parsedMoves <- objMoves(strMoves, variant, variations)
-      } yield ParsedNotation(parsedMoves, initialSfen, variant, init, tags)
+        tags        = createTags(preTags, situation.color, strSteps.size, terminationOption)
+        parsedSteps <- objSteps(strSteps, variant, variations)
+      } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>
         sys error "### StackOverflowError ### in KIF parser"
     }
 
-  def objMoves(
-      strMoves: List[StrMove],
+  def objSteps(
+      strSteps: List[StrStep],
       variant: Variant,
       variations: List[StrVariation],
       startDest: Option[Pos] = None,
       startNum: Int = 1
-  ): Validated[String, ParsedMoves] = {
+  ): Validated[String, ParsedSteps] = {
     // No need to store 0s that mean nothing
     val uselessTimes =
-      strMoves.forall(m => m.timeSpent.fold(true)(_ == Centis(0)) && m.timeTotal.fold(true)(_ == Centis(0)))
+      strSteps.forall(s => s.timeSpent.fold(true)(_ == Centis(0)) && s.timeTotal.fold(true)(_ == Centis(0)))
 
     @scala.annotation.tailrec
     def mk(
-        parsedMoves: List[ParsedMove],
-        strMoves: List[StrMove],
+        parsedSteps: List[ParsedStep],
+        strSteps: List[StrStep],
         lastDest: Option[Pos],
         ply: Int
-    ): Validated[String, List[ParsedMove]] =
-      strMoves match {
-        case Nil => valid(parsedMoves.reverse)
-        case move :: rest =>
-          move match {
-            case StrMove(moveNumber, moveStr, comments, secondLionMove, timeSpent, timeTotal) => {
+    ): Validated[String, List[ParsedStep]] =
+      strSteps match {
+        case Nil => valid(parsedSteps.reverse)
+        case step :: rest =>
+          step match {
+            case StrStep(stepNumber, stepStr, comments, secondLionMove, timeSpent, timeTotal) => {
               MoveDropParser(
-                moveStr,
+                stepStr,
                 lastDest,
                 if (variant.chushogi && secondLionMove)
-                  parsedMoves.headOption.flatMap(_.positions.headOption)
+                  parsedSteps.headOption.flatMap(_.positions.headOption)
                 else None,
                 variant
-              ) map { m =>
-                val m1 = m withComments comments withVariations {
+              ) map { s =>
+                val s1 = s withComments comments withVariations {
                   variations
-                    .withFilter(_.variationStart == (moveNumber | ply))
+                    .withFilter(_.variationStart == (stepNumber | ply))
                     .map { v =>
-                      objMoves(v.moves, variant, v.variations, lastDest, ply + 1) getOrElse ParsedMoves.empty
+                      objSteps(v.steps, variant, v.variations, lastDest, ply + 1) getOrElse ParsedSteps.empty
                     }
                     .filter(_.value.nonEmpty)
                 }
-                if (uselessTimes) m1 else m1 withTimeSpent timeSpent withTimeTotal timeTotal
+                if (uselessTimes) s1 else s1 withTimeSpent timeSpent withTimeTotal timeTotal
               } match {
-                case Valid(move) => {
-                  val newMoves =
-                    if (variant.chushogi && secondLionMove && parsedMoves.nonEmpty)
-                      move :: parsedMoves.tail
-                    else move :: parsedMoves
-                  mk(newMoves, rest, move.positions.lastOption, ply + 1)
+                case Valid(step) => {
+                  val newSteps =
+                    if (variant.chushogi && secondLionMove && parsedSteps.nonEmpty)
+                      step :: parsedSteps.tail
+                    else step :: parsedSteps
+                  mk(newSteps, rest, step.positions.lastOption, ply + 1)
                 }
                 case Invalid(err) => invalid(err)
               }
@@ -153,7 +153,7 @@ object KifParser {
           }
       }
 
-    mk(Nil, strMoves, startDest, startNum) map ParsedMoves.apply
+    mk(Nil, strSteps, startDest, startNum) map ParsedSteps.apply
   }
 
   def createVariations(vs: List[StrVariation]): List[StrVariation] = {
@@ -170,14 +170,14 @@ object KifParser {
       val res = ch.map { case (k, i) =>
         getChildren(k, rest.drop(i + 1))
       }
-      StrVariation(parent.variationStart, parent.moves, res)
+      StrVariation(parent.variationStart, parent.steps, res)
     }
-    // Obtain first depth variations - that's what we want to use in objMoves
+    // Obtain first depth variations - that's what we want to use in objSteps
     val ch = vs.zipWithIndex
       .foldLeft[List[(StrVariation, Int)]](Nil) { case (acc, cur) =>
         if (
           acc.headOption.fold(false)(v =>
-            (v._1.variationStart < cur._1.variationStart) && ((v._1.variationStart + v._1.moves.size) > cur._1.variationStart)
+            (v._1.variationStart < cur._1.variationStart) && ((v._1.variationStart + v._1.steps.size) > cur._1.variationStart)
           )
         ) acc
         else cur :: acc
@@ -192,14 +192,14 @@ object KifParser {
   def createTags(
       tags: Tags,
       color: Color,
-      nbMoves: Int,
-      moveTermTag: Option[Tag]
+      nbSteps: Int,
+      stepTermTag: Option[Tag]
   ): Tags = {
-    val termTag = (tags(_.Termination) orElse moveTermTag.map(_.value)).map(t => Tag(_.Termination, t))
+    val termTag = (tags(_.Termination) orElse stepTermTag.map(_.value)).map(t => Tag(_.Termination, t))
     val resultTag = KifParserHelper
       .createResult(
         termTag,
-        Color.fromSente((nbMoves + { if (color.gote) 1 else 0 }) % 2 == 0)
+        Color.fromSente((nbSteps + { if (color.gote) 1 else 0 }) % 2 == 0)
       )
 
     List[Option[Tag]](resultTag, termTag).flatten.foldLeft(tags)(_ + _)
@@ -220,8 +220,8 @@ object KifParser {
 
     def variation: Parser[StrVariation] =
       as("variation") {
-        header ~ rep(move) ^^ { case h ~ m =>
-          StrVariation(h, m, Nil)
+        header ~ rep(step) ^^ { case h ~ s =>
+          StrVariation(h, s, Nil)
         }
       }
 
@@ -230,13 +230,13 @@ object KifParser {
         raw"""${numbersS}""".r.findFirstIn(num).map(KifUtils.kanjiToInt _) | 0
       }
 
-    // todo - don't repeat this just use MovesParser
-    def move: Parser[StrMove] =
-      as("move") {
+    // todo - don't repeat this just use StepsParser
+    def step: Parser[StrStep] =
+      as("step") {
         (commentary *) ~>
           (opt(number) ~ opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(commentary)) <~
-          (moveExtras *) ^^ { case num ~ lionMove ~ moveStr ~ _ ~ comments =>
-            StrMove(num, moveStr, cleanComments(comments), lionMove.exists(_.contains("二歩目")))
+          (stepExtras *) ^^ { case num ~ lionMove ~ stepStr ~ _ ~ comments =>
+            StrStep(num, stepStr, cleanComments(comments), lionMove.exists(_.contains("二歩目")))
           }
       }
 
@@ -249,8 +249,8 @@ object KifParser {
         """[\(（][0-9０-９\/\s:／]{1,}[\)）]\+?""".r
       }
 
-    def moveExtras: Parser[Unit] =
-      as("moveExtras") {
+    def stepExtras: Parser[Unit] =
+      as("stepExtras") {
         commentary.^^^(())
       }
 
@@ -267,40 +267,40 @@ object KifParser {
       if (loggingEnabled) log(p)(msg) else p
   }
 
-  object MovesParser extends RegexParsers with Logging {
+  object StepsParser extends RegexParsers with Logging {
 
     override val whiteSpace = """(\s|\t|\r?\n)+""".r
 
-    def apply(kifMoves: String): Validated[String, (List[StrMove], Option[Tag])] = {
-      parseAll(strMoves, kifMoves) match {
-        case Success((moves, termination), _) =>
+    def apply(kifSteps: String): Validated[String, (List[StrStep], Option[Tag])] = {
+      parseAll(strSteps, kifSteps) match {
+        case Success((steps, termination), _) =>
           valid(
             (
-              moves,
+              steps,
               termination map { r =>
                 Tag(_.Termination, r)
               }
             )
           )
-        case err => invalid("Cannot parse moves: %s\n%s".format(err.toString, kifMoves))
+        case err => invalid("Cannot parse moves/drops: %s\n%s".format(err.toString, kifSteps))
       }
     }
 
-    def strMoves: Parser[(List[StrMove], Option[String])] =
-      as("moves") {
-        (strMove *) ~ (termination *) ~ (commentary *) ^^ { case parsedMoves ~ term ~ coms =>
-          (updateLastComments(parsedMoves, coms), term.headOption)
+    def strSteps: Parser[(List[StrStep], Option[String])] =
+      as("steps") {
+        (strStep *) ~ (termination *) ~ (commentary *) ^^ { case parsedSteps ~ term ~ coms =>
+          (updateLastComments(parsedSteps, coms), term.headOption)
         }
       }
 
-    def strMove: Parser[StrMove] =
-      as("move") {
+    def strStep: Parser[StrStep] =
+      as("step") {
         (commentary *) ~>
           (opt(number) ~ opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(commentary)) <~
-          (moveExtras *) ^^ { case num ~ lionMove ~ moveStr ~ clk ~ comments =>
-            StrMove(
+          (stepExtras *) ^^ { case num ~ lionMove ~ stepStr ~ clk ~ comments =>
+            StrStep(
               num,
-              moveStr,
+              stepStr,
               cleanComments(comments),
               lionMove.exists(_.contains("二歩目")),
               clk.flatMap(_._1),
@@ -334,10 +334,10 @@ object KifParser {
       }
     }
 
-    private def updateLastComments(moves: List[StrMove], comments: List[String]): List[StrMove] = {
-      val index = moves.size - 1
-      (moves lift index).fold(moves) { move =>
-        moves.updated(index, move.copy(comments = move.comments ::: comments))
+    private def updateLastComments(steps: List[StrStep], comments: List[String]): List[StrStep] = {
+      val index = steps.size - 1
+      (steps lift index).fold(steps) { step =>
+        steps.updated(index, step.copy(comments = step.comments ::: comments))
       }
     }
 
@@ -350,8 +350,8 @@ object KifParser {
           }
       }
 
-    def moveExtras: Parser[Unit] =
-      as("moveExtras") {
+    def stepExtras: Parser[Unit] =
+      as("stepExtras") {
         commentary.^^^(())
       }
 
@@ -384,7 +384,7 @@ object KifParser {
         lastDest: Option[Pos],
         firstLionOrig: Option[Pos], // for chushogi lion moves
         variant: Variant
-    ): Validated[String, ParsedMove] = {
+    ): Validated[String, ParsedStep] = {
       str match {
         case MoveRegex(destS, roleS, promS, origS) =>
           for {
@@ -489,8 +489,8 @@ object KifParser {
         rest span { line =>
           !line.startsWith("変化")
         } match {
-          case (moveLines, variationsLines) =>
-            valid((headerLines.mkString("\n"), moveLines.mkString("\n"), variationsLines.mkString("\n")))
+          case (stepLines, variationsLines) =>
+            valid((headerLines.mkString("\n"), stepLines.mkString("\n"), variationsLines.mkString("\n")))
         }
       }
     }

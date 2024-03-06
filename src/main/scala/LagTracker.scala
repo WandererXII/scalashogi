@@ -12,7 +12,7 @@ final case class LagTracker(
     compEstOvers: Centis = Centis(0),
     compEstimate: Option[Centis] = None
 ) {
-  def onMove(lag: Centis) = {
+  def onStep(lag: Centis) = {
     val comp     = lag atMost quota
     val uncomped = lag - comp
     val ceDiff   = (compEstimate | Centis(1)) - comp
@@ -43,14 +43,14 @@ final case class LagTracker(
     )
   }
 
-  def moves = lagStats.samples
+  def steps = lagStats.samples
 
-  def lagMean: Option[Centis] = moves > 0 option Centis(lagStats.mean)
+  def lagMean: Option[Centis] = steps > 0 option Centis(lagStats.mean)
 
   def compEstStdErr: Option[Float] =
-    moves > 2 option math.sqrt(compEstSqErr).toFloat / (moves - 2)
+    steps > 2 option math.sqrt(compEstSqErr).toFloat / (steps - 2)
 
-  def compAvg: Option[Centis] = totalComp / moves
+  def compAvg: Option[Centis] = totalComp / steps
 
   def totalComp: Centis = totalLag - totalUncomped
 

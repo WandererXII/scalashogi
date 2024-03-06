@@ -102,11 +102,11 @@ object Replay {
         }
 
       val sit = initialSfenToSituation(initialSfen, variant)
-      recursivePlyAtSfen(sit, usis.toList, initialSfen.flatMap(_.moveNumber) | 1)
+      recursivePlyAtSfen(sit, usis.toList, initialSfen.flatMap(_.stepNumber) | 1)
     }
 
   // Use for trusted usis
-  // doesn't verify whether the moves are possible
+  // doesn't verify whether the usis are possible
   def usiWithRoleWhilePossible(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],

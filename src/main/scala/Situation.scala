@@ -4,7 +4,7 @@ import cats.data.Validated
 import cats.implicits._
 
 import shogi.format.forsyth.Sfen
-import shogi.format.ParsedMove
+import shogi.format.ParsedStep
 import shogi.format.usi.Usi
 import shogi.variant.Variant
 
@@ -22,8 +22,8 @@ final case class Situation(
       case u: Usi.Drop => variant.drop(this, u)
     }
 
-  def apply(parsedMove: ParsedMove): Validated[String, Situation] =
-    parsedMove.toUsi(this) andThen (apply _)
+  def apply(parsedStep: ParsedStep): Validated[String, Situation] =
+    parsedStep.toUsi(this) andThen (apply _)
 
   // Moves
 
@@ -170,7 +170,7 @@ final case class Situation(
 
   def toSfen: Sfen = Sfen(this)
 
-  override def toString = s"${variant.name}\n$visual\nLast Move: ${history.lastUsi.fold("-")(_.usi)}\n"
+  override def toString = s"${variant.name}\n$visual\nLast USI: ${history.lastUsi.fold("-")(_.usi)}\n"
 }
 
 object Situation {

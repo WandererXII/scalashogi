@@ -1,7 +1,5 @@
 package shogi
 
-import Pos._
-
 class PromotionTest extends ShogiTest {
 
   "pawn promotion" should {
@@ -14,7 +12,7 @@ Turn:Gote
 """
     val game      = Game(situation)
     "promote to a tokin" in {
-      game.playMove(SQ7G, SQ7H, true) must beGame(
+      game.playUsiStr("7g7h+") must beGame(
         """
 . . . . . . . . .
 . . . . . . . . .
@@ -32,25 +30,7 @@ Turn:Sente
       )
     }
     "don't force promotion by default" in {
-      game.playMove(SQ7G, SQ7H) must beGame(
-        """
-. . . . . . . . .
-. . . . . . . . .
-. . . . . . . . .
-. . . . . . . . .
-. . . . . . . . .
-. . . . . . . . .
-. . . . . . . . .
-. . p . . . . . .
-K . . . . . . . .
-Hands:
-Turn:Sente
-""",
-        shogi.variant.Standard
-      )
-    }
-    "don't promote" in {
-      game.playMove(SQ7G, SQ7H, false) must beGame(
+      game.playUsiStr("7g7h") must beGame(
         """
 . . . . . . . . .
 . . . . . . . . .
@@ -73,7 +53,7 @@ Turn:Sente
 . . p . . . . . .
 K . R . . . . . .
 Turn:Gote"""
-      ).playMove(SQ7H, SQ7I, true) must beGame(
+      ).playUsiStr("7h7i+") must beGame(
         """
 . . . . . . . . .
 . . . . . . . . .

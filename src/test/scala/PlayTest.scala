@@ -1,7 +1,6 @@
 package shogi
 
 import format.forsyth.Visual.addNewLines
-import Pos._
 
 class PlayTest extends ShogiTest {
 
@@ -9,7 +8,13 @@ class PlayTest extends ShogiTest {
     "opening one" in {
       val game =
         makeGame(shogi.variant.Standard)
-          .playMoves((SQ7G, SQ7F, false), (SQ3C, SQ3D, false), (SQ8H, SQ2B, false))
+          .playUsisStr(
+            List(
+              "7g7f",
+              "3c3d",
+              "8h2b"
+            )
+          )
       "current game" in {
         game must beValid.like { case g =>
           addNewLines(g.situation.visual) must_== """
@@ -28,7 +33,7 @@ Turn:Gote
         }
       }
       "after recapture" in {
-        game flatMap { _.playMoves((SQ3A, SQ2B, false)) } must beValid.like { case g =>
+        game flatMap { _.playUsiStr("3a2b") } must beValid.like { case g =>
           addNewLines(g.situation.visual) must_== """
 l n s g k g . n l
 . r . . . . . s .

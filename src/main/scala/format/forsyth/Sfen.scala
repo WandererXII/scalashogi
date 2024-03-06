@@ -10,8 +10,8 @@ final case class Sfen(value: String) extends AnyVal {
 
   def toSituationPlus(variant: Variant): Option[Sfen.SituationPlus] =
     toSituation(variant) map { sit =>
-      val mn = moveNumber map (_ max 1 min 9999)
-      Sfen.SituationPlus(sit, mn | 1)
+      val sn = stepNumber map (_ max 1 min 9999)
+      Sfen.SituationPlus(sit, sn | 1)
     }
 
   def toSituation(variant: Variant): Option[Situation] =
@@ -50,7 +50,7 @@ final case class Sfen(value: String) extends AnyVal {
   def handsString: Option[String] =
     value.split(' ').lift(2)
 
-  def moveNumber: Option[Int] =
+  def stepNumber: Option[Int] =
     value.split(' ').lift(3) flatMap (_.toIntOption)
 
   def truncate = Sfen(value.split(' ') take 3 mkString " ")
@@ -64,16 +64,16 @@ final case class Sfen(value: String) extends AnyVal {
 object Sfen {
 
   def apply(game: Game): Sfen =
-    apply(SituationPlus(game.situation, game.moveNumber))
+    apply(SituationPlus(game.situation, game.stepNumber))
 
   def apply(sp: SituationPlus): Sfen =
-    Sfen(s"${situationToString(sp.situation)} ${sp.moveNumber}")
+    Sfen(s"${situationToString(sp.situation)} ${sp.stepNumber}")
 
   def apply(sit: Situation): Sfen =
     Sfen(s"${situationToString(sit)}")
 
-  final case class SituationPlus(situation: Situation, moveNumber: Int) {
-    def plies        = moveNumber - (if ((moveNumber % 2 == 1) == situation.color.sente) 1 else 0)
+  final case class SituationPlus(situation: Situation, stepNumber: Int) {
+    def plies        = stepNumber - (if ((stepNumber % 2 == 1) == situation.color.sente) 1 else 0)
     def toSfen: Sfen = apply(this)
   }
 

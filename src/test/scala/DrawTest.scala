@@ -1,6 +1,5 @@
 package shogi
 
-import Pos._
 import variant.Standard
 import format.forsyth.Sfen
 
@@ -17,13 +16,7 @@ class DrawTest extends ShogiTest {
         makeSituation(Standard).repetition must_== false
       }
       "opened" in {
-        makeGame(Standard).playMoves(
-          (SQ5G, SQ5F, false),
-          (SQ5C, SQ5D, false),
-          (SQ7G, SQ7F, false),
-          (SQ5D, SQ5E, false),
-          (SQ5F, SQ5E, false)
-        ) map { g =>
+        makeGame(Standard).playUsisStr(List("5g5f", "5c5d", "7g7f", "5d5e", "5f5e")) map { g =>
           g.situation.draw || g.situation.repetition
         } must beValid.like(_ must beFalse)
       }
@@ -60,10 +53,7 @@ K . . . . N .""".draw must_== false
     "on a single pawn" in {
       val position = Sfen("2p2k3/9/9/9/9/9/9/9/4K4 b - 1")
       val game     = sfenToGame(position, Standard)
-      val newGame = game flatMap (_.playMove(
-        Pos.SQ5I,
-        Pos.SQ5H
-      ))
+      val newGame  = game flatMap (_.playUsiStr("5i5h"))
       newGame must beValid.like { case game =>
         game.situation.draw must beFalse
         game.situation.end(true) must beFalse

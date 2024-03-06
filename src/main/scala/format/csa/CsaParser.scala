@@ -22,8 +22,8 @@ object CsaParser {
   val moveOrDropRegex =
     raw"""($colorsS)?($positionS|$dropOriginS)($positionS)($piecesS)""".r
 
-  final case class StrMove(
-      move: String,
+  final case class StrStep(
+      step: String,
       comments: List[String],
       timeSpent: Option[Centis] = None
   )
@@ -38,46 +38,46 @@ object CsaParser {
         .filterNot(l => l.isEmpty || l == "'" || l.startsWith("V")) // remove empty comments and version
         .mkString("\n")
       for {
-        splitted <- splitHeaderAndMoves(preprocessed)
-        (headerStr, movesStr) = splitted
+        splitted <- splitHeaderAndSteps(preprocessed)
+        (headerStr, stepsStr) = splitted
         splitted3 <- splitMetaAndBoard(headerStr)
         (metaStr, boardStr) = splitted3
         preTags     <- TagParser(metaStr)
-        parsedMoves <- MovesParser(movesStr)
-        (strMoves, terminationOption) = parsedMoves
+        parsedSteps <- StepsParser(stepsStr)
+        (strSteps, terminationOption) = parsedSteps
         init      <- getComments(headerStr)
         situation <- CsaParserHelper.parseSituation(boardStr)
         variant     = situation.variant
         initialSfen = situation.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
-        tags        = createTags(preTags, situation.color, strMoves.size, terminationOption)
-        parsedMoves <- objMoves(strMoves)
-      } yield ParsedNotation(parsedMoves, initialSfen, variant, init, tags)
+        tags        = createTags(preTags, situation.color, strSteps.size, terminationOption)
+        parsedSteps <- objSteps(strSteps)
+      } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>
         sys error "### StackOverflowError ### in CSA parser"
     }
 
-  def objMoves(strMoves: List[StrMove]): Validated[String, ParsedMoves] = {
-    strMoves.map { case StrMove(moveStr, comments, timeSpent) =>
+  def objSteps(strSteps: List[StrStep]): Validated[String, ParsedSteps] = {
+    strSteps.map { case StrStep(stepStr, comments, timeSpent) =>
       (
-        MoveParser(moveStr) map { m =>
-          m withComments comments withTimeSpent timeSpent
+        StepParser(stepStr) map { s =>
+          s withComments comments withTimeSpent timeSpent
         }
-      ): Validated[String, ParsedMove]
-    }.sequence map { ParsedMoves.apply(_) }
+      ): Validated[String, ParsedStep]
+    }.sequence map { ParsedSteps.apply(_) }
   }
 
   def createTags(
       tags: Tags,
       color: Color,
-      nbMoves: Int,
-      moveTermTag: Option[Tag]
+      nbSteps: Int,
+      stepTermTag: Option[Tag]
   ): Tags = {
-    val termTag = (tags(_.Termination) orElse moveTermTag.map(_.value)).map(t => Tag(_.Termination, t))
+    val termTag = (tags(_.Termination) orElse stepTermTag.map(_.value)).map(t => Tag(_.Termination, t))
     val resultTag = CsaParserHelper
       .createResult(
         termTag,
-        Color.fromSente((nbMoves + { if (color.gote) 1 else 0 }) % 2 == 0)
+        Color.fromSente((nbSteps + { if (color.gote) 1 else 0 }) % 2 == 0)
       )
 
     List[Option[Tag]](resultTag, termTag).flatten.foldLeft(tags)(_ + _)
@@ -89,38 +89,38 @@ object CsaParser {
       if (loggingEnabled) log(p)(msg) else p
   }
 
-  object MovesParser extends RegexParsers with Logging {
+  object StepsParser extends RegexParsers with Logging {
 
     override val whiteSpace = """(\s|\t|\r?\n)+""".r
 
-    def apply(csaMoves: String): Validated[String, (List[StrMove], Option[Tag])] = {
-      parseAll(strMoves, csaMoves) match {
-        case Success((moves, termination), _) =>
+    def apply(csaSteps: String): Validated[String, (List[StrStep], Option[Tag])] = {
+      parseAll(strSteps, csaSteps) match {
+        case Success((steps, termination), _) =>
           valid(
             (
-              moves,
+              steps,
               termination map { r =>
                 Tag(_.Termination, r)
               }
             )
           )
-        case err => invalid("Cannot parse moves: %s\n%s".format(err.toString, csaMoves))
+        case err => invalid("Cannot parse moves/drops: %s\n%s".format(err.toString, csaSteps))
       }
     }
 
-    def strMoves: Parser[(List[StrMove], Option[String])] =
-      as("moves") {
-        (strMove *) ~ (termination *) ~ (commentary *) ^^ { case parsedMoves ~ term ~ coms =>
-          (updateLastComments(parsedMoves, cleanComments(coms)), term.headOption)
+    def strSteps: Parser[(List[StrStep], Option[String])] =
+      as("steps") {
+        (strStep *) ~ (termination *) ~ (commentary *) ^^ { case parsedSteps ~ term ~ coms =>
+          (updateLastComments(parsedSteps, cleanComments(coms)), term.headOption)
         }
       }
 
-    def strMove: Parser[StrMove] =
-      as("move") {
+    def strStep: Parser[StrStep] =
+      as("step") {
         (commentary *) ~>
           (moveOrDropRegex ~ opt(clock) ~ rep(commentary)) <~
-          (moveExtras *) ^^ { case move ~ clk ~ comments =>
-            StrMove(move, cleanComments(comments), clk.flatten)
+          (stepExtras *) ^^ { case step ~ clk ~ comments =>
+            StrStep(step, cleanComments(comments), clk.flatten)
           }
       }
 
@@ -139,10 +139,10 @@ object CsaParser {
       }
     }
 
-    private def updateLastComments(moves: List[StrMove], comments: List[String]): List[StrMove] = {
-      val index = moves.size - 1
-      (moves lift index).fold(moves) { move =>
-        moves.updated(index, move.copy(comments = move.comments ::: comments))
+    private def updateLastComments(steps: List[StrStep], comments: List[String]): List[StrStep] = {
+      val index = steps.size - 1
+      (steps lift index).fold(steps) { step =>
+        steps.updated(index, step.copy(comments = step.comments ::: comments))
       }
     }
 
@@ -154,8 +154,8 @@ object CsaParser {
           }
       }
 
-    def moveExtras: Parser[Unit] =
-      as("moveExtras") {
+    def stepExtras: Parser[Unit] =
+      as("stepExtras") {
         commentary.^^^(())
       }
 
@@ -175,7 +175,7 @@ object CsaParser {
       "CHUDAN" | "TORYO" | "JISHOGI" | "SENNICHITE" | "TSUMI" | "TIME_UP" | "ILLEGAL_MOVE" | "+ILLEGAL_ACTION" | "-ILLEGAL_ACTION" | "KACHI" | "HIKIWAKE" | "FUZUMI" | "MATTA" | "ERROR"
   }
 
-  object MoveParser extends RegexParsers with Logging {
+  object StepParser extends RegexParsers with Logging {
 
     val MoveRegex =
       raw"""^(?:${colorsS})?($positionS)($positionS)($piecesS)""".r
@@ -183,7 +183,7 @@ object CsaParser {
 
     override def skipWhitespace = false
 
-    def apply(str: String): Validated[String, ParsedMove] = {
+    def apply(str: String): Validated[String, ParsedStep] = {
       str match {
         case MoveRegex(origS, destS, roleS) => {
           for {
@@ -279,11 +279,11 @@ object CsaParser {
       )
     )
 
-  private def splitHeaderAndMoves(csa: String): Validated[String, (String, String)] =
+  private def splitHeaderAndSteps(csa: String): Validated[String, (String, String)] =
     augmentString(csa).linesIterator.map(_.trim).filter(_.nonEmpty) span { line =>
       !moveOrDropRegex.matches(line)
     } match {
-      case (headerLines, moveLines) => valid(headerLines.mkString("\n") -> moveLines.mkString("\n"))
+      case (headerLines, stepLines) => valid(headerLines.mkString("\n") -> stepLines.mkString("\n"))
     }
 
   private def splitMetaAndBoard(csa: String): Validated[String, (String, String)] =

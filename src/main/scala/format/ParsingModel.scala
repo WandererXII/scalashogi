@@ -9,20 +9,20 @@ import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
 
 final case class ParsedNotation(
-    parsedMoves: ParsedMoves,
+    parsedSteps: ParsedSteps,
     initialSfen: Option[Sfen],
     variant: shogi.variant.Variant,
     initialPosition: InitialPosition,
     tags: Tags
 )
 
-final case class ParsedMoves(value: List[ParsedMove]) extends AnyVal
+final case class ParsedSteps(value: List[ParsedStep]) extends AnyVal
 
-object ParsedMoves {
-  val empty = ParsedMoves(Nil)
+object ParsedSteps {
+  val empty = ParsedSteps(Nil)
 }
 
-sealed trait ParsedMove {
+sealed trait ParsedStep {
 
   def toUsi(sit: Situation): Validated[String, Usi]
 
@@ -30,19 +30,19 @@ sealed trait ParsedMove {
 
   def metas: Metas
 
-  def withMetas(m: Metas): ParsedMove
+  def withMetas(m: Metas): ParsedStep
 
-  def withSuffixes(s: Suffixes): ParsedMove = withMetas(metas withSuffixes s)
+  def withSuffixes(s: Suffixes): ParsedStep = withMetas(metas withSuffixes s)
 
-  def withComments(s: List[String]): ParsedMove = withMetas(metas withComments s)
+  def withComments(s: List[String]): ParsedStep = withMetas(metas withComments s)
 
-  def withVariations(s: List[ParsedMoves]): ParsedMove = withMetas(metas withVariations s)
+  def withVariations(s: List[ParsedSteps]): ParsedStep = withMetas(metas withVariations s)
 
-  def withTimeSpent(ts: Option[Centis]): ParsedMove = withMetas(metas withTimeSpent ts)
+  def withTimeSpent(ts: Option[Centis]): ParsedStep = withMetas(metas withTimeSpent ts)
 
-  def withTimeTotal(tt: Option[Centis]): ParsedMove = withMetas(metas withTimeTotal tt)
+  def withTimeTotal(tt: Option[Centis]): ParsedStep = withMetas(metas withTimeTotal tt)
 
-  def mergeGlyphs(glyphs: Glyphs): ParsedMove =
+  def mergeGlyphs(glyphs: Glyphs): ParsedStep =
     withMetas(
       metas.withGlyphs(metas.glyphs merge glyphs)
     )
@@ -56,7 +56,7 @@ final case class KifMove(
     midStep: Option[Pos] = None,
     promotion: Boolean = false,
     metas: Metas = Metas.empty
-) extends ParsedMove {
+) extends ParsedStep {
 
   def toUsi(sit: Situation) = valid(Usi.Move(orig, dest, promotion, midStep))
 
@@ -71,7 +71,7 @@ final case class CsaMove(
     orig: Pos,
     role: Role,
     metas: Metas = Metas.empty
-) extends ParsedMove {
+) extends ParsedStep {
 
   def toUsi(sit: Situation): Validated[String, Usi] =
     Validated.fromOption(sit.board(orig), s"No piece at $orig") map { p =>
@@ -89,7 +89,7 @@ final case class Drop(
     role: DroppableRole,
     pos: Pos,
     metas: Metas = Metas.empty
-) extends ParsedMove {
+) extends ParsedStep {
 
   def toUsi(sit: Situation) =
     valid(Usi.Drop(role, pos))
@@ -106,7 +106,7 @@ final case class InitialPosition(
 final case class Metas(
     comments: List[String],
     glyphs: Glyphs,
-    variations: List[ParsedMoves],
+    variations: List[ParsedSteps],
     timeSpent: Option[Centis],
     timeTotal: Option[Centis]
 ) {
@@ -120,7 +120,7 @@ final case class Metas(
 
   def withComments(c: List[String]) = copy(comments = c)
 
-  def withVariations(v: List[ParsedMoves]) = copy(variations = v)
+  def withVariations(v: List[ParsedSteps]) = copy(variations = v)
 
   def withTimeSpent(ts: Option[Centis]) = copy(timeSpent = ts)
 

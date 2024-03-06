@@ -9,32 +9,32 @@ import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
 
 final case class Kif(
-    moves: List[NotationMove],
+    steps: List[NotationStep],
     initialSfen: Option[Sfen],
     variant: Variant,
     initial: Initial = Initial.empty,
     tags: Tags = Tags.empty
 ) extends Notation {
 
-  def withMoves(moves: List[NotationMove]) =
-    copy(moves = moves)
+  def withSteps(steps: List[NotationStep]) =
+    copy(steps = steps)
 
   def withTags(tags: Tags) =
     copy(tags = tags)
 
-  def renderMovesAndVariations(moveline: List[NotationMove]): String = {
-    val mainline = moveline
+  def renderStepsAndVariations(steps: List[NotationStep]): String = {
+    val mainline = steps
       .foldLeft[(List[String], Option[Pos])]((Nil, None)) { case ((acc, lastDest), cur) =>
         (
-          Kif.renderNotationMove(cur, lastDest, variant) :: acc,
+          Kif.renderNotationStep(cur, lastDest, variant) :: acc,
           cur.usiWithRole.usi.positions.lastOption
         )
       }
       ._1
       .reverse mkString "\n"
 
-    val variations = moveline.reverse.foldLeft("")((acc, cur) => {
-      acc + cur.variations.map(v => s"\n\n変化：${cur.moveNumber}手\n${renderMovesAndVariations(v)}").mkString("")
+    val variations = steps.reverse.foldLeft("")((acc, cur) => {
+      acc + cur.variations.map(v => s"\n\n変化：${cur.stepNumber}手\n${renderStepsAndVariations(v)}").mkString("")
     })
 
     s"$mainline$variations"
@@ -45,9 +45,9 @@ final case class Kif(
       if (initial.comments.nonEmpty) initial.comments.map(Kif.fixComment _).mkString("* ", "\n* ", "\n")
       else ""
     val header      = Kif.renderHeader(initialSfen, variant, tags)
-    val movesHeader = "\n手数----指手---------消費時間--\n"
-    val movesStr    = renderMovesAndVariations(moves)
-    s"$header$movesHeader$initStr$movesStr"
+    val stepsHeader = "\n手数----指手---------消費時間--\n"
+    val stepsStr    = renderStepsAndVariations(steps)
+    s"$header$stepsHeader$initStr$stepsStr"
   }.trim
 
   override def toString = render
@@ -55,10 +55,10 @@ final case class Kif(
 
 object Kif {
 
-  def renderNotationMove(cur: NotationMove, lastDest: Option[Pos], variant: Variant): String = {
+  def renderNotationStep(cur: NotationStep, lastDest: Option[Pos], variant: Variant): String = {
     val suf           = if (variant.chushogi) "手目" else ""
-    val moveNumberStr = moveNumberOffset(cur.moveNumber, suf)
-    val resultStr     = cur.result.fold("")(r => s"\n${moveNumberOffset(cur.moveNumber + 1, suf)}$offset$r")
+    val stepNumberStr = stepNumberOffset(cur.stepNumber, suf)
+    val resultStr     = cur.result.fold("")(r => s"\n${stepNumberOffset(cur.stepNumber + 1, suf)}$offset$r")
     val timeStr       = clockString(cur) | ""
     val glyphsNames   = cur.glyphs.toList.map(_.name)
     val commentsStr   = (glyphsNames ::: cur.comments).map { text => s"\n* ${fixComment(text)}" }.mkString("")
@@ -66,13 +66,13 @@ object Kif {
       case Usi.Move(orig, dest, prom, Some(midStep)) => {
         val m1 = Usi.WithRole(Usi.Move(orig, midStep, false, None), cur.usiWithRole.role)
         val m2 = Usi.WithRole(Usi.Move(midStep, dest, prom, None), cur.usiWithRole.role)
-        val s1 = s"${s"${moveNumberStr}一歩目"} ${renderMove(m1, lastDest, variant)}"
+        val s1 = s"${s"${stepNumberStr}一歩目"} ${renderStep(m1, lastDest, variant)}"
         val s2 =
-          s"${s"${moveNumberStr}二歩目"} ${renderMove(m2, None, variant)}$timeStr$commentsStr$resultStr"
+          s"${s"${stepNumberStr}二歩目"} ${renderStep(m2, None, variant)}$timeStr$commentsStr$resultStr"
         List[String](s1, s2) mkString "\n"
       }
       case _ =>
-        s"${moveNumberStr}$offset${renderMove(cur.usiWithRole, lastDest, variant)}$timeStr$commentsStr$resultStr"
+        s"${stepNumberStr}$offset${renderStep(cur.usiWithRole, lastDest, variant)}$timeStr$commentsStr$resultStr"
     }
   }
 
@@ -90,7 +90,7 @@ object Kif {
       case _        => s"(${orig.file.key}${orig.rank.number})"
     }
 
-  def renderMove(usiWithRole: Usi.WithRole, lastDest: Option[Pos], variant: Variant): String =
+  def renderStep(usiWithRole: Usi.WithRole, lastDest: Option[Pos], variant: Variant): String =
     usiWithRole.usi match {
       case Usi.Drop(role, pos) =>
         val roleStr = KifUtils.toKif(role, variant).map(_.head) | ""
@@ -211,7 +211,7 @@ object Kif {
         .mkString("　")
   }
 
-  def createTerminationMove(status: Status, winnerTurn: Boolean): Option[String] = {
+  def createTerminationStep(status: Status, winnerTurn: Boolean): Option[String] = {
     import Status._
     status match {
       case Aborted | NoStart     => "中断".some
@@ -244,7 +244,7 @@ object Kif {
   private def getHandicapName(sfen: Sfen, variant: Variant): Option[String] =
     Handicap.allByVariant.get(variant).flatMap(_.find(_.sfen.truncate == sfen.truncate).map(t => t.japanese))
 
-  private def clockString(cur: NotationMove): Option[String] =
+  private def clockString(cur: NotationStep): Option[String] =
     cur.secondsSpent.map(spent =>
       s"${offset}(${formatKifSpent(spent)}/${cur.secondsTotal.fold("")(total => formatKifTotal(total))})"
     )
@@ -253,8 +253,8 @@ object Kif {
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 
-  private def moveNumberOffset(moveNumber: Int, suf: String) =
-    f"$moveNumber%4d${suf}"
+  private def stepNumberOffset(stepNumber: Int, suf: String) =
+    f"$stepNumber%4d${suf}"
 
   private def fixComment(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n").replace("\n", "\n* ")

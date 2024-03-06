@@ -6,7 +6,7 @@ import shogi.format.forsyth.Sfen
 
 trait Notation {
 
-  def moves: List[NotationMove]
+  def steps: List[NotationStep]
 
   def initialSfen: Option[Sfen]
 
@@ -14,20 +14,20 @@ trait Notation {
 
   def tags: Tags
 
-  def withMoves(moves: List[NotationMove]): Notation
+  def withSteps(steps: List[NotationStep]): Notation
 
   def withTags(tags: Tags): Notation
 
-  def updatePly(ply: Int, f: NotationMove => NotationMove) = {
+  def updatePly(ply: Int, f: NotationStep => NotationStep) = {
     val index = ply - 1
-    (moves lift index).fold(this) { move =>
-      withMoves(moves.updated(index, f(move)))
+    (steps lift index).fold(this) { step =>
+      withSteps(steps.updated(index, f(step)))
     }
   }
 
-  def nbPlies = moves.size
+  def nbPlies = steps.size
 
-  def updateLastPly(f: NotationMove => NotationMove) = updatePly(nbPlies, f)
+  def updateLastPly(f: NotationStep => NotationStep) = updatePly(nbPlies, f)
 
   def withEvent(title: String) =
     withTags(tags + Tag(_.Event, title))
@@ -43,14 +43,14 @@ object Initial {
   val empty = Initial(Nil)
 }
 
-final case class NotationMove(
-    moveNumber: Int,
+final case class NotationStep(
+    stepNumber: Int,
     usiWithRole: Usi.WithRole,
     comments: List[String] = Nil,
     glyphs: Glyphs = Glyphs.empty,
     result: Option[String] = None,
-    variations: List[List[NotationMove]] = Nil,
-    // time left for the user who made the move, after he made it
+    variations: List[List[NotationStep]] = Nil,
+    // time left for the user who made the move/drop, after he made it
     secondsSpent: Option[Int] = None,
     // total time spent playing so far
     secondsTotal: Option[Int] = None
