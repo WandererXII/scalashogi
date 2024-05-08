@@ -147,10 +147,10 @@ class AnnanshogiTest extends ShogiTest {
         .valid(true) must beTrue
     }
     "king move not working in shogiops 0.16.0" in {
-      val sit = Sfen("5K3/9/9/9/3B5/4k4/9/9/9 w - 1").toSituation(shogi.variant.Annanshogi).get
+      val sit   = Sfen("5K3/9/9/9/3B5/4k4/9/9/9 w - 1").toSituation(shogi.variant.Annanshogi).get
       val dests = sit.moveDestsFrom(Pos.SQ5F).get
       sit(Usi("5f6f").get).isValid must beTrue
-      dests.size must_==7
+      dests.size must_== 7
 
       val sit2 = Sfen("5K3/9/9/9/3B5/3Bk4/9/9/9 w - 1").toSituation(shogi.variant.Annanshogi).get
       sit2(Usi("5f6f").get).isValid must beTrue
