@@ -122,6 +122,19 @@ class ChushogiTest extends ShogiTest {
       sit4Alt(Usi("2d3e").get).isValid must beTrue
       sit4Alt2.history.lastLionCapture must beNone
       sit4Alt2(Usi("2d3e").get).isValid must beTrue
+
+      val sit5Base = Sfen("12/12/12/12/12/12/12/12/4+ho3n2/4N7/12/6B5 w")
+        .toSituation(shogi.variant.Chushogi)
+        .get
+      val sit5     = sit5Base(Usi("8i8j8i").get).toOption.get
+      val sit5Alt  = sit5Base(Usi("8i8j").get).toOption.get
+      val sit5Alt2 = sit5Base(Usi("7i8j+").get).toOption.get
+
+      sit5(Usi("6l3i").get).isValid must beFalse
+      sit5.history.lastLionCapture must beSome
+      sit5Alt(Usi("6l3i").get).isValid must beFalse
+      sit5Alt2(Usi("6l3i").get).isValid must beFalse
+      sit5Alt2(Usi("6l8j").get).isValid must beTrue
     }
     "wiki and more" in {
       val sit = Sfen("12/12/12/12/7g4/6n5/5N6/12/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get

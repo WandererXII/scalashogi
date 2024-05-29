@@ -178,13 +178,13 @@ abstract class Variant private[variant] (
       .withLastUsi(usi)
       .withLastLionCapture {
         val roleOpt = usi.positions.headOption.flatMap(beforeSit.board(_).map(_.role))
-        if (
-          roleOpt.exists(!Role.allLions.contains(_)) &&
-          usi.positions.lastOption
-            .flatMap(beforeSit board _)
-            .exists(p => (p is newSit.color) && Role.allLions.contains(p.role))
-        )
-          usi.positions.lastOption
+        if (chushogi && roleOpt.exists(!Role.allLions.contains(_)))
+          usi.positions
+            .drop(1) // drop orig
+            .reverse // start from the final dest
+            .find(pos =>
+              beforeSit.board(pos).exists(p => (p is newSit.color) && Role.allLions.contains(p.role))
+            )
         else None
       }
       .withConsecutiveAttacks {

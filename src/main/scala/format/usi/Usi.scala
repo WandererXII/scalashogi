@@ -25,7 +25,7 @@ object Usi {
 
     def promotionString = if (promotion) "+" else ""
 
-    def positions = midStep.fold(List(orig, dest))(List(orig, _, dest))
+    def positions = midStep.fold(List(orig, dest))(ms => List(orig, ms, dest))
 
   }
 
