@@ -106,7 +106,7 @@ object Replay {
     }
 
   // Use for trusted usis
-  // doesn't verify whether the usis are possible
+  // doesn't verify whether the usis are valid
   def usiWithRoleWhilePossible(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
