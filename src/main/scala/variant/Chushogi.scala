@@ -166,25 +166,25 @@ case object Chushogi
 
   def promote(role: Role): Option[Role] =
     role match {
-      case Pawn          => PromotedPawn.some;
-      case GoBetween     => ElephantPromoted.some;
-      case SideMover     => Boar.some;
-      case VerticalMover => Ox.some;
-      case Rook          => DragonPromoted.some;
-      case Bishop        => HorsePromoted.some;
-      case Dragon        => Eagle.some;
-      case Horse         => Falcon.some;
-      case Elephant      => Prince.some;
-      case Chariot       => Whale.some;
-      case Tiger         => Stag.some;
-      case Kirin         => LionPromoted.some;
-      case Phoenix       => QueenPromoted.some;
-      case Lance         => WhiteHorse.some;
-      case Leopard       => BishopPromoted.some;
-      case Copper        => SideMoverPromoted.some;
-      case Silver        => VerticalMoverPromoted.some;
-      case Gold          => RookPromoted.some;
-      case _             => none;
+      case Pawn          => PromotedPawn.some
+      case GoBetween     => ElephantPromoted.some
+      case SideMover     => Boar.some
+      case VerticalMover => Ox.some
+      case Rook          => DragonPromoted.some
+      case Bishop        => HorsePromoted.some
+      case Dragon        => Eagle.some
+      case Horse         => Falcon.some
+      case Elephant      => Prince.some
+      case Chariot       => Whale.some
+      case Tiger         => Stag.some
+      case Kirin         => LionPromoted.some
+      case Phoenix       => QueenPromoted.some
+      case Lance         => WhiteHorse.some
+      case Leopard       => BishopPromoted.some
+      case Copper        => SideMoverPromoted.some
+      case Silver        => VerticalMoverPromoted.some
+      case Gold          => RookPromoted.some
+      case _             => none
     }
 
   def unpromote(role: Role): Option[Role] =
