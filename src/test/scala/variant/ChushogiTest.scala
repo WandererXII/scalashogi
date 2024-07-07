@@ -200,6 +200,40 @@ class ChushogiTest extends ShogiTest {
     }
   }
 
+  "falcon/eagle second move" should {
+    "not allow lion recapture" in {
+      val sit = Sfen("k11/12/12/12/6n5/6P5/12/5+h6/12/5N6/12/11K b")
+        .toSituation(shogi.variant.Chushogi)
+        .get(Usi("6f6e").get)
+        .toOption
+        .get
+      sit(Usi("7h7i").get).isValid must beTrue
+      sit(Usi("7h7j").get).isValid must beFalse
+      sit(Usi("7h7i7j").get).isValid must beFalse
+
+      val sit2 = Sfen("k11/12/12/12/6n5/6P5/12/7+d4/12/5N6/12/11K b")
+        .toSituation(shogi.variant.Chushogi)
+        .get(Usi("6f6e").get)
+        .toOption
+        .get
+      sit2(Usi("5h6i").get).isValid must beTrue
+      sit2(Usi("5h7j").get).isValid must beFalse
+      sit2(Usi("5h6i7j").get).isValid must beFalse
+    }
+
+    "allow lion recapture directly after kirin promotion" in {
+      val sit3 = Sfen("k11/12/12/12/12/12/12/7+d4/12/5n6/12/5O5K b")
+        .toSituation(shogi.variant.Chushogi)
+        .get(Usi("7l7j").get)
+        .toOption
+        .get
+
+      sit3(Usi("5h6i").get).isValid must beTrue
+      sit3(Usi("5h7j").get).isValid must beTrue
+      sit3(Usi("5h6i7j").get).isValid must beTrue
+    }
+  }
+
   "isAttacked" in {
     val sit = Sfen("12/12/12/12/12/4r7/11n/12/5o5n/4N6P/12/6B5 w - 1")
       .toSituation(shogi.variant.Chushogi)

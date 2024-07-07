@@ -119,7 +119,14 @@ abstract class Variant private[variant] (
             ))
         }
       }
-    else a.shortUnfilteredDestinations.filter(_.dist(midStep) == 1)
+    else {
+      val dests = a.shortUnfilteredDestinations.filter(_.dist(midStep) == 1)
+      a.situation.history.lastLionCapture.fold(dests) { lionCaptureDest =>
+        dests filterNot { d =>
+          lionCaptureDest != d && a.situation.board(d).exists(p => Role.allLions.contains(p.role))
+        }
+      }
+    }
 
   def check(board: Board, color: Color): Boolean =
     board.royalPossOf(color) exists {
