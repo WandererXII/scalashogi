@@ -2,8 +2,8 @@ package shogi
 
 import cats.data.Validated
 
-import shogi.format.forsyth.Sfen
 import shogi.format.ParsedStep
+import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
 final case class Game(
@@ -12,7 +12,7 @@ final case class Game(
     clock: Option[Clock] = None,
     plies: Int = 0,
     startedAtPly: Int = 0,
-    startedAtStep: Int = 1
+    startedAtStep: Int = 1,
 ) {
 
   private def applySituation(sit: Situation, metrics: LagMetrics = LagMetrics.empty): Game =
@@ -23,7 +23,7 @@ final case class Game(
       clock = clock map { c =>
         val newC = c.step(metrics, sit.status.isEmpty)
         if (plies - startedAtPly == 1) newC.start else newC
-      }
+      },
     )
 
   def apply(usi: Usi, metrics: LagMetrics): Validated[String, Game] =
@@ -87,7 +87,7 @@ object Game {
         apply(parsed.situation).copy(
           plies = parsed.plies,
           startedAtPly = parsed.plies,
-          startedAtStep = parsed.stepNumber
+          startedAtStep = parsed.stepNumber,
         )
       }
 }

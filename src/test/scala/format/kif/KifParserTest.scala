@@ -4,12 +4,16 @@ package kif
 
 class KifParserTest extends ShogiTest {
 
-  import KifFixtures._
+  import shogi.format.kif.KifFixtures._
 
   val parser = KifParser.full _
   def parseStep(str: String, lastDest: Option[Pos] = None) =
     KifParser.MoveDropParser(str, lastDest, None, shogi.variant.Standard)
-  def parseChushogiMove(str: String, lastDest: Option[Pos] = None, firstLionOrig: Option[Pos] = None) =
+  def parseChushogiMove(
+      str: String,
+      lastDest: Option[Pos] = None,
+      firstLionOrig: Option[Pos] = None,
+  ) =
     KifParser.MoveDropParser(str, lastDest, firstLionOrig, shogi.variant.Chushogi)
 
   "drop" in {
@@ -231,8 +235,9 @@ class KifParserTest extends ShogiTest {
       *such a neat comment
       * one more
       *
-      * drop P*5e""") must beValid.like { case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-        step.metas.comments must_== List("such a neat comment", "one more", "drop P*5e")
+      * drop P*5e""") must beValid.like {
+        case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
+          step.metas.comments must_== List("such a neat comment", "one more", "drop P*5e")
       }
     }
     "termination comments" in {
@@ -242,7 +247,11 @@ class KifParserTest extends ShogiTest {
       2 投了 ( 0:03/ )
       * comment on termination?""") must beValid.like {
         case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-          step.metas.comments must_== List("such a neat comment", "one more", "comment on termination?")
+          step.metas.comments must_== List(
+            "such a neat comment",
+            "one more",
+            "comment on termination?",
+          )
       }
     }
     "comments in header" in {
@@ -300,9 +309,10 @@ class KifParserTest extends ShogiTest {
       }
     }
     "no time" in {
-      parser("""29 ４八玉(59)""") must beValid.like { case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-        step.metas.timeSpent must_== None
-        step.metas.timeTotal must_== None
+      parser("""29 ４八玉(59)""") must beValid.like {
+        case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
+          step.metas.timeSpent must_== None
+          step.metas.timeTotal must_== None
       }
     }
     "ignore + at the end?" in {
@@ -569,11 +579,12 @@ class KifParserTest extends ShogiTest {
   }
 
   "kif fixture 3" in {
-    parser(kif3) must beValid.like { case ParsedNotation(ParsedSteps(ps), initialSfen, v, _, tags) =>
-      ps.size must_== 117
-      tags.value.size must_== 9
-      initialSfen must beSome
-      v.standard must beTrue
+    parser(kif3) must beValid.like {
+      case ParsedNotation(ParsedSteps(ps), initialSfen, v, _, tags) =>
+        ps.size must_== 117
+        tags.value.size must_== 9
+        initialSfen must beSome
+        v.standard must beTrue
     }
   }
 

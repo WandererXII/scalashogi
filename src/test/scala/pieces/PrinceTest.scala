@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class PrinceTest extends ShogiTest {
 
@@ -19,7 +19,7 @@ class PrinceTest extends ShogiTest {
         SQ6E,
         SQ5E,
         SQ5F,
-        SQ5G
+        SQ5G,
       )
       pieceMoves(princeGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ6G,
@@ -29,7 +29,7 @@ class PrinceTest extends ShogiTest {
         SQ6E,
         SQ5E,
         SQ5F,
-        SQ5G
+        SQ5G,
       )
     }
 
@@ -72,7 +72,7 @@ P . P . P P P . P . . .
 . . . . . . . . . . . .
 . . . . . . . . . . . .
 Turn:Sente
-"""
+""",
       )
     }
 

@@ -10,7 +10,7 @@ final case class LagTracker(
     // We can remove compEst fields after tuning estimate.
     compEstSqErr: Int = 0,
     compEstOvers: Centis = Centis(0),
-    compEstimate: Option[Centis] = None
+    compEstimate: Option[Centis] = None,
 ) {
   def onStep(lag: Centis) = {
     val comp     = lag atMost quota
@@ -28,8 +28,8 @@ final case class LagTracker(
         },
         lagStats = lagStats record (lag atMost Centis(2000)).centis.toFloat,
         compEstSqErr = compEstSqErr + ceDiff.centis * ceDiff.centis,
-        compEstOvers = compEstOvers + ceDiff.nonNeg
-      ).recordLag(lag)
+        compEstOvers = compEstOvers + ceDiff.nonNeg,
+      ).recordLag(lag),
     )
   }
 
@@ -38,8 +38,8 @@ final case class LagTracker(
     copy(
       lagEstimator = e,
       compEstimate = Some(
-        Centis(e.mean - .8f * e.deviation).nonNeg atMost quota
-      )
+        Centis(e.mean - .8f * e.deviation).nonNeg atMost quota,
+      ),
     )
   }
 
@@ -70,7 +70,7 @@ object LagTracker {
       quotaGain = quotaGain,
       quota = quotaGain * 3,
       quotaMax = quotaGain * 7,
-      lagEstimator = EmptyDecayingStats(deviation = 4f, decay = 0.85f)
+      lagEstimator = EmptyDecayingStats(deviation = 4f, decay = 0.85f),
     )
   }
 }

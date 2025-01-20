@@ -1,6 +1,6 @@
 package shogi
 
-import Pos._
+import shogi.Pos._
 import shogi.variant._
 
 class RoleTest extends ShogiTest {
@@ -10,7 +10,7 @@ class RoleTest extends ShogiTest {
       val piece   = Piece(color, role)
       val dests = makeSituationWithBoard(
         variant,
-        SQ5E -> piece
+        SQ5E -> piece,
       ).moveDestsFrom(SQ5E).get
 
       s"$color-$role" in {

@@ -9,7 +9,7 @@ case object Standard
       id = 1,
       key = "standard",
       name = "Standard",
-      title = "Standard rules of shogi"
+      title = "Standard rules of shogi",
     ) {
 
   val initialSfen = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1")
@@ -60,7 +60,7 @@ case object Standard
       SQ4A -> Gote.gold,
       SQ3A -> Gote.silver,
       SQ2A -> Gote.knight,
-      SQ1A -> Gote.lance
+      SQ1A -> Gote.lance,
     )
 
   val allRoles = List(
@@ -77,7 +77,7 @@ case object Standard
     PromotedSilver,
     Dragon,
     Horse,
-    Tokin
+    Tokin,
   )
 
   val handRoles = List(
@@ -87,7 +87,7 @@ case object Standard
     Silver,
     Knight,
     Lance,
-    Pawn
+    Pawn,
   )
 
   def promote(role: Role): Option[Role] =
@@ -150,7 +150,7 @@ case object Standard
           0,
           54 -
             (initSit.board.pieces.values.map(p => impasseValueOf(p.role)).sum +
-              initSit.hands(Sente).sum(impasseValueOf) + initSit.hands(Gote).sum(impasseValueOf))
+              initSit.hands(Sente).sum(impasseValueOf) + initSit.hands(Gote).sum(impasseValueOf)),
         )
       }
 

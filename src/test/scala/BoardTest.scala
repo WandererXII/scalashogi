@@ -1,6 +1,6 @@
 package shogi
 
-import Pos._
+import shogi.Pos._
 
 class BoardTest extends ShogiTest {
 
@@ -49,7 +49,7 @@ class BoardTest extends ShogiTest {
         SQ4A -> (Gote - Gold),
         SQ3A -> (Gote - Silver),
         SQ2A -> (Gote - Knight),
-        SQ1A -> (Gote - Lance)
+        SQ1A -> (Gote - Lance),
       )
     }
 
@@ -87,8 +87,9 @@ class BoardTest extends ShogiTest {
 
     "allow a pawn to be promoted" in {
       makeEmptySituation(shogi.variant.Standard).board
-        .place(Gote.pawn, SQ9F) flatMap (_.promote(SQ9F, SQ9G, _ => Some(Tokin))) must beSome.like { case b =>
-        b(SQ9G) must beSome(Gote.tokin)
+        .place(Gote.pawn, SQ9F) flatMap (_.promote(SQ9F, SQ9G, _ => Some(Tokin))) must beSome.like {
+        case b =>
+          b(SQ9G) must beSome(Gote.tokin)
       }
     }
 
@@ -96,7 +97,7 @@ class BoardTest extends ShogiTest {
       makeEmptySituation(shogi.variant.Standard).board.seq(
         _.place(Sente - Pawn, SQ9H),
         _.place(Sente - Pawn, SQ9G),
-        _.move(SQ9H, SQ9F)
+        _.move(SQ9H, SQ9F),
       ) must beSome.like { case b =>
         b(SQ9F) mustEqual Some(Sente - Pawn)
       }
@@ -106,7 +107,7 @@ class BoardTest extends ShogiTest {
       makeEmptySituation(shogi.variant.Standard).board.seq(
         _.place(Sente - Pawn, SQ9H),
         _.place(Sente - Pawn, SQ7G),
-        _.move(SQ8G, SQ8F)
+        _.move(SQ8G, SQ8F),
       ) must beNone
     }
 

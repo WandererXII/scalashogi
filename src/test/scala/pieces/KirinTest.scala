@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class KirinTest extends ShogiTest {
 
@@ -19,7 +19,7 @@ class KirinTest extends ShogiTest {
         SQ4F,
         SQ7G,
         SQ5G,
-        SQ6H
+        SQ6H,
       )
       pieceMoves(kirinGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ6D,
@@ -29,7 +29,7 @@ class KirinTest extends ShogiTest {
         SQ4F,
         SQ7G,
         SQ5G,
-        SQ6H
+        SQ6H,
       )
     }
 

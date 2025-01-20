@@ -1,6 +1,6 @@
 package shogi
 
-import format.usi.Usi
+import shogi.format.usi.Usi
 
 class ReplayTest extends ShogiTest {
   val usis = format.usi.Fixtures.prod500standard.map(Usi.readList(_).get)

@@ -5,15 +5,15 @@ import cats.data.NonEmptyList
 import cats.data.Validated
 import cats.data.Validated.valid
 
-import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 
 final case class ParsedNotation(
     parsedSteps: ParsedSteps,
     initialSfen: Option[Sfen],
     variant: shogi.variant.Variant,
     initialPosition: InitialPosition,
-    tags: Tags
+    tags: Tags,
 )
 
 final case class ParsedSteps(value: List[ParsedStep]) extends AnyVal
@@ -44,7 +44,7 @@ sealed trait ParsedStep {
 
   def mergeGlyphs(glyphs: Glyphs): ParsedStep =
     withMetas(
-      metas.withGlyphs(metas.glyphs merge glyphs)
+      metas.withGlyphs(metas.glyphs merge glyphs),
     )
 
 }
@@ -55,7 +55,7 @@ final case class KifMove(
     roles: NonEmptyList[Role], // in chushogi some kanji map to many roles
     midStep: Option[Pos] = None,
     promotion: Boolean = false,
-    metas: Metas = Metas.empty
+    metas: Metas = Metas.empty,
 ) extends ParsedStep {
 
   def toUsi(sit: Situation) = valid(Usi.Move(orig, dest, promotion, midStep))
@@ -70,7 +70,7 @@ final case class CsaMove(
     dest: Pos,
     orig: Pos,
     role: Role,
-    metas: Metas = Metas.empty
+    metas: Metas = Metas.empty,
 ) extends ParsedStep {
 
   def toUsi(sit: Situation): Validated[String, Usi] =
@@ -88,7 +88,7 @@ final case class CsaMove(
 final case class Drop(
     role: DroppableRole,
     pos: Pos,
-    metas: Metas = Metas.empty
+    metas: Metas = Metas.empty,
 ) extends ParsedStep {
 
   def toUsi(sit: Situation) =
@@ -100,7 +100,7 @@ final case class Drop(
 }
 
 final case class InitialPosition(
-    comments: List[String]
+    comments: List[String],
 )
 
 final case class Metas(
@@ -108,12 +108,12 @@ final case class Metas(
     glyphs: Glyphs,
     variations: List[ParsedSteps],
     timeSpent: Option[Centis],
-    timeTotal: Option[Centis]
+    timeTotal: Option[Centis],
 ) {
 
   def withSuffixes(s: Suffixes) =
     copy(
-      glyphs = s.glyphs
+      glyphs = s.glyphs,
     )
 
   def withGlyphs(g: Glyphs) = copy(glyphs = g)
@@ -133,5 +133,5 @@ object Metas {
 
 final case class Suffixes(
     promotion: Boolean,
-    glyphs: Glyphs
+    glyphs: Glyphs,
 )

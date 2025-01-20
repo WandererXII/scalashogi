@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class DragonTest extends ShogiTest {
 
@@ -31,7 +31,7 @@ class DragonTest extends ShogiTest {
         SQ6F,
         SQ6D,
         SQ4F,
-        SQ4D
+        SQ4D,
       )
       pieceMoves(dragonGote, SQ5E, shogi.variant.Standard) must bePoss(
         SQ5D,
@@ -53,7 +53,7 @@ class DragonTest extends ShogiTest {
         SQ6F,
         SQ6D,
         SQ4F,
-        SQ4D
+        SQ4D,
       )
     }
 
@@ -75,7 +75,7 @@ class DragonTest extends ShogiTest {
         SQ7A,
         SQ8A,
         SQ9A,
-        SQ2B
+        SQ2B,
       )
     }
 
@@ -105,7 +105,7 @@ Turn:Sente
         SQ8F,
         SQ8D,
         SQ6F,
-        SQ6D
+        SQ6D,
       )
     }
 
@@ -136,7 +136,7 @@ Turn:Sente
         SQ8F,
         SQ8D,
         SQ6F,
-        SQ6D
+        SQ6D,
       )
     }
     "threaten" in {

@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class ChariotTest extends ShogiTest {
 
@@ -22,7 +22,7 @@ class ChariotTest extends ShogiTest {
         SQ6I,
         SQ6J,
         SQ6K,
-        SQ6L
+        SQ6L,
       )
       pieceMoves(chariotGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ6A,
@@ -35,7 +35,7 @@ class ChariotTest extends ShogiTest {
         SQ6I,
         SQ6J,
         SQ6K,
-        SQ6L
+        SQ6L,
       )
     }
 

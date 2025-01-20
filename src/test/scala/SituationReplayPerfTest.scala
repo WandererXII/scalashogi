@@ -1,6 +1,6 @@
 package shogi
 
-import format.usi._
+import shogi.format.usi._
 
 class SituationReplayPerfTest extends ShogiTest {
 

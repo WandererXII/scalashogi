@@ -17,7 +17,7 @@ object Usi {
       orig: Pos,
       dest: Pos,
       promotion: Boolean = false,
-      midStep: Option[Pos] = None
+      midStep: Option[Pos] = None,
   ) extends Usi {
 
     def keys = orig.key + midStep.fold("")(_.key) + dest.key
@@ -71,7 +71,7 @@ object Usi {
       Gold   -> "G",
       Bishop -> "B",
       Rook   -> "R",
-      Tokin  -> "T"
+      Tokin  -> "T",
     )
     val usiToRole: Map[String, DroppableRole] = roleToUsi map { case (k, v) => v -> k }
 

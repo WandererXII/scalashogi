@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class SideMoverTest extends ShogiTest {
 
@@ -24,7 +24,7 @@ class SideMoverTest extends ShogiTest {
         SQ4F,
         SQ3F,
         SQ2F,
-        SQ1F
+        SQ1F,
       )
       pieceMoves(sideMoverGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ6E,
@@ -39,7 +39,7 @@ class SideMoverTest extends ShogiTest {
         SQ4F,
         SQ3F,
         SQ2F,
-        SQ1F
+        SQ1F,
       )
     }
 

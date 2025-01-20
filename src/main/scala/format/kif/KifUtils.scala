@@ -5,9 +5,9 @@ package kif
 import cats.data.NonEmptyList
 import cats.syntax.option._
 
-import shogi.variant._
-import shogi.format.forsyth.SfenUtils
 import shogi.format.csa.CsaUtils
+import shogi.format.forsyth.SfenUtils
+import shogi.variant._
 
 object KifUtils {
 
@@ -87,7 +87,7 @@ object KifUtils {
     Chushogi   -> NonEmptyList.of("平手", "中将棋", "chushogi", "chuushogi"),
     Annanshogi -> NonEmptyList.of("安南将棋", "安南", "annanshogi"),
     Kyotoshogi -> NonEmptyList.of("京都将棋", "京都", "kyotoshogi"),
-    Checkshogi -> NonEmptyList.of("王手将棋", "王手", "checkshogi")
+    Checkshogi -> NonEmptyList.of("王手将棋", "王手", "checkshogi"),
   )
 
   def toKif(role: Role, variant: Variant): Option[NonEmptyList[String]] =
@@ -133,13 +133,14 @@ object KifUtils {
     PromotedKnight -> NonEmptyList.of("成桂", "圭", "今"),
     PromotedSilver -> NonEmptyList.of("成銀", "全"),
     Horse          -> NonEmptyList.of("馬", "龍馬", "竜馬"),
-    Dragon         -> NonEmptyList.of("龍", "龍王", "龍玉", "竜", "竜王", "竜玉")
+    Dragon         -> NonEmptyList.of("龍", "龍王", "龍玉", "竜", "竜王", "竜玉"),
   )
 
-  private val toRoleStandard: Map[String, NonEmptyList[Role]] = toKifStandard flatMap { case (r, kifs) =>
-    kifs.toList map { k =>
-      (k, NonEmptyList.one(r))
-    }
+  private val toRoleStandard: Map[String, NonEmptyList[Role]] = toKifStandard flatMap {
+    case (r, kifs) =>
+      kifs.toList map { k =>
+        (k, NonEmptyList.one(r))
+      }
   } toMap
 
   private val toKifMinishogi: Map[Role, NonEmptyList[String]] =
@@ -184,7 +185,7 @@ object KifUtils {
         "杏",
         "仝",
         "成歩",
-        "成兵"
+        "成兵",
       ), // in chushogi promoted pawn is not really tokin
       Queen                 -> NonEmptyList.of("奔王", "奔"),
       QueenPromoted         -> NonEmptyList.of("奔王", "奔", "成奔"),
@@ -198,21 +199,21 @@ object KifUtils {
       VerticalMover         -> NonEmptyList.of("竪行", "竪"),
       VerticalMoverPromoted -> NonEmptyList.of("竪行", "竪", "成竪"),
       Whale                 -> NonEmptyList.of("鯨鯢", "鯨"),
-      WhiteHorse            -> NonEmptyList.of("白駒", "駒")
+      WhiteHorse            -> NonEmptyList.of("白駒", "駒"),
     )
 
   private def toRoleChushogiAlt(str: String): Option[NonEmptyList[Role]] = str match {
     case "龍" | "龍王" | "龍玉" | "竜" | "竜王" | "竜玉" => NonEmptyList.of(Dragon, DragonPromoted).some
     case "角" | "角行"                            => NonEmptyList.of(Bishop, BishopPromoted).some
     case "飛" | "飛車"                            => NonEmptyList.of(Rook, RookPromoted).some
-    case "竪" | "竪行"                            => NonEmptyList.of(VerticalMover, VerticalMoverPromoted).some
-    case "横" | "横行"                            => NonEmptyList.of(SideMover, SideMoverPromoted).some
-    case "奔" | "奔王"                            => NonEmptyList.of(Queen, QueenPromoted).some
-    case "獅" | "師" | "獅子"                      => NonEmptyList.of(Lion, LionPromoted).some
-    case "金"                                   => NonEmptyList.of(Gold, PromotedPawn).some
-    case "象" | "醉象"                            => NonEmptyList.of(Elephant, ElephantPromoted).some
-    case "馬" | "龍馬" | "竜馬"                     => NonEmptyList.of(Horse, HorsePromoted).some
-    case _                                     => None
+    case "竪" | "竪行"        => NonEmptyList.of(VerticalMover, VerticalMoverPromoted).some
+    case "横" | "横行"        => NonEmptyList.of(SideMover, SideMoverPromoted).some
+    case "奔" | "奔王"        => NonEmptyList.of(Queen, QueenPromoted).some
+    case "獅" | "師" | "獅子"  => NonEmptyList.of(Lion, LionPromoted).some
+    case "金"               => NonEmptyList.of(Gold, PromotedPawn).some
+    case "象" | "醉象"        => NonEmptyList.of(Elephant, ElephantPromoted).some
+    case "馬" | "龍馬" | "竜馬" => NonEmptyList.of(Horse, HorsePromoted).some
+    case _                 => None
   }
 
   private val toRoleChushogi: Map[String, NonEmptyList[Role]] =
@@ -267,7 +268,7 @@ object KifUtils {
     PromotedKnight -> "圭",
     PromotedSilver -> "全",
     Horse          -> "馬",
-    Dragon         -> "龍"
+    Dragon         -> "龍",
   )
 
   private val toKifBoardMinishogi: Map[Role, String] =
@@ -303,7 +304,7 @@ object KifUtils {
     VerticalMover         -> "竪",
     VerticalMoverPromoted -> "成竪",
     Whale                 -> "鯨",
-    WhiteHorse            -> "駒"
+    WhiteHorse            -> "駒",
   )
 
   private val toKifBoardKyotoshogi: Map[Role, String] =

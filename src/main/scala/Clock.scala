@@ -1,9 +1,10 @@
 package shogi
 
-import cats.syntax.option._
 import java.text.DecimalFormat
 
-import Clock.Config
+import cats.syntax.option._
+
+import shogi.Clock.Config
 
 final case class CurrentClockInfo(time: Centis, periods: Int)
 
@@ -13,9 +14,10 @@ final case class Clock(
     color: Color,
     players: Color.Map[ClockPlayer],
     timer: Option[Timestamp] = None,
-    timestamper: Timestamper = RealTimestamper
+    timestamper: Timestamper = RealTimestamper,
 ) {
-  import timestamper.{ now, toNow }
+  import timestamper.now
+  import timestamper.toNow
 
   @inline def timerFor(c: Color) = if (c == color) timer else None
 
@@ -35,7 +37,7 @@ final case class Clock(
     val periods               = periodsInUse(c, elapsed)
     CurrentClockInfo(
       (remainingAfterElapsed + players(c).byoyomi * periods) nonNeg,
-      periods + players(c).spentPeriods
+      periods + players(c).spentPeriods,
     )
   }
 
@@ -63,9 +65,9 @@ final case class Clock(
           _.takeTime(curT)
             .giveTime(byoyomiOf(color) * periods)
             .spendPeriods(periods)
-            .copy(lastTime = curT)
+            .copy(lastTime = curT),
         ),
-        timer = None
+        timer = None,
       )
     }
 
@@ -77,12 +79,12 @@ final case class Clock(
   def switch =
     copy(
       color = !color,
-      timer = timer.map(_ => now)
+      timer = timer.map(_ => now),
     )
 
   def step(
       metrics: LagMetrics = LagMetrics.empty,
-      gameActive: Boolean = true
+      gameActive: Boolean = true,
   ) =
     (timer match {
       case None =>
@@ -115,7 +117,7 @@ final case class Clock(
           else
             updatePlayer(color) {
               _.takeTime(
-                stepTime - (clockActive ?? player.increment) - (player.byoyomi.isPositive ?? player.byoyomi * periodSpan)
+                stepTime - (clockActive ?? player.increment) - (player.byoyomi.isPositive ?? player.byoyomi * periodSpan),
               )
                 .spendPeriods(periodSpan)
                 .copy(lag = lagTrack, lastTime = stepTime)
@@ -176,7 +178,7 @@ final case class ClockPlayer(
     elapsed: Centis = Centis(0),
     spentPeriods: Int = 0,
     berserk: Boolean = false,
-    lastTime: Centis = Centis(0)
+    lastTime: Centis = Centis(0),
 ) {
 
   def limit =
@@ -212,7 +214,7 @@ object ClockPlayer {
   def withConfig(config: Clock.Config) =
     ClockPlayer(
       config,
-      LagTracker.init(config)
+      LagTracker.init(config),
     ).setPeriods(config.initPeriod)
 }
 
@@ -220,7 +222,12 @@ object Clock {
   private val limitFormatter = new DecimalFormat("#.##")
 
   // All unspecified durations are expressed in seconds
-  final case class Config(limitSeconds: Int, incrementSeconds: Int, byoyomiSeconds: Int, periods: Int) {
+  final case class Config(
+      limitSeconds: Int,
+      incrementSeconds: Int,
+      byoyomiSeconds: Int,
+      periods: Int,
+  ) {
 
     def berserkable = (incrementSeconds == 0 && byoyomiSeconds == 0) || limitSeconds > 0
 
@@ -228,7 +235,8 @@ object Clock {
     def emergSeconds = math.min(90, math.max(10, limitSeconds / 8))
 
     // Estimate 60 moves/drops (per player) per game
-    def estimateTotalSeconds = limitSeconds + 60 * incrementSeconds + 25 * periodsTotal * byoyomiSeconds
+    def estimateTotalSeconds =
+      limitSeconds + 60 * incrementSeconds + 25 * periodsTotal * byoyomiSeconds
 
     def estimateTotalTime = Centis.ofSeconds(estimateTotalSeconds)
 
@@ -273,7 +281,8 @@ object Clock {
         case _  => limitFormatter.format(limitSeconds / 60d)
       }
 
-    def baseString: String = if (hasIncrement) s"${limitString}+${incrementSeconds}" else s"${limitString}"
+    def baseString: String =
+      if (hasIncrement) s"${limitString}+${incrementSeconds}" else s"${limitString}"
 
     def periodsString: String = if (periodsTotal > 1) s"(${periodsTotal}x)" else ""
 
@@ -299,8 +308,9 @@ object Clock {
     else str.filterNot(_ == '秒').toIntOption
   }
 
-  val kifTime          = """(?:\d+(?:秒|分|時間)?)+"""
-  lazy val KifClkRegex = raw"""($kifTime)(?:[\+|\|]($kifTime))?(?:\((\d)\))?(?:[\+|\|]($kifTime))?""".r
+  val kifTime = """(?:\d+(?:秒|分|時間)?)+"""
+  lazy val KifClkRegex =
+    raw"""($kifTime)(?:[\+|\|]($kifTime))?(?:\((\d)\))?(?:[\+|\|]($kifTime))?""".r
 
   // 持ち時間: 10分|20秒(1)+10 -> 600 init, 10inc, 20 byo, 1 per
   def readKifConfig(str: String): Option[Config] =
@@ -341,7 +351,7 @@ object Clock {
       config = config,
       color = Sente,
       players = Color.Map(player, player),
-      timer = None
+      timer = None,
     )
   }
 }

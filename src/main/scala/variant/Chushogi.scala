@@ -12,11 +12,11 @@ case object Chushogi
       id = 3,
       key = "chushogi",
       name = "Chushogi",
-      title = "The most popular historical variant of modern shogi"
+      title = "The most popular historical variant of modern shogi",
     ) {
 
   val initialSfen = Sfen(
-    "lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1"
+    "lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1",
   )
 
   val numberOfRanks = 12
@@ -117,7 +117,7 @@ case object Chushogi
       SQ12I -> Sente.pawn,
       SQ12J -> Sente.sideMover,
       SQ12K -> Sente.chariot,
-      SQ12L -> Sente.lance
+      SQ12L -> Sente.lance,
     )
 
   val allRoles = List(
@@ -159,7 +159,7 @@ case object Chushogi
     VerticalMover,
     VerticalMoverPromoted,
     Whale,
-    WhiteHorse
+    WhiteHorse,
   )
 
   val handRoles = Nil
@@ -284,7 +284,7 @@ case object Chushogi
           a.situation.board.forceTake(a.pos),
           !a.color,
           dest,
-          _ => true
+          _ => true,
         )
       }
     } else
@@ -300,7 +300,7 @@ case object Chushogi
         prom || after
           .board(dest)
           .exists(
-            List[Role](Pawn, Lance) contains _.role
+            List[Role](Pawn, Lance) contains _.role,
           ) || before.board.pieces.size != after.board.pieces.size
       }
       case _ => false
@@ -326,7 +326,7 @@ case object Chushogi
     val ourPiecesFiltered = sit.board.pieces.view.collect {
       case (pos, piece)
           if (piece is color) && !(((piece is Pawn) || (piece is Lance)) && backrank(
-            piece.color
+            piece.color,
           ) == pos.rank) =>
         pos
     }
@@ -334,7 +334,7 @@ case object Chushogi
     lazy val theirPiecesFiltered = sit.board.pieces.collect {
       case (pos, piece)
           if (piece is !color) && !((piece is Pawn) || (piece is GoBetween)) && !((piece is Lance) && backrank(
-            piece.color
+            piece.color,
           ) == pos.rank) =>
         pos
     }
@@ -346,7 +346,7 @@ case object Chushogi
     theirKing.sizeIs >= 1 &&          // but they have to have at least one royal
     !sit.switch.check &&              // we cannot be threating to capture opponents king/prince
     (theirPiecesFiltered.sizeIs > 2 || !theirPiecesFiltered.exists(p =>
-      ourKing.headOption.fold(false)(_.dist(p) == 1)
+      ourKing.headOption.fold(false)(_.dist(p) == 1),
     )) // opponent either has more pieces than we can capture, or we don't threaten to bare their king
   }
 
@@ -358,7 +358,7 @@ case object Chushogi
     val piecesFiltered = sit.board.pieces.view.filter { case (pos, piece) =>
       if (
         ((piece is Pawn) || (piece is Lance)) && backrank(
-          piece.color
+          piece.color,
         ) == pos.rank
       ) false
       else true

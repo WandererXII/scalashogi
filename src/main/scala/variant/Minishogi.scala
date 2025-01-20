@@ -9,7 +9,7 @@ case object Minishogi
       id = 2,
       key = "minishogi",
       name = "Minishogi",
-      title = "Same rules, smaller board"
+      title = "Same rules, smaller board",
     ) {
 
   val initialSfen = Sfen("rbsgk/4p/5/P4/KGSBR b - 1")
@@ -32,7 +32,7 @@ case object Minishogi
       SQ3A -> Gote.silver,
       SQ4A -> Gote.bishop,
       SQ5A -> Gote.rook,
-      SQ1B -> Gote.pawn
+      SQ1B -> Gote.pawn,
     )
 
   val allRoles = List(
@@ -45,7 +45,7 @@ case object Minishogi
     PromotedSilver,
     Dragon,
     Horse,
-    Tokin
+    Tokin,
   )
 
   val handRoles = List(
@@ -53,7 +53,7 @@ case object Minishogi
     Bishop,
     Gold,
     Silver,
-    Pawn
+    Pawn,
   )
 
   def promote(role: Role)   = Standard.promote(role)

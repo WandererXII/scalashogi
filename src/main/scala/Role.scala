@@ -110,13 +110,13 @@ case object Eagle extends Role {
     _.upRight,
     p => Pos.at(p.file.index + 2, p.rank.index - 2),
     _.upLeft,
-    p => Pos.at(p.file.index - 2, p.rank.index - 2)
+    p => Pos.at(p.file.index - 2, p.rank.index - 2),
   )
   val goteDirectDirs: Directions = List(
     _.downRight,
     p => Pos.at(p.file.index + 2, p.rank.index + 2),
     _.downLeft,
-    p => Pos.at(p.file.index - 2, p.rank.index + 2)
+    p => Pos.at(p.file.index - 2, p.rank.index + 2),
   )
 
   override val hasLionPower = true
@@ -124,12 +124,12 @@ case object Eagle extends Role {
   def senteEyes(from: Pos, to: Pos) =
     (Rook.senteEyes(
       from,
-      to
+      to,
     ) || ((from onSameDiagonal to) && ((from isAbove to) || (from xDist to) <= 2))) && from != to
   def goteEyes(from: Pos, to: Pos) =
     (Rook.senteEyes(
       from,
-      to
+      to,
     ) || ((from onSameDiagonal to) && ((from isBelow to) || (from xDist to) <= 2))) && from != to
 }
 
@@ -158,16 +158,17 @@ case object ElephantPromoted extends Role {
 }
 
 case object Falcon extends Role {
-  val senteProjectionDirs = List(_.upRight, _.right, _.downRight, _.down, _.downLeft, _.left, _.upLeft)
-  val goteProjectionDirs  = List(_.up, _.upRight, _.right, _.downRight, _.downLeft, _.left, _.upLeft)
+  val senteProjectionDirs =
+    List(_.upRight, _.right, _.downRight, _.down, _.downLeft, _.left, _.upLeft)
+  val goteProjectionDirs = List(_.up, _.upRight, _.right, _.downRight, _.downLeft, _.left, _.upLeft)
 
   val senteDirectDirs = List(
     _.up,
-    p => Pos.at(p.file.index, p.rank.index - 2)
+    p => Pos.at(p.file.index, p.rank.index - 2),
   )
   val goteDirectDirs = List(
     _.down,
-    p => Pos.at(p.file.index, p.rank.index + 2)
+    p => Pos.at(p.file.index, p.rank.index + 2),
   )
 
   override val hasLionPower = true
@@ -175,12 +176,12 @@ case object Falcon extends Role {
   def senteEyes(from: Pos, to: Pos) =
     (Bishop.senteEyes(
       from,
-      to
+      to,
     ) || (from isSameRank to) || ((from isSameFile to) && ((from isAbove to) || (from yDist to) <= 2))) && from != to
   def goteEyes(from: Pos, to: Pos) =
     (Bishop.senteEyes(
       from,
-      to
+      to,
     ) || (from isSameRank to) || ((from isSameFile to) && ((from isBelow to) || (from yDist to) <= 2))) && from != to
 
 }
@@ -252,7 +253,7 @@ case object Kirin extends Role {
     p => Pos.at(p.file.index, p.rank.index - 2),
     p => Pos.at(p.file.index + 2, p.rank.index),
     p => Pos.at(p.file.index, p.rank.index + 2),
-    p => Pos.at(p.file.index - 2, p.rank.index)
+    p => Pos.at(p.file.index - 2, p.rank.index),
   ) ::: Bishop.senteProjectionDirs
   val goteDirectDirs = senteDirectDirs
 
@@ -267,11 +268,11 @@ case object Knight extends DroppableRole {
 
   val senteDirectDirs: Directions = List(
     p => Pos.at(p.file.index - 1, p.rank.index - 2),
-    p => Pos.at(p.file.index + 1, p.rank.index - 2)
+    p => Pos.at(p.file.index + 1, p.rank.index - 2),
   )
   val goteDirectDirs: Directions = List(
     p => Pos.at(p.file.index - 1, p.rank.index + 2),
-    p => Pos.at(p.file.index + 1, p.rank.index + 2)
+    p => Pos.at(p.file.index + 1, p.rank.index + 2),
   )
 
   def senteEyes(from: Pos, to: Pos) =
@@ -326,7 +327,7 @@ case object Lion extends Role {
       p => Pos.at(p.file.index - 2, p.rank.index),
       p => Pos.at(p.file.index - 2, p.rank.index + 1),
       p => Pos.at(p.file.index - 2, p.rank.index + 2),
-      p => Pos.at(p.file.index - 1, p.rank.index + 2)
+      p => Pos.at(p.file.index - 1, p.rank.index + 2),
     ) ::: King.senteDirectDirs
   val goteDirectDirs = senteDirectDirs
 
@@ -381,7 +382,7 @@ case object Phoenix extends Role {
       p => Pos.at(p.file.index + 2, p.rank.index + 2),
       p => Pos.at(p.file.index + 2, p.rank.index - 2),
       p => Pos.at(p.file.index - 2, p.rank.index + 2),
-      p => Pos.at(p.file.index - 2, p.rank.index - 2)
+      p => Pos.at(p.file.index - 2, p.rank.index - 2),
     ) ::: Rook.senteProjectionDirs
   val goteDirectDirs = senteDirectDirs
 
@@ -654,7 +655,7 @@ object Role {
     VerticalMover,
     VerticalMoverPromoted,
     Whale,
-    WhiteHorse
+    WhiteHorse,
   )
 
   val allDroppable = List[DroppableRole](
@@ -665,17 +666,17 @@ object Role {
     Pawn,
     Rook,
     Silver,
-    Tokin
+    Tokin,
   )
 
   val allLions = List[Role](
     Lion,
-    LionPromoted
+    LionPromoted,
   )
 
   val allRoyal = List[Role](
     King,
-    Prince
+    Prince,
   )
 
   val allByName: Map[String, Role] = all map { r =>

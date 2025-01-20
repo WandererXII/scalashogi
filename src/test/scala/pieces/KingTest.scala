@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class KingTest extends ShogiTest {
 
@@ -19,7 +19,7 @@ class KingTest extends ShogiTest {
         SQ6E,
         SQ5E,
         SQ5F,
-        SQ5G
+        SQ5G,
       )
       pieceMoves(kingGote, SQ6F, shogi.variant.Standard) must bePoss(
         SQ6G,
@@ -29,7 +29,7 @@ class KingTest extends ShogiTest {
         SQ6E,
         SQ5E,
         SQ5F,
-        SQ5G
+        SQ5G,
       )
     }
 
@@ -68,7 +68,7 @@ P . P . P P P . P
 . . S G K G S N L
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
 
@@ -100,7 +100,7 @@ k . . . . . . . .
 l . . . . . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
     "threaten" in {

@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class FalconTest extends ShogiTest {
 
@@ -51,7 +51,7 @@ class FalconTest extends ShogiTest {
         SQ6I,
         SQ6J,
         SQ6K,
-        SQ6L
+        SQ6L,
       )
       pieceMoves(falconGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ12F,
@@ -92,7 +92,7 @@ class FalconTest extends ShogiTest {
         SQ6D,
         SQ6E,
         SQ6G,
-        SQ6H
+        SQ6H,
       )
     }
 

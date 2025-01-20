@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class KnightTest extends ShogiTest {
 
@@ -47,7 +47,7 @@ P P P . . P P P P
 . . . . K . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
 
@@ -79,7 +79,7 @@ P P P . . P P P P
 . . . . K . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
     "threaten" in {

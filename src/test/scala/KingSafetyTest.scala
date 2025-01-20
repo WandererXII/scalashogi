@@ -1,6 +1,6 @@
 package shogi
 
-import Pos._
+import shogi.Pos._
 
 class KingSafetyTest extends ShogiTest {
 

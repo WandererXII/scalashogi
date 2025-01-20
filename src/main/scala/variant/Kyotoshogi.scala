@@ -9,7 +9,7 @@ case object Kyotoshogi
       id = 5,
       key = "kyotoshogi",
       name = "Kyoto shogi",
-      title = "Pieces alternate between promoted and demoted state after each time they are moved"
+      title = "Pieces alternate between promoted and demoted state after each time they are moved",
     ) {
 
   val initialSfen = Sfen("pgkst/5/5/5/TSKGP b - 1")
@@ -30,7 +30,7 @@ case object Kyotoshogi
       SQ2A -> Gote.silver,
       SQ3A -> Gote.king,
       SQ4A -> Gote.gold,
-      SQ5A -> Gote.pawn
+      SQ5A -> Gote.pawn,
     )
 
   val allRoles = List(
@@ -42,14 +42,14 @@ case object Kyotoshogi
     Knight,
     Lance,
     Tokin,
-    King
+    King,
   )
 
   val handRoles = List(
     Tokin,
     Gold,
     Silver,
-    Pawn
+    Pawn,
   )
 
   override def dropRoles = List(
@@ -60,7 +60,7 @@ case object Kyotoshogi
     Lance,
     Bishop,
     Knight,
-    Rook
+    Rook,
   )
 
   override def dropFilter(a: DropActor): List[Pos] = a.situation.possibleDropDests

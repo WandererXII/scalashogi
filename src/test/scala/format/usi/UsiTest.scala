@@ -2,7 +2,7 @@ package shogi
 package format
 package usi
 
-import Pos._
+import shogi.Pos._
 
 class UsiTest extends ShogiTest {
 

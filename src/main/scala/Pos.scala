@@ -1,6 +1,8 @@
 package shogi
 
-import scala.math.{ abs, max, min }
+import scala.math.abs
+import scala.math.max
+import scala.math.min
 
 // Coordinate system starts at top right
 // Directions are given from sente POV
@@ -44,7 +46,9 @@ final case class Pos private (index: Int) extends AnyVal {
     }
 
   def <->(other: Pos): Seq[Pos] =
-    min(file.index, other.file.index) to max(file.index, other.file.index) flatMap { Pos.at(_, rank.index) }
+    min(file.index, other.file.index) to max(file.index, other.file.index) flatMap {
+      Pos.at(_, rank.index)
+    }
 
   // from down left corner to top right corner
   def upTo(other: Pos): Seq[Pos] =
@@ -268,11 +272,11 @@ object Pos {
     if (to == from) None
     else if (to isSameFile from)
       Some(
-        if (to isAbove from) (_.up) else (_.down)
+        if (to isAbove from) (_.up) else (_.down),
       )
     else if (to isSameRank from)
       Some(
-        if (to isLeftOf from) (_.left) else (_.right)
+        if (to isLeftOf from) (_.left) else (_.right),
       )
     else if (to onSameDiagonal from)
       Some(
@@ -280,7 +284,7 @@ object Pos {
           if (to isLeftOf from) (_.upLeft) else (_.upRight)
         } else {
           if (to isLeftOf from) (_.downLeft) else (_.downRight)
-        }
+        },
       )
     else None
   }

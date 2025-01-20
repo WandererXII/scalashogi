@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class WhiteHorseTest extends ShogiTest {
 
@@ -32,7 +32,7 @@ class WhiteHorseTest extends ShogiTest {
         SQ8D,
         SQ4D,
         SQ7E,
-        SQ5E
+        SQ5E,
       )
       pieceMoves(whiteHorseGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ6A,
@@ -56,7 +56,7 @@ class WhiteHorseTest extends ShogiTest {
         SQ2J,
         SQ11K,
         SQ1K,
-        SQ12L
+        SQ12L,
       )
     }
 

@@ -2,8 +2,9 @@ package shogi
 package format
 package usi
 
-import Usi._
-import variant.{ Chushogi, Standard }
+import shogi.format.usi.Usi._
+import shogi.variant.Chushogi
+import shogi.variant.Standard
 
 class UsiCharPairTest extends ShogiTest {
 

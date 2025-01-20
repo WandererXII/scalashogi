@@ -9,7 +9,7 @@ case object Annanshogi
       id = 4,
       key = "annanshogi",
       name = "Annan shogi",
-      title = "Pieces move like the friendly piece behind them"
+      title = "Pieces move like the friendly piece behind them",
     ) {
 
   val initialSfen = Sfen("lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1")
@@ -60,7 +60,7 @@ case object Annanshogi
       SQ4A -> Gote.gold,
       SQ3A -> Gote.silver,
       SQ2A -> Gote.knight,
-      SQ1A -> Gote.lance
+      SQ1A -> Gote.lance,
     )
 
   def allRoles = Standard.allRoles
@@ -85,7 +85,10 @@ case object Annanshogi
     pieces.foldLeft(Map.empty[Pos, Piece]) { case (acc, (pos, piece)) =>
       acc.updated(
         pos,
-        directlyBehind(pos, piece.color).flatMap(pieces.get).filter(_.color == piece.color).getOrElse(piece)
+        directlyBehind(pos, piece.color)
+          .flatMap(pieces.get)
+          .filter(_.color == piece.color)
+          .getOrElse(piece),
       )
     }
 
@@ -93,14 +96,17 @@ case object Annanshogi
       board: Board,
       color: Color,
       pos: Pos,
-      filter: Piece => Boolean = _ => true
+      filter: Piece => Boolean = _ => true,
   ): Boolean = {
     val updatedBoard = Board(toAnnanAttackPieceMap(board.pieces))
     super.posThreatened(updatedBoard, color, pos, _ => true)
   }
 
   override def attackingPiece(piece: Piece, pos: Pos, board: Board): Piece =
-    directlyBehind(pos, piece.color).flatMap(board.apply).filter(_.color == piece.color).getOrElse(piece)
+    directlyBehind(pos, piece.color)
+      .flatMap(board.apply)
+      .filter(_.color == piece.color)
+      .getOrElse(piece)
 
   override def hasUnmovablePieces(board: Board) = false
 

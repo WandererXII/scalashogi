@@ -1,14 +1,14 @@
 package shogi
 
-import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 
 final case class History(
     lastUsi: Option[Usi],
     lastLionCapture: Option[Pos],
     consecutiveAttacks: ConsecutiveAttacks,
     positionHashes: PositionHash,
-    initialSfen: Option[Sfen]
+    initialSfen: Option[Sfen],
 ) {
 
   // only hashes for positions with the same side to play
@@ -73,13 +73,13 @@ final case class ConsecutiveAttacks(sente: Int, gote: Int) {
   def add(color: Color) =
     copy(
       sente = sente + color.fold(1, 0),
-      gote = gote + color.fold(0, 1)
+      gote = gote + color.fold(0, 1),
     )
 
   def reset(color: Color) =
     copy(
       sente = color.fold(0, sente),
-      gote = color.fold(gote, 0)
+      gote = color.fold(gote, 0),
     )
 
   def apply(color: Color) = color.fold(sente, gote)

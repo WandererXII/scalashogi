@@ -3,7 +3,8 @@ package format
 package kif
 
 import cats.data.Validated
-import cats.data.Validated.{ invalid, valid }
+import cats.data.Validated.invalid
+import cats.data.Validated.valid
 import cats.implicits._
 
 import shogi.variant._
@@ -13,16 +14,17 @@ object KifParserHelper {
   def parseSituation(
       str: String,
       handicapString: Option[String],
-      steps: List[String]
+      steps: List[String],
   ): Validated[String, Situation] = {
-    val lines = augmentString(str).linesIterator.map(_.trim.replace("：", ":").replace("　", " ")).toList
+    val lines =
+      augmentString(str).linesIterator.map(_.trim.replace("：", ":").replace("　", " ")).toList
     val ranks = lines
       .withFilter(l => (l lift 0 contains '|') && (l.sizeIs <= 100))
       .map(
         _.replace(".", "・")
           .replace(" ", "")
           .drop(1)
-          .takeWhile(_ != '|')
+          .takeWhile(_ != '|'),
       )
 
     val variant = detectVariant(ranks, handicapString, steps) | Standard
@@ -42,14 +44,16 @@ object KifParserHelper {
       } yield Situation(board, hands, color, variant)
     else
       invalid(
-        s"Cannot parse board setup (wrong number of ranks provided ${ranks.size}/${variant.numberOfRanks})"
+        s"Cannot parse board setup (wrong number of ranks provided ${ranks.size}/${variant.numberOfRanks})",
       )
   }
 
   // We need to somehow figure out if it's chushogi
   // looking for something like this - `△6五龍馬 （←4三）`
   // but not strictly - focus on the two kanji representation
-  private val chushogiFullKanjiRoles = KifUtils.toKifChushogi map { case (_, v) => v.head } mkString "|"
+  private val chushogiFullKanjiRoles = KifUtils.toKifChushogi map { case (_, v) =>
+    v.head
+  } mkString "|"
   private val chushogiKifMoveRegex =
     raw"""^(${KifParser.colorsS})?(${KifParser.positionS})(${chushogiFullKanjiRoles})\s*(${KifParser.parsS})?←?(${KifParser.positionS})(${KifParser.parsS})?""".r.unanchored
   private def isDefaultHandicapOf(handicap: String, variant: Variant): Boolean =
@@ -57,7 +61,7 @@ object KifParserHelper {
   private def detectVariant(
       ranks: List[String],
       handicapString: Option[String],
-      steps: List[String]
+      steps: List[String],
   ): Option[Variant] = {
     if (handicapString.exists(isDefaultHandicapOf(_, Kyotoshogi))) Kyotoshogi.some
     else if (
@@ -80,7 +84,7 @@ object KifParserHelper {
         chars: List[Char],
         pieceSoFar: String,
         x: Int,
-        y: Int
+        y: Int,
     ): Validated[String, List[(Pos, Piece)]] =
       chars match {
         case Nil         => valid(pieces)
@@ -93,30 +97,31 @@ object KifParserHelper {
             pieceStr = pieceSoFar + p
             piece <- KifUtils.toPieceBoard(
               pieceStr,
-              variant
+              variant,
             ) toValid s"Unknown piece in board setup: $pieceStr"
             _ <- Validated.cond(
               variant.allRoles contains piece.role,
               (),
-              s"${piece.role} is not valid in $variant variant"
+              s"${piece.role} is not valid in $variant variant",
             )
           } yield pos -> piece :: pieces) match {
             case cats.data.Validated.Valid(ps) => makePiecesList(ps, rest, "", x - 1, y)
             case e                             => e
           }
       }
-    ranks.zipWithIndex.foldLeft[Validated[String, List[(Pos, Piece)]]](valid(Nil)) { case (acc, cur) =>
-      for {
-        pieces     <- acc
-        nextPieces <- makePiecesList(Nil, cur._1.toList, "", variant.numberOfFiles - 1, cur._2)
-      } yield pieces ::: nextPieces
+    ranks.zipWithIndex.foldLeft[Validated[String, List[(Pos, Piece)]]](valid(Nil)) {
+      case (acc, cur) =>
+        for {
+          pieces     <- acc
+          nextPieces <- makePiecesList(Nil, cur._1.toList, "", variant.numberOfFiles - 1, cur._2)
+        } yield pieces ::: nextPieces
     } map (_.toMap)
   }
 
   private def parseHands(
       sente: Option[String],
       gote: Option[String],
-      variant: Variant
+      variant: Variant,
   ): Validated[String, Hands] = {
 
     def parseHand(str: String): Validated[String, Hand] = {
@@ -128,7 +133,7 @@ object KifParserHelper {
             .anyToRole(roleStr.toString, variant)
             .map(_.toList) toValid s"Unknown piece in hand: $roleStr"
           role <- variant.handRoles.find(
-            rolesBase contains _
+            rolesBase contains _,
           ) toValid s"Cannot place ${rolesBase mkString ","} in hand in $variant variant"
         } yield hand.store(role, num)
       val values = (str.split(":").lastOption | "").trim
@@ -153,8 +158,8 @@ object KifParserHelper {
         .get(variant)
         .flatMap(
           _.find(
-            _.japanese == str
-          )
+            _.japanese == str,
+          ),
         ) toValid s"Unknown handicap: $str"
       situation <- handicap.sfen.toSituation(variant) toValid s"Cannot parse handicap: $str"
     } yield situation

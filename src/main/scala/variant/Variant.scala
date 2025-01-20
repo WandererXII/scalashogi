@@ -1,9 +1,10 @@
 package shogi
 package variant
 
+import scala.annotation.unused
+
 import cats.data.Validated
 import cats.syntax.option._
-import scala.annotation.unused
 
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
@@ -13,7 +14,7 @@ abstract class Variant private[variant] (
     val id: Int,
     val key: String,
     val name: String,
-    val title: String
+    val title: String,
 ) {
 
   def initialSfen: Sfen
@@ -66,7 +67,12 @@ abstract class Variant private[variant] (
 
   // Optimized for performance
   // Exists a piece of color on board, which passes the filter and attacks pos
-  def posThreatened(board: Board, color: Color, pos: Pos, filter: Piece => Boolean = _ => true): Boolean =
+  def posThreatened(
+      board: Board,
+      color: Color,
+      pos: Pos,
+      filter: Piece => Boolean = _ => true,
+  ): Boolean =
     board.pieces exists {
       case (from, piece) if piece.color == color && filter(piece) && piece.eyes(from, pos) =>
         piece.projectionDirs.isEmpty || piece.directDirs.exists(dir => dir(from).contains(pos)) ||
@@ -91,7 +97,7 @@ abstract class Variant private[variant] (
           a.situation.board.forceMove(a.piece, a.pos, dest),
           !a.color,
           _,
-          filter
+          filter,
         )
       }
     }
@@ -100,23 +106,24 @@ abstract class Variant private[variant] (
   def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] =
     if (Role.allLions.contains(a.piece.role))
       a.shortUnfilteredDestinations filter { d =>
-        d.dist(midStep) == 1 && a.situation.board(d).filter(_.color != a.color).fold(true) { capture =>
-          d.dist(a.pos) == 1 || !Role.allLions.contains(capture.role) ||
-          a.situation
-            .board(midStep)
-            .exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween)) ||
-          (!posThreatened(
-            a.situation.board.forceTake(a.pos).forceTake(midStep),
-            !a.color,
-            d,
-            _ => true
-          ) &&
-            !posThreatened(
-              a.situation.board.forceTake(a.pos),
+        d.dist(midStep) == 1 && a.situation.board(d).filter(_.color != a.color).fold(true) {
+          capture =>
+            d.dist(a.pos) == 1 || !Role.allLions.contains(capture.role) ||
+            a.situation
+              .board(midStep)
+              .exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween)) ||
+            (!posThreatened(
+              a.situation.board.forceTake(a.pos).forceTake(midStep),
               !a.color,
               d,
-              p => (p is Pawn) || (p is GoBetween)
-            ))
+              _ => true,
+            ) &&
+              !posThreatened(
+                a.situation.board.forceTake(a.pos),
+                !a.color,
+                d,
+                p => (p is Pawn) || (p is GoBetween),
+              ))
         }
       }
     else {
@@ -164,7 +171,11 @@ abstract class Variant private[variant] (
   }
 
   // Could the position before the usi occur ever again
-  def isIrreversible(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean = false
+  def isIrreversible(
+      @unused before: Situation,
+      @unused after: Situation,
+      @unused usi: Usi,
+  ): Boolean = false
 
   // for perpetual check
   def isAttacked(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean =
@@ -179,7 +190,12 @@ abstract class Variant private[variant] (
       })
 
   // Finalizes situation after usi, used both for moves and drops
-  protected def finalizeSituation(beforeSit: Situation, board: Board, hands: Hands, usi: Usi): Situation = {
+  protected def finalizeSituation(
+      beforeSit: Situation,
+      board: Board,
+      hands: Hands,
+      usi: Usi,
+  ): Situation = {
     val newSit = beforeSit.copy(board = board, hands = hands).switch
     val h = beforeSit.history
       .withLastUsi(usi)
@@ -190,7 +206,9 @@ abstract class Variant private[variant] (
             .drop(1) // drop orig
             .reverse // start from the final dest
             .find(pos =>
-              beforeSit.board(pos).exists(p => (p is newSit.color) && Role.allLions.contains(p.role))
+              beforeSit
+                .board(pos)
+                .exists(p => (p is newSit.color) && Role.allLions.contains(p.role)),
             )
         else None
       }
@@ -217,19 +235,19 @@ abstract class Variant private[variant] (
       _ <- Validated.cond(
         !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined),
         (),
-        s"${actor.piece} cannot promote"
+        s"${actor.piece} cannot promote",
       )
       _ <- Validated.cond(
         usi.promotion || !forcePromote(actor.piece, usi.dest),
         (),
-        s"${actor.piece} needs to promote"
+        s"${actor.piece} needs to promote",
       )
       _ <- Validated.cond(
         usi.midStep.fold(actor.destinations contains usi.dest) { ms =>
           actor.lionMoveDestinationsMap.get(ms).exists(_ contains usi.dest)
         },
         (),
-        s"Piece on ${usi.orig} cannot move to ${usi.dest}${usi.midStep.fold("")(ms => s" via $ms")}"
+        s"Piece on ${usi.orig} cannot move to ${usi.dest}${usi.midStep.fold("")(ms => s" via $ms")}",
       )
       unpromotedRoleCapture = capture.flatMap(p => unpromoteRoleForHand(p.role))
       hands =
@@ -242,9 +260,9 @@ abstract class Variant private[variant] (
          else
            sit.board.move(
              usi.orig,
-             usi.dest
+             usi.dest,
            )).map(b =>
-          usi.midStep.fold(b)(b forceTake _)
+          usi.midStep.fold(b)(b forceTake _),
         ) toValid s"Can't update board with ${usi.usi} in \n${sit.toSfen}"
     } yield finalizeSituation(sit, board, hands, usi)
 
@@ -254,12 +272,15 @@ abstract class Variant private[variant] (
       _ <- Validated.cond(dropRoles contains usi.role, (), "Can't drop this role in this variant")
       piece = Piece(sit.color, usi.role)
       actor <- sit.dropActorOf(piece) toValid s"No actor of $piece"
-      _     <- Validated.cond(actor.destinations.contains(usi.pos), (), s"Dropping $piece is not valid")
+      _ <- Validated.cond(actor.destinations.contains(usi.pos), (), s"Dropping $piece is not valid")
       roleToTake = if (supportsDroppingEitherSide) unpromoteRoleForHand(usi.role) else usi.role.some
       hands <- roleToTake.flatMap(
-        sit.hands.take(sit.color, _)
+        sit.hands.take(sit.color, _),
       ) toValid s"No ${usi.role} to drop on ${usi.pos}"
-      board <- sit.board.place(piece, usi.pos) toValid s"Can't drop ${usi.role} on ${usi.pos}, it's occupied"
+      board <- sit.board.place(
+        piece,
+        usi.pos,
+      ) toValid s"Can't drop ${usi.role} on ${usi.pos}, it's occupied"
     } yield finalizeSituation(sit, board, hands, usi)
 
   def impasse(@unused sit: Situation): Boolean = false
@@ -296,7 +317,8 @@ abstract class Variant private[variant] (
 
   // Player wins or loses after their move/drop
   def winner(sit: Situation): Option[Color] =
-    if (sit.checkmate || sit.stalemate || sit.bareKing(sit.color) || sit.royalsLost) Some(!sit.color)
+    if (sit.checkmate || sit.stalemate || sit.bareKing(sit.color) || sit.royalsLost)
+      Some(!sit.color)
     else if (sit.bareKing(!sit.color) || sit.impasse) Some(sit.color)
     else if (sit.perpetualCheck) perpetualCheckAttacker(sit).map(!_)
     else None
@@ -364,7 +386,7 @@ object Variant {
     Chushogi,
     Annanshogi,
     Kyotoshogi,
-    Checkshogi
+    Checkshogi,
   )
 
   val byId: Map[Int, Variant] = all map { v =>
@@ -390,7 +412,7 @@ object Variant {
   val divisionSensibleVariants: Set[Variant] = Set(
     shogi.variant.Standard,
     shogi.variant.Annanshogi,
-    shogi.variant.Checkshogi
+    shogi.variant.Checkshogi,
   )
 
 }

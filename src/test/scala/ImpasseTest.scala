@@ -1,6 +1,6 @@
 package shogi
 
-import format.forsyth.Sfen
+import shogi.format.forsyth.Sfen
 import shogi.variant._
 
 class ImpasseTest extends ShogiTest {
@@ -8,7 +8,10 @@ class ImpasseTest extends ShogiTest {
   "Pieces in promotion zone" should {
     "not be enough" in {
       "starting position" in {
-        val g = sfenToGame(Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"), Standard)
+        val g = sfenToGame(
+          Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"),
+          Standard,
+        )
         g must beValid.like { case game =>
           game.situation.impasse must beFalse
           game.situation.winner must beNone
@@ -65,8 +68,8 @@ class ImpasseTest extends ShogiTest {
         g must beValid.like { case game =>
           val handicapGame = game.withHistory(
             game.situation.history.withInitialSfen(
-              Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
-            )
+              Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+            ),
           )
           handicapGame.situation.impasse must beFalse
           handicapGame.situation.winner must beNone
@@ -77,8 +80,8 @@ class ImpasseTest extends ShogiTest {
         g must beValid.like { case game =>
           val handicapGame = game.withHistory(
             game.situation.history.withInitialSfen(
-              Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB 1")
-            )
+              Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB 1"),
+            ),
           )
           handicapGame.situation.impasse must beFalse
           handicapGame.situation.winner must beNone
@@ -136,8 +139,8 @@ class ImpasseTest extends ShogiTest {
         g must beValid.like { case game =>
           val handicapGame = game.withHistory(
             game.situation.history.withInitialSfen(
-              Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
-            )
+              Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+            ),
           )
           handicapGame.situation.impasse must beTrue
           handicapGame.situation.winner must beSome.like { case color =>
@@ -180,8 +183,8 @@ class ImpasseTest extends ShogiTest {
           g must beValid.like { case game =>
             val handicapGame = game.withHistory(
               game.situation.history.withInitialSfen(
-                Sfen("lnsgkgsnl/9/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1")
-              )
+                Sfen("lnsgkgsnl/9/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1"),
+              ),
             )
             handicapGame.situation.impasse must beTrue
             handicapGame.situation.winner must beSome.like { case color =>
@@ -210,7 +213,7 @@ class ImpasseTest extends ShogiTest {
           val g =
             sfenToGame(
               Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"),
-              Annanshogi
+              Annanshogi,
             )
           g must beValid.like { case game =>
             game.situation.impasse must beFalse
@@ -222,8 +225,8 @@ class ImpasseTest extends ShogiTest {
           g must beValid.like { case game =>
             val handicapGame = game.withHistory(
               game.situation.history.withInitialSfen(
-                Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
-              )
+                Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+              ),
             )
             handicapGame.situation.impasse must beFalse
             handicapGame.situation.winner must beNone

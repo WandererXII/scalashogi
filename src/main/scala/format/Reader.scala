@@ -3,8 +3,8 @@ package format
 
 import cats.data.Validated
 
-import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 
 object Reader {
 
@@ -24,14 +24,14 @@ object Reader {
   def fromParsedNotation(parsed: ParsedNotation, op: ParsedSteps => ParsedSteps): Result =
     makeReplayFromParsedSteps(
       makeGame(parsed.initialSfen, parsed.variant, parsed.tags),
-      op(parsed.parsedSteps)
+      op(parsed.parsedSteps),
     )
 
   def fromUsi(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
       variant: shogi.variant.Variant,
-      tags: Tags
+      tags: Tags,
   ): Result =
     makeReplayFromUsi(makeGame(initialSfen, variant, tags), usis)
 
@@ -42,7 +42,7 @@ object Reader {
           .state(usi)
           .fold(
             err => Result.Incomplete(replay, err),
-            game => Result.Complete(replay(game))
+            game => Result.Complete(replay(game)),
           )
       case (r: Result.Incomplete, _) => r
     }
@@ -54,7 +54,7 @@ object Reader {
           .state(parsedStep)
           .fold(
             err => Result.Incomplete(replay, err),
-            game => Result.Complete(replay(game))
+            game => Result.Complete(replay(game)),
           )
       case (r: Result.Incomplete, _) => r
     }
@@ -62,8 +62,8 @@ object Reader {
   private def makeGame(initialSfen: Option[Sfen], variant: shogi.variant.Variant, tags: Tags) =
     Game(
       initialSfen,
-      variant
+      variant,
     ).copy(
-      clock = tags.clockConfig map Clock.apply
+      clock = tags.clockConfig map Clock.apply,
     )
 }

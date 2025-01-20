@@ -1,6 +1,6 @@
 package shogi
 
-import Pos._
+import shogi.Pos._
 
 class PosTest extends ShogiTest {
 
@@ -184,8 +184,8 @@ class PosTest extends ShogiTest {
             SQ4A,
             SQ3A,
             SQ2A,
-            SQ1A
-          )
+            SQ1A,
+          ),
         )
       }
       "5x5" in {
@@ -216,8 +216,8 @@ class PosTest extends ShogiTest {
             SQ4A,
             SQ3A,
             SQ2A,
-            SQ1A
-          )
+            SQ1A,
+          ),
         )
       }
     }

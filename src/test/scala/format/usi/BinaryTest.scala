@@ -3,11 +3,11 @@ package format.usi
 
 import scala._
 
-import variant._
+import shogi.variant._
 
 class BinaryTest extends ShogiTest {
 
-  import BinaryTestUtils._
+  import shogi.format.usi.BinaryTestUtils._
 
   def compareStrAndBin(usisStr: String, variant: Variant) = {
     val bin = Binary.encode(Usi.readList(usisStr).get, variant).toVector
@@ -213,7 +213,7 @@ class BinaryTest extends ShogiTest {
       forall(
         allMoves
           .withFilter(m => promRanks.contains(m.orig.rank) || promRanks.contains(m.dest.rank))
-          .map(m => s"${m.usi}+")
+          .map(m => s"${m.usi}+"),
       )(compareStrAndBin(_, Chushogi))
       forall(allIguis.map(_.usi))(compareStrAndBin(_, Chushogi))
       forall(allLionMoves.map(_.usi))(compareStrAndBin(_, Chushogi))

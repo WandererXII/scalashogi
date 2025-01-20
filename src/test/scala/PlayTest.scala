@@ -1,6 +1,6 @@
 package shogi
 
-import format.forsyth.Visual.addNewLines
+import shogi.format.forsyth.Visual.addNewLines
 
 class PlayTest extends ShogiTest {
 
@@ -12,8 +12,8 @@ class PlayTest extends ShogiTest {
             List(
               "7g7f",
               "3c3d",
-              "8h2b"
-            )
+              "8h2b",
+            ),
           )
       "current game" in {
         game must beValid.like { case g =>

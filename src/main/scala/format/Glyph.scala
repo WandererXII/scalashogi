@@ -9,7 +9,7 @@ case class Glyph(id: Int, symbol: String, name: String) {
 final case class Glyphs(
     moveOrDrop: Option[Glyph.MoveOrDropAssessment],
     position: Option[Glyph.PositionAssessment],
-    observations: List[Glyph.Observation]
+    observations: List[Glyph.Observation],
 ) {
 
   def isEmpty = this == Glyphs.empty
@@ -23,7 +23,7 @@ final case class Glyphs(
       case g: Glyph.Observation =>
         copy(observations =
           if (observations contains g) observations.filter(g !=)
-          else g :: observations
+          else g :: observations,
         )
       case _ => this
     }
@@ -35,7 +35,7 @@ final case class Glyphs(
       Glyphs(
         g.moveOrDrop orElse moveOrDrop,
         g.position orElse position,
-        (g.observations ::: observations).distinct
+        (g.observations ::: observations).distinct,
       )
 
   def toList: List[Glyph] = moveOrDrop.toList ::: position.toList ::: observations
@@ -48,7 +48,7 @@ object Glyphs {
     Glyphs(
       moveOrDrop = glyphs.collectFirst { case g: Glyph.MoveOrDropAssessment => g },
       position = glyphs.collectFirst { case g: Glyph.PositionAssessment => g },
-      observations = glyphs.collect { case g: Glyph.Observation => g }
+      observations = glyphs.collect { case g: Glyph.Observation => g },
     )
 }
 
@@ -94,7 +94,7 @@ object Glyph {
       senteQuiteBetter,
       goteQuiteBetter,
       senteMuchBetter,
-      goteMuchBetter
+      goteMuchBetter,
     )
     val byId: Map[Int, Glyph] = all.map { g =>
       g.id -> g
@@ -116,7 +116,16 @@ object Glyph {
     val withIdea     = new Glyph(140, "∆", "With the idea") with Observation
 
     val all =
-      List[Glyph](novelty, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
+      List[Glyph](
+        novelty,
+        development,
+        initiative,
+        attack,
+        counterplay,
+        timeTrouble,
+        compensation,
+        withIdea,
+      )
     val byId: Map[Int, Glyph] = all.map { g =>
       g.id -> g
     }.toMap

@@ -2,7 +2,7 @@ package shogi
 package format
 package forsyth
 
-import Pos._
+import shogi.Pos._
 
 class VisualTest extends ShogiTest {
 
@@ -21,18 +21,22 @@ class VisualTest extends ShogiTest {
 
     "partial import" in {
       f.addNewLines(
-        f render (f.parse(partialSituationFormat, shogi.variant.Standard).get)
+        f render (f.parse(partialSituationFormat, shogi.variant.Standard).get),
       ) must_== fullSituationFormat
     }
 
     "hand import" in {
-      f.addNewLines(f render (f.parse(handInBoard, shogi.variant.Standard).get)) must_== fullHandInBoard
+      f.addNewLines(
+        f render (f.parse(handInBoard, shogi.variant.Standard).get),
+      ) must_== fullHandInBoard
     }
 
     "bigger board" in {
-      f.addNewLines(f render (f.parse(chushogiBoard, shogi.variant.Chushogi).get)) must_== chushogiBoard
       f.addNewLines(
-        f render (f.parse(chushogiPartial, shogi.variant.Chushogi).get)
+        f render (f.parse(chushogiBoard, shogi.variant.Chushogi).get),
+      ) must_== chushogiBoard
+      f.addNewLines(
+        f render (f.parse(chushogiPartial, shogi.variant.Chushogi).get),
       ) must_== chushogiPartialFull
     }
 
@@ -51,7 +55,7 @@ P P P P P P P P .
 Hands:
 Turn:Sente
 """,
-        shogi.variant.Standard
+        shogi.variant.Standard,
       )
       val markedBoard =
         f render (situation.get, Map(Set(SQ8F, SQ6F, SQ8D, SQ6D, SQ9C, SQ5C, SQ4B, SQ3A) -> 'x'))
@@ -222,6 +226,6 @@ P . . . . P P P .
 L N S . K . . . L
 Hands:B2r10p
 Turn:Sente
-"""
+""",
   )
 }

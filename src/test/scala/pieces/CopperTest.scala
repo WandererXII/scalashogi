@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class CopperTest extends ShogiTest {
 
@@ -15,13 +15,13 @@ class CopperTest extends ShogiTest {
         SQ7E,
         SQ6E,
         SQ5E,
-        SQ6G
+        SQ6G,
       )
       pieceMoves(copperGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ7G,
         SQ6G,
         SQ5G,
-        SQ6E
+        SQ6E,
       )
     }
 

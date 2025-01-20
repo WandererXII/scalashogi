@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class RookTest extends ShogiTest {
 
@@ -27,7 +27,7 @@ class RookTest extends ShogiTest {
         SQ6E,
         SQ7E,
         SQ8E,
-        SQ9E
+        SQ9E,
       )
       pieceMoves(rookGote, SQ5E, shogi.variant.Standard) must bePoss(
         SQ5D,
@@ -45,7 +45,7 @@ class RookTest extends ShogiTest {
         SQ6E,
         SQ7E,
         SQ8E,
-        SQ9E
+        SQ9E,
       )
     }
 
@@ -66,7 +66,7 @@ class RookTest extends ShogiTest {
         SQ6A,
         SQ7A,
         SQ8A,
-        SQ9A
+        SQ9A,
       )
     }
 

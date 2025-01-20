@@ -1,7 +1,7 @@
 package shogi
 
-import variant.Standard
-import format.forsyth.Sfen
+import shogi.format.forsyth.Sfen
+import shogi.variant.Standard
 
 class DrawTest extends ShogiTest {
 

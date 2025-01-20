@@ -7,7 +7,7 @@ import shogi.format.usi.Usi
 final case class MoveActor(
     piece: Piece,
     pos: Pos,
-    situation: Situation
+    situation: Situation,
 ) {
 
   lazy val attackingPiece = situation.variant.attackingPiece(piece, pos, situation.board)

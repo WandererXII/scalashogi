@@ -23,8 +23,9 @@ object Division {
 }
 
 sealed trait DividerData
-final case class NotFound(senteInvadersInGotesCamp: Int, goteInvadersInSentesCamp: Int) extends DividerData
-final case class Found(index: Int)                                                      extends DividerData
+final case class NotFound(senteInvadersInGotesCamp: Int, goteInvadersInSentesCamp: Int)
+    extends DividerData
+final case class Found(index: Int) extends DividerData
 
 object Divider {
 
@@ -81,7 +82,7 @@ object Divider {
     Division(
       midGameOption.filter(m => endGameOption.fold(true)(m <)),
       endGameOption,
-      sits.size
+      sits.size,
     )
   }
 

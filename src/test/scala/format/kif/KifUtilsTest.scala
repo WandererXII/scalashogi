@@ -1,7 +1,8 @@
 package shogi
 package format
 package kif
-import KifUtils._
+
+import shogi.format.kif.KifUtils._
 
 class KifUtilTest extends ShogiTest {
 

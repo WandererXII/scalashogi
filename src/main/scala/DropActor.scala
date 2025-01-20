@@ -5,7 +5,7 @@ import shogi.format.usi.Usi
 final case class DropActor(
     color: Color,
     role: DroppableRole,
-    situation: Situation
+    situation: Situation,
 ) {
 
   lazy val destinations: List[Pos] =
@@ -37,7 +37,7 @@ object DropActor {
         case Some(next) if !sit.variant.isInsideBoard(next)          => Nil
         case Some(next) if sit.board(next).exists(attacker(_, next)) => squares
         case Some(next) if sit.board(next).isDefined                 => Nil
-        case Some(next)                                              => forward(next, dir, next :: squares)
+        case Some(next) => forward(next, dir, next :: squares)
       }
     Pos.allDirections flatMap { forward(royalPos, _, Nil) } filter { square =>
       sit.board.place(Piece(sit.color, Gold), square) exists { defended =>

@@ -2,7 +2,13 @@ package shogi
 package format
 package forsyth
 
-import shogi.variant.{ Annanshogi, Checkshogi, Chushogi, Kyotoshogi, Minishogi, Standard, Variant }
+import shogi.variant.Annanshogi
+import shogi.variant.Checkshogi
+import shogi.variant.Chushogi
+import shogi.variant.Kyotoshogi
+import shogi.variant.Minishogi
+import shogi.variant.Standard
+import shogi.variant.Variant
 
 object SfenUtils {
 
@@ -56,7 +62,7 @@ object SfenUtils {
     PromotedKnight -> "+n",
     PromotedSilver -> "+s",
     Horse          -> "+b",
-    Dragon         -> "+r"
+    Dragon         -> "+r",
   )
 
   private val toRoleStandard: Map[String, Role] = toForsythStandard map { case (k, v) => v -> k }
@@ -100,7 +106,7 @@ object SfenUtils {
       Queen                 -> "q",
       PromotedPawn          -> "+p",
       GoBetween             -> "i",
-      ElephantPromoted      -> "+i"
+      ElephantPromoted      -> "+i",
     )
 
   private val toRoleChushogi: Map[String, Role] = toForsythChushogi map { case (k, v) => v -> k }
@@ -114,10 +120,12 @@ object SfenUtils {
     Gold   -> "g",
     Bishop -> "b",
     Rook   -> "r",
-    Tokin  -> "t"
+    Tokin  -> "t",
   )
 
-  private val toRoleKyotoshogi: Map[String, Role] = toForsythKyotoshogi map { case (k, v) => v -> k }
+  private val toRoleKyotoshogi: Map[String, Role] = toForsythKyotoshogi map { case (k, v) =>
+    v -> k
+  }
 
   val allForsyth: List[String] = (Role.all flatMap { r: Role =>
     Variant.all flatMap { v =>

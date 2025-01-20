@@ -26,7 +26,7 @@ K . . . . . . . .
 Hands:
 Turn:Sente
 """,
-        shogi.variant.Standard
+        shogi.variant.Standard,
       )
     }
     "don't force promotion by default" in {
@@ -44,7 +44,7 @@ K . . . . . . . .
 Hands:
 Turn:Sente
 """,
-        shogi.variant.Standard
+        shogi.variant.Standard,
       )
     }
     "promotion by killing" in {
@@ -52,7 +52,7 @@ Turn:Sente
         """
 . . p . . . . . .
 K . R . . . . . .
-Turn:Gote"""
+Turn:Gote""",
       ).playUsiStr("7h7i+") must beGame(
         """
 . . . . . . . . .
@@ -66,7 +66,7 @@ Turn:Gote"""
 K .+p . . . . . .
 Hands:r
 Turn:Sente""",
-        shogi.variant.Standard
+        shogi.variant.Standard,
       )
     }
   }

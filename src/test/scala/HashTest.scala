@@ -1,17 +1,17 @@
 package shogi
 
-import variant.Standard
-import format.forsyth.Sfen
-import format.usi.Usi
+import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
+import shogi.variant.Standard
 
 class HashTest extends ShogiTest {
 
   "Hasher" should {
 
     "be consistent" in {
-      val sfen          = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
-      val situation     = sfen.toSituation(Standard).get
-      val sitAfterMove  = situation(Usi.Move(Pos.SQ8H, Pos.SQ2B, false, None)).toOption.get
+      val sfen         = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
+      val situation    = sfen.toSituation(Standard).get
+      val sitAfterMove = situation(Usi.Move(Pos.SQ8H, Pos.SQ2B, false, None)).toOption.get
       val hashAfterMove = Hash(sitAfterMove)
 
       val sfenAfter = Sfen("lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4")
@@ -47,11 +47,15 @@ class HashTest extends ShogiTest {
 
     "hash hands" in {
       val gotePawn =
-        Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b p 3").toSituation(Standard).get
+        Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b p 3")
+          .toSituation(Standard)
+          .get
       val gotePawnHash = Hash(gotePawn)
 
       val sentePawn =
-        Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b P 3").toSituation(Standard).get
+        Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b P 3")
+          .toSituation(Standard)
+          .get
       val sentePawnHash = Hash(sentePawn)
 
       sentePawnHash mustNotEqual gotePawnHash

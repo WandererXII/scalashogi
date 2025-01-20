@@ -1,6 +1,9 @@
 import ornicar.scalalib
 
-package object shogi extends scalalib.Common with scalalib.OrnicarOption with scalalib.OrnicarBoolean {
+package object shogi
+    extends scalalib.Common
+    with scalalib.OrnicarOption
+    with scalalib.OrnicarBoolean {
 
   val Sente = Color.Sente
   val Gote  = Color.Gote

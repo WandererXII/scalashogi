@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class GoBetweenTest extends ShogiTest {
 
@@ -13,11 +13,11 @@ class GoBetweenTest extends ShogiTest {
     "move to valid positions" in {
       pieceMoves(goBetween, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ6E,
-        SQ6G
+        SQ6G,
       )
       pieceMoves(goBetweenGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ6E,
-        SQ6G
+        SQ6G,
       )
     }
 

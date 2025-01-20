@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class BishopTest extends ShogiTest {
 
@@ -27,7 +27,7 @@ class BishopTest extends ShogiTest {
         SQ8H,
         SQ8B,
         SQ9I,
-        SQ9A
+        SQ9A,
       )
       pieceMoves(bishopGote, SQ5E, shogi.variant.Standard) must bePoss(
         SQ4F,
@@ -45,7 +45,7 @@ class BishopTest extends ShogiTest {
         SQ8H,
         SQ8B,
         SQ9I,
-        SQ9A
+        SQ9A,
       )
     }
 
@@ -58,7 +58,7 @@ class BishopTest extends ShogiTest {
         SQ4F,
         SQ5G,
         SQ6H,
-        SQ7I
+        SQ7I,
       )
     }
 
@@ -90,7 +90,7 @@ P P P P P P P . P
 . . . . K . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
 
@@ -122,7 +122,7 @@ P P P P P P P . P
 . . . . K . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
     "threaten" in {

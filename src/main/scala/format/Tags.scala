@@ -116,7 +116,7 @@ object Tag {
     Publication,
     Collection,
     Length,
-    Prize
+    Prize,
   )
 
   val tagTypes = List[TagType](
@@ -142,7 +142,7 @@ object Tag {
     Termination,
     Annotator,
     Handicap,
-    Byoyomi
+    Byoyomi,
   ) ++ tsumeTypes
 
   val tagTypesByLowercase: Map[String, TagType] =
@@ -153,30 +153,32 @@ object Tag {
   def apply(name: String, value: Any): Tag =
     new Tag(
       name = tagType(name),
-      value = value.toString
+      value = value.toString,
     )
 
   def apply(name: Tag.type => TagType, value: Any): Tag =
     new Tag(
       name = name(this),
-      value = value.toString
+      value = value.toString,
     )
 
   def tagType(name: String) =
-    (tagTypesByLowercase get (kifNameToTag.get(name).fold(name.toLowerCase)(_.lowercase))) | Unknown(name)
+    (tagTypesByLowercase get (kifNameToTag
+      .get(name)
+      .fold(name.toLowerCase)(_.lowercase))) | Unknown(name)
 
   val tagToCsaName = Map[TagType, String](
     Tag.Start       -> "START_TIME",
     Tag.End         -> "END_TIME",
     Tag.TimeControl -> "TIME_LIMIT",
     Tag.Sente       -> "+",
-    Tag.Gote        -> "-"
+    Tag.Gote        -> "-",
   )
 
   val csaNameToTag =
     (tagToCsaName map { case (k, v) => v -> k }) ++ Map(
       "Name+" -> Tag.Sente,
-      "Name-" -> Tag.Gote
+      "Name-" -> Tag.Gote,
     )
 
   val tagToKifName = Map[TagType, String](
@@ -201,14 +203,14 @@ object Tag {
     Tag.Publication       -> "発表誌",
     Tag.Collection        -> "出典",
     Tag.Length            -> "手数",
-    Tag.Prize             -> "受賞"
+    Tag.Prize             -> "受賞",
   )
 
   val kifNameToTag =
     (tagToKifName map { case (k, v) => v -> k }) ++ Map(
       "下手"  -> Tag.Sente,
       "上手"  -> Tag.Gote,
-      "対局日" -> Tag.Start
+      "対局日" -> Tag.Start,
     )
 
   def timeControlKif(clock: Option[Clock.Config]) =
@@ -228,7 +230,7 @@ object Tag {
           if (c.periodsTotal > 1) s"(${c.periodsTotal})"
           else ""
         s"$init$inc$byo$periods"
-      }
+      },
     )
 
   def timeControlCsa(clock: Option[Clock.Config]) =
@@ -242,6 +244,6 @@ object Tag {
           if (c.hasByoyomi) f"+${c.byoyomi.roundSeconds}%02d"
           else ""
         s"$init$byo"
-      }
+      },
     )
 }

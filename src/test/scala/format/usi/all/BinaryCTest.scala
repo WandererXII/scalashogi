@@ -3,7 +3,8 @@ package format.usi
 package all
 
 import scala._
-import variant._
+
+import shogi.variant._
 
 class BinaryCTest extends ShogiTest {
 

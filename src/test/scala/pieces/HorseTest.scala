@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class HorseTest extends ShogiTest {
 
@@ -31,7 +31,7 @@ class HorseTest extends ShogiTest {
         SQ6E,
         SQ4E,
         SQ5D,
-        SQ5F
+        SQ5F,
       )
       pieceMoves(horseGote, SQ5E, shogi.variant.Standard) must bePoss(
         SQ4F,
@@ -53,7 +53,7 @@ class HorseTest extends ShogiTest {
         SQ6E,
         SQ4E,
         SQ5D,
-        SQ5F
+        SQ5F,
       )
     }
 
@@ -69,7 +69,7 @@ class HorseTest extends ShogiTest {
         SQ7I,
         SQ2C,
         SQ1D,
-        SQ1B
+        SQ1B,
       )
     }
 
@@ -101,7 +101,7 @@ P P P P P P P . P
 . . . . K . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
 
@@ -133,7 +133,7 @@ P P P P P P P . P
 . . . . K . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
     "threaten" in {

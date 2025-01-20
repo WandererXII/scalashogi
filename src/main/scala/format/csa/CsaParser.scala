@@ -3,8 +3,10 @@ package format
 package csa
 
 import scala.util.parsing.combinator._
+
 import cats.data.Validated
-import cats.data.Validated.{ invalid, valid }
+import cats.data.Validated.invalid
+import cats.data.Validated.valid
 import cats.implicits._
 
 import shogi.variant.Standard
@@ -25,7 +27,7 @@ object CsaParser {
   final case class StrStep(
       step: String,
       comments: List[String],
-      timeSpent: Option[Centis] = None
+      timeSpent: Option[Centis] = None,
   )
 
   def full(csa: String): Validated[String, ParsedNotation] =
@@ -35,7 +37,9 @@ object CsaParser {
           case l if !l.trim.startsWith("'") => l.replace(",", "\n").trim
           case l                            => l.trim // try to keep ',' in comments
         }
-        .filterNot(l => l.isEmpty || l == "'" || l.startsWith("V")) // remove empty comments and version
+        .filterNot(l =>
+          l.isEmpty || l == "'" || l.startsWith("V"),
+        ) // remove empty comments and version
         .mkString("\n")
       for {
         splitted <- splitHeaderAndSteps(preprocessed)
@@ -71,13 +75,14 @@ object CsaParser {
       tags: Tags,
       color: Color,
       nbSteps: Int,
-      stepTermTag: Option[Tag]
+      stepTermTag: Option[Tag],
   ): Tags = {
-    val termTag = (tags(_.Termination) orElse stepTermTag.map(_.value)).map(t => Tag(_.Termination, t))
+    val termTag =
+      (tags(_.Termination) orElse stepTermTag.map(_.value)).map(t => Tag(_.Termination, t))
     val resultTag = CsaParserHelper
       .createResult(
         termTag,
-        Color.fromSente((nbSteps + { if (color.gote) 1 else 0 }) % 2 == 0)
+        Color.fromSente((nbSteps + { if (color.gote) 1 else 0 }) % 2 == 0),
       )
 
     List[Option[Tag]](resultTag, termTag).flatten.foldLeft(tags)(_ + _)
@@ -101,8 +106,8 @@ object CsaParser {
               steps,
               termination map { r =>
                 Tag(_.Termination, r)
-              }
-            )
+              },
+            ),
           )
         case err => invalid("Cannot parse moves/drops: %s\n%s".format(err.toString, csaSteps))
       }
@@ -128,8 +133,9 @@ object CsaParser {
 
     private def readCentis(seconds: String): Option[Centis] =
       seconds.toDoubleOption match {
-        case Some(s) => Centis(BigDecimal(s * 100).setScale(0, BigDecimal.RoundingMode.HALF_UP).toInt).some
-        case _       => none
+        case Some(s) =>
+          Centis(BigDecimal(s * 100).setScale(0, BigDecimal.RoundingMode.HALF_UP).toInt).some
+        case _ => none
       }
 
     private def parseClock(str: String): Option[Centis] = {
@@ -191,7 +197,9 @@ object CsaParser {
             _ <-
               if (Standard.allRoles contains role) valid(role)
               else invalid(s"$role not supported in standard shogi")
-            dest <- CsaUtils.parseCsaPos(destS) toValid s"Cannot parse destination sqaure in move: $str"
+            dest <- CsaUtils.parseCsaPos(
+              destS,
+            ) toValid s"Cannot parse destination sqaure in move: $str"
             orig <- CsaUtils.parseCsaPos(origS) toValid s"Cannot parse origin sqaure in move: $str"
           } yield CsaMove(
             dest = dest,
@@ -202,17 +210,19 @@ object CsaParser {
               glyphs = Glyphs.empty,
               variations = Nil,
               timeSpent = None,
-              timeTotal = None
-            )
+              timeTotal = None,
+            ),
           )
         }
         case DropRegex(posS, roleS) =>
           for {
             roleBase <- CsaUtils.toRole(roleS) toValid s"Uknown role in drop: $str"
             role <- Standard.handRoles.find(
-              _ == roleBase
+              _ == roleBase,
             ) toValid s"$roleBase can't be dropped in standard shogi"
-            pos <- CsaUtils.parseCsaPos(posS) toValid s"Cannot parse destination sqaure in drop: $str"
+            pos <- CsaUtils.parseCsaPos(
+              posS,
+            ) toValid s"Cannot parse destination sqaure in drop: $str"
           } yield Drop(
             role = role,
             pos = pos,
@@ -221,8 +231,8 @@ object CsaParser {
               glyphs = Glyphs.empty,
               variations = Nil,
               timeSpent = None,
-              timeTotal = None
-            )
+              timeTotal = None,
+            ),
           )
         case _ => invalid("Cannot parse move/drop: %s\n".format(str))
       }
@@ -275,8 +285,12 @@ object CsaParser {
   private def getComments(csa: String): Validated[String, InitialPosition] =
     valid(
       InitialPosition(
-        augmentString(csa).linesIterator.map(_.trim).filter(_.startsWith("'")).map(_.drop(1).trim).toList
-      )
+        augmentString(csa).linesIterator
+          .map(_.trim)
+          .filter(_.startsWith("'"))
+          .map(_.drop(1).trim)
+          .toList,
+      ),
     )
 
   private def splitHeaderAndSteps(csa: String): Validated[String, (String, String)] =

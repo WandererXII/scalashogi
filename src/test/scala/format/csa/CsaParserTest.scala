@@ -4,7 +4,7 @@ package csa
 
 class CsaParserTest extends ShogiTest {
 
-  import CsaFixtures._
+  import shogi.format.csa.CsaFixtures._
 
   val parser                 = CsaParser.full _
   def parseStep(str: String) = CsaParser.StepParser(str)
@@ -125,8 +125,13 @@ class CsaParserTest extends ShogiTest {
       'such a neat comment
       ' one more, keep com,ma
       '
-      ' drop P*5e""") must beValid.like { case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-        step.metas.comments must_== List("such a neat comment", "one more, keep com,ma", "drop P*5e")
+      ' drop P*5e""") must beValid.like {
+        case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
+          step.metas.comments must_== List(
+            "such a neat comment",
+            "one more, keep com,ma",
+            "drop P*5e",
+          )
       }
     }
     "termination comments" in {
@@ -137,7 +142,11 @@ class CsaParserTest extends ShogiTest {
       %TORYO,T3
       'comment on termination?""") must beValid.like {
         case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-          step.metas.comments must_== List("such a neat comment", "one more", "comment on termination?")
+          step.metas.comments must_== List(
+            "such a neat comment",
+            "one more",
+            "comment on termination?",
+          )
       }
     }
     "comments in header" in {

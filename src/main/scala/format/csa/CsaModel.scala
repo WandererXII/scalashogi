@@ -4,15 +4,15 @@ package csa
 
 import cats.syntax.option._
 
-import shogi.variant.Standard
-import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
+import shogi.variant.Standard
 
 final case class Csa(
     steps: List[NotationStep],
     initialSfen: Option[Sfen],
     initial: Initial = Initial.empty,
-    tags: Tags = Tags.empty
+    tags: Tags = Tags.empty,
 ) extends Notation {
 
   def variant = Standard
@@ -46,7 +46,7 @@ final case class Csa(
       header,
       setup,
       initStr,
-      stepsStr
+      stepsStr,
     ).filter(_.nonEmpty).mkString("\n")
   }.trim
 
@@ -82,7 +82,7 @@ object Csa {
             if (isValidTagValue(tagValue))
               s"N${ct.csaName}${tagValue.replace(",", ";")}"
             else
-              ""
+              "",
           )
         } else {
           tags(ct.name).fold("")(tagValue => {
@@ -115,7 +115,7 @@ object Csa {
       csaBoard.toString,
       renderHand(sit.hands(Sente), "P+"),
       renderHand(sit.hands(Gote), "P-"),
-      if (sit.color.gote) "-" else "+"
+      if (sit.color.gote) "-" else "+",
     ).filter(_.nonEmpty).mkString("\n")
   }
 
@@ -134,21 +134,22 @@ object Csa {
   def createTerminationStep(
       status: Status,
       winnerTurn: Boolean,
-      winnerColor: Option[Color]
+      winnerColor: Option[Color],
   ): Option[String] = {
-    import Status._
+    import shogi.Status._
     status match {
-      case Aborted | NoStart                                 => "%CHUDAN".some
-      case Timeout | Outoftime                               => "%TIME_UP".some
-      case Resign if !winnerTurn                             => "%TORYO".some
-      case PerpetualCheck if winnerColor.contains(Sente)     => "%-ILLEGAL_ACTION".some
-      case PerpetualCheck                                    => "%+ILLEGAL_ACTION".some
-      case Mate if winnerTurn && winnerColor.contains(Sente) => "%-ILLEGAL_ACTION".some // pawn checkmate
-      case Mate if winnerTurn                                => "%+ILLEGAL_ACTION".some // pawn checkmate
-      case Mate | Stalemate                                  => "%TSUMI".some
-      case Repetition                                        => "%SENNICHITE".some
-      case Impasse27                                         => "%KACHI".some
-      case _                                                 => None
+      case Aborted | NoStart                             => "%CHUDAN".some
+      case Timeout | Outoftime                           => "%TIME_UP".some
+      case Resign if !winnerTurn                         => "%TORYO".some
+      case PerpetualCheck if winnerColor.contains(Sente) => "%-ILLEGAL_ACTION".some
+      case PerpetualCheck                                => "%+ILLEGAL_ACTION".some
+      case Mate if winnerTurn && winnerColor.contains(Sente) =>
+        "%-ILLEGAL_ACTION".some // pawn checkmate
+      case Mate if winnerTurn => "%+ILLEGAL_ACTION".some // pawn checkmate
+      case Mate | Stalemate   => "%TSUMI".some
+      case Repetition         => "%SENNICHITE".some
+      case Impasse27          => "%KACHI".some
+      case _                  => None
     }
   }
 
@@ -163,7 +164,7 @@ object Csa {
     Tag.TimeControl,
     Tag.SenteTeam,
     Tag.GoteTeam,
-    Tag.Opening
+    Tag.Opening,
   )
 
   private def clockString(cur: NotationStep): Option[String] =

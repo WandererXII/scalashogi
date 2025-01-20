@@ -26,7 +26,8 @@ object Visual {
     val lines = augmentString(clean).linesIterator.map(_.trim).filter(_.nonEmpty).toList
     val hands = lines.find(_.toLowerCase.startsWith("hands")).flatMap(_.split(':').lift(1)) | ""
     val turn =
-      if (lines.map(_.toLowerCase).exists(l => l.startsWith("turn") && l.contains("gote"))) "w" else "b"
+      if (lines.map(_.toLowerCase).exists(l => l.startsWith("turn") && l.contains("gote"))) "w"
+      else "b"
     val sfenReversed = lines
       .filterNot(_ contains ":")
       .mkString("/")
@@ -39,7 +40,8 @@ object Visual {
       .map(ic => s"${if (ic._2 == '.') ic._1 else ""}${ic._2}")
       .mkString("")
       .filter(_ != '.')
-    val padStr = s"${variant.numberOfFiles}/" * (variant.numberOfRanks - sfenReversed.count(_ == '/') - 1)
+    val padStr =
+      s"${variant.numberOfFiles}/" * (variant.numberOfRanks - sfenReversed.count(_ == '/') - 1)
     val finalSfen =
       List[String](padStr + sfenReversed.reverse, turn, hands)
         .mkString(" ")
@@ -47,10 +49,11 @@ object Visual {
   }
 
   def render(sit: Situation, marks: Map[Iterable[Pos], Char] = Map.empty): String = {
-    val markedPoss: Map[Pos, Char] = marks.foldLeft[Map[Pos, Char]](Map.empty) { case (marks, (poss, char)) =>
-      marks ++ (poss.toList map { pos =>
-        (pos, char)
-      })
+    val markedPoss: Map[Pos, Char] = marks.foldLeft[Map[Pos, Char]](Map.empty) {
+      case (marks, (poss, char)) =>
+        marks ++ (poss.toList map { pos =>
+          (pos, char)
+        })
     }
     for (y <- 0 to (sit.variant.numberOfRanks - 1)) yield {
       for (x <- (sit.variant.numberOfFiles - 1) to 0 by -1) yield {
@@ -63,9 +66,10 @@ object Visual {
   } map (_.trim) mkString "\n" pipe { board =>
     List[String](
       board,
-      if (sit.variant.supportsDrops) s"Hands:${Sfen.handsToString(sit.hands, sit.variant).filterNot('-' ==)}"
+      if (sit.variant.supportsDrops)
+        s"Hands:${Sfen.handsToString(sit.hands, sit.variant).filterNot('-' ==)}"
       else "",
-      s"Turn:${sit.color.name.capitalize}"
+      s"Turn:${sit.color.name.capitalize}",
     ).filter(_.nonEmpty).mkString("\n")
   }
 

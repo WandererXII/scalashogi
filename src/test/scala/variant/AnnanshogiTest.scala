@@ -1,8 +1,8 @@
 package shogi
 package variant
 
-import format.forsyth.Sfen
-import format.usi.Usi
+import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 
 class AnnanshogiTest extends ShogiTest {
 
@@ -22,10 +22,13 @@ class AnnanshogiTest extends ShogiTest {
     ("4k4/4p4/9/4P4/4L4/4N4/9/9/9 b - 1", 10),
     ("2k6/9/9/9/9/1P1P1P1P1/1R3K1+B1/3R5/9 w - 1", 1),
     ("4k3S/r1l1gs3/n+N1s5/L+P4G1+B/1Pp1p1Rb1/4PNpN1/3+pPGPP1/6G1P/1p1K2S1+l w - 1", 35),
-    ("P1G+N3s1/lp7/2+N+Pp+P1+L+P/1sB1kP3/N1pl1s3/g6p1/+p1B2+p+p+l+p/1+s+r+n4R/1g1pK1+p2 b G3P 167", 2),
+    (
+      "P1G+N3s1/lp7/2+N+Pp+P1+L+P/1sB1kP3/N1pl1s3/g6p1/+p1B2+p+p+l+p/1+s+r+n4R/1g1pK1+p2 b G3P 167",
+      2,
+    ),
     ("1n2g1g2/l2k1p3/p1p1psb1l/r4Ppp1/1p6p/P2p1PPpP/L3+n1S1L/1BKN2GS1/r1G4N1 b 2Psp 83", 7),
     ("Pn2g4/+S2ps3l/4p1p1+P/sPpg1Pk2/lS1rr2pp/p2GnnPP1/LB+p4+nL/2B2K2+p/1p1GP2+p1 b - 129", 46),
-    ("9/1k7/9/4b4/4p4/5N3/6K2/9/9 b - 1", 6)
+    ("9/1k7/9/4b4/4p4/5N3/6K2/9/9 b - 1", 6),
   )
 
   "default positions" should {
@@ -79,7 +82,7 @@ class AnnanshogiTest extends ShogiTest {
     }
     "do not allow capturing move givers that prevent check" in {
       val sit = Sfen(
-        "2k5N/3p2+P1G/1+P+P1s2+P+L/1pg1bS3/6Bp1/6G1P/1K1SL+pP2/+ln+pRG1+p1+p/1+lP1+p2R1 b SN2Pnp"
+        "2k5N/3p2+P1G/1+P+P1s2+P+L/1pg1bS3/6Bp1/6G1P/1K1SL+pP2/+ln+pRG1+p1+p/1+lP1+p2R1 b SN2Pnp",
       ).toSituation(shogi.variant.Annanshogi).get
       sit(Usi("4d5c").get).isValid must beFalse
 
@@ -133,7 +136,8 @@ class AnnanshogiTest extends ShogiTest {
         .valid(true) must beTrue
     }
     "double pawns" in {
-      val sit = Sfen("9/9/9/9/9/k8/n1PPPPPP1/N2G2B2/K8 b 3P").toSituation(shogi.variant.Annanshogi).get
+      val sit =
+        Sfen("9/9/9/9/9/k8/n1PPPPPP1/N2G2B2/K8 b 3P").toSituation(shogi.variant.Annanshogi).get
       sit(Usi("6g7f").get).isValid must beTrue
       sit(Usi("P*8f").get).isValid must beTrue
       sit(Usi("P*7f").get).isValid must beFalse
@@ -159,7 +163,7 @@ class AnnanshogiTest extends ShogiTest {
 
   "parse" in {
     Sfen("lPsgkgLnP/1r5b1/p1ppp1p1p/1p5pp/9/1P3P1P1/P1PP1P2P/1B5n1/lNSGKGpNL b").toSituation(
-      shogi.variant.Annanshogi
+      shogi.variant.Annanshogi,
     ) must beSome
   }
 

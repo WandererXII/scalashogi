@@ -2,6 +2,7 @@ package shogi
 package variant
 
 import scala.annotation.unused
+
 import shogi.format.usi.Usi
 
 case object Checkshogi
@@ -9,7 +10,7 @@ case object Checkshogi
       id = 6,
       key = "checkshogi",
       name = "Checkshogi",
-      title = "Check your opponent's king to win"
+      title = "Check your opponent's king to win",
     ) {
 
   def initialSfen = Standard.initialSfen
@@ -34,7 +35,11 @@ case object Checkshogi
 
   def valueOfRole(r: Role): Int = Standard.valueOfRole(r)
 
-  override def isAttacked(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean =
+  override def isAttacked(
+      @unused before: Situation,
+      @unused after: Situation,
+      @unused usi: Usi,
+  ): Boolean =
     false
 
   override def impasse(sit: Situation): Boolean = Standard.impasse(sit)

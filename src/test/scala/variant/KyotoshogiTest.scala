@@ -1,8 +1,8 @@
 package shogi
 package variant
 
-import format.forsyth.Sfen
-import format.usi.Usi
+import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 
 class KyotoshogiTest extends ShogiTest {
 
@@ -30,7 +30,7 @@ class KyotoshogiTest extends ShogiTest {
   val kyotoPerfts = List(
     ("1S3/L2k1/5/1Kl2/2n2 w Psgp 58", 120),
     ("5/2k1l/5/5/pBK2 w Ggtsp 28", 170),
-    ("kl3/1n3/G4/5/TSK1P b P", 47)
+    ("kl3/1n3/G4/5/TSK1P b P", 47),
   )
 
   "kyotoshogi positions" should {
@@ -87,7 +87,10 @@ class KyotoshogiTest extends ShogiTest {
 
   "parse with pieces in dead zone" in {
     Sfen("PgksL/3N1/5/1n3/pSKGl b").toSituation(shogi.variant.Kyotoshogi) must beSome
-    Sfen("PgksL/3N1/5/1n3/pSKGl b").toSituation(shogi.variant.Kyotoshogi).get.valid(true) must beTrue
+    Sfen("PgksL/3N1/5/1n3/pSKGl b")
+      .toSituation(shogi.variant.Kyotoshogi)
+      .get
+      .valid(true) must beTrue
   }
 
   "fixture perfts" should {

@@ -44,7 +44,7 @@ object CsaUtils {
     PromotedKnight -> "NK",
     PromotedSilver -> "NG",
     Horse          -> "UM",
-    Dragon         -> "RY"
+    Dragon         -> "RY",
   )
 
   private val toRoleStandard: Map[String, Role] = toCsaStandard map { case (k, v) => v -> k }

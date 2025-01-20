@@ -4,16 +4,16 @@ package kif
 
 import cats.syntax.option._
 
-import shogi.variant._
-import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
+import shogi.variant._
 
 final case class Kif(
     steps: List[NotationStep],
     initialSfen: Option[Sfen],
     variant: Variant,
     initial: Initial = Initial.empty,
-    tags: Tags = Tags.empty
+    tags: Tags = Tags.empty,
 ) extends Notation {
 
   def withSteps(steps: List[NotationStep]) =
@@ -27,14 +27,16 @@ final case class Kif(
       .foldLeft[(List[String], Option[Pos])]((Nil, None)) { case ((acc, lastDest), cur) =>
         (
           Kif.renderNotationStep(cur, lastDest, variant) :: acc,
-          cur.usiWithRole.usi.positions.lastOption
+          cur.usiWithRole.usi.positions.lastOption,
         )
       }
       ._1
       .reverse mkString "\n"
 
     val variations = steps.reverse.foldLeft("")((acc, cur) => {
-      acc + cur.variations.map(v => s"\n\n変化：${cur.stepNumber}手\n${renderStepsAndVariations(v)}").mkString("")
+      acc + cur.variations
+        .map(v => s"\n\n変化：${cur.stepNumber}手\n${renderStepsAndVariations(v)}")
+        .mkString("")
     })
 
     s"$mainline$variations"
@@ -42,7 +44,8 @@ final case class Kif(
 
   def render: String = {
     val initStr =
-      if (initial.comments.nonEmpty) initial.comments.map(Kif.fixComment _).mkString("* ", "\n* ", "\n")
+      if (initial.comments.nonEmpty)
+        initial.comments.map(Kif.fixComment _).mkString("* ", "\n* ", "\n")
       else ""
     val header      = Kif.renderHeader(initialSfen, variant, tags)
     val stepsHeader = "\n手数----指手---------消費時間--\n"
@@ -58,10 +61,12 @@ object Kif {
   def renderNotationStep(cur: NotationStep, lastDest: Option[Pos], variant: Variant): String = {
     val suf           = if (variant.chushogi) "手目" else ""
     val stepNumberStr = stepNumberOffset(cur.stepNumber, suf)
-    val resultStr     = cur.result.fold("")(r => s"\n${stepNumberOffset(cur.stepNumber + 1, suf)}$offset$r")
-    val timeStr       = clockString(cur) | ""
-    val glyphsNames   = cur.glyphs.toList.map(_.name)
-    val commentsStr   = (glyphsNames ::: cur.comments).map { text => s"\n* ${fixComment(text)}" }.mkString("")
+    val resultStr =
+      cur.result.fold("")(r => s"\n${stepNumberOffset(cur.stepNumber + 1, suf)}$offset$r")
+    val timeStr     = clockString(cur) | ""
+    val glyphsNames = cur.glyphs.toList.map(_.name)
+    val commentsStr =
+      (glyphsNames ::: cur.comments).map { text => s"\n* ${fixComment(text)}" }.mkString("")
     cur.usiWithRole.usi match {
       case Usi.Move(orig, dest, prom, Some(midStep)) => {
         val m1 = Usi.WithRole(Usi.Move(orig, midStep, false, None), cur.usiWithRole.role)
@@ -139,8 +144,9 @@ object Kif {
         val handicap = getHandicapName(sf, variant)
         handicap
           .filter(_ => variant.standard)
-          .fold(sf.toSituation(variant).map(sit => renderSituation(sit, handicap.isDefined)) | "") { hc =>
-            s"${Tag.Handicap.kifName}：$hc"
+          .fold(sf.toSituation(variant).map(sit => renderSituation(sit, handicap.isDefined)) | "") {
+            hc =>
+              s"${Tag.Handicap.kifName}：$hc"
           }
       }
 
@@ -178,7 +184,7 @@ object Kif {
       if (sit.variant.supportsDrops)
         s"${colorName(Sente, isHandicap)}の持駒：${renderHand(sit.hands(Sente), sit.variant)}"
       else "",
-      if (sit.color.gote) s"${colorName(Gote, isHandicap)}番" else ""
+      if (sit.color.gote) s"${colorName(Gote, isHandicap)}番" else "",
     ).filter(_.nonEmpty).mkString("\n")
   }
 
@@ -212,7 +218,7 @@ object Kif {
   }
 
   def createTerminationStep(status: Status, winnerTurn: Boolean): Option[String] = {
-    import Status._
+    import shogi.Status._
     status match {
       case Aborted | NoStart     => "中断".some
       case Timeout | Outoftime   => "切れ負け".some
@@ -238,15 +244,18 @@ object Kif {
     Tag.SenteTeam,
     Tag.Gote,
     Tag.GoteTeam,
-    Tag.Opening
+    Tag.Opening,
   )
 
   private def getHandicapName(sfen: Sfen, variant: Variant): Option[String] =
-    Handicap.allByVariant.get(variant).flatMap(_.find(_.sfen.truncate == sfen.truncate).map(t => t.japanese))
+    Handicap.allByVariant
+      .get(variant)
+      .flatMap(_.find(_.sfen.truncate == sfen.truncate).map(t => t.japanese))
 
   private def clockString(cur: NotationStep): Option[String] =
     cur.secondsSpent.map(spent =>
-      s"${offset}(${formatKifSpent(spent)}/${cur.secondsTotal.fold("")(total => formatKifTotal(total))})"
+      s"${offset}(${formatKifSpent(spent)}/${cur.secondsTotal
+          .fold("")(total => formatKifTotal(total))})",
     )
 
   private val offset = "   "
@@ -261,12 +270,12 @@ object Kif {
 
   private def formatKifSpent(t: Int) =
     ms.print(
-      org.joda.time.Duration.standardSeconds(t).toPeriod
+      org.joda.time.Duration.standardSeconds(t).toPeriod,
     )
 
   private def formatKifTotal(t: Int) =
     hms.print(
-      org.joda.time.Duration.standardSeconds(t).toPeriod
+      org.joda.time.Duration.standardSeconds(t).toPeriod,
     )
 
   private[this] val ms = new org.joda.time.format.PeriodFormatterBuilder().printZeroAlways

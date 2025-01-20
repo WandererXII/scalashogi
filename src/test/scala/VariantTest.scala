@@ -1,7 +1,7 @@
 package shogi
 
-import Pos._
-import variant._
+import shogi.Pos._
+import shogi.variant._
 
 class VariantTest extends ShogiTest {
 
@@ -48,7 +48,7 @@ class VariantTest extends ShogiTest {
         SQ4A -> (Gote - Gold),
         SQ3A -> (Gote - Silver),
         SQ2A -> (Gote - Knight),
-        SQ1A -> (Gote - Lance)
+        SQ1A -> (Gote - Lance),
       )
     }
   }

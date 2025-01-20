@@ -1,6 +1,6 @@
 package shogi
 
-import format.usi.Usi
+import shogi.format.usi.Usi
 
 object Perft {
 

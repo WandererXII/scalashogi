@@ -10,13 +10,13 @@ final case class Hands(sente: Hand, gote: Hand) {
       },
       gote.take(role, cnt) map { nh =>
         copy(gote = nh)
-      }
+      },
     )
 
   def store(color: Color, role: DroppableRole, cnt: Int = 1) =
     color.fold(
       copy(sente = sente.store(role, cnt)),
-      copy(gote = gote.store(role, cnt))
+      copy(gote = gote.store(role, cnt)),
     )
 
   def rolesOf: Color.Map[List[DroppableRole]] =
@@ -55,7 +55,10 @@ final case class Hand(handMap: HandMap) extends AnyVal {
     handMap.getOrElse(role, 0)
 
   def take(role: DroppableRole, cnt: Int = 1) =
-    handMap.get(role).filter(_ - cnt >= 0).map(cur => copy(handMap = handMap + (role -> (cur - cnt))))
+    handMap
+      .get(role)
+      .filter(_ - cnt >= 0)
+      .map(cur => copy(handMap = handMap + (role -> (cur - cnt))))
 
   def store(role: DroppableRole, cnt: Int = 1) =
     copy(handMap = handMap + (role -> (apply(role) + cnt)))

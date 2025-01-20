@@ -27,7 +27,7 @@ object UsiCharPair {
       case Usi.Drop(role, pos) =>
         UsiCharPair(
           posToChar(pos, variant),
-          roleToChar(role, variant)
+          roleToChar(role, variant),
         )
     }
 

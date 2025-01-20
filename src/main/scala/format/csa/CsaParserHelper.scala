@@ -3,7 +3,8 @@ package format
 package csa
 
 import cats.data.Validated
-import cats.data.Validated.{ invalid, valid }
+import cats.data.Validated.invalid
+import cats.data.Validated.valid
 import cats.implicits._
 
 import shogi.variant.Standard
@@ -24,10 +25,12 @@ object CsaParserHelper {
       }(h => parseHandicap(h))
       for {
         pieces <- initPieces
-        board     = Board(pieces)
-        color     = Color.fromSente(!lines.contains("-"))
-        additions = lines.filter(l => l.startsWith("P") && l.lift(1).exists(List[Char]('+', '-') contains _))
-        sit       = Situation(board, Hands.empty, color, Standard)
+        board = Board(pieces)
+        color = Color.fromSente(!lines.contains("-"))
+        additions = lines.filter(l =>
+          l.startsWith("P") && l.lift(1).exists(List[Char]('+', '-') contains _),
+        )
+        sit = Situation(board, Hands.empty, color, Standard)
         sit2 <- parseAdditions(additions, sit)
       } yield sit2
     }
@@ -45,7 +48,9 @@ object CsaParserHelper {
         _ <-
           if (pieces contains pos) valid(pos)
           else invalid(s"No piece to remove from $posStr in handicap setup")
-        role <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role in handicap setup: $roleStr"
+        role <- CsaUtils.toRole(
+          roleStr,
+        ) toValid s"Non existent piece role in handicap setup: $roleStr"
         _ <-
           if (pieces.get(pos).exists(_.role == role)) valid(role)
           else invalid(s"$role not present on $posStr in handicap setup")
@@ -63,17 +68,18 @@ object CsaParserHelper {
       for {
         pos <- Pos.at(
           8 - i % 9,
-          i / 9
+          i / 9,
         ) toValid s"Invalid board setup - too many squares"
         piece <- CsaUtils.toPiece(sq) toValid s"Non existent piece (${sq}) in board setup"
       } yield pieces + (pos -> piece)
 
     val squares = ranks.flatMap(_.drop(2).grouped(3)).zipWithIndex
-    if (ranks.size != 9) invalid("Incorrect number of board ranks in board setup: %d/9".format(ranks.size))
+    if (ranks.size != 9)
+      invalid("Incorrect number of board ranks in board setup: %d/9".format(ranks.size))
     else if (squares.size != 81)
       invalid(
         "Incorrect number of squares in board setup: %d/81 (%s)"
-          .format(squares.size, ranks.withFilter(_.size > (2 + 9 * 3)).map(_.take(2)).mkString(","))
+          .format(squares.size, ranks.withFilter(_.size > (2 + 9 * 3)).map(_.take(2)).mkString(",")),
       )
     else {
       squares.foldLeft[Validated[String, PieceMap]](valid(Map.empty)) { case (acc, cur) =>
@@ -87,13 +93,13 @@ object CsaParserHelper {
 
   private def parseAdditions(
       additions: List[String],
-      sit: Situation
+      sit: Situation,
   ): Validated[String, Situation] = {
     def parseSingleLine(line: String, sit: Situation): Validated[String, Situation] = {
       def parseHandAddition(
           str: String,
           color: Color,
-          sit: Situation
+          sit: Situation,
       ): Validated[String, Situation] = {
         if (str == "00AL") {
           val hands        = sit.hands
@@ -101,12 +107,13 @@ object CsaParserHelper {
           val initialRoles = Standard.pieces.values.toList
           val curBoard     = sit.board.pieces.values.toList
           val newHand = Standard.handRoles.foldLeft(Hand.empty) { case (acc, cur) =>
-            val n = initialRoles.count(_.role == cur) - otherHand(cur) - curBoard.count(_.role == cur)
+            val n =
+              initialRoles.count(_.role == cur) - otherHand(cur) - curBoard.count(_.role == cur)
             acc.store(cur, math.max(n, 0))
           }
           val newHands = color.fold(
             hands.copy(sente = newHand),
-            hands.copy(gote = newHand)
+            hands.copy(gote = newHand),
           )
           valid(sit.withHands(newHands))
         } else
@@ -115,11 +122,19 @@ object CsaParserHelper {
               if (str.sizeIs == 4) valid(str)
               else invalid(s"Incorrect format (${str}) in: $line")
             roleStr = str.slice(2, 4)
-            roleBase <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
-            role     <- Standard.handRoles.find(_ == roleBase) toValid s"Can't have $roleBase in hand: $line"
+            roleBase <- CsaUtils.toRole(
+              roleStr,
+            ) toValid s"Non existent piece role (${roleStr}) in: $line"
+            role <- Standard.handRoles.find(
+              _ == roleBase,
+            ) toValid s"Can't have $roleBase in hand: $line"
           } yield sit.withHands(sit.hands.store(color, role))
       }
-      def parseBoardAddition(str: String, color: Color, sit: Situation): Validated[String, Situation] = {
+      def parseBoardAddition(
+          str: String,
+          color: Color,
+          sit: Situation,
+      ): Validated[String, Situation] = {
         for {
           _ <-
             if (str.sizeIs == 4) valid(str)
@@ -131,19 +146,20 @@ object CsaParserHelper {
           boardWithPiece <- sit.board
             .place(
               Piece(color, role),
-              pos
+              pos,
             ) toValid s"Cannot place $role on $posStr - already occupied - in: $line"
         } yield sit.withBoard(boardWithPiece)
       }
 
       val color = Color.fromSente(line.lift(1).contains('+'))
-      line.drop(2).grouped(4).foldLeft[Validated[String, Situation]](valid(sit)) { case (acc, cur) =>
-        acc andThen { s =>
-          if (cur startsWith "00")
-            parseHandAddition(cur, color, s)
-          else
-            parseBoardAddition(cur, color, s)
-        }
+      line.drop(2).grouped(4).foldLeft[Validated[String, Situation]](valid(sit)) {
+        case (acc, cur) =>
+          acc andThen { s =>
+            if (cur startsWith "00")
+              parseHandAddition(cur, color, s)
+            else
+              parseBoardAddition(cur, color, s)
+          }
       }
     }
 

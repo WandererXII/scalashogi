@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class StagTest extends ShogiTest {
 
@@ -28,7 +28,7 @@ class StagTest extends ShogiTest {
         SQ7F,
         SQ5F,
         SQ7G,
-        SQ5G
+        SQ5G,
       )
       pieceMoves(stagGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ6A,
@@ -47,7 +47,7 @@ class StagTest extends ShogiTest {
         SQ7F,
         SQ5F,
         SQ7G,
-        SQ5G
+        SQ5G,
       )
     }
 

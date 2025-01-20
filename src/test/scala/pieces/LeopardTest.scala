@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class LeopardTest extends ShogiTest {
 
@@ -17,7 +17,7 @@ class LeopardTest extends ShogiTest {
         SQ5E,
         SQ7G,
         SQ6G,
-        SQ5G
+        SQ5G,
       )
       pieceMoves(leopardGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ7E,
@@ -25,7 +25,7 @@ class LeopardTest extends ShogiTest {
         SQ5E,
         SQ7G,
         SQ6G,
-        SQ5G
+        SQ5G,
       )
     }
 

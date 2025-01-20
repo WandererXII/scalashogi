@@ -1,8 +1,8 @@
 package shogi
 package format
 
-import shogi.format.usi.Usi
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 
 trait Notation {
 
@@ -53,5 +53,5 @@ final case class NotationStep(
     // time left for the user who made the move/drop, after he made it
     secondsSpent: Option[Int] = None,
     // total time spent playing so far
-    secondsTotal: Option[Int] = None
+    secondsTotal: Option[Int] = None,
 )

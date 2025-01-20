@@ -38,7 +38,9 @@ final case class Sfen(value: String) extends AnyVal {
 
   def toHistory(variant: Variant): History =
     if (variant == shogi.variant.Chushogi)
-      handsString.map(s => History.empty withLastLionCapture Pos.fromKey(s)).getOrElse(History.empty)
+      handsString
+        .map(s => History.empty withLastLionCapture Pos.fromKey(s))
+        .getOrElse(History.empty)
     else History.empty
 
   def boardString: Option[String] =
@@ -82,7 +84,7 @@ object Sfen {
       boardToString(sit.board, sit.variant),
       sit.color.letter.toString,
       if (sit.variant == shogi.variant.Chushogi) lastLionCaptureDestToString(sit.history)
-      else handsToString(sit.hands, sit.variant)
+      else handsToString(sit.hands, sit.variant),
     ) mkString " "
 
   def boardToString(board: Board, variant: Variant): String = {
@@ -122,7 +124,7 @@ object Sfen {
   def handsToString(hands: Hands, variant: Variant): String =
     List[String](
       handToString(hands.sente, variant).toUpperCase,
-      handToString(hands.gote, variant)
+      handToString(hands.gote, variant),
     ).mkString("").some.filterNot(_.isEmpty) | "-"
 
   private def makePieceMapFromString(boardStr: String, variant: Variant): Option[PieceMap] = {
@@ -132,14 +134,15 @@ object Sfen {
         pieces: List[(Pos, Piece)],
         chars: List[Char],
         x: Int,
-        y: Int
+        y: Int,
     ): Option[List[(Pos, Piece)]] =
       chars match {
         case Nil => Some(pieces)
         case '/' :: rest if y < variant.numberOfRanks =>
           piecesListRec(pieces, rest, variant.numberOfFiles - 1, y + 1)
-        case '1' :: c :: rest if c.isDigit && x >= 0 => piecesListRec(pieces, rest, x - (10 + c.asDigit), y)
-        case c :: rest if c.isDigit && x >= 0        => piecesListRec(pieces, rest, x - c.asDigit, y)
+        case '1' :: c :: rest if c.isDigit && x >= 0 =>
+          piecesListRec(pieces, rest, x - (10 + c.asDigit), y)
+        case c :: rest if c.isDigit && x >= 0 => piecesListRec(pieces, rest, x - c.asDigit, y)
         case '+' :: c :: rest =>
           (for {
             pos   <- Pos.at(x, y)

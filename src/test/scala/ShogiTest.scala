@@ -6,11 +6,10 @@ import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
 
-//import scala.annotation.nowarn
-
-import format.forsyth.{ Sfen, Visual }
-import format.usi.Usi
-import variant._
+import shogi.format.forsyth.Sfen
+import shogi.format.forsyth.Visual
+import shogi.format.usi.Usi
+import shogi.variant._
 
 trait ShogiTest extends Specification with ValidatedMatchers {
 
@@ -48,21 +47,22 @@ trait ShogiTest extends Specification with ValidatedMatchers {
     def as(color: Color): Game = game.withColor(color)
 
     def playUsisStr(usisStr: Seq[String]): Validated[String, Game] = {
-      val vg = usisStr.foldLeft[Validated[String, Game]](Validated.valid(game)) { case (vg, usiStr) =>
-        vg.foreach { g =>
-          val _ = g.situation.moveDestinations
-          val _ = g.situation.dropDestinations
-        }
-        val ng = vg flatMap { g =>
-          g(Usi(usiStr).get)
-        }
-        ng
+      val vg = usisStr.foldLeft[Validated[String, Game]](Validated.valid(game)) {
+        case (vg, usiStr) =>
+          vg.foreach { g =>
+            val _ = g.situation.moveDestinations
+            val _ = g.situation.dropDestinations
+          }
+          val ng = vg flatMap { g =>
+            g(Usi(usiStr).get)
+          }
+          ng
       }
       vg
     }
 
     def playUsiStr(
-        usiStr: String
+        usiStr: String,
     ): Validated[String, Game] =
       game.apply(Usi(usiStr).get)
 
@@ -74,7 +74,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
   def sfenToGame(sfen: Sfen, variant: Variant) =
     sfen.toSituation(variant) toValid "Could not construct situation from SFEN" map { sit =>
       Game(variant).copy(
-        situation = sit
+        situation = sit,
       )
     }
 
@@ -108,7 +108,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
   def pieceMoves(
       piece: Piece,
       pos: Pos,
-      variant: Variant
+      variant: Variant,
   ): Option[List[Pos]] = {
     val sit = makeEmptySituation(variant)
     sit.withBoard(sit.board.place(piece, pos).get).moveActorAt(pos) map (_.destinations)

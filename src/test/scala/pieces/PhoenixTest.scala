@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class PhoenixTest extends ShogiTest {
 
@@ -19,7 +19,7 @@ class PhoenixTest extends ShogiTest {
         SQ5F,
         SQ6G,
         SQ8H,
-        SQ4H
+        SQ4H,
       )
       pieceMoves(phoenixGote, SQ6F, shogi.variant.Chushogi) must bePoss(
         SQ8D,
@@ -29,7 +29,7 @@ class PhoenixTest extends ShogiTest {
         SQ5F,
         SQ6G,
         SQ8H,
-        SQ4H
+        SQ4H,
       )
     }
 

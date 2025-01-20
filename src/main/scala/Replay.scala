@@ -1,11 +1,15 @@
 package shogi
 
-import cats.data.Validated
-import cats.data.Validated.{ invalid, valid, Invalid, Valid }
 import cats.data.NonEmptyList
+import cats.data.Validated
+import cats.data.Validated.Invalid
+import cats.data.Validated.Valid
+import cats.data.Validated.invalid
+import cats.data.Validated.valid
 import cats.implicits._
 
-import shogi.format.{ Reader, Tags }
+import shogi.format.Reader
+import shogi.format.Tags
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
@@ -20,32 +24,33 @@ object Replay {
   def apply(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
-      variant: shogi.variant.Variant
+      variant: shogi.variant.Variant,
   ): Reader.Result =
     Reader.fromUsi(
       usis,
       initialSfen,
       variant,
-      Tags.empty
+      Tags.empty,
     )
 
   def replay(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
-      variant: shogi.variant.Variant
+      variant: shogi.variant.Variant,
   ): Validated[String, Replay] =
-    usis.foldLeft[Validated[String, Replay]](valid(Replay(Game(initialSfen, variant)))) { case (acc, usi) =>
-      acc andThen { replay =>
-        replay.state(usi) andThen { game =>
-          valid(replay(game))
+    usis.foldLeft[Validated[String, Replay]](valid(Replay(Game(initialSfen, variant)))) {
+      case (acc, usi) =>
+        acc andThen { replay =>
+          replay.state(usi) andThen { game =>
+            valid(replay(game))
+          }
         }
-      }
     }
 
   def gamesWhileValid(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
-      variant: shogi.variant.Variant
+      variant: shogi.variant.Variant,
   ): (NonEmptyList[Game], Option[String]) = {
 
     @scala.annotation.tailrec
@@ -67,7 +72,7 @@ object Replay {
   def situations(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
-      variant: shogi.variant.Variant
+      variant: shogi.variant.Variant,
   ): Validated[String, NonEmptyList[Situation]] = {
     val init = initialSfenToSituation(initialSfen, variant)
     usis.foldLeft[Validated[String, NonEmptyList[Situation]]](valid(NonEmptyList.one(init))) {
@@ -84,7 +89,7 @@ object Replay {
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
       variant: shogi.variant.Variant,
-      atSfen: Sfen
+      atSfen: Sfen,
   ): Validated[String, Int] =
     if (atSfen.toSituation(variant).isEmpty) invalid(s"Invalid Sfen $atSfen")
     else {
@@ -110,11 +115,15 @@ object Replay {
   def usiWithRoleWhilePossible(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
-      variant: shogi.variant.Variant
+      variant: shogi.variant.Variant,
   ): List[Usi.WithRole] = {
 
     @scala.annotation.tailrec
-    def mk(roleMap: Map[Pos, Role], usis: List[Usi], roles: List[Usi.WithRole]): List[Usi.WithRole] =
+    def mk(
+        roleMap: Map[Pos, Role],
+        usis: List[Usi],
+        roles: List[Usi.WithRole],
+    ): List[Usi.WithRole] =
       usis match {
         case Nil => roles
         case usi :: rest =>
@@ -124,7 +133,11 @@ object Replay {
                 case Some(role) => {
                   val maybePromoted = variant.promote(role).filter(_ => prom) | role
                   val toRemove      = List[Option[Pos]](Some(orig), midStep).flatten
-                  mk(roleMap -- toRemove + (dest -> maybePromoted), rest, Usi.WithRole(usi, role) :: roles)
+                  mk(
+                    roleMap -- toRemove + (dest -> maybePromoted),
+                    rest,
+                    Usi.WithRole(usi, role) :: roles,
+                  )
                 }
                 case None => roles
               }
@@ -137,7 +150,10 @@ object Replay {
     mk(init.board.pieces.map { case (k, v) => k -> v.role }, usis.toList, Nil).reverse
   }
 
-  private def initialSfenToSituation(initialSfen: Option[Sfen], variant: shogi.variant.Variant): Situation =
+  private def initialSfenToSituation(
+      initialSfen: Option[Sfen],
+      variant: shogi.variant.Variant,
+  ): Situation =
     initialSfen.flatMap(_.toSituation(variant)) | Situation(variant)
 
 }

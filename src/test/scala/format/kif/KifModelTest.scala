@@ -2,10 +2,10 @@ package shogi
 package format
 package kif
 
-import forsyth.Sfen
-import variant._
-import Kif._
-import usi._
+import shogi.format.forsyth.Sfen
+import shogi.format.kif.Kif._
+import shogi.format.usi._
+import shogi.variant._
 
 class KifModelTest extends ShogiTest {
   "render steps" in {
@@ -16,7 +16,7 @@ class KifModelTest extends ShogiTest {
 
   "render kif situation - board, hands, turn, from random sfen" in {
     renderSituation(
-      Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p").toSituation(Standard).get
+      Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p").toSituation(Standard).get,
     ) must_== """後手の持駒：飛二　角二　金二　銀　桂　香三　歩十五
   ９ ８ ７ ６ ５ ４ ３ ２ １
 +---------------------------+
@@ -37,13 +37,13 @@ class KifModelTest extends ShogiTest {
   "render kif situation - default minishogi" in {
     renderSetup(
       Some(Sfen("rbsgk/4p/5/P4/KGSBR b - 1")),
-      Minishogi
+      Minishogi,
     ) must_== """手合割：5五将棋"""
   }
 
   "render kif situation - minishogi" in {
     renderSituation(
-      Sfen("rbsgk/4p/P4/5/KGSBR w - 2").toSituation(Minishogi).get
+      Sfen("rbsgk/4p/P4/5/KGSBR w - 2").toSituation(Minishogi).get,
     ) must_== """手合割：5五将棋
 後手の持駒：なし
   ５ ４ ３ ２ １
@@ -63,12 +63,12 @@ class KifModelTest extends ShogiTest {
     val steps = List(
       NotationStep(1, Usi.WithRole(Usi("7h7g").get, Gold)),
       NotationStep(2, Usi.WithRole(Usi("P*6d").get, Pawn)),
-      NotationStep(3, Usi.WithRole(Usi("4i2h").get, Horse))
+      NotationStep(3, Usi.WithRole(Usi("4i2h").get, Horse)),
     )
     Kif(
       steps,
       None,
-      Standard
+      Standard,
     ).render must_== """手合割：平手
 先手：
 後手：
@@ -83,12 +83,12 @@ class KifModelTest extends ShogiTest {
     val steps = List(
       NotationStep(1, Usi.WithRole(Usi("7h7g").get, Gold)),
       NotationStep(2, Usi.WithRole(Usi("4i2h").get, Pawn)),
-      NotationStep(3, Usi.WithRole(Usi("5i2h1a").get, Horse))
+      NotationStep(3, Usi.WithRole(Usi("5i2h1a").get, Horse)),
     )
     Kif(
       steps,
       None,
-      Chushogi
+      Chushogi,
     ).render must_== """先手：
 後手：
 手数----指手---------消費時間--
@@ -101,7 +101,7 @@ class KifModelTest extends ShogiTest {
     renderSituation(
       Sfen("12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b - 1")
         .toSituation(Chushogi)
-        .get
+        .get,
     ) must_== """ １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １
 +------------------------------------------------+
 |  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・|一
@@ -126,9 +126,9 @@ class KifModelTest extends ShogiTest {
       Annanshogi,
       Tags(
         List(
-          Tag(_.Sente, "A")
-        )
-      )
+          Tag(_.Sente, "A"),
+        ),
+      ),
     ) must_== """手合割：安南将棋
 先手：A
 後手："""
@@ -140,9 +140,9 @@ class KifModelTest extends ShogiTest {
       Annanshogi,
       Tags(
         List(
-          Tag(_.Sente, "A")
-        )
-      )
+          Tag(_.Sente, "A"),
+        ),
+      ),
     ) must_== """手合割：安南将棋
 上手の持駒：なし
   ９ ８ ７ ６ ５ ４ ３ ２ １
@@ -169,9 +169,9 @@ class KifModelTest extends ShogiTest {
       Annanshogi,
       Tags(
         List(
-          Tag(_.Sente, "A")
-        )
-      )
+          Tag(_.Sente, "A"),
+        ),
+      ),
     ) must_== """手合割：安南将棋
 後手の持駒：金四　銀二　香三　歩十三
   ９ ８ ７ ６ ５ ４ ３ ２ １
@@ -200,12 +200,12 @@ class KifModelTest extends ShogiTest {
       NotationStep(5, Usi.WithRole(Usi("3e4d").get, King)),
       NotationStep(6, Usi.WithRole(Usi("R*2b").get, Rook)),
       NotationStep(7, Usi.WithRole(Usi("3d2b+").get, Knight)),
-      NotationStep(8, Usi.WithRole(Usi("P*4c").get, Pawn))
+      NotationStep(8, Usi.WithRole(Usi("P*4c").get, Pawn)),
     )
     Kif(
       steps,
       None,
-      Kyotoshogi
+      Kyotoshogi,
     ).render must_== """手合割：京都将棋
 先手：
 後手：
@@ -224,7 +224,7 @@ class KifModelTest extends ShogiTest {
     Kif(
       Nil,
       Some(Sfen("1gks1/5/5/5/TSKGP w - ")),
-      Kyotoshogi
+      Kyotoshogi,
     ).render must_== """手合割：京都将棋
 上手の持駒：なし
   ５ ４ ３ ２ １

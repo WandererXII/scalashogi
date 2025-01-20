@@ -1,7 +1,8 @@
 package shogi
 package format.usi
 
-import shogi.variant.{ Chushogi, Variant }
+import shogi.variant.Chushogi
+import shogi.variant.Variant
 
 // Assumes usis are valid - no positions outside of variant board size or promotions not touching the promotion zone
 object Binary {
@@ -39,7 +40,7 @@ object Binary {
           pos(right(i1, 7), variant.numberOfFiles),
           pos(right(i2, 7), variant.numberOfFiles),
           bitAt(i2, 7),
-          None
+          None,
         )
 
       private def decodeDrop(i1: Int, i2: Int, variant: Variant): Usi =
@@ -71,7 +72,7 @@ object Binary {
           orig,
           posDirection(midStep, right(i2, 3)),
           false,
-          Some(midStep)
+          Some(midStep),
         )
       }
 
@@ -82,7 +83,7 @@ object Binary {
           origDest,
           origDest,
           false,
-          Some(posDirection(origDest, normalizeDirection(i2)))
+          Some(posDirection(origDest, normalizeDirection(i2))),
         )
       }
 
@@ -91,12 +92,12 @@ object Binary {
           pos(normalizePromotionPos(i1), 12),
           pos(normalizePromotionPos(i2), 12),
           isPromotion(i1, i2),
-          None
+          None,
         )
 
       private def posDirection(pos: Pos, dir: Int): Pos =
         Encoding.directions(dir % 8)(pos) getOrElse !!(
-          s"Invalid direction (pos: $pos, dir: ${showByte(dir)})"
+          s"Invalid direction (pos: $pos, dir: ${showByte(dir)})",
         )
 
       //   0..143 - base board
@@ -116,7 +117,7 @@ object Binary {
 
     private def pos(i: Int, files: Int): Pos =
       Pos.at(i % files, i / files) getOrElse !!(
-        s"Invalid position (files: $files, byte: ${showByte(i)})"
+        s"Invalid position (files: $files, byte: ${showByte(i)})",
       )
 
     // right x bits
@@ -147,13 +148,13 @@ object Binary {
       private def encodeMove(orig: Pos, dest: Pos, prom: Boolean, variant: Variant): Seq[Byte] =
         Seq(
           posInt(orig, variant.numberOfFiles),
-          (if (prom) 1 << 7 else 0) | posInt(dest, variant.numberOfFiles)
+          (if (prom) 1 << 7 else 0) | posInt(dest, variant.numberOfFiles),
         ).map(_.toByte)
 
       private def encodeDrop(role: DroppableRole, pos: Pos, variant: Variant): Seq[Byte] =
         Seq(
           (1 << 7) | Encoding.roleToInt(role),
-          posInt(pos, variant.numberOfFiles)
+          posInt(pos, variant.numberOfFiles),
         ).map(_.toByte)
     }
 
@@ -173,7 +174,7 @@ object Binary {
         if (prom)
           Seq(
             if (promotionRanks contains orig.rank) promotionZoneInt(orig) else posInt(orig, files),
-            if (promotionRanks contains dest.rank) promotionZoneInt(dest) else posInt(dest, files)
+            if (promotionRanks contains dest.rank) promotionZoneInt(dest) else posInt(dest, files),
           ).map(_.toByte)
         else Seq(posInt(orig, files), posInt(dest, files)).map(_.toByte)
 
@@ -184,7 +185,7 @@ object Binary {
           Seq(
             255,
             posInt(orig, files),
-            (encodeDirection(orig, midStep) << 3) | (encodeDirection(midStep, dest))
+            (encodeDirection(orig, midStep) << 3) | (encodeDirection(midStep, dest)),
           ).map(_.toByte)
 
       private def promotionZoneInt(pos: Pos): Int = {
@@ -209,7 +210,7 @@ object Binary {
       Silver -> 4,
       Gold   -> 5,
       Bishop -> 6,
-      Rook   -> 7
+      Rook   -> 7,
     )
     val intToRole: Map[Int, DroppableRole] = roleToInt map { case (k, v) => v -> k }
     val directions: Directions =

@@ -2,8 +2,8 @@ package shogi
 package format
 package kif
 
-import forsyth.Sfen
-import KifParserHelper._
+import shogi.format.forsyth.Sfen
+import shogi.format.kif.KifParserHelper._
 
 class KifParserHelperTest extends ShogiTest {
 
@@ -13,8 +13,16 @@ class KifParserHelperTest extends ShogiTest {
     }
 
   "Handicap" in {
-    parseAndCompare("", Some("平手"), Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b -"))
-    parseAndCompare("", Some("二枚落ち"), Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w -"))
+    parseAndCompare(
+      "",
+      Some("平手"),
+      Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b -"),
+    )
+    parseAndCompare(
+      "",
+      Some("二枚落ち"),
+      Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w -"),
+    )
   }
 
   "Board" in {
@@ -37,7 +45,7 @@ class KifParserHelperTest extends ShogiTest {
       先手：先手
       先手の持駒：なし""",
       None,
-      Sfen("3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p")
+      Sfen("3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p"),
     )
   }
 
@@ -59,7 +67,7 @@ class KifParserHelperTest extends ShogiTest {
 |  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・|十二
 +------------------------------------------------+""",
       None,
-      Sfen("12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b -")
+      Sfen("12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b -"),
     )
   }
 

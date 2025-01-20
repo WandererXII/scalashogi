@@ -32,5 +32,18 @@ object File {
   val Twelfth  = new File(11)
 
   val all =
-    List[File](First, Second, Third, Forth, Fifth, Sixth, Seventh, Eighth, Ninth, Tenth, Eleventh, Twelfth)
+    List[File](
+      First,
+      Second,
+      Third,
+      Forth,
+      Fifth,
+      Sixth,
+      Seventh,
+      Eighth,
+      Ninth,
+      Tenth,
+      Eleventh,
+      Twelfth,
+    )
 }

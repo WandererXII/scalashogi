@@ -3,8 +3,8 @@ package shogi
 import cats.data.Validated
 import cats.implicits._
 
-import shogi.format.forsyth.Sfen
 import shogi.format.ParsedStep
+import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 import shogi.variant.Variant
 
@@ -13,7 +13,7 @@ final case class Situation(
     hands: Hands,
     color: Color,
     history: History,
-    variant: Variant
+    variant: Variant,
 ) {
 
   def apply(usi: Usi): Validated[String, Situation] =
@@ -108,7 +108,7 @@ final case class Situation(
     Some(checkSquares)
       .filter(_.size == 1)
       .fold(
-        variant.allPositions.filterNot(board.pieces contains _)
+        variant.allPositions.filterNot(board.pieces contains _),
       ) { royals =>
         DropActor.blockades(this, royals.head)
       }
@@ -170,7 +170,8 @@ final case class Situation(
 
   def toSfen: Sfen = Sfen(this)
 
-  override def toString = s"${variant.name}\n$visual\nLast USI: ${history.lastUsi.fold("-")(_.usi)}\n"
+  override def toString =
+    s"${variant.name}\n$visual\nLast USI: ${history.lastUsi.fold("-")(_.usi)}\n"
 }
 
 object Situation {
@@ -181,7 +182,7 @@ object Situation {
       Hands(variant),
       Sente,
       History.empty,
-      variant
+      variant,
     )
 
   def apply(board: Board, hands: Hands, color: Color, variant: Variant): Situation =

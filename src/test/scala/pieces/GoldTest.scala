@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import Pos._
+import shogi.Pos._
 
 class GoldTest extends ShogiTest {
 
@@ -12,7 +12,14 @@ class GoldTest extends ShogiTest {
 
     "move in 6 directions" in {
       pieceMoves(gold, SQ5E, shogi.variant.Standard) must bePoss(SQ5D, SQ4D, SQ4E, SQ5F, SQ6E, SQ6D)
-      pieceMoves(goldGote, SQ5E, shogi.variant.Standard) must bePoss(SQ5F, SQ4F, SQ4E, SQ5D, SQ6E, SQ6F)
+      pieceMoves(goldGote, SQ5E, shogi.variant.Standard) must bePoss(
+        SQ5F,
+        SQ4F,
+        SQ4E,
+        SQ5D,
+        SQ6E,
+        SQ6F,
+      )
     }
 
     "move in 2 directions, when at the edges" in {
@@ -47,7 +54,7 @@ P P P P P P P . P
 . . . . K . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
 
@@ -79,7 +86,7 @@ P P P P P P P . P
 . . . . K . . . .
 Hands:
 Turn:Sente
-"""
+""",
       )
     }
     "threaten" in {

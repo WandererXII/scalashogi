@@ -1,7 +1,9 @@
 package shogi
 
-import variant.{ Kyotoshogi, Minishogi, Standard }
-import format.forsyth.Sfen
+import shogi.format.forsyth.Sfen
+import shogi.variant.Kyotoshogi
+import shogi.variant.Minishogi
+import shogi.variant.Standard
 
 class RepetitionTest extends ShogiTest {
 
@@ -20,7 +22,7 @@ class RepetitionTest extends ShogiTest {
         "2h3h",
         "8b7b",
         "3h2h",
-        "7b8b"
+        "7b8b",
       )
       "should be fourfold" in {
         game.playUsisStr(usis) must beValid.like { case g =>
@@ -40,7 +42,8 @@ class RepetitionTest extends ShogiTest {
       }
     }
     "minishogi repetition" in {
-      val game = makeGame(Minishogi).withHistory(History.empty.withInitialSfen(Minishogi.initialSfen))
+      val game =
+        makeGame(Minishogi).withHistory(History.empty.withInitialSfen(Minishogi.initialSfen))
       val usis = List(
         "4e4d",
         "2a2b",
@@ -53,7 +56,7 @@ class RepetitionTest extends ShogiTest {
         "4e4d",
         "2a2b",
         "4d4e",
-        "2b2a"
+        "2b2a",
       )
       "should be fourfold" in {
         game.playUsisStr(usis) must beValid.like { case g =>
@@ -63,7 +66,8 @@ class RepetitionTest extends ShogiTest {
           g.situation.winner must_== Some(Gote)
           val gNoInitialSfen = g.withHistory(g.history.copy(initialSfen = None))
           gNoInitialSfen.situation.winner must_== Some(Gote)
-          val gOppositeColorSfen = g.withHistory(g.history.withInitialSfen(Sfen("rbsgk/4p/5/P4/KGSBR w - 1")))
+          val gOppositeColorSfen =
+            g.withHistory(g.history.withInitialSfen(Sfen("rbsgk/4p/5/P4/KGSBR w - 1")))
           gOppositeColorSfen.situation.winner must_== Some(Sente)
         }
       }
@@ -86,7 +90,7 @@ class RepetitionTest extends ShogiTest {
         "4e3d+",
         "2a3b+",
         "3d4e+",
-        "3b2a+"
+        "3b2a+",
       )
       "should be threefold" in {
         game.playUsisStr(usis) must beValid.like { case g =>

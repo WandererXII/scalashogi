@@ -1,7 +1,7 @@
 package shogi
 package variant
 
-import format.forsyth.Sfen
+import shogi.format.forsyth.Sfen
 
 class MinishogiTest extends ShogiTest {
 

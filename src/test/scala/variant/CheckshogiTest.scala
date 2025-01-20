@@ -1,8 +1,8 @@
 package shogi
 package variant
 
-import format.forsyth.Sfen
-import format.usi.Usi
+import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 
 class CheckshogiTest extends ShogiTest {
 
@@ -73,7 +73,8 @@ class CheckshogiTest extends ShogiTest {
 
   "pawn drops" should {
     "not be allowed with checkmate" in {
-      val sit = Sfen("3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp").toSituation(shogi.variant.Checkshogi).get
+      val sit =
+        Sfen("3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp").toSituation(shogi.variant.Checkshogi).get
       sit.check must beFalse
       sit.end(false) must beFalse
       sit.winner must beNone
@@ -94,7 +95,8 @@ class CheckshogiTest extends ShogiTest {
       lanceCheck.winner must_== Some(Sente)
     }
     "be allowed with check only" in {
-      val sit = Sfen("3rk4/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1").toSituation(shogi.variant.Checkshogi).get
+      val sit =
+        Sfen("3rk4/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1").toSituation(shogi.variant.Checkshogi).get
       sit.check must beFalse
       sit.end(false) must beFalse
       sit.winner must beNone
