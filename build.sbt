@@ -12,10 +12,6 @@ libraryDependencies ++= List(
   "org.specs2"             %% "specs2-cats"              % "4.20.9" % Test,
 )
 
-resolvers ++= Seq(
-  "lila-maven" at "https://raw.githubusercontent.com/lichess-org/lila-maven/master"
-)
-
 scalacOptions ++= Seq(
   "-encoding",
   "utf-8",
