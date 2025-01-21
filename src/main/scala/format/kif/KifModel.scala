@@ -270,12 +270,12 @@ object Kif {
 
   private def formatKifSpent(t: Int) =
     ms.print(
-      org.joda.time.Duration.standardSeconds(t).toPeriod,
+      org.joda.time.Duration.standardSeconds(t.toLong).toPeriod,
     )
 
   private def formatKifTotal(t: Int) =
     hms.print(
-      org.joda.time.Duration.standardSeconds(t).toPeriod,
+      org.joda.time.Duration.standardSeconds(t.toLong).toPeriod,
     )
 
   private[this] val ms = new org.joda.time.format.PeriodFormatterBuilder().printZeroAlways

@@ -13,7 +13,7 @@ sealed trait Stats {
       s record n.toFloat(v)
     }
 
-  def stdDev = variance.map { math.sqrt(_).toFloat }
+  def stdDev = variance.map { v => math.sqrt(v.toDouble).toFloat }
 
   def total = samples * mean
 }

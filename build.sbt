@@ -6,10 +6,10 @@ ThisBuild / scalaVersion := "2.13.16"
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+  "org.typelevel"          %% "cats-core"                % "2.12.0",
+  "joda-time"               % "joda-time"                % "2.13.0",
   "org.specs2"             %% "specs2-core"              % "4.20.9" % Test,
   "org.specs2"             %% "specs2-cats"              % "4.20.9" % Test,
-  "joda-time"               % "joda-time"                % "2.13.0",
-  "org.typelevel"          %% "cats-core"                % "2.12.0"
 )
 
 resolvers ++= Seq(
@@ -44,7 +44,7 @@ scalacOptions ++= Seq(
   "-Xlint:type-parameter-shadow",
   "-Wdead-code",
   "-Wextra-implicit",
-  // "-Wnumeric-widen",
+  "-Wnumeric-widen",
   "-Wunused:imports",
   "-Wunused:locals",
   "-Wunused:patvars",
