@@ -23,7 +23,7 @@ final protected case class StatHolder(
     mean: Float,
     sn: Float,
 ) extends Stats {
-  def variance = (samples > 1) option sn / (samples - 1)
+  def variance = Option.when(samples > 1)(sn / (samples - 1))
 
   def record(value: Float) = {
     val newSamples = samples + 1

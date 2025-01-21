@@ -427,7 +427,7 @@ object KifParser {
             dest = dest,
             roles = roles,
             orig = firstLionOrig | orig,
-            midStep = if (firstLionOrig.isDefined) Some(orig) else None,
+            midStep = Option.when(firstLionOrig.isDefined)(orig),
             promotion = promS == "成" || promS == "+",
             metas = Metas(
               comments = Nil,

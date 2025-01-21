@@ -3,7 +3,6 @@ package shogi
 import scala.concurrent.duration._
 
 import cats.Monoid
-import ornicar.scalalib.Zero
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
 final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
@@ -24,7 +23,7 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def *(scalar: Int)     = Centis(scalar * centis)
   def *~(scalar: Float)  = Centis(scalar * centis)
   def *~(scalar: Double) = Centis(scalar * centis)
-  def /(div: Int)        = div != 0 option Centis(centis / div)
+  def /(div: Int)        = Option.when(div != 0)(Centis(centis / div))
   def unary_-            = Centis(-centis)
 
   def avg(other: Centis) = Centis((centis + other.centis) >> 1)
@@ -38,7 +37,6 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 }
 
 object Centis {
-  implicit final val zeroInstance: Zero[shogi.Centis] = Zero.instance(Centis(0))
   implicit val CentisMonoid: Monoid[shogi.Centis] = new Monoid[Centis] {
     def combine(c1: Centis, c2: Centis) = c1 + c2
     final val empty: shogi.Centis       = Centis(0)

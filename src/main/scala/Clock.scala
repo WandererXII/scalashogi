@@ -93,7 +93,7 @@ final case class Clock(
         }
       case Some(t) => {
         val elapsed = toNow(t)
-        val lag     = ~metrics.reportedLag(elapsed) nonNeg
+        val lag     = metrics.reportedLag(elapsed).orEmpty nonNeg
 
         val player              = players(color)
         val remaining           = player.remaining
@@ -117,7 +117,10 @@ final case class Clock(
           else
             updatePlayer(color) {
               _.takeTime(
-                stepTime - (clockActive ?? player.increment) - (player.byoyomi.isPositive ?? player.byoyomi * periodSpan),
+                stepTime - (if (clockActive) player.increment
+                            else Centis(0)) - (if (player.byoyomi.isPositive)
+                                                 player.byoyomi * periodSpan
+                                               else Centis(0)),
               )
                 .spendPeriods(periodSpan)
                 .copy(lag = lagTrack, lastTime = stepTime)
@@ -155,7 +158,7 @@ final case class Clock(
   def berserked(c: Color) = players(c).berserk
   def lag(c: Color)       = players(c).lag
 
-  def lagCompAvg = players map { ~_.lag.compAvg } reduce (_ avg _)
+  def lagCompAvg = players map { _.lag.compAvg.orEmpty } reduce (_ avg _)
 
   // Lowball estimate of next step's lag comp for UI butter.
   def lagCompEstimate(c: Color) = players(c).lag.compEstimate

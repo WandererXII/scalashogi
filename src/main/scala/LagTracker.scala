@@ -45,10 +45,10 @@ final case class LagTracker(
 
   def steps = lagStats.samples
 
-  def lagMean: Option[Centis] = steps > 0 option Centis(lagStats.mean)
+  def lagMean: Option[Centis] = Option.when(steps > 0)(Centis(lagStats.mean))
 
   def compEstStdErr: Option[Float] =
-    steps > 2 option math.sqrt(compEstSqErr).toFloat / (steps - 2)
+    Option.when(steps > 2)(math.sqrt(compEstSqErr).toFloat / (steps - 2))
 
   def compAvg: Option[Centis] = totalComp / steps
 
