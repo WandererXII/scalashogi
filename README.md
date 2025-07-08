@@ -1,5 +1,5 @@
-[![Continuous Integration](https://github.com/WandererXII/scalashogi/actions/workflows/ci.yml/badge.svg)](https://github.com/WandererXII/scalashogi/actions/workflows/ci.yml)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.WandererXII/scalashogi_2.13.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.WandererXII%22%20AND%20a:%22scalashogi_2.13%22)
+[![Build and test](https://github.com/WandererXII/scalashogi/actions/workflows/build.yml/badge.svg)](https://github.com/WandererXII/scalashogi/actions/workflows/build.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.wandererxii/scalashogi_2.13.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.wandererxii%22%20AND%20a:%22scalashogi_2.13%22)
 
 Shogi API forked from [scalachess](https://github.com/lichess-org/scalachess) and rewritten for shogi.
 Used on [lishogi.org](https://lishogi.org).

@@ -1,4 +1,4 @@
-ThisBuild / organization         := "io.github.WandererXII"
+ThisBuild / organization         := "io.github.wandererxii"
 ThisBuild / organizationName     := "WandererXII"
 ThisBuild / organizationHomepage := Some(url("https://lishogi.org"))
 
@@ -28,9 +28,9 @@ ThisBuild / homepage := Some(url("https://github.com/WandererXII/scalashogi"))
 ThisBuild / pomIncludeRepository := { _ => false }
 
 ThisBuild / publishTo := {
-  val nexus = "https://s01.oss.sonatype.org/"
-  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  val centralSnapshots = "https://central.sonatype.com/repository/maven-snapshots/"
+  if (isSnapshot.value) Some("central-snapshots" at centralSnapshots)
+  else localStaging.value
 }
 
 ThisBuild / publishMavenStyle := true
