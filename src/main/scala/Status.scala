@@ -33,6 +33,7 @@ object Status {
   case object BareKing          extends Status(43)
   case object Repetition        extends Status(44)
   case object SpecialVariantEnd extends Status(45)
+  case object IllegalMove       extends Status(46)
 
   val all = List[Status](
     Created,
@@ -55,6 +56,7 @@ object Status {
     BareKing,
     Repetition,
     SpecialVariantEnd,
+    IllegalMove,
   )
 
   val finishedNotCheated: List[Status] = all filter { s =>
