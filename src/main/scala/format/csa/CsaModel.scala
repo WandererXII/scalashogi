@@ -149,6 +149,7 @@ object Csa {
       case Mate | Stalemate   => "%TSUMI".some
       case Repetition         => "%SENNICHITE".some
       case Impasse27          => "%KACHI".some
+      case IllegalMove        => "%ILLEGAL_MOVE".some
       case _                  => None
     }
   }

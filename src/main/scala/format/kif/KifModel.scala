@@ -220,15 +220,17 @@ object Kif {
   def createTerminationStep(status: Status, winnerTurn: Boolean): Option[String] = {
     import shogi.Status._
     status match {
-      case Aborted | NoStart     => "中断".some
-      case Timeout | Outoftime   => "切れ負け".some
-      case Resign if !winnerTurn => "投了".some
-      case PerpetualCheck        => "反則勝ち".some
-      case Mate if winnerTurn    => "反則勝ち".some // pawn checkmate
-      case Mate | Stalemate      => "詰み".some
-      case Repetition            => "千日手".some
-      case Impasse27             => "入玉勝ち".some
-      case _                     => None
+      case Aborted | NoStart          => "中断".some
+      case Timeout | Outoftime        => "切れ負け".some
+      case Resign if !winnerTurn      => "投了".some
+      case PerpetualCheck             => "反則勝ち".some
+      case Mate if winnerTurn         => "反則勝ち".some // pawn checkmate
+      case Mate | Stalemate           => "詰み".some
+      case Repetition                 => "千日手".some
+      case Impasse27                  => "入玉勝ち".some
+      case IllegalMove if !winnerTurn => "反則勝ち".some
+      case IllegalMove                => "反則負け".some
+      case _                          => None
     }
   }
 
