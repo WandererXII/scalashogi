@@ -78,7 +78,7 @@ object Csa {
     csaHeaderTags
       .map { ct =>
         if (ct == Tag.Sente || ct == Tag.Gote) {
-          tags(ct.name).fold("")(tagValue =>
+          tags(ct.name).map(onlyAsciiTagValue).fold("")(tagValue =>
             if (isValidTagValue(tagValue))
               s"N${ct.csaName}${tagValue.replace(",", ";")}"
             else
@@ -95,8 +95,11 @@ object Csa {
       .mkString("\n")
 
   // we want only ascii tags
+  private def onlyAsciiTagValue(str: String): String =
+    str.filter(c => c >= 32 && c < 127)
+  
   private def isValidTagValue(str: String): Boolean =
-    str.nonEmpty && str != "?" && str.forall(c => c >= 32 && c < 127)
+    str.nonEmpty && str != "?"
 
   def renderSituation(sit: Situation): String = {
     val csaBoard = new scala.collection.mutable.StringBuilder(256)
