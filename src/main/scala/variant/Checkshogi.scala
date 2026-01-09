@@ -42,12 +42,17 @@ case object Checkshogi
   ): Boolean =
     false
 
+  override def checkmate(@unused sit: Situation): Boolean = false
+
   override def impasse(sit: Situation): Boolean = Standard.impasse(sit)
 
   override def perpetualCheck(@unused sit: Situation): Boolean = false
 
   override def specialVariantEnd(sit: Situation): Boolean =
     sit.check
+
+  override def pawnCheckmate(@unused a: DropActor, @unused d: Pos): Boolean =
+    false
 
   override def winner(sit: Situation): Option[Color] =
     if (sit.stalemate || sit.specialVariantEnd) Some(!sit.color)
