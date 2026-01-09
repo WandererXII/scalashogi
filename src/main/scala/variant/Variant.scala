@@ -151,13 +151,15 @@ abstract class Variant private[variant] (
 
   def dropRoles = handRoles
 
-  // For example, can't drop a pawn on a file with another pawn of the same color
-  def dropFilter(a: DropActor): List[Pos] = {
-    def illegalPawn(d: Pos) =
-      (a.piece is Pawn) && (
+  def doublePawn(a: DropActor, d: Pos): Boolean =
+    (a.piece is Pawn) && (
         a.situation.board.pieces.exists { case (pos, piece) =>
           a.piece == piece && pos.file == d.file
-        } ||
+        }
+      )
+
+  def pawnCheckmate(a: DropActor, d: Pos): Boolean =
+    (a.piece is Pawn) && (
           a.situation.board.singleRoyalPosOf(!a.situation.color).fold(false) { kingPos =>
             a.piece.eyes(d, kingPos) && a.situation
               .withBoard(a.situation.board.forcePlace(a.piece, d))
@@ -165,8 +167,10 @@ abstract class Variant private[variant] (
               .checkmate
           }
       )
+
+  def dropFilter(a: DropActor): List[Pos] = {
     a.situation.possibleDropDests.filterNot { d =>
-      forcePromote(a.piece, d) || illegalPawn(d)
+      forcePromote(a.piece, d) || doublePawn(a, d) || pawnCheckmate(a, d)
     }
   }
 
