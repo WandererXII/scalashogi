@@ -25,8 +25,8 @@ object CsaParserHelper {
       }(h => parseHandicap(h))
       for {
         pieces <- initPieces
-        board = Board(pieces)
-        color = Color.fromSente(!lines.contains("-"))
+        board     = Board(pieces)
+        color     = Color.fromSente(!lines.contains("-"))
         additions = lines.filter(l =>
           l.startsWith("P") && l.lift(1).exists(List[Char]('+', '-') contains _),
         )
@@ -45,7 +45,7 @@ object CsaParserHelper {
         posStr  = squarePiece.slice(0, 2)
         roleStr = squarePiece.slice(2, 4)
         pos <- CsaUtils.parseCsaPos(posStr) toValid s"Incorrect position in handicap setup: $posStr"
-        _ <-
+        _   <-
           if (pieces contains pos) valid(pos)
           else invalid(s"No piece to remove from $posStr in handicap setup")
         role <- CsaUtils.toRole(
@@ -106,7 +106,7 @@ object CsaParserHelper {
           val otherHand    = hands(!color)
           val initialRoles = Standard.pieces.values.toList
           val curBoard     = sit.board.pieces.values.toList
-          val newHand = Standard.handRoles.foldLeft(Hand.empty) { case (acc, cur) =>
+          val newHand      = Standard.handRoles.foldLeft(Hand.empty) { case (acc, cur) =>
             val n =
               initialRoles.count(_.role == cur) - otherHand(cur) - curBoard.count(_.role == cur)
             acc.store(cur, math.max(n, 0))

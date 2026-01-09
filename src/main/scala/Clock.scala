@@ -103,7 +103,7 @@ final case class Clock(
         // As long as game is still in progress, and we have enough time left (including byoyomi and periods)
         val clockActive = gameActive && stepTime < remaining + player.periodsLeft * player.byoyomi
         // The number of periods the step stretched over
-        val periodSpan = periodsInUse(color, stepTime)
+        val periodSpan    = periodsInUse(color, stepTime)
         val reloadByoyomi =
           clockActive && player.byoyomi.isPositive && (player.spentPeriods > 0 || periodSpan > 0)
 
@@ -311,7 +311,7 @@ object Clock {
     else str.filterNot(_ == '秒').toIntOption
   }
 
-  val kifTime = """(?:\d+(?:秒|分|時間)?)+"""
+  val kifTime          = """(?:\d+(?:秒|分|時間)?)+"""
   lazy val KifClkRegex =
     raw"""($kifTime)(?:[\+|\|]($kifTime))?(?:\((\d)\))?(?:[\+|\|]($kifTime))?""".r
 

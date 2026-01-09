@@ -21,7 +21,7 @@ final case class Glyphs(
       case g: Glyph.MoveOrDropAssessment =>
         copy(moveOrDrop = Option.when(!moveOrDrop.contains(g))(g))
       case g: Glyph.PositionAssessment => copy(position = Option.when(!position.contains(g))(g))
-      case g: Glyph.Observation =>
+      case g: Glyph.Observation        =>
         copy(observations =
           if (observations contains g) observations.filter(g !=)
           else g :: observations,

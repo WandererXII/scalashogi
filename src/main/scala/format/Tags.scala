@@ -67,33 +67,33 @@ object Tags {
 
 object Tag {
 
-  case object Event extends TagType
-  case object Site  extends TagType
-  case object Start extends TagType
-  case object End   extends TagType
+  case object Event   extends TagType
+  case object Site    extends TagType
+  case object Start   extends TagType
+  case object End     extends TagType
   case object UTCDate extends TagType {
     val format = DateTimeFormat forPattern "yyyy/MM/dd" withZone DateTimeZone.UTC
   }
   case object UTCTime extends TagType {
     val format = DateTimeFormat forPattern "HH:mm:ss" withZone DateTimeZone.UTC
   }
-  case object Sente       extends TagType
-  case object Gote        extends TagType
-  case object TimeControl extends TagType
-  case object SenteClock  extends TagType
-  case object GoteClock   extends TagType
-  case object SenteElo    extends TagType
-  case object GoteElo     extends TagType
-  case object SenteTitle  extends TagType
-  case object GoteTitle   extends TagType
-  case object SenteTeam   extends TagType
-  case object GoteTeam    extends TagType
-  case object Result      extends TagType
-  case object Opening     extends TagType
-  case object Termination extends TagType
-  case object Annotator   extends TagType
-  case object Handicap    extends TagType
-  case object Byoyomi     extends TagType
+  case object Sente                   extends TagType
+  case object Gote                    extends TagType
+  case object TimeControl             extends TagType
+  case object SenteClock              extends TagType
+  case object GoteClock               extends TagType
+  case object SenteElo                extends TagType
+  case object GoteElo                 extends TagType
+  case object SenteTitle              extends TagType
+  case object GoteTitle               extends TagType
+  case object SenteTeam               extends TagType
+  case object GoteTeam                extends TagType
+  case object Result                  extends TagType
+  case object Opening                 extends TagType
+  case object Termination             extends TagType
+  case object Annotator               extends TagType
+  case object Handicap                extends TagType
+  case object Byoyomi                 extends TagType
   final case class Unknown(n: String) extends TagType {
     override def toString  = n
     override val isUnknown = true

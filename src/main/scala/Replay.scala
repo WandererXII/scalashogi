@@ -56,7 +56,7 @@ object Replay {
     @scala.annotation.tailrec
     def mk(games: NonEmptyList[Game], usis: List[Usi]): (NonEmptyList[Game], Option[String]) =
       usis match {
-        case Nil => (games, None)
+        case Nil         => (games, None)
         case usi :: rest =>
           games.head(usi) match {
             case Valid(newGame) => mk(newGame :: games, rest)
@@ -96,7 +96,7 @@ object Replay {
       @scala.annotation.tailrec
       def recursivePlyAtSfen(sit: Situation, usis: List[Usi], ply: Int): Validated[String, Int] =
         usis match {
-          case Nil => invalid(s"Can't find $atSfen, reached ply $ply")
+          case Nil         => invalid(s"Can't find $atSfen, reached ply $ply")
           case usi :: rest =>
             sit(usi) match {
               case Valid(sitAfter) =>
@@ -125,7 +125,7 @@ object Replay {
         roles: List[Usi.WithRole],
     ): List[Usi.WithRole] =
       usis match {
-        case Nil => roles
+        case Nil         => roles
         case usi :: rest =>
           usi match {
             case Usi.Move(orig, dest, prom, midStep) =>

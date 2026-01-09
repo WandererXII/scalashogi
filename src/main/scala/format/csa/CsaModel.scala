@@ -38,7 +38,7 @@ final case class Csa(
       else ""
     val header               = Csa renderHeader tags
     val initialSfenOrDefault = initialSfen | variant.initialSfen
-    val setup =
+    val setup                =
       initialSfenOrDefault.toSituation(variant).fold("")(Csa renderSituation _)
     val startColor: Color = initialSfenOrDefault.color | Sente
     val stepsStr          = renderMainline(steps, startColor)
@@ -78,12 +78,14 @@ object Csa {
     csaHeaderTags
       .map { ct =>
         if (ct == Tag.Sente || ct == Tag.Gote) {
-          tags(ct.name).map(onlyAsciiTagValue).fold("")(tagValue =>
-            if (isValidTagValue(tagValue))
-              s"N${ct.csaName}${tagValue.replace(",", ";")}"
-            else
-              "",
-          )
+          tags(ct.name)
+            .map(onlyAsciiTagValue)
+            .fold("")(tagValue =>
+              if (isValidTagValue(tagValue))
+                s"N${ct.csaName}${tagValue.replace(",", ";")}"
+              else
+                "",
+            )
         } else {
           tags(ct.name).fold("")(tagValue => {
             if (isValidTagValue(tagValue)) s"$$${ct.csaName}:${tagValue.replace(",", ";")}"
@@ -97,7 +99,7 @@ object Csa {
   // we want only ascii tags
   private def onlyAsciiTagValue(str: String): String =
     str.filter(c => c >= 32 && c < 127)
-  
+
   private def isValidTagValue(str: String): Boolean =
     str.nonEmpty && str != "?"
 
@@ -107,7 +109,7 @@ object Csa {
       csaBoard append ("P" + (y + 1))
       for (x <- 8 to 0 by -1) {
         sit.board(x, y).flatMap(CsaUtils toCsa _) match {
-          case None => csaBoard append " * "
+          case None      => csaBoard append " * "
           case Some(csa) =>
             csaBoard append s"$csa"
         }
@@ -141,11 +143,11 @@ object Csa {
   ): Option[String] = {
     import shogi.Status._
     status match {
-      case Aborted | NoStart                             => "%CHUDAN".some
-      case Timeout | Outoftime                           => "%TIME_UP".some
-      case Resign if !winnerTurn                         => "%TORYO".some
-      case PerpetualCheck if winnerColor.contains(Sente) => "%-ILLEGAL_ACTION".some
-      case PerpetualCheck                                => "%+ILLEGAL_ACTION".some
+      case Aborted | NoStart                                 => "%CHUDAN".some
+      case Timeout | Outoftime                               => "%TIME_UP".some
+      case Resign if !winnerTurn                             => "%TORYO".some
+      case PerpetualCheck if winnerColor.contains(Sente)     => "%-ILLEGAL_ACTION".some
+      case PerpetualCheck                                    => "%+ILLEGAL_ACTION".some
       case Mate if winnerTurn && winnerColor.contains(Sente) =>
         "%-ILLEGAL_ACTION".some // pawn checkmate
       case Mate if winnerTurn => "%+ILLEGAL_ACTION".some // pawn checkmate

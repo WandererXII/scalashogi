@@ -24,7 +24,8 @@ object Binary {
         @scala.annotation.tailrec
         def mk(usis: List[Usi], mds: List[Int], pliesToGo: Int): List[Usi] =
           mds match {
-            case _ if pliesToGo <= 0 => usis
+            case _ if (pliesToGo <= 0) =>
+              usis
             case i1 :: i2 :: rest if bitAt(i1, 7) && variant.supportsDrops =>
               mk(decodeDrop(i1, i2, variant) :: usis, rest, pliesToGo - 1)
             case i1 :: i2 :: rest =>
@@ -52,7 +53,7 @@ object Binary {
         @scala.annotation.tailrec
         def mk(usis: List[Usi], ms: List[Int], pliesToGo: Int): List[Usi] =
           ms match {
-            case _ if pliesToGo <= 0 => usis
+            case _ if pliesToGo <= 0                        => usis
             case i1 :: i2 :: i3 :: rest if lionMoveType(i1) =>
               mk(decodeLionMove(i2, i3) :: usis, rest, pliesToGo - 1)
             case i1 :: i2 :: rest if iguiMoveType(i2) =>
@@ -105,8 +106,8 @@ object Binary {
       // 192..239 - promotion zone bottom
       // 240..247 - igui/jitto direction
       // 255      - flag for three byte move
-      private def lionMoveType(i: Int) = i == 255
-      private def iguiMoveType(i: Int) = i >= 240 && i <= 247
+      private def lionMoveType(i: Int)          = i == 255
+      private def iguiMoveType(i: Int)          = i >= 240 && i <= 247
       private def normalizePromotionPos(i: Int) =
         (i % 144) + ((i / 192) * 48)
       private def normalizeDirection(i: Int) =
@@ -213,7 +214,7 @@ object Binary {
       Rook   -> 7,
     )
     val intToRole: Map[Int, DroppableRole] = roleToInt map { case (k, v) => v -> k }
-    val directions: Directions =
+    val directions: Directions             =
       List[Direction](_.right, _.upLeft, _.up, _.upRight, _.downLeft, _.down, _.downRight, _.left)
   }
 

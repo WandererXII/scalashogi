@@ -153,20 +153,20 @@ abstract class Variant private[variant] (
 
   def doublePawn(a: DropActor, d: Pos): Boolean =
     (a.piece is Pawn) && (
-        a.situation.board.pieces.exists { case (pos, piece) =>
-          a.piece == piece && pos.file == d.file
-        }
-      )
+      a.situation.board.pieces.exists { case (pos, piece) =>
+        a.piece == piece && pos.file == d.file
+      }
+    )
 
   def pawnCheckmate(a: DropActor, d: Pos): Boolean =
     (a.piece is Pawn) && (
-          a.situation.board.singleRoyalPosOf(!a.situation.color).fold(false) { kingPos =>
-            a.piece.eyes(d, kingPos) && a.situation
-              .withBoard(a.situation.board.forcePlace(a.piece, d))
-              .switch
-              .checkmate
-          }
-      )
+      a.situation.board.singleRoyalPosOf(!a.situation.color).fold(false) { kingPos =>
+        a.piece.eyes(d, kingPos) && a.situation
+          .withBoard(a.situation.board.forcePlace(a.piece, d))
+          .switch
+          .checkmate
+      }
+    )
 
   def dropFilter(a: DropActor): List[Pos] = {
     a.situation.possibleDropDests.filterNot { d =>
@@ -201,7 +201,7 @@ abstract class Variant private[variant] (
       usi: Usi,
   ): Situation = {
     val newSit = beforeSit.copy(board = board, hands = hands).switch
-    val h = beforeSit.history
+    val h      = beforeSit.history
       .withLastUsi(usi)
       .withLastLionCapture {
         val roleOpt = usi.positions.headOption.flatMap(beforeSit.board(_).map(_.role))
@@ -254,7 +254,7 @@ abstract class Variant private[variant] (
         s"Piece on ${usi.orig} cannot move to ${usi.dest}${usi.midStep.fold("")(ms => s" via $ms")}",
       )
       unpromotedRoleCapture = capture.flatMap(p => unpromoteRoleForHand(p.role))
-      hands =
+      hands                 =
         unpromotedRoleCapture
           .filter(_ => supportsDrops)
           .fold(sit.hands)(sit.hands.store(sit.color, _))

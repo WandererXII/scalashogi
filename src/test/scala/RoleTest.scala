@@ -8,7 +8,7 @@ class RoleTest extends ShogiTest {
     Role.all foreach { case role =>
       val variant = Variant.all.find(_.allRoles contains role).get
       val piece   = Piece(color, role)
-      val dests = makeSituationWithBoard(
+      val dests   = makeSituationWithBoard(
         variant,
         SQ5E -> piece,
       ).moveDestsFrom(SQ5E).get

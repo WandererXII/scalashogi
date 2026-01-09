@@ -176,7 +176,7 @@ object KifUtils {
       Pawn             -> NonEmptyList.of("歩兵", "歩", "兵"),
       Prince           -> NonEmptyList.of("太子", "太"),
       Phoenix          -> NonEmptyList.of("鳳凰", "鳳"),
-      PromotedPawn -> NonEmptyList.of(
+      PromotedPawn     -> NonEmptyList.of(
         "金将",
         "金",
         "と",

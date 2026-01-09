@@ -61,7 +61,7 @@ object Kif {
   def renderNotationStep(cur: NotationStep, lastDest: Option[Pos], variant: Variant): String = {
     val suf           = if (variant.chushogi) "手目" else ""
     val stepNumberStr = stepNumberOffset(cur.stepNumber, suf)
-    val resultStr =
+    val resultStr     =
       cur.result.fold("")(r => s"\n${stepNumberOffset(cur.stepNumber + 1, suf)}$offset$r")
     val timeStr     = clockString(cur) | ""
     val glyphsNames = cur.glyphs.toList.map(_.name)
@@ -113,7 +113,7 @@ object Kif {
         // we need these even empty
         if (tag == Tag.Sente || tag == Tag.Gote) {
           val playerName = tags(tag.name) | ""
-          val playerTag = {
+          val playerTag  = {
             if (!initialSfen.exists(Handicap.isHandicap(_, variant))) tag.kifName
             else if (tag == Tag.Sente) "下手"
             else "上手"
@@ -160,7 +160,7 @@ object Kif {
       kifBoard append "|"
       for (x <- nbFiles to 0 by -1) {
         sit.board(x, y).flatMap(p => KifUtils.toKifBoard(p, sit.variant)) match {
-          case None => kifBoard append padder
+          case None      => kifBoard append padder
           case Some(kif) =>
             kifBoard append String
               .format("%1$" + space + "s", kif)

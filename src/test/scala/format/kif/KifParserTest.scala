@@ -6,7 +6,7 @@ class KifParserTest extends ShogiTest {
 
   import shogi.format.kif.KifFixtures._
 
-  val parser = KifParser.full _
+  val parser                                               = KifParser.full _
   def parseStep(str: String, lastDest: Option[Pos] = None) =
     KifParser.MoveDropParser(str, lastDest, None, shogi.variant.Standard)
   def parseChushogiMove(

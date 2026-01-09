@@ -89,7 +89,8 @@ object CsaParser {
   }
 
   trait Logging { self: Parsers =>
-    protected val loggingEnabled = false
+    protected val loggingEnabled =
+      false
     protected def as[T](msg: String)(p: => Parser[T]): Parser[T] =
       if (loggingEnabled) log(p)(msg) else p
   }
@@ -194,7 +195,7 @@ object CsaParser {
         case MoveRegex(origS, destS, roleS) => {
           for {
             role <- CsaUtils.toRole(roleS) toValid s"Uknown role in move: $str"
-            _ <-
+            _    <-
               if (Standard.allRoles contains role) valid(role)
               else invalid(s"$role not supported in standard shogi")
             dest <- CsaUtils.parseCsaPos(
@@ -217,7 +218,7 @@ object CsaParser {
         case DropRegex(posS, roleS) =>
           for {
             roleBase <- CsaUtils.toRole(roleS) toValid s"Uknown role in drop: $str"
-            role <- Standard.handRoles.find(
+            role     <- Standard.handRoles.find(
               _ == roleBase,
             ) toValid s"$roleBase can't be dropped in standard shogi"
             pos <- CsaUtils.parseCsaPos(

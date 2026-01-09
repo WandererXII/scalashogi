@@ -94,7 +94,7 @@ object Sfen {
       empty = 0
       for (x <- (variant.numberOfFiles - 1) to 0 by -1) {
         board(x, y).flatMap(p => SfenUtils.toForsyth(p, variant)) match {
-          case None => empty = empty + 1
+          case None          => empty = empty + 1
           case Some(forsyth) =>
             if (empty == 0) sfen append forsyth
             else {
@@ -137,13 +137,14 @@ object Sfen {
         y: Int,
     ): Option[List[(Pos, Piece)]] =
       chars match {
-        case Nil => Some(pieces)
+        case Nil =>
+          Some(pieces)
         case '/' :: rest if y < variant.numberOfRanks =>
           piecesListRec(pieces, rest, variant.numberOfFiles - 1, y + 1)
         case '1' :: c :: rest if c.isDigit && x >= 0 =>
           piecesListRec(pieces, rest, x - (10 + c.asDigit), y)
         case c :: rest if c.isDigit && x >= 0 => piecesListRec(pieces, rest, x - c.asDigit, y)
-        case '+' :: c :: rest =>
+        case '+' :: c :: rest                 =>
           (for {
             pos   <- Pos.at(x, y)
             _     <- Option.when(variant.isInsideBoard(pos))(())
@@ -172,8 +173,8 @@ object Sfen {
     @scala.annotation.tailrec
     def handsRec(hands: Hands, chars: List[Char], curCount: Option[Int]): Option[Hands] =
       chars match {
-        case Nil      => Some(hands)
-        case '-' :: _ => Some(Hands.empty)
+        case Nil                    => Some(hands)
+        case '-' :: _               => Some(Hands.empty)
         case d :: rest if d.isDigit =>
           handsRec(hands, rest, curCount.map(_ * 10 + d.asDigit) orElse d.asDigit.some)
         case p :: rest =>

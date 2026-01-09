@@ -2,7 +2,7 @@ package shogi
 
 class HistoryTest extends ShogiTest {
 
-  def toHash(a: Int) = Array(a.toByte, 0.toByte, 0.toByte)
+  def toHash(a: Int)                    = Array(a.toByte, 0.toByte, 0.toByte)
   def makeHistory(positions: List[Int]) =
     (positions map toHash).foldLeft(History.empty) { case (history, hash) =>
       history.copy(positionHashes = hash ++ history.positionHashes)

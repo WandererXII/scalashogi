@@ -2,7 +2,7 @@ package shogi
 
 final case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
 
-  def openingSize: Int = middle | plies
+  def openingSize: Int        = middle | plies
   def middleSize: Option[Int] =
     middle.map { m =>
       (end | plies) - m
@@ -10,7 +10,7 @@ final case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
   def endSize = end.map(plies -)
 
   def openingBounds = middle.map(0 -> _)
-  def middleBounds =
+  def middleBounds  =
     for {
       m <- middle
       e <- end
@@ -34,7 +34,8 @@ object Divider {
     val indexedSits = sits.zipWithIndex
 
     val midGame = indexedSits.foldLeft[DividerData](NotFound(0, 0)) {
-      case (found: Found, _) => found
+      case (found: Found, _) =>
+        found
       case (NotFound(lastSenteInvaders, lastGoteInvaders), (sit, index)) => {
         val curSenteInvaders = countInvaders(sit, Sente)
         val curGoteInvaders  = countInvaders(sit, Gote)
@@ -59,7 +60,8 @@ object Divider {
 
     val endGame =
       if (midGameOption.isDefined) indexedSits.foldLeft[DividerData](NotFound(0, 0)) {
-        case (found: Found, _) => found
+        case (found: Found, _) =>
+          found
         case (NotFound(lastSenteInvaders, lastGoteInvaders), (sit, index)) => {
           val curSenteInvaders = countInvaders(sit, Sente)
           val curGoteInvaders  = countInvaders(sit, Gote)

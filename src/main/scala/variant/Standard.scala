@@ -155,8 +155,8 @@ case object Standard
       }
 
   override def impasse(sit: Situation): Boolean = !sit.check && {
-    val color = sit.color
-    val ranks = sit.variant.promotionRanks(color)
+    val color        = sit.color
+    val ranks        = sit.variant.promotionRanks(color)
     val enteredRoles = sit.board.pieces.collect {
       case (pos, piece) if (piece is color) && (ranks contains pos.rank) => piece.role
     }.toList

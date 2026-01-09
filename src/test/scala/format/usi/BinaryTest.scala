@@ -195,7 +195,7 @@ class BinaryTest extends ShogiTest {
     }
     "for all moves chushogi" in {
       val promRanks = Chushogi.promotionRanks(Sente) ::: Chushogi.promotionRanks(Gote)
-      val allMoves = for {
+      val allMoves  = for {
         orig <- Chushogi.allPositions
         dest <- Chushogi.allPositions
       } yield Usi.Move(orig, dest, false, None)

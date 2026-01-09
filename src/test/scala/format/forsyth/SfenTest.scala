@@ -67,7 +67,7 @@ class SfenTest extends ShogiTest {
 
     }
     "import" in {
-      val steps = List("7g7f", "3c3d", "8h2b", "3a2b")
+      val steps                                = List("7g7f", "3c3d", "8h2b", "3a2b")
       def compare(u: List[String], sfen: Sfen) =
         makeGame(Standard).playUsisStr(u) must beValid.like { case g =>
           sfen must_== g.toSfen

@@ -25,7 +25,7 @@ object Visual {
     val clean = source.replaceAll("^\n|\n$| ", "")
     val lines = augmentString(clean).linesIterator.map(_.trim).filter(_.nonEmpty).toList
     val hands = lines.find(_.toLowerCase.startsWith("hands")).flatMap(_.split(':').lift(1)) | ""
-    val turn =
+    val turn  =
       if (lines.map(_.toLowerCase).exists(l => l.startsWith("turn") && l.contains("gote"))) "w"
       else "b"
     val sfenReversed = lines

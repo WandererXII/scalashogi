@@ -19,7 +19,7 @@ ThisBuild / developers := List(
 )
 
 ThisBuild / description := "Shogi API written in scala. Immutable and free of side effects."
-ThisBuild / licenses := List(
+ThisBuild / licenses    := List(
   "The MIT license" -> new URL("https://github.com/WandererXII/scalashogi/blob/main/LICENSE"),
 )
 ThisBuild / homepage := Some(url("https://github.com/WandererXII/scalashogi"))

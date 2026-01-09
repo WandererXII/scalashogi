@@ -27,7 +27,7 @@ object KifParser {
   // Helper strings for regex, so we don't have to repeat ourselves that much
   val colorsS  = """▲|△|☗|☖"""
   val numbersS = """[1-9１-９一二三四五六七八九十百][0-9０-９一二三四五六七八九十百]*"""
-  val filesS = s"""${(Pos.MaxFiles to 1 by -1)
+  val filesS   = s"""${(Pos.MaxFiles to 1 by -1)
       .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}")
       .toList
       .mkString("|")}"""
@@ -130,7 +130,7 @@ object KifParser {
         ply: Int,
     ): Validated[String, List[ParsedStep]] =
       strSteps match {
-        case Nil => valid(parsedSteps.reverse)
+        case Nil          => valid(parsedSteps.reverse)
         case step :: rest =>
           step match {
             case StrStep(stepNumber, stepStr, comments, secondLionMove, timeSpent, timeTotal) => {
@@ -283,7 +283,8 @@ object KifParser {
   }
 
   trait Logging { self: Parsers =>
-    protected val loggingEnabled = false
+    protected val loggingEnabled =
+      false
     protected def as[T](msg: String)(p: => Parser[T]): Parser[T] =
       if (loggingEnabled) log(p)(msg) else p
   }
@@ -341,8 +342,8 @@ object KifParser {
 
     private def readCentis(hours: String, minutes: String, seconds: String): Option[Centis] =
       for {
-        h <- hours.toIntOption
-        m <- minutes.toIntOption
+        h  <- hours.toIntOption
+        m  <- minutes.toIntOption
         cs <- seconds.toDoubleOption match {
           case Some(s) =>
             Some(BigDecimal(s * 100).setScale(0, BigDecimal.RoundingMode.HALF_UP).toInt)
