@@ -3,7 +3,6 @@ package variant
 
 import scala.annotation.unused
 
-import cats.data.Validated
 import cats.syntax.option._
 
 import shogi.format.forsyth.Sfen
@@ -187,100 +186,6 @@ abstract class Variant private[variant] (
         case Some(dRole: DroppableRole) if handRoles.contains(dRole) => dRole.some
         case _                                                       => none
       })
-
-  // Finalizes situation after usi, used both for moves and drops
-  protected def finalizeSituation(
-      beforeSit: Situation,
-      board: Board,
-      hands: Hands,
-      usi: Usi,
-  ): Situation = {
-    val newSit = beforeSit.copy(board = board, hands = hands).switch
-    val h      = beforeSit.history
-      .withLastUsi(usi)
-      .withLastLionCapture {
-        val roleOpt = usi.positions.headOption.flatMap(beforeSit.board(_).map(_.role))
-        if (chushogi && roleOpt.exists(!Role.allLions.contains(_)))
-          usi.positions
-            .drop(1) // drop orig
-            .reverse // start from the final dest
-            .find(pos =>
-              beforeSit
-                .board(pos)
-                .exists(p => (p is newSit.color) && Role.allLions.contains(p.role)),
-            )
-        else None
-      }
-      .withConsecutiveAttacks {
-        if (isAttacked(beforeSit, newSit, usi))
-          beforeSit.history.consecutiveAttacks.add(!newSit.color)
-        else beforeSit.history.consecutiveAttacks.reset(!newSit.color)
-      }
-      .withPositionHashes {
-        val basePositionHashes =
-          if (isIrreversible(beforeSit, newSit, usi)) Array.empty: PositionHash
-          else if (beforeSit.history.positionHashes.isEmpty) Hash(beforeSit)
-          else beforeSit.history.positionHashes
-        Hash(newSit) ++ basePositionHashes
-      }
-    newSit.withHistory(h)
-  }
-
-  def move(sit: Situation, usi: Usi.Move): Validated[String, Situation] =
-    for {
-      actor <- sit.moveActorAt(usi.orig) toValid s"No piece on ${usi.orig}"
-      _     <- Validated.cond(actor is sit.color, (), s"Not my piece on ${usi.orig}")
-      capture = sit.board(usi.dest).filter(_.color != sit.color)
-      _ <- Validated.cond(
-        !usi.promotion || canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined),
-        (),
-        s"${actor.piece} cannot promote",
-      )
-      _ <- Validated.cond(
-        usi.promotion || !forcePromote(actor.piece, usi.dest),
-        (),
-        s"${actor.piece} needs to promote",
-      )
-      _ <- Validated.cond(
-        usi.midStep.fold(actor.destinations contains usi.dest) { ms =>
-          actor.lionMoveDestinationsMap.get(ms).exists(_ contains usi.dest)
-        },
-        (),
-        s"Piece on ${usi.orig} cannot move to ${usi.dest}${usi.midStep.fold("")(ms => s" via $ms")}",
-      )
-      unpromotedRoleCapture = capture.flatMap(p => unpromoteRoleForHand(p.role))
-      hands                 =
-        unpromotedRoleCapture
-          .filter(_ => supportsDrops)
-          .fold(sit.hands)(sit.hands.store(sit.color, _))
-      board <-
-        (if (usi.promotion)
-           sit.board.promote(usi.orig, usi.dest, promote)
-         else
-           sit.board.move(
-             usi.orig,
-             usi.dest,
-           )).map(b =>
-          usi.midStep.fold(b)(b forceTake _),
-        ) toValid s"Can't update board with ${usi.usi} in \n${sit.toSfen}"
-    } yield finalizeSituation(sit, board, hands, usi)
-
-  def drop(sit: Situation, usi: Usi.Drop): Validated[String, Situation] =
-    for {
-      _ <- Validated.cond(sit.variant.supportsDrops, (), "Variant doesn't support drops")
-      _ <- Validated.cond(dropRoles contains usi.role, (), "Can't drop this role in this variant")
-      piece = Piece(sit.color, usi.role)
-      actor <- sit.dropActorOf(piece) toValid s"No actor of $piece"
-      _ <- Validated.cond(actor.destinations.contains(usi.pos), (), s"Dropping $piece is not valid")
-      roleToTake = if (supportsDroppingEitherSide) unpromoteRoleForHand(usi.role) else usi.role.some
-      hands <- roleToTake.flatMap(
-        sit.hands.take(sit.color, _),
-      ) toValid s"No ${usi.role} to drop on ${usi.pos}"
-      board <- sit.board.place(
-        piece,
-        usi.pos,
-      ) toValid s"Can't drop ${usi.role} on ${usi.pos}, it's occupied"
-    } yield finalizeSituation(sit, board, hands, usi)
 
   def perpetualCheck(sit: Situation): Boolean =
     sit.history.fourfoldRepetition && sit.history.perpetualCheckAttacker.isDefined
