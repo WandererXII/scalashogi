@@ -54,14 +54,14 @@ class AnnanshogiTest extends ShogiTest {
     "not checkmate" in {
       val sit = Sfen("4k4/4+R4/4L4/9/9/9/9/7GS/7GK w").toSituation(shogi.variant.Annanshogi).get
       sit.check must beTrue
-      sit.end(false) must beFalse
+      sit.end must beFalse
       val sit2 = Sfen("5lkl1/5p1p1/9/6P2/6r2/9/9/9/K8 w").toSituation(shogi.variant.Annanshogi).get
       sit2.check must beFalse
-      sit2.end(false) must beFalse
+      sit2.end must beFalse
     }
     "checkmate" in {
       val sit = Sfen("4k4/4+R4/9/4L4/9/9/9/7GS/7GK w").toSituation(shogi.variant.Annanshogi).get
-      sit.end(false) must beTrue
+      sit.end must beTrue
     }
     "capture move giver to defend from check" in {
       val sit = Sfen("5k3/9/9/5l3/5p3/9/2B6/9/5K3 b").toSituation(shogi.variant.Annanshogi).get
@@ -173,7 +173,7 @@ class AnnanshogiTest extends ShogiTest {
         line match {
           case (sfenStr, d1) => {
             val game = Game(Some(Sfen(sfenStr)), shogi.variant.Annanshogi)
-            game.situation.end(false) must beFalse
+            game.situation.end must beFalse
             perft(game, 1) must be equalTo d1.toInt
           }
         }

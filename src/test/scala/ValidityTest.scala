@@ -21,6 +21,6 @@ class ValidityTest extends ShogiTest {
   )
   sfens foreach { case (variant, sfen, strict, valid) =>
     val sit = Sfen(sfen).toSituation(variant).get
-    variant.valid(sit, strict) must_== valid
+    sit.valid(strict) must_== valid
   }
 }

@@ -103,14 +103,14 @@ K . . r . . . . .
     "not be playable" in {
       "with touching kings" in {
         val game = "k K . B N . . . ." as Gote
-        game.playable(strict = true, withImpasse = true) must beFalse
-        game.playable(strict = false, withImpasse = true) must beFalse
+        game.playable(strict = true) must beFalse
+        game.playable(strict = false) must beFalse
       }
 
       "with other side in check" in {
         val game = "k . R . K . . . ."
-        game.playable(strict = true, withImpasse = true) must beFalse
-        game.playable(strict = false, withImpasse = true) must beFalse
+        game.playable(strict = true) must beFalse
+        game.playable(strict = false) must beFalse
       }
 
       "with doubled pawns" in {
@@ -121,8 +121,8 @@ P p . . . . . . .
 P . . . . . . . .
 K . . . . . . . .
 """
-        game.playable(strict = true, withImpasse = true) must beFalse
-        game.playable(strict = false, withImpasse = true) must beFalse
+        game.playable(strict = true) must beFalse
+        game.playable(strict = false) must beFalse
       }
     }
 

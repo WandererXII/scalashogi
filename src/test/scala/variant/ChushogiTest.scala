@@ -331,7 +331,7 @@ class ChushogiTest extends ShogiTest {
         line match {
           case (sfenStr, d1) => {
             val game = Game(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
-            game.situation.end(false) must beFalse
+            game.situation.end must beFalse
             perft(game, 1) must be equalTo d1.toInt
           }
         }

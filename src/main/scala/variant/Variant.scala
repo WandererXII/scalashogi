@@ -135,11 +135,6 @@ abstract class Variant private[variant] (
       }
     }
 
-  def check(board: Board, color: Color): Boolean =
-    board.royalPossOf(color) exists {
-      posThreatened(board, !color, _)
-    }
-
   def checkSquares(board: Board, color: Color): List[Pos] =
     board.royalPossOf(color).filter(posThreatened(board, !color, _))
 
@@ -185,7 +180,7 @@ abstract class Variant private[variant] (
   def isAttacked(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean =
     after.check
 
-  protected def unpromoteRoleForHand(role: Role): Option[DroppableRole] =
+  def unpromoteRoleForHand(role: Role): Option[DroppableRole] =
     handRoles
       .find(_ == role)
       .orElse(unpromote(role) match {
@@ -287,29 +282,19 @@ abstract class Variant private[variant] (
       ) toValid s"Can't drop ${usi.role} on ${usi.pos}, it's occupied"
     } yield finalizeSituation(sit, board, hands, usi)
 
-  def impasse(@unused sit: Situation): Boolean = false
-
-  private def perpetualCheckAttacker(sit: Situation): Option[Color] =
-    sit.history.firstRepetitionDistance flatMap { dist =>
-      val senteAttacks = sit.history.consecutiveAttacks(Sente) >= dist
-      val goteAttacks  = sit.history.consecutiveAttacks(Gote) >= dist
-      if (senteAttacks && goteAttacks) none
-      else if (senteAttacks) Sente.some
-      else if (goteAttacks) Gote.some
-      else none
-    }
-
   def perpetualCheck(sit: Situation): Boolean =
-    sit.history.fourfoldRepetition && perpetualCheckAttacker(sit).isDefined
+    sit.history.fourfoldRepetition && sit.history.perpetualCheckAttacker.isDefined
 
   def repetition(sit: Situation): Boolean =
     sit.history.fourfoldRepetition && !perpetualCheck(sit)
 
   def stalemate(sit: Situation): Boolean =
-    !sit.check && !sit.hasMoveDestinations && !sit.hasDropDestinations
+    !sit.hasDestinations && !checkmate(sit)
 
   def checkmate(sit: Situation): Boolean =
-    sit.check && !sit.hasMoveDestinations && !sit.hasDropDestinations
+    sit.check && !sit.hasDestinations
+
+  def impasse(@unused sit: Situation): Boolean = false
 
   def bareKing(@unused sit: Situation, @unused color: Color): Boolean = false
 
@@ -324,7 +309,7 @@ abstract class Variant private[variant] (
     if (sit.checkmate || sit.stalemate || sit.bareKing(sit.color) || sit.royalsLost)
       Some(!sit.color)
     else if (sit.bareKing(!sit.color) || sit.impasse) Some(sit.color)
-    else if (sit.perpetualCheck) perpetualCheckAttacker(sit).map(!_)
+    else if (sit.perpetualCheck) sit.history.perpetualCheckAttacker.map(!_)
     else None
 
   // Returns the material imbalance in pawns
@@ -364,8 +349,8 @@ abstract class Variant private[variant] (
   protected def validHands(hands: Hands) =
     hands.roles.forall(handRoles contains _)
 
-  def valid(sit: Situation, strict: Boolean) =
-    validHands(sit.hands) && Color.all.forall(validBoardSide(sit.board, strict) _)
+  def valid(board: Board, hands: Hands, strict: Boolean) =
+    validHands(hands) && Color.all.forall(validBoardSide(board, strict) _)
 
   def standard   = this == Standard
   def minishogi  = this == Minishogi

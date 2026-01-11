@@ -47,7 +47,7 @@ K . . . . N .""".draw must_== false
       val position = Sfen("4k4/9/9/9/9/9/9/9/5K3 b p 1")
       sfenToGame(position, Standard) must beValid.like { case game =>
         game.situation.draw must beFalse
-        game.situation.end(true) must beFalse
+        game.situation.end must beFalse
       }
     }
     "on a single pawn" in {
@@ -56,7 +56,7 @@ K . . . . N .""".draw must_== false
       val newGame  = game flatMap (_.playUsiStr("5i5h"))
       newGame must beValid.like { case game =>
         game.situation.draw must beFalse
-        game.situation.end(true) must beFalse
+        game.situation.end must beFalse
       }
     }
   }

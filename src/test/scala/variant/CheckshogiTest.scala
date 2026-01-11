@@ -37,68 +37,46 @@ class CheckshogiTest extends ShogiTest {
     "sente" in {
       val sit = Sfen("9/3gk4/9/2b6/9/6B2/9/4KG3/9 b").toSituation(shogi.variant.Checkshogi).get
       sit.check must beFalse
-      sit.end(false) must beFalse
+      sit.end must beFalse
       sit.winner must beNone
       val res = sit(Usi("3f2e").get).toOption.get
       res.check must beTrue
-      res.end(false) must beTrue
+      res.end must beTrue
       res.status must_== Some(Status.SpecialVariantEnd)
       res.winner must_== Some(Sente)
     }
     "gote" in {
       val sit = Sfen("9/3gk4/9/2b6/9/6B2/9/4KG3/9 w").toSituation(shogi.variant.Checkshogi).get
       sit.check must beFalse
-      sit.end(false) must beFalse
+      sit.end must beFalse
       sit.winner must beNone
       val res = sit(Usi("7d8e").get).toOption.get
       res.check must beTrue
-      res.end(false) must beTrue
+      res.end must beTrue
       res.status must_== Some(Status.SpecialVariantEnd)
       res.winner must_== Some(Gote)
     }
-    "checkmate" in {
+    "check end" in {
       val sit = Sfen("lnsgkgsnl/4r2b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1BG1G4/LNS1K1SNL w Pp 12")
         .toSituation(shogi.variant.Checkshogi)
         .get
       sit.check must beFalse
-      sit.end(false) must beFalse
+      sit.end must beFalse
       sit.winner must beNone
       val res = sit(Usi("5e5h+").get).toOption.get
       res.check must beTrue
-      res.end(false) must beTrue
+      res.end must beTrue
       res.status must_== Some(Status.SpecialVariantEnd)
       res.winner must_== Some(Gote)
     }
   }
 
   "pawn drops" should {
-    "not be allowed with checkmate" in {
+    "be allowed with checkmate" in {
       val sit =
         Sfen("3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp").toSituation(shogi.variant.Checkshogi).get
       sit.check must beFalse
-      sit.end(false) must beFalse
-      sit.winner must beNone
-      val usi = Usi.Drop("P*5b").get
-      sit.dropDestinations
-        .get(Piece(sit.color, sit.variant.allRoles.find(_ == usi.role).get))
-        .get must not contain (usi.pos)
-      sit(usi).toOption must beNone
-
-      val usi2 = Usi.Drop("L*5b").get
-      sit.dropDestinations
-        .get(Piece(sit.color, sit.variant.allRoles.find(_ == usi2.role).get))
-        .get must contain(usi2.pos)
-      val lanceCheck = sit(usi2).toOption.get
-      lanceCheck.check must beTrue
-      lanceCheck.end(false) must beTrue
-      lanceCheck.status must_== Some(Status.SpecialVariantEnd)
-      lanceCheck.winner must_== Some(Sente)
-    }
-    "be allowed with check only" in {
-      val sit =
-        Sfen("3rk4/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1").toSituation(shogi.variant.Checkshogi).get
-      sit.check must beFalse
-      sit.end(false) must beFalse
+      sit.end must beFalse
       sit.winner must beNone
       val usi = Usi.Drop("P*5b").get
       sit.dropDestinations
@@ -106,7 +84,33 @@ class CheckshogiTest extends ShogiTest {
         .get must contain(usi.pos)
       val pawnCheck = sit(usi).toOption.get
       pawnCheck.check must beTrue
-      pawnCheck.end(false) must beTrue
+      pawnCheck.end must beTrue
+      pawnCheck.status must_== Some(Status.SpecialVariantEnd)
+      pawnCheck.winner must_== Some(Sente)
+
+      val usi2 = Usi.Drop("L*5b").get
+      sit.dropDestinations
+        .get(Piece(sit.color, sit.variant.allRoles.find(_ == usi2.role).get))
+        .get must contain(usi2.pos)
+      val lanceCheck = sit(usi2).toOption.get
+      lanceCheck.check must beTrue
+      lanceCheck.end must beTrue
+      lanceCheck.status must_== Some(Status.SpecialVariantEnd)
+      lanceCheck.winner must_== Some(Sente)
+    }
+    "be allowed with check alone" in {
+      val sit =
+        Sfen("3rk4/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1").toSituation(shogi.variant.Checkshogi).get
+      sit.check must beFalse
+      sit.end must beFalse
+      sit.winner must beNone
+      val usi = Usi.Drop("P*5b").get
+      sit.dropDestinations
+        .get(Piece(sit.color, sit.variant.allRoles.find(_ == usi.role).get))
+        .get must contain(usi.pos)
+      val pawnCheck = sit(usi).toOption.get
+      pawnCheck.check must beTrue
+      pawnCheck.end must beTrue
       pawnCheck.status must_== Some(Status.SpecialVariantEnd)
       pawnCheck.winner must_== Some(Sente)
     }

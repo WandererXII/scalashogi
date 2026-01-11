@@ -1,5 +1,7 @@
 package shogi
 
+import cats.syntax.option._
+
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
@@ -28,22 +30,32 @@ final case class History(
     }
 
   // number of moves/drops each player made since the repeated position first occured
-  lazy val firstRepetitionDistance: Option[Int] = {
+  private[shogi] def firstRepetitionDistance: Option[Int] = {
     val positions = currentTurnHashes
     positions.headOption match {
       case Some(Array(x, y, z)) =>
-        Some(positions lastIndexWhere {
+        (positions lastIndexWhere {
           case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
           case _                 => false
-        }).filter(_ > 0)
-      case _ => None
+        }).some.filter(_ > 0)
+      case _ => none
     }
   }
+
+  lazy val perpetualCheckAttacker: Option[Color] =
+    firstRepetitionDistance flatMap { dist =>
+      val senteAttacks = consecutiveAttacks(Sente) >= dist
+      val goteAttacks  = consecutiveAttacks(Gote) >= dist
+      if (senteAttacks && goteAttacks) none
+      else if (senteAttacks) Sente.some
+      else if (goteAttacks) Gote.some
+      else none
+    }
 
   lazy val threefoldRepetition = isRepetition(3)
   lazy val fourfoldRepetition  = isRepetition(4)
 
-  def withLastUsi(u: Usi) = copy(lastUsi = Some(u))
+  def withLastUsi(u: Usi) = copy(lastUsi = u.some)
 
   def withLastLionCapture(op: Option[Pos]) = copy(lastLionCapture = op)
 
@@ -51,7 +63,7 @@ final case class History(
 
   def withPositionHashes(h: PositionHash) = copy(positionHashes = h)
 
-  def withInitialSfen(s: Sfen) = copy(initialSfen = Some(s))
+  def withInitialSfen(s: Sfen) = copy(initialSfen = s.some)
 
   override def toString = {
     val positions = (positionHashes grouped Hash.size).toList
@@ -63,7 +75,7 @@ final case class History(
 
 object History {
 
-  def empty: History = History(None, None, ConsecutiveAttacks.empty, Array.empty, None)
+  def empty: History = History(none, none, ConsecutiveAttacks.empty, Array.empty, none)
 
 }
 

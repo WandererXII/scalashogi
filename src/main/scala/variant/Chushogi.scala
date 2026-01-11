@@ -274,6 +274,7 @@ case object Chushogi
 
   override def supportsDrops = false
 
+  // filters out illegal lion captures
   override def moveFilter(a: MoveActor): List[Pos] =
     if (Role.allLions.contains(a.piece.role)) {
       val oppLions = a.situation.board.pieces.collect {

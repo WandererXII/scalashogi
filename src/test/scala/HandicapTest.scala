@@ -18,7 +18,7 @@ class HandicapTest extends ShogiTest {
         forall(lsh) { h =>
           val sit = h.sfen.toSituation(v)
           sit must beSome
-          sit.get.playable(true, true) must beTrue
+          sit.get.playable(strict = true) must beTrue
         }
       }
     }

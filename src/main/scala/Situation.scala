@@ -23,7 +23,7 @@ final case class Situation(
     }
 
   def apply(parsedStep: ParsedStep): Validated[String, Situation] =
-    parsedStep.toUsi(this) andThen (apply _)
+    parsedStep.toUsi(this) flatMap (apply _)
 
   // Moves
 
@@ -87,21 +87,16 @@ final case class Situation(
 
   def dropDestsOf(piece: Piece): Option[List[Pos]] = dropActorOf(piece) map (_.destinations)
 
+  // Moves and drops
+
+  def hasDestinations: Boolean =
+    hasDropDestinations || hasMoveDestinations
+
   // King safety
 
-  def check: Boolean = checkOf(color)
+  def check: Boolean = checkSquares.nonEmpty
 
-  private def checkOf(c: Color): Boolean = c.fold(checkSente, checkGote)
-
-  lazy val checkSente = variant.check(board, Sente)
-  lazy val checkGote  = variant.check(board, Gote)
-
-  def checkSquares: List[Pos] = checkSquaresOf(color)
-
-  private def checkSquaresOf(c: Color): List[Pos] = c.fold(checkSquaresSente, checkSquaresGote)
-
-  lazy val checkSquaresSente = variant.checkSquares(board, Sente)
-  lazy val checkSquaresGote  = variant.checkSquares(board, Gote)
+  lazy val checkSquares: List[Pos] = variant.checkSquares(board, color)
 
   // Not taking into account specific drop rules
   lazy val possibleDropDests: List[Pos] =
@@ -133,18 +128,17 @@ final case class Situation(
 
   def impasse = variant impasse this
 
-  def end(withImpasse: Boolean): Boolean =
-    specialVariantEnd || checkmate || stalemate || perpetualCheck || repetition || draw || (withImpasse && impasse)
-
   def winner: Option[Color] = variant.winner(this)
 
-  def materialImbalance: Int = variant.materialImbalance(this)
+  def end: Boolean =
+    status.isDefined
 
-  def valid(strict: Boolean) = variant.valid(this, strict)
+  def valid(strict: Boolean) = variant.valid(this.board, this.hands, strict)
 
-  def playable(strict: Boolean, withImpasse: Boolean): Boolean =
-    valid(strict) && !end(withImpasse) && !copy(color = !color).check
+  def playable(strict: Boolean): Boolean =
+    valid(strict) && !end && !copy(color = !color).check
 
+  // lazy val status: Option[Status] = variant.status(this)
   lazy val status: Option[Status] =
     if (specialVariantEnd) Status.SpecialVariantEnd.some
     else if (checkmate) Status.Mate.some
@@ -158,6 +152,8 @@ final case class Situation(
     else none
 
   // Util
+
+  def materialImbalance: Int = variant.materialImbalance(this)
 
   def withBoard(board: Board)                     = copy(board = board)
   def withHands(hands: Hands)                     = copy(hands = hands)
