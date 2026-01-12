@@ -157,7 +157,7 @@ final case class Situation(
       }
       .withPositionHashes {
         val basePositionHashes =
-          if (variant.isIrreversible(this, newSit, usi)) Array.empty: PositionHash
+          if (variant.isIrreversible(board, newSit.board, usi)) Array.empty: PositionHash
           else if (history.positionHashes.isEmpty) Hash(this)
           else history.positionHashes
         Hash(newSit) ++ basePositionHashes

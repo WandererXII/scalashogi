@@ -25,7 +25,6 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   implicit def colorChanger(str: String): AnyRef { def as(color: shogi.Color): shogi.Situation } =
     new {
-
       def as(color: Color): Situation = stringToSituation(str).copy(color = color)
     }
 

@@ -43,7 +43,7 @@ case object Checkshogi
   ): Boolean =
     false
 
-  override def pawnCheckmate(@unused a: DropActor, @unused d: Pos): Boolean =
+  override def dropFilterPawnCheckmate(@unused a: DropActor, @unused d: Pos): Boolean =
     false
 
   def status(sit: Situation): Option[Status] =

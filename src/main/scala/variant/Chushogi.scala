@@ -294,14 +294,13 @@ case object Chushogi
         }
       }
 
-  override def isIrreversible(before: Situation, after: Situation, usi: Usi): Boolean =
+  override def isIrreversible(before: Board, after: Board, usi: Usi): Boolean =
     usi match {
       case Usi.Move(_, dest, prom, _) => {
-        prom || after
-          .board(dest)
+        prom || after(dest)
           .exists(
             List[Role](Pawn, Lance) contains _.role,
-          ) || before.board.pieces.size != after.board.pieces.size
+          ) || before.pieces.size != after.pieces.size
       }
       case _ => false
     }

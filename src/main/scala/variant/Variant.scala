@@ -144,14 +144,14 @@ abstract class Variant private[variant] (
 
   def dropRoles = handRoles
 
-  def doublePawn(a: DropActor, d: Pos): Boolean =
+  def dropFilterDoublePawn(a: DropActor, d: Pos): Boolean =
     (a.piece is Pawn) && (
       a.situation.board.pieces.exists { case (pos, piece) =>
         a.piece == piece && pos.file == d.file
       }
     )
 
-  def pawnCheckmate(a: DropActor, d: Pos): Boolean =
+  def dropFilterPawnCheckmate(a: DropActor, d: Pos): Boolean =
     (a.piece is Pawn) && (
       a.situation.board.singleRoyalPosOf(!a.situation.color).fold(false) { kingPos =>
         a.piece.eyes(d, kingPos) && !(a.situation
@@ -163,14 +163,14 @@ abstract class Variant private[variant] (
 
   def dropFilter(a: DropActor): List[Pos] = {
     a.situation.possibleDropDests.filterNot { d =>
-      forcePromote(a.piece, d) || doublePawn(a, d) || pawnCheckmate(a, d)
+      forcePromote(a.piece, d) || dropFilterDoublePawn(a, d) || dropFilterPawnCheckmate(a, d)
     }
   }
 
   // Could the position before the usi occur ever again
   def isIrreversible(
-      @unused before: Situation,
-      @unused after: Situation,
+      @unused before: Board,
+      @unused after: Board,
       @unused usi: Usi,
   ): Boolean = false
 
