@@ -50,8 +50,12 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       val vg = usisStr.foldLeft[Validated[String, Game]](Validated.valid(game)) {
         case (vg, usiStr) =>
           vg.foreach { g =>
-            val _ = g.situation.moveDestinations
-            val _ = g.situation.dropDestinations
+            val _ = g.situation.moveActors.values.map { actor =>
+              actor.destinations
+            }
+            val _ = g.situation.dropActors.values.map { actor =>
+              actor.destinations
+            }
           }
           val ng = vg flatMap { g =>
             g(Usi(usiStr).get)
@@ -81,8 +85,8 @@ trait ShogiTest extends Specification with ValidatedMatchers {
   def makeSituation(variant: Variant): Situation =
     Situation(variant)
 
-  def makeSituationWithBoard(variant: Variant, pieces: (Pos, Piece)*): Situation =
-    makeSituation(variant).withBoard(Board(pieces))
+  def makeSituationWithBoard(variant: Variant, color: Color, pieces: (Pos, Piece)*): Situation =
+    makeSituation(variant).withColor(color).withBoard(Board(pieces))
 
   def makeEmptySituation(variant: Variant): Situation =
     Situation(variant).withBoard(Board.empty)
@@ -111,6 +115,9 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       variant: Variant,
   ): Option[List[Pos]] = {
     val sit = makeEmptySituation(variant)
-    sit.withBoard(sit.board.place(piece, pos).get).moveActorAt(pos) map (_.destinations)
+    sit
+      .withColor(piece.color)
+      .withBoard(sit.board.place(piece, pos).get)
+      .moveActorAt(pos) map (_.destinations)
   }
 }

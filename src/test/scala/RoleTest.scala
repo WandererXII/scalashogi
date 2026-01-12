@@ -10,6 +10,7 @@ class RoleTest extends ShogiTest {
       val piece   = Piece(color, role)
       val dests   = makeSituationWithBoard(
         variant,
+        piece.color,
         SQ5E -> piece,
       ).moveDestsFrom(SQ5E).get
 

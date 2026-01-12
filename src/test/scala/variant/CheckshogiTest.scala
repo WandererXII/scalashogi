@@ -79,9 +79,7 @@ class CheckshogiTest extends ShogiTest {
       sit.end must beFalse
       sit.winner must beNone
       val usi = Usi.Drop("P*5b").get
-      sit.dropDestinations
-        .get(Piece(sit.color, sit.variant.allRoles.find(_ == usi.role).get))
-        .get must contain(usi.pos)
+      sit.dropActorOf(usi.role).get.destinations must contain(usi.pos)
       val pawnCheck = sit(usi).toOption.get
       pawnCheck.check must beTrue
       pawnCheck.end must beTrue
@@ -89,9 +87,7 @@ class CheckshogiTest extends ShogiTest {
       pawnCheck.winner must_== Some(Sente)
 
       val usi2 = Usi.Drop("L*5b").get
-      sit.dropDestinations
-        .get(Piece(sit.color, sit.variant.allRoles.find(_ == usi2.role).get))
-        .get must contain(usi2.pos)
+      sit.dropActorOf(usi2.role).get.destinations must contain(usi2.pos)
       val lanceCheck = sit(usi2).toOption.get
       lanceCheck.check must beTrue
       lanceCheck.end must beTrue
@@ -105,9 +101,10 @@ class CheckshogiTest extends ShogiTest {
       sit.end must beFalse
       sit.winner must beNone
       val usi = Usi.Drop("P*5b").get
-      sit.dropDestinations
-        .get(Piece(sit.color, sit.variant.allRoles.find(_ == usi.role).get))
-        .get must contain(usi.pos)
+      sit
+        .dropActorOf(usi.role)
+        .get
+        .destinations must contain(usi.pos)
       val pawnCheck = sit(usi).toOption.get
       pawnCheck.check must beTrue
       pawnCheck.end must beTrue

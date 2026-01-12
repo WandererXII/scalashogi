@@ -38,7 +38,7 @@ class MinishogiTest extends ShogiTest {
         line match {
           case (sfenStr, d1) => {
             val game = Game(Some(Sfen(sfenStr)), shogi.variant.Minishogi)
-            perft(game, 1) must be equalTo d1.toInt
+            Perft.perft(game, 1) must be equalTo d1.toInt
           }
         }
       }

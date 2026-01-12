@@ -4,14 +4,12 @@ import shogi.format.usi.Usi
 
 object Perft {
 
-  def drops(sit: Situation): List[Usi] =
-    sit
-      .dropActorsOf(sit.color)
+  def drops(sit: Situation): List[Usi.Drop] =
+    sit.dropActors.values.toList
       .flatMap(_.toUsis)
 
-  def moves(sit: Situation): List[Usi] =
-    sit
-      .moveActorsOf(sit.color)
+  def moves(sit: Situation): List[Usi.Move] =
+    sit.moveActors.values.toList
       .flatMap(_.toUsis)
 
   def perft(game: Game, depth: Int, log: Boolean = false): Int =

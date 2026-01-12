@@ -205,7 +205,8 @@ abstract class Variant private[variant] (
 
   def royalsLost(@unused sit: Situation): Boolean = false
 
-  def draw(sit: Situation): Boolean = isInsufficientMaterial(sit)
+  def draw(sit: Situation): Boolean = sit.hands.isEmpty && sit.board.pieces.sizeIs <= 2 &&
+    sit.board.pieces.forall { p => p._2 is King }
 
   def specialVariantEnd(@unused sit: Situation): Boolean = false
 
@@ -216,17 +217,6 @@ abstract class Variant private[variant] (
     else if (sit.bareKing(!sit.color) || sit.impasse) Some(sit.color)
     else if (sit.perpetualCheck) sit.history.perpetualCheckAttacker.map(!_)
     else None
-
-  // Returns the material imbalance in pawns
-  def materialImbalance(sit: Situation): Int =
-    sit.board.pieces.values.foldLeft(0) { case (acc, Piece(color, role)) =>
-      acc + valueOfRole(role) * color.fold(1, -1)
-    } + (sit.hands(Sente).sum(valueOfRole) - sit.hands(Gote).sum(valueOfRole))
-
-  // Returns true if neither player can win. The game should end immediately.
-  def isInsufficientMaterial(sit: Situation) =
-    sit.hands.isEmpty && sit.board.pieces.sizeIs <= 2 &&
-      sit.board.pieces.forall { p => p._2 is King }
 
   protected def hasUnmovablePieces(board: Board) =
     board.pieces.exists { case (pos, piece) =>

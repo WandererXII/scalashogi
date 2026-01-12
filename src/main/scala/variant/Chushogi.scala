@@ -311,7 +311,7 @@ case object Chushogi
     after.check || {
       usi match {
         case Usi.Move(_, dest, _, _) =>
-          after
+          after.switch
             .moveActorAt(dest)
             .exists(a => a.destinations.exists(d => after.board(d).exists(_.color == after.color)))
         case _ => false
@@ -354,7 +354,7 @@ case object Chushogi
   override def royalsLost(sit: Situation): Boolean =
     sit.board.royalPossOf(sit.color).isEmpty
 
-  override def isInsufficientMaterial(sit: Situation) = {
+  override def draw(sit: Situation) = {
     // don't count dead pieces
     val piecesFiltered = sit.board.pieces.view.filter { case (pos, piece) =>
       if (

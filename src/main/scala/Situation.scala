@@ -27,25 +27,15 @@ final case class Situation(
 
   // Moves
 
-  lazy val moveActors: Map[Pos, MoveActor] = board.pieces map { case (pos, piece) =>
-    (pos, MoveActor(piece, pos, this))
-  }
-
-  lazy val moveActorsOf: Color.Map[List[MoveActor]] = {
-    val (s, g) = moveActors.values.toList.partition { _.color.sente }
-    Color.Map(s, g)
+  lazy val moveActors: Map[Pos, MoveActor] = board.pieces collect {
+    case (pos, piece) if piece.color == color =>
+      (pos, MoveActor(piece, pos, this))
   }
 
   def moveActorAt(at: Pos): Option[MoveActor] = moveActors get at
 
-  lazy val moveDestinations: Map[Pos, List[Pos]] =
-    moveActorsOf(color).collect {
-      case actor if actor.destinations.nonEmpty => actor.pos -> actor.destinations
-    }.toMap
-
   lazy val hasMoveDestinations: Boolean =
-    moveActorsOf(color)
-      .exists(_.destinations.nonEmpty)
+    moveActors.values.exists(_.destinations.nonEmpty)
 
   def moveDestsFrom(from: Pos): Option[List[Pos]] = moveActorAt(from) map (_.destinations)
 
@@ -99,32 +89,18 @@ final case class Situation(
       }
     }
 
-  lazy val dropActors: Map[Piece, DropActor] = (if (variant.supportsDroppingEitherSide)
-                                                  hands.rolesOf.map(addOtherSide)
-                                                else hands.rolesOf)
-    .reduce[List[(Piece, DropActor)]] { (sente, gote) =>
-      sente.map(role => (Piece(Sente, role), DropActor(Sente, role, this))) :::
-        gote.map(role => (Piece(Gote, role), DropActor(Gote, role, this)))
-    }
-    .toMap
-
-  lazy val dropActorsOf: Color.Map[List[DropActor]] = {
-    val (s, g) = dropActors.values.toList.partition { _.color.sente }
-    Color.Map(s, g)
+  lazy val dropActors: Map[DroppableRole, DropActor] = {
+    val rolesInHand    = hands(color).roles
+    val allRolesInHand =
+      if (variant.supportsDroppingEitherSide) addOtherSide(rolesInHand) else rolesInHand
+    allRolesInHand.map(r => (r, DropActor(color, r, this))).toMap
   }
 
-  def dropActorOf(piece: Piece): Option[DropActor] = dropActors get piece
-
-  lazy val dropDestinations: Map[Piece, List[Pos]] =
-    dropActorsOf(color).collect {
-      case actor if actor.destinations.nonEmpty => actor.piece -> actor.destinations
-    }.toMap
+  def dropActorOf(role: DroppableRole): Option[DropActor] = dropActors get role
 
   lazy val hasDropDestinations: Boolean =
-    dropActorsOf(color)
+    dropActors.values
       .exists(_.destinations.nonEmpty)
-
-  def dropDestsOf(piece: Piece): Option[List[Pos]] = dropActorOf(piece) map (_.destinations)
 
   def drop(usi: Usi.Drop): Validated[String, Situation] =
     for {
@@ -135,7 +111,7 @@ final case class Situation(
         "Can't drop this role in this variant",
       )
       piece = Piece(color, usi.role)
-      actor <- dropActorOf(piece) toValid s"No actor of $piece"
+      actor <- dropActorOf(usi.role) toValid s"No actor of $piece"
       _ <- Validated.cond(actor.destinations.contains(usi.pos), (), s"Dropping $piece is not valid")
       roleToTake =
         if (variant.supportsDroppingEitherSide) variant.unpromoteRoleForHand(usi.role)
@@ -225,15 +201,7 @@ final case class Situation(
 
   def impasse = variant impasse this
 
-  def winner: Option[Color] = variant.winner(this)
-
-  def end: Boolean =
-    status.isDefined
-
-  def valid(strict: Boolean) = variant.valid(this.board, this.hands, strict)
-
-  def playable(strict: Boolean): Boolean =
-    valid(strict) && !end && !copy(color = !color).check
+  lazy val winner: Option[Color] = variant.winner(this)
 
   // lazy val status: Option[Status] = variant.status(this)
   lazy val status: Option[Status] =
@@ -248,12 +216,24 @@ final case class Situation(
     else if (draw) Status.Draw.some
     else none
 
+  def end: Boolean =
+    status.isDefined
+
   // Util
 
-  def materialImbalance: Int = variant.materialImbalance(this)
+  def valid(strict: Boolean) = variant.valid(this.board, this.hands, strict)
+
+  def playable(strict: Boolean): Boolean =
+    valid(strict) && !end && !copy(color = !color).check
+
+  def materialImbalance: Int =
+    board.pieces.values.foldLeft(0) { case (acc, Piece(c, r)) =>
+      acc + variant.valueOfRole(r) * c.fold(1, -1)
+    } + (hands(Sente).sum(variant.valueOfRole) - hands(Gote).sum(variant.valueOfRole))
 
   def withBoard(board: Board)                     = copy(board = board)
   def withHands(hands: Hands)                     = copy(hands = hands)
+  def withColor(color: Color)                     = copy(color = color)
   def withHistory(history: History)               = copy(history = history)
   def withVariant(variant: shogi.variant.Variant) = copy(variant = variant)
 
