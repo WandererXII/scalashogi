@@ -14,11 +14,15 @@ object Perft {
 
   def perft(game: Game, depth: Int, log: Boolean = false): Int =
     if (depth > 0) {
-      val mds: List[Usi] = moves(game.situation) ::: drops(game.situation)
-      mds.foldLeft(0) { (p, u) =>
-        val cnt = perft(game(u).toOption.get, depth - 1)
-        if (log) println(s"${u.usi.padTo(5, ' ')} - $cnt")
-        p + cnt
+      if (game.situation.end) 0
+      else {
+        val mds: List[Usi] = moves(game.situation) ::: drops(game.situation)
+        mds.foldLeft(0) { (p, u) =>
+          val newGame = game(u).toOption.get
+          val cnt     = perft(newGame, depth - 1)
+          if (log) println(s"${u.usi.padTo(5, ' ')} - $cnt")
+          p + cnt
+        }
       }
     } else 1
 

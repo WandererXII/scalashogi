@@ -19,11 +19,11 @@ class CheckshogiTest extends ShogiTest {
     "3 depth" in {
       perft(game, 3) must be equalTo 25470
     }
-    // "4 depth" in {
-    //   perft(game, 4) must be equalTo 719731
-    // }
+    "4 depth" in {
+      perft(game, 4) must be equalTo 719408
+    }
     // "5 depth" in {
-    //  perft(game, 5) must be equalTo 19861490
+    //  perft(game, 5) must be equalTo 19839626
     // }
   }
 
