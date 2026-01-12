@@ -11,7 +11,6 @@ case object Kyotoshogi
       id = 5,
       key = "kyotoshogi",
       name = "Kyoto shogi",
-      title = "Pieces alternate between promoted and demoted state after each time they are moved",
     ) {
 
   val initialSfen = Sfen("pgkst/5/5/5/TSKGP b - 1")

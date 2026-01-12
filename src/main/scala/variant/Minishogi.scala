@@ -9,7 +9,6 @@ case object Minishogi
       id = 2,
       key = "minishogi",
       name = "Minishogi",
-      title = "Same rules, smaller board",
     ) {
 
   val initialSfen = Sfen("rbsgk/4p/5/P4/KGSBR b - 1")

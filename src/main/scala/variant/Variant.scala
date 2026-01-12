@@ -13,7 +13,6 @@ abstract class Variant private[variant] (
     val id: Int,
     val key: String,
     val name: String,
-    val title: String,
 ) {
 
   def initialSfen: Sfen

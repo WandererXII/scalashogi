@@ -12,7 +12,6 @@ case object Checkshogi
       id = 6,
       key = "checkshogi",
       name = "Checkshogi",
-      title = "Check your opponent's king to win",
     ) {
 
   def initialSfen = Standard.initialSfen
