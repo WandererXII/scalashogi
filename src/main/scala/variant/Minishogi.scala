@@ -76,8 +76,12 @@ case object Minishogi
       case _                             => 0
     }
 
-  override def winner(sit: Situation): Option[Color] =
-    if (sit.repetition) sit.history.initialSfen.flatMap(_.color.map(!_)).orElse(Some(Gote))
-    else super.winner(sit)
+  def status(sit: Situation): Option[Status] =
+    Standard.status(sit)
+
+  def winner(sit: Situation): Option[Color] =
+    if (sit.status.contains(Status.Repetition))
+      sit.history.initialSfen.flatMap(_.color.map(!_)).orElse(Some(Gote))
+    else Standard.winner(sit)
 
 }

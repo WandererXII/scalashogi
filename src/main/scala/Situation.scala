@@ -171,7 +171,7 @@ final case class Situation(
 
   lazy val checkSquares: List[Pos] = variant.checkSquares(board, color)
 
-  // Not taking into account specific drop rules
+  // Not taking into account specific drop rules, cached here
   lazy val possibleDropDests: List[Pos] =
     Some(checkSquares)
       .filter(_.size == 1)
@@ -183,41 +183,21 @@ final case class Situation(
 
   // Results
 
-  def checkmate: Boolean = variant checkmate this
-
-  def stalemate: Boolean = variant stalemate this
-
-  def perpetualCheck: Boolean = variant perpetualCheck this
-
-  def repetition: Boolean = variant repetition this
-
-  def royalsLost: Boolean = variant royalsLost this
-
-  def bareKing(color: Color): Boolean = variant.bareKing(this, color)
-
-  def draw: Boolean = variant draw this
-
-  def specialVariantEnd = variant specialVariantEnd this
-
-  def impasse = variant impasse this
-
   lazy val winner: Option[Color] = variant.winner(this)
-
-  // lazy val status: Option[Status] = variant.status(this)
-  lazy val status: Option[Status] =
-    if (specialVariantEnd) Status.SpecialVariantEnd.some
-    else if (checkmate) Status.Mate.some
-    else if (royalsLost) Status.RoyalsLost.some
-    else if (bareKing(Sente) || bareKing(Gote)) Status.BareKing.some
-    else if (stalemate) Status.Stalemate.some
-    else if (impasse) Status.Impasse27.some
-    else if (perpetualCheck) Status.PerpetualCheck.some
-    else if (repetition) Status.Repetition.some
-    else if (draw) Status.Draw.some
-    else none
+  lazy val status: Option[Status] = variant.status(this)
 
   def end: Boolean =
     status.isDefined
+
+  // For tests mostly
+  def checkmate = status.contains(Status.Mate)
+  def stalemate = status.contains(Status.Stalemate)
+  def perpetualCheck = status.contains(Status.PerpetualCheck)
+  def repetition = status.contains(Status.Repetition)
+  def draw = status.contains(Status.Draw)
+  def impasse = status.contains(Status.Impasse27)
+  // bare king color loses 
+  def bareKing(color: Color) = status.contains(Status.BareKing) && winner.contains(!color)
 
   // Util
 
@@ -225,6 +205,9 @@ final case class Situation(
 
   def playable(strict: Boolean): Boolean =
     valid(strict) && !end && !copy(color = !color).check
+
+  def isInsufficientMaterial: Boolean =
+    variant.isInsufficientMaterial(this)
 
   def materialImbalance: Int =
     board.pieces.values.foldLeft(0) { case (acc, Piece(c, r)) =>

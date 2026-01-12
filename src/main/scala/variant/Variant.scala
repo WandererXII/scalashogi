@@ -155,10 +155,10 @@ abstract class Variant private[variant] (
   def pawnCheckmate(a: DropActor, d: Pos): Boolean =
     (a.piece is Pawn) && (
       a.situation.board.singleRoyalPosOf(!a.situation.color).fold(false) { kingPos =>
-        a.piece.eyes(d, kingPos) && a.situation
+        a.piece.eyes(d, kingPos) && !(a.situation
           .withBoard(a.situation.board.forcePlace(a.piece, d))
           .switch
-          .checkmate
+          .hasDestinations)
       }
     )
 
@@ -187,36 +187,12 @@ abstract class Variant private[variant] (
         case _                                                       => none
       })
 
-  def perpetualCheck(sit: Situation): Boolean =
-    sit.history.fourfoldRepetition && sit.history.perpetualCheckAttacker.isDefined
-
-  def repetition(sit: Situation): Boolean =
-    sit.history.fourfoldRepetition && !perpetualCheck(sit)
-
-  def stalemate(sit: Situation): Boolean =
-    !sit.hasDestinations && !checkmate(sit)
-
-  def checkmate(sit: Situation): Boolean =
-    sit.check && !sit.hasDestinations
-
-  def impasse(@unused sit: Situation): Boolean = false
-
-  def bareKing(@unused sit: Situation, @unused color: Color): Boolean = false
-
-  def royalsLost(@unused sit: Situation): Boolean = false
-
-  def draw(sit: Situation): Boolean = sit.hands.isEmpty && sit.board.pieces.sizeIs <= 2 &&
+  def isInsufficientMaterial(sit: Situation): Boolean = sit.hands.isEmpty && sit.board.pieces.sizeIs <= 2 &&
     sit.board.pieces.forall { p => p._2 is King }
 
-  def specialVariantEnd(@unused sit: Situation): Boolean = false
+  def status(sit: Situation): Option[Status]
 
-  // Player wins or loses after their move/drop
-  def winner(sit: Situation): Option[Color] =
-    if (sit.checkmate || sit.stalemate || sit.bareKing(sit.color) || sit.royalsLost)
-      Some(!sit.color)
-    else if (sit.bareKing(!sit.color) || sit.impasse) Some(sit.color)
-    else if (sit.perpetualCheck) sit.history.perpetualCheckAttacker.map(!_)
-    else None
+  def winner(sit: Situation): Option[Color]
 
   protected def hasUnmovablePieces(board: Board) =
     board.pieces.exists { case (pos, piece) =>

@@ -1,6 +1,8 @@
 package shogi
 package variant
 
+import cats.syntax.option._
+
 import shogi.Pos._
 import shogi.format.forsyth.Sfen
 
@@ -102,12 +104,25 @@ case object Kyotoshogi
 
   override def supportsDroppingEitherSide = true
 
-  override def perpetualCheck(sit: Situation): Boolean = false
-
-  override def repetition(sit: Situation): Boolean = sit.history.threefoldRepetition
-
   override def hasUnmovablePieces(board: Board) = false
 
   override def hasDoublePawns(board: Board, color: Color) = false
+
+  def status(sit: Situation): Option[Status] =
+    if (!sit.hasDestinations) {
+      if (sit.check) Status.Mate.some
+      else Status.Stalemate.some
+    } else if (sit.history.threefoldRepetition) Status.Repetition.some
+    else if (isInsufficientMaterial(sit)) Status.Draw.some
+    else none
+
+  def winner(sit: Situation): Option[Color] =
+    sit.status flatMap { status =>
+      status match {
+        case Status.Mate | Status.Stalemate => (!sit.color).some
+        case Status.PerpetualCheck          => sit.history.perpetualCheckAttacker.map(!_)
+        case _                              => none
+      }
+    }
 
 }

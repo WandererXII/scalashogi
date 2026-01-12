@@ -1,6 +1,8 @@
 package shogi
 package variant
 
+import cats.syntax.option._
+
 import shogi.Pos._
 import shogi.format.forsyth.Sfen
 
@@ -154,7 +156,7 @@ case object Standard
         )
       }
 
-  override def impasse(sit: Situation): Boolean = !sit.check && {
+  protected def impasse(sit: Situation): Boolean = !sit.check && {
     val color        = sit.color
     val ranks        = sit.variant.promotionRanks(color)
     val enteredRoles = sit.board.pieces.collect {
@@ -169,5 +171,26 @@ case object Standard
     enteredRoles.sizeIs > 10 && enteredRoles
       .contains(King) && impassePoints >= color.fold(28, 27 - missingImpassePoints(sit))
   }
+
+  def status(sit: Situation): Option[Status] =
+    if (!sit.hasDestinations) {
+      if (sit.check) Status.Mate.some
+      else Status.Stalemate.some
+    } else if (impasse(sit)) Status.Impasse27.some
+    else if (sit.history.fourfoldRepetition) {
+      if (sit.history.perpetualCheckAttacker.isDefined) Status.PerpetualCheck.some
+      else Status.Repetition.some
+    } else if (isInsufficientMaterial(sit)) Status.Draw.some
+    else none
+
+  def winner(sit: Situation): Option[Color] =
+    sit.status flatMap { status =>
+      status match {
+        case Status.Mate | Status.Stalemate => (!sit.color).some
+        case Status.Impasse27               => (sit.color).some
+        case Status.PerpetualCheck          => sit.history.perpetualCheckAttacker.map(!_)
+        case _                              => none
+      }
+    }
 
 }

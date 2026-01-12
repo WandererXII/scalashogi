@@ -318,12 +318,8 @@ case object Chushogi
       }
     }
 
-  override def stalemate(sit: Situation): Boolean = !sit.hasMoveDestinations
-
-  override def checkmate(sit: Situation): Boolean = false
-
   // from color's side - was color king bared
-  override def bareKing(sit: Situation, color: Color): Boolean = {
+  private def bareKing(sit: Situation, color: Color): Boolean = {
     val ourPiecesFiltered = sit.board.pieces.view.collect {
       case (pos, piece)
           if (piece is color) && !(((piece is Pawn) || (piece is Lance)) && backrank(
@@ -351,10 +347,7 @@ case object Chushogi
     )) // opponent either has more pieces than we can capture, or we don't threaten to bare their king
   }
 
-  override def royalsLost(sit: Situation): Boolean =
-    sit.board.royalPossOf(sit.color).isEmpty
-
-  override def draw(sit: Situation) = {
+  override def isInsufficientMaterial(sit: Situation) = {
     // don't count dead pieces
     val piecesFiltered = sit.board.pieces.view.filter { case (pos, piece) =>
       if (
@@ -370,6 +363,27 @@ case object Chushogi
     !sit.check &&
     !sit.switch.check
   }
+
+  def status(sit: Situation): Option[Status] =
+    if (sit.board.royalPossOf(sit.color).isEmpty) Status.RoyalsLost.some
+    else if (bareKing(sit, Sente) || bareKing(sit, Gote)) Status.BareKing.some
+    else if (!sit.hasDestinations) Status.Stalemate.some
+    else if (sit.history.fourfoldRepetition) {
+      if (sit.history.perpetualCheckAttacker.isDefined) Status.PerpetualCheck.some
+      else Status.Repetition.some
+    } else if (isInsufficientMaterial(sit)) Status.Draw.some
+    else none
+
+  def winner(sit: Situation): Option[Color] =
+    sit.status flatMap { status =>
+      status match {
+        case Status.RoyalsLost | Status.Stalemate => (!sit.color).some
+        case Status.BareKing                      =>
+          if (bareKing(sit, Sente)) Gote.some else Sente.some
+        case Status.PerpetualCheck => sit.history.perpetualCheckAttacker.map(!_)
+        case _                     => none
+      }
+    }
 
   // Unmovable pieces are allowed
   override def hasUnmovablePieces(board: Board) = false

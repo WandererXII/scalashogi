@@ -8,7 +8,7 @@ class DrawTest extends ShogiTest {
   "detect draw" should {
     "by lack of pieces" in {
       "empty" in {
-        makeEmptySituation(Standard).draw must_== true
+        makeEmptySituation(Standard).isInsufficientMaterial must_== true
         makeSituation(Standard).repetition must_== false
       }
       "new" in {

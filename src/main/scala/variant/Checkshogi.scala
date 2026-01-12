@@ -3,6 +3,8 @@ package variant
 
 import scala.annotation.unused
 
+import cats.syntax.option._
+
 import shogi.format.usi.Usi
 
 case object Checkshogi
@@ -42,21 +44,15 @@ case object Checkshogi
   ): Boolean =
     false
 
-  override def checkmate(@unused sit: Situation): Boolean = false
-
-  override def impasse(sit: Situation): Boolean = Standard.impasse(sit)
-
-  override def perpetualCheck(@unused sit: Situation): Boolean = false
-
-  override def specialVariantEnd(sit: Situation): Boolean =
-    sit.check
-
   override def pawnCheckmate(@unused a: DropActor, @unused d: Pos): Boolean =
     false
 
-  override def winner(sit: Situation): Option[Color] =
-    if (sit.stalemate || sit.specialVariantEnd) Some(!sit.color)
-    else if (sit.impasse) Some(sit.color)
-    else None
+  def status(sit: Situation): Option[Status] =
+    if (sit.check) Status.SpecialVariantEnd.some
+    else Standard.status(sit)
+
+  def winner(sit: Situation): Option[Color] =
+    if (sit.status.contains(Status.SpecialVariantEnd)) (!sit.color).some
+    else Standard.winner(sit)
 
 }
