@@ -64,7 +64,7 @@ case object Kyotoshogi
     Rook,
   )
 
-  override def dropFilter(a: DropActor): List[Pos] = a.situation.possibleDropDests
+  override def dropFilter(a: DropActor): List[Pos] = a.unfilteredDestinations
 
   def promote(role: Role): Option[Role] =
     role match {
@@ -107,21 +107,12 @@ case object Kyotoshogi
 
   override def hasDoublePawns(board: Board, color: Color) = false
 
-  def status(sit: Situation): Option[Status] =
+  override def status(sit: Situation): Option[Status] =
     if (!sit.hasDestinations) {
       if (sit.check) Status.Mate.some
       else Status.Stalemate.some
     } else if (sit.history.threefoldRepetition) Status.Repetition.some
-    else if (isInsufficientMaterial(sit)) Status.Draw.some
+    else if (isInsufficientMaterial(sit.board, sit.hands)) Status.Draw.some
     else none
-
-  def winner(sit: Situation): Option[Color] =
-    sit.status flatMap { status =>
-      status match {
-        case Status.Mate | Status.Stalemate => (!sit.color).some
-        case Status.PerpetualCheck          => sit.history.perpetualCheckAttacker.map(!_)
-        case _                              => none
-      }
-    }
 
 }

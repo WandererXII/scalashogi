@@ -25,15 +25,15 @@ object Status {
   case object Outoftime extends Status(35) // clock flag
   case object Cheat     extends Status(36)
   case object NoStart   extends Status(37) // the player did not make the first move/drop in time
-  case object UnknownFinish     extends Status(38) // we don't know why the game ended
-  case object TryRule           extends Status(39)
-  case object PerpetualCheck    extends Status(40)
-  case object Impasse27         extends Status(41)
-  case object RoyalsLost        extends Status(42)
-  case object BareKing          extends Status(43)
-  case object Repetition        extends Status(44)
-  case object SpecialVariantEnd extends Status(45)
-  case object IllegalMove       extends Status(46)
+  case object UnknownFinish  extends Status(38) // we don't know why the game ended
+  case object TryRule        extends Status(39)
+  case object PerpetualCheck extends Status(40)
+  case object Impasse27      extends Status(41)
+  case object RoyalsLost     extends Status(42)
+  case object BareKing       extends Status(43)
+  case object Repetition     extends Status(44)
+  case object Check          extends Status(45) // checkshogi end status
+  case object IllegalMove    extends Status(46)
 
   val all = List[Status](
     Created,
@@ -55,7 +55,7 @@ object Status {
     RoyalsLost,
     BareKing,
     Repetition,
-    SpecialVariantEnd,
+    Check,
     IllegalMove,
   )
 

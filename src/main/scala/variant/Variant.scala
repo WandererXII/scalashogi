@@ -87,12 +87,12 @@ abstract class Variant private[variant] (
   def moveFilter(a: MoveActor): List[Pos] = {
     // only long range roles, since you can only unpin a check from a role with projection
     val filter: Piece => Boolean =
-      if ((a.piece is King) || a.situation.check) _ => true else (_.projectionDirs.nonEmpty)
-    val stableKingPos = if (a.piece is King) None else a.situation.board.singleRoyalPosOf(a.color)
+      if ((a.piece is King) || a.check) _ => true else (_.projectionDirs.nonEmpty)
+    val stableKingPos = if (a.piece is King) None else a.board.singleRoyalPosOf(a.color)
     a.unfilteredDestinations filterNot { dest =>
       (stableKingPos orElse Option.when(a.piece is King)(dest)) exists {
         posThreatened(
-          a.situation.board.forceMove(a.piece, a.pos, dest),
+          a.board.forceMove(a.piece, a.pos, dest),
           !a.color,
           _,
           filter,
@@ -104,34 +104,36 @@ abstract class Variant private[variant] (
   def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] =
     if (Role.allLions.contains(a.piece.role))
       a.shortUnfilteredDestinations filter { d =>
-        d.dist(midStep) == 1 && a.situation.board(d).filter(_.color != a.color).fold(true) {
-          capture =>
-            d.dist(a.pos) == 1 || !Role.allLions.contains(capture.role) ||
-            a.situation
-              .board(midStep)
-              .exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween)) ||
-            (!posThreatened(
-              a.situation.board.forceTake(a.pos).forceTake(midStep),
+        d.dist(midStep) == 1 && a.board(d).filter(_.color != a.color).fold(true) { capture =>
+          d.dist(a.pos) == 1 || !Role.allLions.contains(capture.role) ||
+          a
+            .board(midStep)
+            .exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween)) ||
+          (!posThreatened(
+            a.board.forceTake(a.pos).forceTake(midStep),
+            !a.color,
+            d,
+            _ => true,
+          ) &&
+            !posThreatened(
+              a.board.forceTake(a.pos),
               !a.color,
               d,
-              _ => true,
-            ) &&
-              !posThreatened(
-                a.situation.board.forceTake(a.pos),
-                !a.color,
-                d,
-                p => (p is Pawn) || (p is GoBetween),
-              ))
+              p => (p is Pawn) || (p is GoBetween),
+            ))
         }
       }
     else {
       val dests = a.shortUnfilteredDestinations.filter(_.dist(midStep) == 1)
-      a.situation.history.lastLionCapture.fold(dests) { lionCaptureDest =>
+      a.history.lastLionCapture.fold(dests) { lionCaptureDest =>
         dests filterNot { d =>
-          lionCaptureDest != d && a.situation.board(d).exists(p => Role.allLions.contains(p.role))
+          lionCaptureDest != d && a.board(d).exists(p => Role.allLions.contains(p.role))
         }
       }
     }
+
+  def check(board: Board, color: Color): Boolean =
+    board.royalPossOf(color).exists(posThreatened(board, !color, _))
 
   def checkSquares(board: Board, color: Color): List[Pos] =
     board.royalPossOf(color).filter(posThreatened(board, !color, _))
@@ -146,23 +148,23 @@ abstract class Variant private[variant] (
 
   def dropFilterDoublePawn(a: DropActor, d: Pos): Boolean =
     (a.piece is Pawn) && (
-      a.situation.board.pieces.exists { case (pos, piece) =>
+      a.board.pieces.exists { case (pos, piece) =>
         a.piece == piece && pos.file == d.file
       }
     )
 
   def dropFilterPawnCheckmate(a: DropActor, d: Pos): Boolean =
     (a.piece is Pawn) && (
-      a.situation.board.singleRoyalPosOf(!a.situation.color).fold(false) { kingPos =>
+      a.board.singleRoyalPosOf(!a.color).fold(false) { kingPos =>
         a.piece.eyes(d, kingPos) && !(a.situation
-          .withBoard(a.situation.board.forcePlace(a.piece, d))
+          .withBoard(a.board.forcePlace(a.piece, d))
           .switch
           .hasDestinations)
       }
     )
 
   def dropFilter(a: DropActor): List[Pos] = {
-    a.situation.possibleDropDests.filterNot { d =>
+    a.unfilteredDestinations.filterNot { d =>
       forcePromote(a.piece, d) || dropFilterDoublePawn(a, d) || dropFilterPawnCheckmate(a, d)
     }
   }
@@ -175,7 +177,7 @@ abstract class Variant private[variant] (
   ): Boolean = false
 
   // for perpetual check
-  def isAttacked(@unused before: Situation, @unused after: Situation, @unused usi: Usi): Boolean =
+  def isAttacking(after: Situation, @unused usi: Usi): Boolean =
     after.check
 
   def unpromoteRoleForHand(role: Role): Option[DroppableRole] =
@@ -186,12 +188,30 @@ abstract class Variant private[variant] (
         case _                                                       => none
       })
 
-  def isInsufficientMaterial(sit: Situation): Boolean = sit.hands.isEmpty && sit.board.pieces.sizeIs <= 2 &&
-    sit.board.pieces.forall { p => p._2 is King }
+  def isInsufficientMaterial(board: Board, hands: Hands): Boolean =
+    hands.isEmpty && board.pieces.sizeIs <= 2 &&
+      board.pieces.forall { p => p._2 is King }
 
-  def status(sit: Situation): Option[Status]
+  def status(sit: Situation): Option[Status] =
+    if (!sit.hasDestinations) {
+      if (sit.check) Status.Mate.some
+      else Status.Stalemate.some
+    } else if (Impasse(sit)) Status.Impasse27.some
+    else if (sit.history.fourfoldRepetition) {
+      if (sit.history.perpetualCheckAttacker.isDefined) Status.PerpetualCheck.some
+      else Status.Repetition.some
+    } else if (isInsufficientMaterial(sit.board, sit.hands)) Status.Draw.some
+    else none
 
-  def winner(sit: Situation): Option[Color]
+  def winner(sit: Situation): Option[Color] =
+    sit.status flatMap { status =>
+      status match {
+        case Status.Mate | Status.Stalemate | Status.Check => (!sit.color).some
+        case Status.Impasse27                              => (sit.color).some
+        case Status.PerpetualCheck => sit.history.perpetualCheckAttacker.map(!_)
+        case _                     => none
+      }
+    }
 
   protected def hasUnmovablePieces(board: Board) =
     board.pieces.exists { case (pos, piece) =>

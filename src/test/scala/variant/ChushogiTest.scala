@@ -257,6 +257,16 @@ class ChushogiTest extends ShogiTest {
     sitMove.history.consecutiveAttacks must_== ConsecutiveAttacks.empty
     sitMoveAlt.history.consecutiveAttacks must_== ConsecutiveAttacks(0, 1)
     sitMoveAlt2.history.consecutiveAttacks must_== ConsecutiveAttacks(0, 1)
+
+    val sit2 = Sfen("12/12/12/12/12/2n6n2/3h8/2N5N3/12/12/12/12 b - 1")
+      .toSituation(shogi.variant.Chushogi)
+      .get
+    val sit2Move     = sit2(Usi("10h12g").get).toOption.get
+    val sit2MoveAlt  = sit2(Usi("10h9h10h").get).toOption.get
+    val sit2MoveAlt2 = sit2(Usi("4h4g").get).toOption.get
+    sit2Move.history.consecutiveAttacks must_== ConsecutiveAttacks.empty
+    sit2MoveAlt.history.consecutiveAttacks must_== ConsecutiveAttacks(1, 0)
+    sit2MoveAlt2.history.consecutiveAttacks must_== ConsecutiveAttacks(1, 0)
   }
 
   "bare king" in {
@@ -323,6 +333,13 @@ class ChushogiTest extends ShogiTest {
     sit6.bareKing(Gote) must beFalse
     sit6.bareKing(Sente) must beFalse
     sit6.draw must beFalse
+
+    val sit7 =
+      Sfen("12/11G/12/12/3d8/3S8/7k4/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
+    val sit7After1 = sit7(Usi("9f9e").get).toOption.get
+    sit7After1.bareKing(Gote) must beFalse
+    sit7After1.bareKing(Sente) must beFalse
+    sit7After1.status must beNone
   }
 
   "fixture perfts" should {

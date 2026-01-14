@@ -42,7 +42,7 @@ class CheckshogiTest extends ShogiTest {
       val res = sit(Usi("3f2e").get).toOption.get
       res.check must beTrue
       res.end must beTrue
-      res.status must_== Some(Status.SpecialVariantEnd)
+      res.status must_== Some(Status.Check)
       res.winner must_== Some(Sente)
     }
     "gote" in {
@@ -53,7 +53,7 @@ class CheckshogiTest extends ShogiTest {
       val res = sit(Usi("7d8e").get).toOption.get
       res.check must beTrue
       res.end must beTrue
-      res.status must_== Some(Status.SpecialVariantEnd)
+      res.status must_== Some(Status.Check)
       res.winner must_== Some(Gote)
     }
     "check end" in {
@@ -66,7 +66,7 @@ class CheckshogiTest extends ShogiTest {
       val res = sit(Usi("5e5h+").get).toOption.get
       res.check must beTrue
       res.end must beTrue
-      res.status must_== Some(Status.SpecialVariantEnd)
+      res.status must_== Some(Status.Check)
       res.winner must_== Some(Gote)
     }
   }
@@ -83,7 +83,7 @@ class CheckshogiTest extends ShogiTest {
       val pawnCheck = sit(usi).toOption.get
       pawnCheck.check must beTrue
       pawnCheck.end must beTrue
-      pawnCheck.status must_== Some(Status.SpecialVariantEnd)
+      pawnCheck.status must_== Some(Status.Check)
       pawnCheck.winner must_== Some(Sente)
 
       val usi2 = Usi.Drop("L*5b").get
@@ -91,7 +91,7 @@ class CheckshogiTest extends ShogiTest {
       val lanceCheck = sit(usi2).toOption.get
       lanceCheck.check must beTrue
       lanceCheck.end must beTrue
-      lanceCheck.status must_== Some(Status.SpecialVariantEnd)
+      lanceCheck.status must_== Some(Status.Check)
       lanceCheck.winner must_== Some(Sente)
     }
     "be allowed with check alone" in {
@@ -108,7 +108,7 @@ class CheckshogiTest extends ShogiTest {
       val pawnCheck = sit(usi).toOption.get
       pawnCheck.check must beTrue
       pawnCheck.end must beTrue
-      pawnCheck.status must_== Some(Status.SpecialVariantEnd)
+      pawnCheck.status must_== Some(Status.Check)
       pawnCheck.winner must_== Some(Sente)
     }
   }

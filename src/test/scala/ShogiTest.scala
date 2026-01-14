@@ -34,7 +34,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
         (actor.piece.projectionDirs.isEmpty) ||
         (actor.piece.directDirs.exists(_(actor.pos).contains(to))) ||
         Pos.findDirection(actor.pos, to).exists { dir =>
-          actor.situation.variant.longRangeThreatens(actor.situation.board, actor.pos, dir, to)
+          actor.variant.longRangeThreatens(actor.board, actor.pos, dir, to)
         }
       }
   }

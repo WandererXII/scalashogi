@@ -68,7 +68,7 @@ class KyotoshogiTest extends ShogiTest {
     "pawn checkmate" in {
       val sit = Sfen("kl3/1n3/G4/5/TSK1P b P").toSituation(shogi.variant.Kyotoshogi).get
       sit(Usi("P*5b").get).isValid must beTrue
-      sit(Usi("P*5b").get).toOption.get.checkmate must beTrue
+      sit(Usi("P*5b").get).toOption.get.status must_== Some(Status.Mate)
     }
     "enforce + in usi" in {
       val sit = Situation(shogi.variant.Kyotoshogi)

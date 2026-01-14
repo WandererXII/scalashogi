@@ -3,10 +3,18 @@ package shogi
 import shogi.format.usi.Usi
 
 final case class DropActor(
-    color: Color,
     role: DroppableRole,
     situation: Situation,
 ) {
+
+  def board   = situation.board
+  def color   = situation.color
+  def history = situation.history
+  def variant = situation.variant
+
+  def check = situation.check
+
+  def unfilteredDestinations: List[Pos] = situation.possibleDropDests
 
   lazy val destinations: List[Pos] =
     if (

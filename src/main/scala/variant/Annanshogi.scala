@@ -111,8 +111,4 @@ case object Annanshogi
 
   override def hasDoublePawns(board: Board, color: Color) = false
 
-  def status(sit: Situation): Option[Status] = Standard.status(sit)
-
-  def winner(sit: Situation): Option[Color] = Standard.winner(sit)
-
 }

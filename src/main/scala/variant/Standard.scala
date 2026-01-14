@@ -1,8 +1,6 @@
 package shogi
 package variant
 
-import cats.syntax.option._
-
 import shogi.Pos._
 import shogi.format.forsyth.Sfen
 
@@ -131,65 +129,6 @@ case object Standard
       case Horse                                                          => 10
       case Dragon                                                         => 12
       case _                                                              => 0
-    }
-
-  private def impasseValueOf(r: Role): Int =
-    r match {
-      case Bishop | Rook | Horse | Dragon => 5
-      case King                           => 0
-      case _                              => 1
-    }
-
-  // In handicaps we give the value of the missing pieces to the handicap giver
-  // Since this rule applies only to handicap games, only gote/uwate can be affected
-  private def missingImpassePoints(sit: Situation): Int =
-    sit.history.initialSfen
-      .filter(Handicap.isHandicap(_, sit.variant))
-      .flatMap(_.toSituation(sit.variant))
-      .fold(0) { initSit =>
-        math.max(
-          0,
-          54 -
-            (initSit.board.pieces.values.map(p => impasseValueOf(p.role)).sum +
-              initSit.hands(Sente).sum(impasseValueOf) + initSit.hands(Gote).sum(impasseValueOf)),
-        )
-      }
-
-  protected def impasse(sit: Situation): Boolean = !sit.check && {
-    val color        = sit.color
-    val ranks        = sit.variant.promotionRanks(color)
-    val enteredRoles = sit.board.pieces.collect {
-      case (pos, piece) if (piece is color) && (ranks contains pos.rank) => piece.role
-    }.toList
-    def impassePoints: Int =
-      enteredRoles.map(impasseValueOf).sum + sit
-        .hands(color)
-        .sum(impasseValueOf)
-
-    // more than 10 - including the king
-    enteredRoles.sizeIs > 10 && enteredRoles
-      .contains(King) && impassePoints >= color.fold(28, 27 - missingImpassePoints(sit))
-  }
-
-  def status(sit: Situation): Option[Status] =
-    if (!sit.hasDestinations) {
-      if (sit.check) Status.Mate.some
-      else Status.Stalemate.some
-    } else if (impasse(sit)) Status.Impasse27.some
-    else if (sit.history.fourfoldRepetition) {
-      if (sit.history.perpetualCheckAttacker.isDefined) Status.PerpetualCheck.some
-      else Status.Repetition.some
-    } else if (isInsufficientMaterial(sit)) Status.Draw.some
-    else none
-
-  def winner(sit: Situation): Option[Color] =
-    sit.status flatMap { status =>
-      status match {
-        case Status.Mate | Status.Stalemate => (!sit.color).some
-        case Status.Impasse27               => (sit.color).some
-        case Status.PerpetualCheck          => sit.history.perpetualCheckAttacker.map(!_)
-        case _                              => none
-      }
     }
 
 }

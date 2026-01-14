@@ -45,21 +45,21 @@ K . . . . . . . .
         """
 P P . . . . . . .
 K . . r . . . . .
-""".checkmate must beTrue
+""".status must_== Some(Status.Mate)
       }
       "by knight" in {
         """
 . n . . . . . . .
 P B . . . . . . .
 K R . . . . . . .
-""".checkmate must beTrue
+""".status must_== Some(Status.Mate)
       }
       "not" in {
         """
 . n . . . . . . .
 . . . . . . . . .
 K . . . . . . . .
-""".checkmate must beFalse
+""".status must beNone
       }
     }
     "stale mate" in {
@@ -67,13 +67,13 @@ K . . . . . . . .
         """
 b r r . . . . . .
 K . . . . . . . .
-""".stalemate must beTrue
+""".status must_== Some(Status.Stalemate)
       }
       "not" in {
         """
 . . b . . . . . .
 K . . . . . . . .
-""".stalemate must beFalse
+""".status must beNone
       }
     }
 
@@ -84,7 +84,7 @@ P P . . . . . . .
 K . . r . . . . .
 """
 
-      game.checkmate must beTrue
+      game.status must_== Some(Status.Mate)
       game.winner must beSome.like { case color =>
         color.gote
       }
