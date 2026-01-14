@@ -101,37 +101,6 @@ abstract class Variant private[variant] (
     }
   }
 
-  def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] =
-    if (Role.allLions.contains(a.piece.role))
-      a.shortUnfilteredDestinations filter { d =>
-        d.dist(midStep) == 1 && a.board(d).filter(_.color != a.color).fold(true) { capture =>
-          d.dist(a.pos) == 1 || !Role.allLions.contains(capture.role) ||
-          a
-            .board(midStep)
-            .exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween)) ||
-          (!posThreatened(
-            a.board.forceTake(a.pos).forceTake(midStep),
-            !a.color,
-            d,
-            _ => true,
-          ) &&
-            !posThreatened(
-              a.board.forceTake(a.pos),
-              !a.color,
-              d,
-              p => (p is Pawn) || (p is GoBetween),
-            ))
-        }
-      }
-    else {
-      val dests = a.shortUnfilteredDestinations.filter(_.dist(midStep) == 1)
-      a.history.lastLionCapture.fold(dests) { lionCaptureDest =>
-        dests filterNot { d =>
-          lionCaptureDest != d && a.board(d).exists(p => Role.allLions.contains(p.role))
-        }
-      }
-    }
-
   def check(board: Board, color: Color): Boolean =
     board.royalPossOf(color).exists(posThreatened(board, !color, _))
 
