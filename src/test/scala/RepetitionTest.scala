@@ -26,17 +26,13 @@ class RepetitionTest extends ShogiTest {
       )
       "should be fourfold" in {
         game.playUsisStr(usis) must beValid.like { case g =>
-          g.situation.draw must beFalse
-          g.situation.repetition must beTrue
-          g.situation.perpetualCheck must beFalse
+          g.situation.status.contains(Status.Repetition) must beTrue
           g.situation.winner must beNone
         }
       }
       "should not be fourfold" in {
         game.playUsisStr(usis.dropRight(1)) must beValid.like { case g =>
-          g.situation.draw must beFalse
-          g.situation.repetition must beFalse
-          g.situation.perpetualCheck must beFalse
+          g.situation.status must beNone
           g.situation.winner must beNone
         }
       }
@@ -60,9 +56,7 @@ class RepetitionTest extends ShogiTest {
       )
       "should be fourfold" in {
         game.playUsisStr(usis) must beValid.like { case g =>
-          g.situation.draw must beFalse
-          g.situation.repetition must beTrue
-          g.situation.perpetualCheck must beFalse
+          g.situation.status.contains(Status.Repetition) must beTrue
           g.situation.winner must_== Some(Gote)
           val gNoInitialSfen = g.withHistory(g.history.copy(initialSfen = None))
           gNoInitialSfen.situation.winner must_== Some(Gote)
@@ -73,9 +67,7 @@ class RepetitionTest extends ShogiTest {
       }
       "should not be fourfold" in {
         game.playUsisStr(usis.dropRight(1)) must beValid.like { case g =>
-          g.situation.draw must beFalse
-          g.situation.repetition must beFalse
-          g.situation.perpetualCheck must beFalse
+          g.situation.status must beNone
           g.situation.winner must beNone
         }
       }
@@ -94,17 +86,13 @@ class RepetitionTest extends ShogiTest {
       )
       "should be threefold" in {
         game.playUsisStr(usis) must beValid.like { case g =>
-          g.situation.draw must beFalse
-          g.situation.repetition must beTrue
-          g.situation.perpetualCheck must beFalse
+          g.situation.status.contains(Status.Repetition) must beTrue
           g.situation.winner must beNone
         }
       }
       "should not be threefold" in {
         game.playUsisStr(usis.dropRight(1)) must beValid.like { case g =>
-          g.situation.draw must beFalse
-          g.situation.repetition must beFalse
-          g.situation.perpetualCheck must beFalse
+          g.situation.status must beNone
           g.situation.winner must beNone
         }
       }

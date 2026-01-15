@@ -7,26 +7,26 @@ class BerserkTest extends ShogiTest {
 
   "berserkable" should {
     "yep" in {
-      Clock.Config(60 * 60, 0, 0, 1).berserkable must_== true
-      Clock.Config(1 * 60, 0, 0, 1).berserkable must_== true
-      Clock.Config(60 * 60, 60, 0, 1).berserkable must_== true
-      Clock.Config(60 * 60, 0, 60, 1).berserkable must_== true
-      Clock.Config(1 * 60, 0, 0, 1).berserkable must_== true
+      Clock.Config(60 * 60, 0, 0, 1).berserkable must beTrue
+      Clock.Config(1 * 60, 0, 0, 1).berserkable must beTrue
+      Clock.Config(60 * 60, 60, 0, 1).berserkable must beTrue
+      Clock.Config(60 * 60, 0, 60, 1).berserkable must beTrue
+      Clock.Config(1 * 60, 0, 0, 1).berserkable must beTrue
     }
     "nope" in {
-      Clock.Config(0 * 60, 1, 0, 1).berserkable must_== false
-      Clock.Config(0 * 60, 10, 0, 1).berserkable must_== false
-      Clock.Config(0 * 60, 0, 10, 1).berserkable must_== false
+      Clock.Config(0 * 60, 1, 0, 1).berserkable must beFalse
+      Clock.Config(0 * 60, 10, 0, 1).berserkable must beFalse
+      Clock.Config(0 * 60, 0, 10, 1).berserkable must beFalse
     }
   }
   "berserk flags" should {
     "sente" in {
-      Clock(60, 0, 0, 1).berserked(Sente) must_== false
-      Clock(60, 0, 0, 1).goBerserk(Sente).berserked(Sente) must_== true
+      Clock(60, 0, 0, 1).berserked(Sente) must beFalse
+      Clock(60, 0, 0, 1).goBerserk(Sente).berserked(Sente) must beTrue
     }
     "gote" in {
-      Clock(60, 0, 0, 1).berserked(Gote) must_== false
-      Clock(60, 0, 0, 1).goBerserk(Gote).berserked(Gote) must_== true
+      Clock(60, 0, 0, 1).berserked(Gote) must beFalse
+      Clock(60, 0, 0, 1).goBerserk(Gote).berserked(Gote) must beTrue
     }
   }
   "initial time penalty, no byoyomi, no increment" should {

@@ -28,7 +28,7 @@ class KifParserTest extends ShogiTest {
       m.dest must_== Pos.SQ7G
       m.orig must_== Pos.SQ7H
       m.roles.head must_== Gold
-      m.promotion must_== false
+      m.promotion must beFalse
     }
   }
 
@@ -38,7 +38,7 @@ class KifParserTest extends ShogiTest {
       m.orig must_== Pos.SQ4J
       m.roles.head must_== Horse
       m.roles.tail must_== List(HorsePromoted)
-      m.promotion must_== false
+      m.promotion must beFalse
     }
   }
 
@@ -49,7 +49,7 @@ class KifParserTest extends ShogiTest {
       m.dest must_== Pos.SQ2H
       m.roles.head must_== Horse
       m.roles.tail must_== List(HorsePromoted)
-      m.promotion must_== false
+      m.promotion must beFalse
     }
   }
 
@@ -60,7 +60,7 @@ class KifParserTest extends ShogiTest {
           m.dest must_== Pos.SQ7G
           m.orig must_== Pos.SQ7H
           m.roles.head must_== Gold
-          m.promotion must_== false
+          m.promotion must beFalse
         }
       }
     }
@@ -86,7 +86,7 @@ class KifParserTest extends ShogiTest {
           m.dest must_== Pos.SQ7G
           m.orig must_== Pos.SQ7H
           m.roles.head must_== Gold
-          m.promotion must_== false
+          m.promotion must beFalse
         }
       }
     }
@@ -96,7 +96,7 @@ class KifParserTest extends ShogiTest {
           m.dest must_== Pos.SQ7G
           m.orig must_== Pos.SQ7H
           m.roles.head must_== Gold
-          m.promotion must_== false
+          m.promotion must beFalse
         }
       }
     }
@@ -106,7 +106,7 @@ class KifParserTest extends ShogiTest {
           m.dest must_== Pos.SQ7G
           m.orig must_== Pos.SQ7H
           m.roles.head must_== Gold
-          m.promotion must_== false
+          m.promotion must beFalse
         }
       }
     }
@@ -119,7 +119,7 @@ class KifParserTest extends ShogiTest {
           m.dest must_== Pos.SQ7F
           m.orig must_== Pos.SQ7G
           m.roles.head must_== Rook
-          m.promotion must_== false
+          m.promotion must beFalse
         }
       }
     }
@@ -129,14 +129,14 @@ class KifParserTest extends ShogiTest {
     "as a true" in {
       parser("3 ２二角成(88) ") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case m: KifMove =>
-          m.promotion must_== true
+          m.promotion must beTrue
         }
       }
     }
     "as a false" in {
       parser("3 ２二角不成(88) ") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case m: KifMove =>
-          m.promotion must_== false
+          m.promotion must beFalse
         }
       }
     }
@@ -148,7 +148,7 @@ class KifParserTest extends ShogiTest {
         m.dest must_== Pos.SQ7G
         m.orig must_== Pos.SQ7H
         m.roles.head must_== Gold
-        m.promotion must_== false
+        m.promotion must beFalse
       }
     }
     "from last move" in {
@@ -160,7 +160,7 @@ class KifParserTest extends ShogiTest {
           m.dest must_== Pos.SQ7F
           m.orig must_== Pos.SQ7G
           m.roles.head must_== Rook
-          m.promotion must_== false
+          m.promotion must beFalse
         }
       }
     }
@@ -175,7 +175,7 @@ class KifParserTest extends ShogiTest {
           m.dest must_== Pos.SQ7F
           m.orig must_== Pos.SQ5E
           m.roles.head must_== Bishop
-          m.promotion must_== false
+          m.promotion must beFalse
         }
       }
     }

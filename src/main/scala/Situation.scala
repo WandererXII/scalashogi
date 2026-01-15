@@ -184,20 +184,11 @@ final case class Situation(
   // Results
 
   lazy val status: Option[Status] = variant.status(this)
-  def winner: Option[Color]       = variant.winner(this)
+
+  def winner: Option[Color] = variant.winner(this)
 
   def end: Boolean =
     status.isDefined
-
-  // For tests mostly
-  def checkmate      = status.contains(Status.Mate)
-  def stalemate      = status.contains(Status.Stalemate)
-  def perpetualCheck = status.contains(Status.PerpetualCheck)
-  def repetition     = status.contains(Status.Repetition)
-  def draw           = status.contains(Status.Draw)
-  def impasse        = status.contains(Status.Impasse27)
-  // bare king color loses
-  def bareKing(color: Color) = status.contains(Status.BareKing) && winner.contains(!color)
 
   // Util
 

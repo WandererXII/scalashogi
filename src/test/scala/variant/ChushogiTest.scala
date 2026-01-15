@@ -272,73 +272,59 @@ class ChushogiTest extends ShogiTest {
   "bare king" in {
     val sit =
       Sfen("12/12/12/12/6k5/4g7/4G7/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
-    sit.bareKing(Gote) must beFalse
-    sit.bareKing(Sente) must beFalse
+    sit.status.contains(Status.BareKing) must beFalse
     val sitAfter = sit(Usi("8g8f").get).toOption.get
-    sitAfter.bareKing(Gote) must beTrue
-    sitAfter.bareKing(Sente) must beFalse
+    sitAfter.status.contains(Status.BareKing) must beTrue
     sitAfter.winner must_== Some(Sente)
 
     val sit2 = Sfen("12/12/12/12/3I2k5/12/12/5+pK5/12/12/12/12 b - 1")
       .toSituation(shogi.variant.Chushogi)
       .get
-    sit2.bareKing(Gote) must beFalse
-    sit2.bareKing(Sente) must beFalse
+    sit2.status.contains(Status.BareKing) must beFalse
     val sit2After1 = sit2(Usi("6h7h").get).toOption.get
-    sit2After1.bareKing(Gote) must beFalse
-    sit2After1.bareKing(Sente) must beFalse
+    sit2After1.status.contains(Status.BareKing) must beFalse
     val sit2After2 = sit2After1(Usi("6e7d").get).toOption.get
-    sit2After2.bareKing(Gote) must beFalse
-    sit2After2.bareKing(Sente) must beFalse
+    sit2After2.status.contains(Status.BareKing) must beFalse
     val sit2After3 = sit2After2(Usi("9e9d+").get).toOption.get
-    sit2After3.bareKing(Gote) must beTrue
-    sit2After3.bareKing(Sente) must beFalse
+    sit2After3.status.contains(Status.BareKing) must beTrue
     sit2After3.winner must_== Some(Sente)
 
     val sit3 =
       Sfen("1P3PP3P1/12/12/12/6k5/12/12/6K5/12/12/12/l10l b - 1")
         .toSituation(shogi.variant.Chushogi)
         .get
-    sit3.bareKing(Gote) must beFalse
-    sit3.bareKing(Sente) must beFalse
-    sit3.draw must beTrue
+    sit3.status.contains(Status.BareKing) must beFalse
+    sit3.status.contains(Status.Draw) must beTrue
 
     val sit4 =
       Sfen("12/12/12/12/6k5/5g6/4G7/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
-    sit4.bareKing(Sente) must beFalse
-    sit4.bareKing(Gote) must beFalse
-    sit4.draw must beFalse
+    sit4.status.contains(Status.BareKing) must beFalse
+    sit4.status.contains(Status.Draw) must beFalse
     val sit4After1 = sit4(Usi("8g7f").get).toOption.get
-    sit4After1.bareKing(Gote) must beFalse
-    sit4After1.bareKing(Sente) must beFalse
-    sit4After1.draw must beFalse
+    sit4After1.status.contains(Status.BareKing) must beFalse
+    sit4After1.status.contains(Status.Draw) must beFalse
     val sit4After2 = sit4After1(Usi("6e7f").get).toOption.get
-    sit4After2.bareKing(Gote) must beFalse
-    sit4After2.bareKing(Sente) must beFalse
-    sit4After2.draw must beTrue
+    sit4After2.status.contains(Status.BareKing) must beFalse
+    sit4After2.status.contains(Status.Draw) must beTrue
     val sit4After2Alt = sit4After1(Usi("6e6d").get).toOption.get
-    sit4After2Alt.bareKing(Gote) must beTrue
+    sit4After2Alt.status.contains(Status.Draw) must beFalse
+    sit4After2Alt.status.contains(Status.BareKing) must beTrue
     sit4After2Alt.winner must_== Some(Sente)
-    sit4After2Alt.draw must beFalse
 
     val sit5 =
       Sfen("12/12/12/12/6k5/5K6/12/4G7/12/12/12/12 w - 1").toSituation(shogi.variant.Chushogi).get
-    sit5.bareKing(Sente) must beFalse
-    sit5.bareKing(Gote) must beFalse
+    sit5.status.contains(Status.BareKing) must beFalse
 
     val sit6 =
       Sfen("5P3P2/12/12/12/6k2i2/12/12/6K1I3/12/12/12/5p5p b")
         .toSituation(shogi.variant.Chushogi)
         .get
-    sit6.bareKing(Gote) must beFalse
-    sit6.bareKing(Sente) must beFalse
-    sit6.draw must beFalse
+    sit6.status.contains(Status.BareKing) must beFalse
+    sit6.status.contains(Status.Draw) must beFalse
 
     val sit7 =
       Sfen("12/11G/12/12/3d8/3S8/7k4/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
     val sit7After1 = sit7(Usi("9f9e").get).toOption.get
-    sit7After1.bareKing(Gote) must beFalse
-    sit7After1.bareKing(Sente) must beFalse
     sit7After1.status must beNone
   }
 

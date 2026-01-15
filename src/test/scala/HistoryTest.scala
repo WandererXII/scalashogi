@@ -9,19 +9,19 @@ class HistoryTest extends ShogiTest {
     }
   "fourfold repetition" should {
     "empty history" in {
-      History.empty.fourfoldRepetition must_== false
+      History.empty.fourfoldRepetition must beFalse
     }
     "not 4 same elements" in {
       val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 16, 2, 23, 55))
-      history.fourfoldRepetition must_== false
+      history.fourfoldRepetition must beFalse
     }
     "not 4 elements same to the last one" in {
       val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23, 2, 55, 2, 33))
-      history.fourfoldRepetition must_== false
+      history.fourfoldRepetition must beFalse
     }
     "positive" in {
       val history = makeHistory(List(1, 2, 3, 4, 5, 6, 7, 2, 5, 6, 3, 2, 6, 2))
-      history.fourfoldRepetition must_== true
+      history.fourfoldRepetition must beTrue
     }
   }
   "repetition distance" should {

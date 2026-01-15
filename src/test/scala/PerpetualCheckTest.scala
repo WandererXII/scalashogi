@@ -45,9 +45,7 @@ class PerpetualCheckTest extends ShogiTest {
       "after 2 repetitions" in {
         g must beValid.like { case game =>
           game.playUsisStr(u take 5) must beValid.like { case game2 =>
-            game2.situation.draw must beFalse
-            game2.situation.repetition must beFalse
-            game2.situation.perpetualCheck must beFalse
+            game2.situation.status must beNone
             game2.situation.winner must beNone
           }
         }
@@ -55,9 +53,7 @@ class PerpetualCheckTest extends ShogiTest {
       "after 3 repetitions" in {
         g must beValid.like { case game =>
           game.playUsisStr(u take 9) must beValid.like { case game2 =>
-            game2.situation.draw must beFalse
-            game2.situation.repetition must beFalse
-            game2.situation.perpetualCheck must beFalse
+            game2.situation.status must beNone
             game2.situation.winner must beNone
           }
         }
@@ -65,9 +61,7 @@ class PerpetualCheckTest extends ShogiTest {
       "if the checks weren't consecutive" in {
         g must beValid.like { case game =>
           game.playUsisStr(ui) must beValid.like { case game2 =>
-            game2.situation.draw must beFalse
-            game2.situation.repetition must beTrue
-            game2.situation.perpetualCheck must beFalse
+            game2.situation.status.contains(Status.Repetition) must beTrue
             game2.situation.winner must beNone
           }
         }
@@ -93,18 +87,14 @@ class PerpetualCheckTest extends ShogiTest {
           "4c5b+", // 4th
         )
         g.playUsisStr(usis) must beValid.like { case game =>
-          game.situation.draw must beFalse
-          game.situation.repetition must beTrue
-          game.situation.perpetualCheck must beFalse
+          game.situation.status.contains(Status.Repetition) must beTrue
           game.situation.winner must beNone
         }
       }
     }
     "trigger" in {
       def isPerpetualWith(g: Game, winner: Color): Boolean =
-        !g.situation.draw &&
-          !g.situation.repetition &&
-          g.situation.perpetualCheck &&
+        g.situation.status.contains(Status.PerpetualCheck) &&
           g.situation.winner == Some(winner)
 
       "after 4 repetitions" in {
@@ -277,9 +267,7 @@ class PerpetualCheckTest extends ShogiTest {
         "9f9e", // forth repetition
       )
       dGame.playUsisStr(dUsis) must beValid.like { case game =>
-        game.situation.draw must beFalse
-        game.situation.repetition must beTrue
-        game.situation.perpetualCheck must beFalse
+        game.situation.status.contains(Status.Repetition) must beTrue
         game.situation.winner must beNone
       }
     }
@@ -313,9 +301,7 @@ class PerpetualCheckTest extends ShogiTest {
         "9f9e",
       )
       aGame.playUsisStr(aUsis) must beValid.like { case game =>
-        game.situation.draw must beFalse
-        game.situation.repetition must beFalse
-        game.situation.perpetualCheck must beTrue
+        game.situation.status.contains(Status.PerpetualCheck) must beTrue
         game.situation.winner must_== Some(Gote)
       }
     }
