@@ -8,8 +8,8 @@ libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0",
   "org.typelevel"          %% "cats-core"                % "2.13.0",
   "joda-time"               % "joda-time"                % "2.14.0",
-  "org.specs2"             %% "specs2-core"              % "4.21.0" % Test,
-  "org.specs2"             %% "specs2-cats"              % "4.21.0" % Test,
+  "org.specs2"             %% "specs2-core"              % "4.23.0" % Test,
+  "org.specs2"             %% "specs2-cats"              % "4.23.0" % Test,
 )
 
 scalacOptions ++= Seq(
