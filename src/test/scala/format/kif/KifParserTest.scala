@@ -779,4 +779,22 @@ class KifParserTest extends ShogiTest {
     }
   }
 
+  "dobutsu shogi" in {
+    parser("""
+手合割：どうぶつしょうぎ
+先手：
+後手：
+手数----指手---------消費時間--
+   1   ２二ひよこ(23) * comment comment
+   2   同　ぞう(11)
+   3   １三きりん(14)
+   4   同　ぞう(22)
+   5   同　ライオン(24)
+    """) must beValid.like { case p =>
+      p.parsedSteps.value.size must_== 5
+      p.initialSfen must beNone
+      p.variant.dobutsu must beTrue
+    }
+  }
+
 }

@@ -242,4 +242,38 @@ class KifModelTest extends ShogiTest {
 手数----指手---------消費時間--"""
   }
 
+  "kif render dobutsu" in {
+    val steps = List(
+      NotationStep(1, Usi.WithRole(Usi("2c2b").get, Pawn)),
+      NotationStep(2, Usi.WithRole(Usi("1a2b").get, Bishop)),
+      NotationStep(3, Usi.WithRole(Usi("2d2c").get, King)),
+    )
+    Kif(
+      steps,
+      None,
+      Dobutsu,
+    ).render must_== """手合割：どうぶつしょうぎ
+先手：
+後手：
+手数----指手---------消費時間--
+   1   ２二ひよこ(23)
+   2   同　ぞう(11)
+   3   ２三ライオン(24)"""
+  }
+
+  "render kif board - dobutsu" in {
+    renderSituation(
+      Dobutsu.initialSfen.toSituation(Dobutsu).get,
+    ) must_== """手合割：どうぶつしょうぎ
+後手の持駒：なし
+  ３ ２ １
++---------+
+|vきvラvぞ|一
+| ・vひ ・|二
+| ・ ひ ・|三
+| ぞ ラ き|四
++---------+
+先手の持駒：なし"""
+  }
+
 }

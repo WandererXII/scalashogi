@@ -217,6 +217,7 @@ abstract class Variant private[variant] (
   def annanshogi = this == Annanshogi
   def kyotoshogi = this == Kyotoshogi
   def checkshogi = this == Checkshogi
+  def dobutsu    = this == Dobutsu
 
   override def toString = s"Variant($name)"
 
@@ -235,6 +236,7 @@ object Variant {
     Annanshogi,
     Kyotoshogi,
     Checkshogi,
+    Dobutsu,
   )
 
   val byId: Map[Int, Variant] = all map { v =>

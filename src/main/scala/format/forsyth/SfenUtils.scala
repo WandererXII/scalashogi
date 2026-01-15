@@ -5,6 +5,7 @@ package forsyth
 import shogi.variant.Annanshogi
 import shogi.variant.Checkshogi
 import shogi.variant.Chushogi
+import shogi.variant.Dobutsu
 import shogi.variant.Kyotoshogi
 import shogi.variant.Minishogi
 import shogi.variant.Standard
@@ -22,6 +23,8 @@ object SfenUtils {
         toForsythChushogi get role
       case Kyotoshogi =>
         toForsythKyotoshogi get role
+      case Dobutsu =>
+        toForsythDobutsu get role
     }
 
   def toRole(str: String, variant: Variant): Option[Role] =
@@ -34,6 +37,8 @@ object SfenUtils {
         toRoleChushogi get str
       case Kyotoshogi =>
         toRoleKyotoshogi get str
+      case Dobutsu =>
+        toRoleDobutsu get str
     }
 
   def toForsyth(piece: Piece, variant: Variant): Option[String] =
@@ -126,6 +131,12 @@ object SfenUtils {
   private val toRoleKyotoshogi: Map[String, Role] = toForsythKyotoshogi map { case (k, v) =>
     v -> k
   }
+
+  private val toForsythDobutsu: Map[Role, String] =
+    toForsythStandard filter { case (k, _) => Dobutsu.allRoles contains k }
+
+  private val toRoleDobutsu: Map[String, Role] =
+    toForsythMinishogi map { case (k, v) => v -> k }
 
   val allForsyth: List[String] = (Role.all flatMap { r: Role =>
     Variant.all flatMap { v =>

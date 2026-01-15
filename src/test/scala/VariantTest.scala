@@ -52,4 +52,11 @@ class VariantTest extends ShogiTest {
       )
     }
   }
+
+  "match default sfen to default pieces" in {
+    forall(Variant.all) { variant =>
+      val board = variant.initialSfen.toBoard(variant).get
+      board.pieces must_== variant.pieces
+    }
+  }
 }

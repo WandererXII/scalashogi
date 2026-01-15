@@ -346,6 +346,13 @@ object Handicap {
         Sfen("4k4/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
       ),
     ),
+    variant.Checkshogi -> List(
+      Handicap(
+        "ひよこ落ち",
+        "Chick",
+        Sfen("rkb/2/1P1/BKR w - 1"),
+      ),
+    ),
   )
 
   lazy val sfensByVariant: Map[variant.Variant, List[Sfen]] =

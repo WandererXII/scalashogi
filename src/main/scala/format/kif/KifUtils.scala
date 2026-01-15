@@ -88,6 +88,7 @@ object KifUtils {
     Annanshogi -> NonEmptyList.of("安南将棋", "安南", "annanshogi"),
     Kyotoshogi -> NonEmptyList.of("京都将棋", "京都", "kyotoshogi"),
     Checkshogi -> NonEmptyList.of("王手将棋", "王手", "checkshogi"),
+    Dobutsu    -> NonEmptyList.of("どうぶつしょうぎ", "どうぶつ", "動物将棋", "動物", "doubutsu", "dobutsu"),
   )
 
   def toKif(role: Role, variant: Variant): Option[NonEmptyList[String]] =
@@ -100,6 +101,8 @@ object KifUtils {
         toKifChushogi get role
       case Kyotoshogi =>
         toKifKyotoshogi get role
+      case Dobutsu =>
+        toKifDobutsu get role
     }
 
   def toRole(str: String, variant: Variant): Option[NonEmptyList[Role]] =
@@ -112,6 +115,8 @@ object KifUtils {
         toRoleChushogi get str
       case Kyotoshogi =>
         toRoleKyotoshogi get str
+      case Dobutsu =>
+        toRoleDobutsu get str
     }
 
   def anyToRole(str: String, variant: Variant): Option[NonEmptyList[Role]] =
@@ -229,6 +234,22 @@ object KifUtils {
   private val toRoleKyotoshogi: Map[String, NonEmptyList[Role]] =
     toRoleStandard filter { case (_, v) => Kyotoshogi.allRoles contains v.head }
 
+  private val toKifDobutsu: Map[Role, NonEmptyList[String]] =
+    Map(
+      King   -> NonEmptyList.of("ライオン", "ラ", "らいおん", "王", "玉"),
+      Pawn   -> NonEmptyList.of("ひよこ", "ひ", "ヒヨコ", "ひよ子", "歩"),
+      Bishop -> NonEmptyList.of("ぞう", "ぞ", "像", "角"),
+      Rook   -> NonEmptyList.of("きりん", "き", "キリン", "麒麟", "飛"),
+      Tokin  -> NonEmptyList.of("にわとり", "に", "ニワトリ", "鶏", "と"),
+    )
+
+  private val toRoleDobutsu: Map[String, NonEmptyList[Role]] =
+    toKifDobutsu flatMap { case (r, kifs) =>
+      kifs.toList map { k =>
+        (k, NonEmptyList.one(r))
+      }
+    } toMap
+
   def toKifBoard(piece: Piece, variant: Variant): Option[String] =
     toKifBoard(piece.role, variant) map { k =>
       if (piece.color.sente) k else s"v$k"
@@ -252,6 +273,8 @@ object KifUtils {
         toKifBoardChushogi get role
       case Kyotoshogi =>
         toKifBoardKyotoshogi get role
+      case Dobutsu =>
+        toKifBoardDobutsu get role
     }
 
   private val toKifBoardStandard: Map[Role, String] = Map(
@@ -309,6 +332,15 @@ object KifUtils {
 
   private val toKifBoardKyotoshogi: Map[Role, String] =
     toKifBoardStandard filter { case (k, _) => Kyotoshogi.allRoles contains k }
+
+  private val toKifBoardDobutsu: Map[Role, String] =
+    Map(
+      King   -> "ラ",
+      Pawn   -> "ひ",
+      Bishop -> "ぞ",
+      Rook   -> "き",
+      Tokin  -> "に	",
+    )
 
   val allKif: List[String] = (Role.all flatMap { r: Role =>
     Variant.all flatMap { v =>

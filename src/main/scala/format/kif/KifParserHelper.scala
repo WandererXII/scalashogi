@@ -74,6 +74,8 @@ object KifParserHelper {
       Annanshogi.some
     else if (handicapString.exists(isDefaultHandicapOf(_, Checkshogi)))
       Checkshogi.some
+    else if (handicapString.exists(isDefaultHandicapOf(_, Dobutsu)))
+      Dobutsu.some
     else None
   }
 

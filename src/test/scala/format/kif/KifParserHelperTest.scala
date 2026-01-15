@@ -75,5 +75,6 @@ class KifParserHelperTest extends ShogiTest {
     parseAndCompare("", Some("5五将棋"), shogi.variant.Minishogi.initialSfen.truncate)
     parseAndCompare("", Some("安南将棋"), shogi.variant.Annanshogi.initialSfen.truncate)
     parseAndCompare("", Some("王手将棋"), shogi.variant.Checkshogi.initialSfen.truncate)
+    parseAndCompare("", Some("どうぶつしょうぎ"), shogi.variant.Dobutsu.initialSfen.truncate)
   }
 }
