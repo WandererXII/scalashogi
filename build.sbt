@@ -2,7 +2,7 @@ name := "scalashogi"
 
 version := "12.2.1"
 
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "2.13.18"
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0",
