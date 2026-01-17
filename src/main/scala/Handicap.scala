@@ -356,7 +356,7 @@ object Handicap {
       Handicap(
         "ひよこ落ち",
         "Chick",
-        Sfen("rkb/2/1P1/BKR w - 1"),
+        Sfen("rkb/3/1P1/BKR w - 1"),
       ),
     ),
   )
