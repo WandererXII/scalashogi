@@ -12,179 +12,181 @@ final case class Handicap(
 
 object Handicap {
 
-  val allByVariant: Map[variant.Variant, List[Handicap]] = Map(
-    variant.Standard -> List(
-      Handicap(
-        "香落ち",
-        "Lance",
-        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "右香落ち",
-        "Right Lance",
-        Sfen("1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "兩香落ち",
-        "Both Lance",
-        Sfen("1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "角落ち",
-        "Bishop",
-        Sfen("lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "飛車落ち",
-        "Rook",
-        Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "飛香落ち",
-        "Rook-Lance",
-        Sfen("lnsgkgsn1/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "二枚落ち",
-        "2-piece",
-        Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "三枚落ち",
-        "3-piece",
-        Sfen("1nsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "四枚落ち",
-        "4-piece",
-        Sfen("1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "五枚落ち",
-        "5-piece",
-        Sfen("2sgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "六枚落ち",
-        "6-piece",
-        Sfen("2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "七枚落ち",
-        "7-piece",
-        Sfen("3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "八枚落ち",
-        "8-piece",
-        Sfen("3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "九枚落ち",
-        "9-piece",
-        Sfen("4kg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "十枚落ち",
-        "10-piece",
-        Sfen("4k4/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "歩三兵",
-        "3 Pawns",
-        Sfen("4k4/9/9/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 3p 1"),
-      ),
-      Handicap(
-        "裸玉",
-        "Naked King",
-        Sfen("4k4/9/9/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "トンボ＋桂香",
-        "Dragonfly + NL",
-        Sfen("ln2k2nl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "トンボ＋香",
-        "Dragonfly + L",
-        Sfen("l3k3l/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "トンボ",
-        "Dragonfly",
-        Sfen("4k4/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "太閤落ち",
-        "Taiko",
-        Sfen("lnsgkgsnl/1r5b1/p1ppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "香得",
-        "Lance Gained",
-        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w L 1"),
-      ),
-      Handicap(
-        "兩香得",
-        "Two Lance Gained",
-        Sfen("1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 2L 1"),
-      ),
-      Handicap(
-        "角得",
-        "Bishop Gained",
-        Sfen("lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w B 1"),
-      ),
-      Handicap(
-        "飛車得",
-        "Rook Gained",
-        Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w R 1"),
-      ),
-      Handicap(
-        "飛香得",
-        "Rook-Lance Gained",
-        Sfen("lnsgkgsn1/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RL 1"),
-      ),
-      Handicap(
-        "二枚得",
-        "2-piece Gained",
-        Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB 1"),
-      ),
-      Handicap(
-        "三枚得",
-        "3-piece Gained",
-        Sfen("1nsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBL 1"),
-      ),
-      Handicap(
-        "四枚得",
-        "4-piece Gained",
-        Sfen("1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2L 1"),
-      ),
-      Handicap(
-        "五枚得",
-        "5-piece Gained",
-        Sfen("2sgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBN2L 1"),
-      ),
-      Handicap(
-        "六枚得",
-        "6-piece Gained",
-        Sfen("2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2N2L 1"),
-      ),
-      Handicap(
-        "七枚得",
-        "7-piece Gained",
-        Sfen("3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBS2N2L 1"),
-      ),
-      Handicap(
-        "八枚得",
-        "8-piece Gained",
-        Sfen("3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2S2N2L 1"),
-      ),
-      Handicap(
-        "九枚得",
-        "9-piece Gained",
-        Sfen("4kg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBG2S2N2L 1"),
-      ),
+  private val standardHandicaps: List[Handicap] = List(
+    Handicap(
+      "香落ち",
+      "Lance",
+      Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
     ),
+    Handicap(
+      "右香落ち",
+      "Right Lance",
+      Sfen("1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "兩香落ち",
+      "Both Lance",
+      Sfen("1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "角落ち",
+      "Bishop",
+      Sfen("lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "飛車落ち",
+      "Rook",
+      Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "飛香落ち",
+      "Rook-Lance",
+      Sfen("lnsgkgsn1/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "二枚落ち",
+      "2-piece",
+      Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "三枚落ち",
+      "3-piece",
+      Sfen("1nsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "四枚落ち",
+      "4-piece",
+      Sfen("1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "五枚落ち",
+      "5-piece",
+      Sfen("2sgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "六枚落ち",
+      "6-piece",
+      Sfen("2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "七枚落ち",
+      "7-piece",
+      Sfen("3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "八枚落ち",
+      "8-piece",
+      Sfen("3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "九枚落ち",
+      "9-piece",
+      Sfen("4kg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "十枚落ち",
+      "10-piece",
+      Sfen("4k4/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "歩三兵",
+      "3 Pawns",
+      Sfen("4k4/9/9/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 3p 1"),
+    ),
+    Handicap(
+      "裸玉",
+      "Naked King",
+      Sfen("4k4/9/9/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "トンボ＋桂香",
+      "Dragonfly + NL",
+      Sfen("ln2k2nl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "トンボ＋香",
+      "Dragonfly + L",
+      Sfen("l3k3l/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "トンボ",
+      "Dragonfly",
+      Sfen("4k4/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "太閤落ち",
+      "Taiko",
+      Sfen("lnsgkgsnl/1r5b1/p1ppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "香得",
+      "Lance Gained",
+      Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w L 1"),
+    ),
+    Handicap(
+      "兩香得",
+      "Two Lance Gained",
+      Sfen("1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 2L 1"),
+    ),
+    Handicap(
+      "角得",
+      "Bishop Gained",
+      Sfen("lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w B 1"),
+    ),
+    Handicap(
+      "飛車得",
+      "Rook Gained",
+      Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w R 1"),
+    ),
+    Handicap(
+      "飛香得",
+      "Rook-Lance Gained",
+      Sfen("lnsgkgsn1/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RL 1"),
+    ),
+    Handicap(
+      "二枚得",
+      "2-piece Gained",
+      Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB 1"),
+    ),
+    Handicap(
+      "三枚得",
+      "3-piece Gained",
+      Sfen("1nsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBL 1"),
+    ),
+    Handicap(
+      "四枚得",
+      "4-piece Gained",
+      Sfen("1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2L 1"),
+    ),
+    Handicap(
+      "五枚得",
+      "5-piece Gained",
+      Sfen("2sgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBN2L 1"),
+    ),
+    Handicap(
+      "六枚得",
+      "6-piece Gained",
+      Sfen("2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2N2L 1"),
+    ),
+    Handicap(
+      "七枚得",
+      "7-piece Gained",
+      Sfen("3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBS2N2L 1"),
+    ),
+    Handicap(
+      "八枚得",
+      "8-piece Gained",
+      Sfen("3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2S2N2L 1"),
+    ),
+    Handicap(
+      "九枚得",
+      "9-piece Gained",
+      Sfen("4kg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBG2S2N2L 1"),
+    ),
+  )
+
+  val allByVariant: Map[variant.Variant, List[Handicap]] = Map(
+    variant.Standard  -> standardHandicaps,
     variant.Minishogi -> List(
       Handicap(
         "角落ち",
@@ -349,59 +351,8 @@ object Handicap {
         Sfen("2k2/5/5/5/TSKGP w - 1"),
       ),
     ),
-    variant.Checkshogi -> List(
-      Handicap(
-        "香落ち",
-        "Lance",
-        Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "右香落ち",
-        "Right Lance",
-        Sfen("1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "角落ち",
-        "Bishop",
-        Sfen("lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "飛車落ち",
-        "Rook",
-        Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "飛香落ち",
-        "Rook-Lance",
-        Sfen("lnsgkgsn1/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "二枚落ち",
-        "2-piece",
-        Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "四枚落ち",
-        "4-piece",
-        Sfen("1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "六枚落ち",
-        "6-piece",
-        Sfen("2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "八枚落ち",
-        "8-piece",
-        Sfen("3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-      Handicap(
-        "十枚落ち",
-        "10-piece",
-        Sfen("4k4/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
-      ),
-    ),
-    variant.Dobutsu -> List(
+    variant.Checkshogi -> standardHandicaps,
+    variant.Dobutsu    -> List(
       Handicap(
         "ひよこ落ち",
         "Chick",

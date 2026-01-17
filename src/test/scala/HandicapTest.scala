@@ -11,13 +11,11 @@ class HandicapTest extends ShogiTest {
       Handicap.allByVariant(shogi.variant.Chushogi).size must_== 3
       Handicap.allByVariant(shogi.variant.Annanshogi).size must_== 15
       Handicap.allByVariant(shogi.variant.Kyotoshogi).size must_== 7
-      Handicap.allByVariant(shogi.variant.Checkshogi).size must_== 10
+      Handicap.allByVariant(shogi.variant.Checkshogi).size must_== 34
       Handicap.allByVariant(shogi.variant.Dobutsu).size must_== 1
     }
     "all variants defined" in {
-      shogi.variant.Variant.all.forall( v =>
-        Handicap.allByVariant(v).size >= 1
-      ) must beTrue
+      shogi.variant.Variant.all.forall(v => Handicap.allByVariant(v).size >= 1) must beTrue
     }
     "no duplicates" in {
       shogi.variant.Variant.all forall { v =>
