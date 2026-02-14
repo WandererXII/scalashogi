@@ -24,7 +24,7 @@ object Handicap {
       Sfen("1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
     ),
     Handicap(
-      "兩香落ち",
+      "両香落ち",
       "Both Lance",
       Sfen("1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
     ),
@@ -114,7 +114,7 @@ object Handicap {
       Sfen("4k4/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
     ),
     Handicap(
-      "太閤落ち",
+      "太閤将棋",
       "Taiko",
       Sfen("lnsgkgsnl/1r5b1/p1ppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
     ),
@@ -124,7 +124,7 @@ object Handicap {
       Sfen("lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w L 1"),
     ),
     Handicap(
-      "兩香得",
+      "両香得",
       "Two Lance Gained",
       Sfen("1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 2L 1"),
     ),
