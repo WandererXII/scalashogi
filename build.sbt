@@ -1,6 +1,6 @@
 name := "scalashogi"
 
-version := "13.1.0"
+version := "13.2.0"
 
 ThisBuild / scalaVersion := "2.13.18"
 
