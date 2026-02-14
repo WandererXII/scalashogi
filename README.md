@@ -1,3 +1,4 @@
+[![lishogi.org](https://img.shields.io/badge/☗_lishogi.org-Play_shogi-black)](https://lishogi.org)
 [![Build and test](https://github.com/WandererXII/scalashogi/actions/workflows/build.yml/badge.svg)](https://github.com/WandererXII/scalashogi/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.wandererxii/scalashogi_2.13.svg?label=Maven%20Central)](https://search.maven.org/search?q=%22io.github.wandererxii.scalashogi_2.13%22)
 
