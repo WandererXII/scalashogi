@@ -195,7 +195,7 @@ final case class Situation(
   def valid(strict: Boolean) = variant.valid(this.board, this.hands, strict)
 
   def playable(strict: Boolean): Boolean =
-    valid(strict) && !end && !copy(color = !color).check
+    valid(strict) && !end && (!variant.noOppositeCheck || !copy(color = !color).check)
 
   def isInsufficientMaterial: Boolean =
     variant.isInsufficientMaterial(board, hands)

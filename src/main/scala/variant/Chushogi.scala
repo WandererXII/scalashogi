@@ -325,6 +325,8 @@ case object Chushogi
       }
     }
 
+  override def noOppositeCheck = false
+
   override def isIrreversible(before: Board, after: Board, usi: Usi): Boolean =
     usi match {
       case Usi.Move(_, dest, prom, _) => {

@@ -94,6 +94,8 @@ case object Dobutsu
   override def moveFilter(a: MoveActor): List[Pos] =
     a.unfilteredDestinations.filter(_.dist(a.pos) == 1)
 
+  override def noOppositeCheck = false
+
   override def isAttacking(
       @unused after: Situation,
       @unused usi: Usi,

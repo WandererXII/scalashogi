@@ -101,6 +101,8 @@ abstract class Variant private[variant] (
     }
   }
 
+  def noOppositeCheck = true
+
   def check(board: Board, color: Color): Boolean =
     board.royalPossOf(color).exists(posThreatened(board, !color, _))
 

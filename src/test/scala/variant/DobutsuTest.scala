@@ -116,4 +116,13 @@ class DobutsuTest extends ShogiTest {
       afterDrop.end must beFalse
     }
   }
+
+  "playable" should {
+    "be true" in {
+      val sitB = Sfen("r2/2k/PKb/B2 b Pr").toSituation(shogi.variant.Dobutsu).get
+      val sitW = Sfen("r2/2k/PKb/B2 w Pr").toSituation(shogi.variant.Dobutsu).get
+      sitB.playable(strict = true) must beTrue
+      sitW.playable(strict = true) must beTrue
+    }
+  }
 }

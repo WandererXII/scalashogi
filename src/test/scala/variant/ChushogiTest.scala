@@ -328,6 +328,17 @@ class ChushogiTest extends ShogiTest {
     sit7After1.status must beNone
   }
 
+  "playable" should {
+    "be true" in {
+      val sitB =
+        Sfen("12/12/12/12/12/6k5/5K6/12/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
+      val sitW =
+        Sfen("12/12/12/12/12/6k5/5K6/12/12/12/12/12 w - 1").toSituation(shogi.variant.Chushogi).get
+      sitB.playable(strict = true) must beTrue
+      sitW.playable(strict = true) must beTrue
+    }
+  }
+
   "fixture perfts" should {
     "forall" in {
       forall(fixturePerfts) { line =>

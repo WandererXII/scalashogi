@@ -21,7 +21,7 @@ final case class Sfen(value: String) extends AnyVal {
       history = toHistory(variant)
     } yield {
       val sit = Situation(board, hands, color | Sente, history, variant)
-      if (color.isEmpty && sit.check) sit.switch else sit
+      if (color.isEmpty && variant.noOppositeCheck && sit.check) sit.switch else sit
     }
 
   def toBoard(variant: Variant): Option[Board] = {
