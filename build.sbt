@@ -7,7 +7,7 @@ ThisBuild / scalaVersion := "2.13.18"
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
   "org.typelevel"          %% "cats-core"                % "2.13.0",
-  "joda-time"               % "joda-time"                % "2.14.0",
+  "joda-time"               % "joda-time"                % "2.14.1",
   "org.specs2"             %% "specs2-core"              % "4.23.0" % Test,
   "org.specs2"             %% "specs2-cats"              % "4.23.0" % Test,
 )
