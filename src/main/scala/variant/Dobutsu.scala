@@ -128,4 +128,6 @@ case object Dobutsu
       }
     }
 
+  override def hasDoublePawns(board: Board, color: Color) = false
+
 }

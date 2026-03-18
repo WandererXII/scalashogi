@@ -137,7 +137,7 @@ class DobutsuTest extends ShogiTest {
 
   "double pawn" should {
     "work" in {
-      val sit = Sfen("r2/2k/PKb/B2 b Pr").toSituation(shogi.variant.Dobutsu).get
+      val sit = Sfen("rkb/2P/2P/BKR b - 1").toSituation(shogi.variant.Dobutsu).get
       sit.playable(strict = true) must beTrue
 
       val sitPre = Sfen("rkb/3/2P/BKR b P 1").toSituation(shogi.variant.Dobutsu).get
