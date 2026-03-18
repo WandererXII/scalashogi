@@ -112,6 +112,7 @@ case object Dobutsu
 
   override def status(sit: Situation): Option[Status] =
     if (sit.board.royalPossOf(sit.color).isEmpty) Status.RoyalsLost.some
+    else if (tryRule(sit.board, Sente) && tryRule(sit.board, Gote)) Status.Draw.some
     else if (tryRule(sit.board, Sente) || tryRule(sit.board, Gote)) Status.TryRule.some
     else if (!sit.hasDestinations) Status.Stalemate.some
     else if (sit.history.threefoldRepetition) Status.Repetition.some

@@ -95,6 +95,15 @@ class DobutsuTest extends ShogiTest {
       s4.status must_== Some(Status.TryRule)
       s4.winner must_== Some(Color.Sente)
     }
+
+    "draw" in {
+      val sit = Sfen("1K1/1r1/1R1/1k1 w BPbp 40").toSituation(shogi.variant.Dobutsu).get
+      sit.playable(strict = true) must beTrue
+      val sitAfter = sit(Usi("2b2c").get).toOption.get
+      sitAfter.end must beTrue
+      sitAfter.status must_== Some(Status.Draw)
+      sitAfter.winner must_== None
+    }
   }
 
   "force promoting" should {
