@@ -66,7 +66,7 @@ class DobutsuTest extends ShogiTest {
       afterTry.winner must_== Some(Color.Sente)
     }
 
-    "try rule - in check" in {
+    "work in check" in {
       val sit = Sfen("1r1/bpK/k2/3 b -").toSituation(shogi.variant.Dobutsu).get
       sit.moveActorAt(Pos.SQ1B).get.destinations.size must_== 5
 
@@ -96,7 +96,7 @@ class DobutsuTest extends ShogiTest {
       s4.winner must_== Some(Color.Sente)
     }
 
-    "draw" in {
+    "be draw" in {
       val sit = Sfen("1K1/1r1/1R1/1k1 w BPbp 40").toSituation(shogi.variant.Dobutsu).get
       sit.playable(strict = true) must beTrue
       val sitAfter = sit(Usi("2b2c").get).toOption.get
