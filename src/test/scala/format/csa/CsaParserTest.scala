@@ -60,6 +60,20 @@ class CsaParserTest extends ShogiTest {
   }
 
   "tags" should {
+    "Sente illegal action awards Gote the win regardless of turn" in {
+      forall(List("+7776FU", "+7776FU\n-3334FU")) { moves =>
+        parser(s"PI\n+\n$moves\n%+ILLEGAL_ACTION") must beValid.like { case p =>
+          p.tags(_.Result) must beSome("0-1")
+        }
+      }
+    }
+    "Gote illegal action awards Sente the win regardless of turn" in {
+      forall(List("+7776FU", "+7776FU\n-3334FU")) { moves =>
+        parser(s"PI\n+\n$moves\n%-ILLEGAL_ACTION") must beValid.like { case p =>
+          p.tags(_.Result) must beSome("1-0")
+        }
+      }
+    }
     "one tag" in {
       parser("""PI,$SITE:KAZUSA ARC
       -8384FU,T5""") must beValid.like { case p =>
