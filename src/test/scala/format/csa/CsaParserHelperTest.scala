@@ -37,4 +37,37 @@ P-00HI00HI00KA00KA00KI00KI00GI00KE00KY00KY00KY00FU00FU00FU00FU00FU00FU00FU00FU00
       Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p"),
     )
   }
+
+  "00AL counts a tokin as a pawn already on the board" in {
+    val board = (1 to 9)
+      .map { rank =>
+        s"P$rank" + (if (rank == 1) "+TO" else " * ") + " * " * 8
+      }
+      .mkString("\n")
+    parseAndCompare(
+      s"$board\nP+00AL",
+      Sfen("+P8/9/9/9/9/9/9/9/9 b 2R2B4G4S4N4L17P"),
+    )
+  }
+
+  "00AL subtracts promoted board pieces and the opponent's hand" in {
+    val promotions = List(
+      ("TO", "FU", Pawn, 18),
+      ("NY", "KY", Lance, 4),
+      ("NK", "KE", Knight, 4),
+      ("NG", "GI", Silver, 4),
+      ("UM", "KA", Bishop, 2),
+      ("RY", "HI", Rook, 2),
+    )
+    val board = (1 to 9).map(rank => s"P$rank" + " * " * 9).mkString("\n")
+    forall(promotions) { case (promoted, base, role, total) =>
+      forall(List("+", "-")) { color =>
+        val opponent = if (color == "+") "-" else "+"
+        val source   = s"$board\nP${opponent}11$promoted\nP${opponent}00$base\nP${color}00AL"
+        parseSituation(source) must beValid.like { case s =>
+          s.hands(Color.fromSente(color == "+"))(role) must_== total - 2
+        }
+      }
+    }
+  }
 }
