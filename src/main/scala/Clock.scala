@@ -328,16 +328,29 @@ object Clock {
       case _ => none
     }
 
+  private lazy val CsaTimeRegex = """(\d+):(\d+)(?::(\d+))?""".r
+
+  private def readCsaInitialTime(str: String): Option[Int] =
+    str match {
+      case CsaTimeRegex(hours, minutes, seconds) =>
+        for {
+          h <- hours.toIntOption
+          m <- minutes.toIntOption
+          s <- Option(seconds).fold(0.some)(_.toIntOption)
+        } yield h * 3600 + m * 60 + s
+      case _ => str.toIntOption
+    }
+
   def readCsaConfig(str: String): Option[Config] =
     str.split("""\+|\|""") match {
       case Array(initStr, byoStr) =>
         for {
-          init <- initStr.toIntOption
+          init <- readCsaInitialTime(initStr)
           byo  <- byoStr.toIntOption
         } yield Config(init, 0, byo, 1)
       case Array(initStr, byoStr, incStr) =>
         for {
-          init <- initStr.toIntOption
+          init <- readCsaInitialTime(initStr)
           byo  <- byoStr.toIntOption
           inc  <- incStr.toIntOption
         } yield Config(init, inc, byo, 1)

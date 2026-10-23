@@ -329,6 +329,31 @@ class ClockTest extends ShogiTest {
     }
   }
 
+  "csa config" in {
+    "hours and minutes" in {
+      Clock.readCsaConfig("00:10+20") must_== Some(Clock.Config(600, 0, 20, 1))
+      Clock.readCsaConfig("01:30+60") must_== Some(Clock.Config(5400, 0, 60, 1))
+    }
+    "zero initial time" in {
+      Clock.readCsaConfig("00:00+30") must_== Some(Clock.Config(0, 0, 30, 1))
+    }
+    "hours, minutes and seconds" in {
+      Clock.readCsaConfig("01:02:03+20") must_== Some(Clock.Config(3723, 0, 20, 1))
+    }
+    "increment extension" in {
+      Clock.readCsaConfig("00:10+20+5") must_== Some(Clock.Config(600, 5, 20, 1))
+    }
+    "integer seconds remain supported" in {
+      Clock.readCsaConfig("600+20") must_== Some(Clock.Config(600, 0, 20, 1))
+      Clock.readCsaConfig("600|20|5") must_== Some(Clock.Config(600, 5, 20, 1))
+    }
+    "malformed times" in {
+      forall(List("xx:10+20", "00:xx+20", "00:10:xx+20", "00:10:00:00+20", "00:10+xx")) { str =>
+        Clock.readCsaConfig(str) must beNone
+      }
+    }
+  }
+
   "show" in {
     Clock.Config(600, 0, 20, 1).show must_== "10|20"
     Clock.Config(300, 0, 20, 2).show must_== "5|20(2x)"

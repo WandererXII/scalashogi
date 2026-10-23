@@ -60,6 +60,19 @@ class CsaParserTest extends ShogiTest {
   }
 
   "tags" should {
+    "preserve standard CSA time controls" in {
+      parser("$TIME_LIMIT:00:10+20\nPI\n+\n+7776FU") must beValid.like { case p =>
+        p.tags.clockConfig must beSome(Clock.Config(600, 0, 20, 1))
+      }
+    }
+    "preserve generated CSA time controls" in {
+      forall(List(Clock.Config(600, 0, 20, 1), Clock.Config(90, 0, 30, 1))) { config =>
+        val header = Csa.renderHeader(Tags(List(Tag.timeControlCsa(Some(config)))))
+        parser(s"$header\nPI\n+\n+7776FU") must beValid.like { case p =>
+          p.tags.clockConfig must beSome(config)
+        }
+      }
+    }
     "Sente illegal action awards Gote the win regardless of turn" in {
       forall(List("+7776FU", "+7776FU\n-3334FU")) { moves =>
         parser(s"PI\n+\n$moves\n%+ILLEGAL_ACTION") must beValid.like { case p =>
