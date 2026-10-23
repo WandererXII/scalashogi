@@ -136,7 +136,7 @@ object SfenUtils {
     toForsythStandard filter { case (k, _) => Dobutsu.allRoles contains k }
 
   private val toRoleDobutsu: Map[String, Role] =
-    toForsythMinishogi map { case (k, v) => v -> k }
+    toForsythDobutsu map { case (k, v) => v -> k }
 
   val allForsyth: List[String] = (Role.all flatMap { r: Role =>
     Variant.all flatMap { v =>

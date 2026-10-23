@@ -6,6 +6,7 @@ import cats.syntax.option._
 
 import shogi.format.usi.Usi
 import shogi.variant.Chushogi
+import shogi.variant.Dobutsu
 import shogi.variant.Minishogi
 import shogi.variant.Standard
 
@@ -273,6 +274,20 @@ class SfenTest extends ShogiTest {
     }
     "too many files" in {
       Sfen("rrbsgk/4p/5/PG3/K1SBR/PG3").toSituation(Minishogi) must beNone
+    }
+  }
+  "dobutsu" in {
+    "reject unsupported pieces" in {
+      val symbols = List("s", "g", "+s", "+b", "+r")
+      forall(symbols.flatMap(s => List(s, s.toUpperCase))) { symbol =>
+        Sfen(s"rkb/${symbol}p1/1P1/BKR b - 1").toSituation(Dobutsu) must beNone
+      }
+    }
+    "round trip supported pieces of both colors" in {
+      val sfen = Sfen("rkb/+p2/2+P/BKR b RBPrbp")
+      sfen.toSituation(Dobutsu) must beSome.like { case s =>
+        s.toSfen must_== sfen
+      }
     }
   }
   "chushogi" in {
