@@ -53,6 +53,28 @@ class ClockTest extends ShogiTest {
         g.clock map { _.color } must_== Some(Gote)
       }
     }
+    "start after the second move of an active game" in {
+      val unstarted = makeGame(shogi.variant.Standard) withClock Clock(60, 0, 0, 0)
+      val first     = unstarted.playUsiStr("7g7f").toOption.get
+      first.clock.map(_.isRunning) must_== Some(false)
+      first.playUsiStr("3c3d") must beValid.like { case g: Game =>
+        g.situation.status must beNone
+        g.clock.map(_.isRunning) must_== Some(true)
+      }
+    }
+    "stay stopped when the second move ends a game loaded from SFEN" in {
+      val sfen      = shogi.format.forsyth.Sfen("9/3gk4/9/2b6/9/6B2/9/4KG3/9 b - 12")
+      val unstarted = Game(Some(sfen), shogi.variant.Checkshogi) withClock Clock(60, 0, 0, 0)
+      val first     = unstarted.playUsiStr("4h4g").toOption.get
+      first.situation.status must beNone
+      first.clock.map(_.isRunning) must_== Some(false)
+      first.playUsiStr("7d8e") must beValid.like { case g: Game =>
+        g.playedPlies must_== 2
+        g.situation.status must_== Some(Status.Check)
+        g.situation.winner must_== Some(Gote)
+        g.clock.map(_.isRunning) must_== Some(false)
+      }
+    }
   }
   "create a clock" should {
     "with time" in {

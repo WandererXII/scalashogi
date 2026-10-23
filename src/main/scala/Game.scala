@@ -21,8 +21,9 @@ final case class Game(
       plies = plies + 1,
       usis = sit.history.lastUsi.fold(usis)(usis :+ _),
       clock = clock map { c =>
-        val newC = c.step(metrics, sit.status.isEmpty)
-        if (plies - startedAtPly == 1) newC.start else newC
+        val gameActive = sit.status.isEmpty
+        val newC       = c.step(metrics, gameActive)
+        if (plies - startedAtPly == 1 && gameActive) newC.start else newC
       },
     )
 
