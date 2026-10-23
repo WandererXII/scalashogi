@@ -128,6 +128,8 @@ case object Dobutsu
       }
     }
 
+  override def hasUnmovablePieces(@unused board: Board) = false
+
   override def hasDoublePawns(board: Board, color: Color) = false
 
 }

@@ -116,6 +116,11 @@ class DobutsuTest extends ShogiTest {
   }
 
   "drops" should {
+    "allow pawns on the last rank" in {
+      val sit = Sfen("3/2k/K2/3 b P").toSituation(shogi.variant.Dobutsu).get
+      sit(Usi("P*1a").get).toOption.get.valid(strict = true) must beTrue
+    }
+
     "be legal" in {
       val sit  = Sfen("rkr/b1b/1P1/BKR b P").toSituation(shogi.variant.Dobutsu).get
       val drop = Usi("P*2b").get
