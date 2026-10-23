@@ -214,6 +214,25 @@ class ChushogiTest extends ShogiTest {
   }
 
   "falcon/eagle second move" should {
+    "not allow a restricted lion capture on the first step" in {
+      val positions = List(
+        ("k11/12/12/12/6n5/6P5/12/5+h6/5N6/12/12/11K b", "7h7i", "7h7i7h", "7h7i7j"),
+        ("k11/12/12/12/6n5/6P5/12/7+d4/6N5/12/12/11K b", "5h6i", "5h6i5h", "5h6i7j"),
+      )
+      forall(positions) { case (sfen, direct, returning, continuing) =>
+        val before = Sfen(sfen).toSituation(shogi.variant.Chushogi).get
+        val after  = before(Usi("6f6e").get).toOption.get
+        val moves  = List(direct, returning, continuing).map(s => Usi.Move(s).get)
+
+        after.history.lastLionCapture must beSome
+        forall(moves) { move =>
+          before.switch(move).isValid must beTrue
+          after(move).isValid must beFalse
+          after.moveActorAt(move.orig).get.toUsis must not contain move
+        }
+      }
+    }
+
     "not allow lion recapture" in {
       val sit = Sfen("k11/12/12/12/6n5/6P5/12/5+h6/12/5N6/12/11K b")
         .toSituation(shogi.variant.Chushogi)

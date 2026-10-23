@@ -31,7 +31,7 @@ final case class MoveActor(
   lazy val lionMoveDestinationsMap: Map[Pos, List[Pos]] =
     if (piece.role.hasLionPower)
       shortUnfilteredDestinations
-        .withFilter(_.dist(pos) == 1)
+        .withFilter(ms => ms.dist(pos) == 1 && destinations.contains(ms))
         .map { ms =>
           (ms, pos :: shogi.variant.Chushogi.lionMoveFilter(this, ms))
         }
