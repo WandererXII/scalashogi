@@ -23,6 +23,19 @@ class HistoryTest extends ShogiTest {
       val history = makeHistory(List(1, 2, 3, 4, 5, 6, 7, 2, 5, 6, 3, 2, 6, 2))
       history.fourfoldRepetition must beTrue
     }
+    "two-ply cycles" in {
+      makeHistory(List(1, 2, 1, 2, 1)).fourfoldRepetition must beFalse
+      makeHistory(List(1, 2, 1, 2, 1, 2, 1)).fourfoldRepetition must beTrue
+    }
+    "ignore positions with the other side to play" in {
+      makeHistory(List(1, 2, 1, 2, 1, 2, 2)).fourfoldRepetition must beFalse
+    }
+  }
+  "threefold repetition" should {
+    "two-ply cycles" in {
+      makeHistory(List(1, 2, 1)).threefoldRepetition must beFalse
+      makeHistory(List(1, 2, 1, 2, 1)).threefoldRepetition must beTrue
+    }
   }
   "repetition distance" should {
     "no repetition" in {

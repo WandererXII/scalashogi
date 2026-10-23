@@ -17,7 +17,7 @@ final case class History(
   private def currentTurnHashes = positionHashes.sliding(Hash.size, 2 * Hash.size).toList
 
   private def isRepetition(times: Int): Boolean =
-    positionHashes.length > (times - 1) * 4 * Hash.size && {
+    positionHashes.length > (times - 1) * 2 * Hash.size && {
       val positions = currentTurnHashes
       positions.headOption match {
         case Some(Array(x, y, z)) =>
