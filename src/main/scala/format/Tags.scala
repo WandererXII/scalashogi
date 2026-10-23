@@ -213,26 +213,6 @@ object Tag {
       "対局日" -> Tag.Start,
     )
 
-  def timeControlKif(clock: Option[Clock.Config]) =
-    Tag(
-      TimeControl,
-      clock.fold("") { c =>
-        val init =
-          if (c.limit.roundSeconds % 60 == 0) s"${c.limit.roundSeconds / 60}分"
-          else s"${c.limit.roundSeconds}秒"
-        val inc =
-          if (c.hasIncrement) s"+${c.increment.roundSeconds}秒"
-          else ""
-        val byo =
-          if (c.hasByoyomi) s"+${c.byoyomi.roundSeconds}秒"
-          else ""
-        val periods =
-          if (c.periodsTotal > 1) s"(${c.periodsTotal})"
-          else ""
-        s"$init$inc$byo$periods"
-      },
-    )
-
   def timeControlCsa(clock: Option[Clock.Config]) =
     Tag(
       TimeControl,
