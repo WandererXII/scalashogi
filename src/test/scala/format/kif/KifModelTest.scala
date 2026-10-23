@@ -220,6 +220,30 @@ class KifModelTest extends ShogiTest {
    8   ４三歩打"""
   }
 
+  "kif render kyoto - pawn and tokin hands round trip" in {
+    val sfen     = Sfen("2k2/5/5/5/2K2 b TP2tp 1")
+    val rendered = Kif(Nil, Some(sfen), Kyotoshogi).render
+
+    rendered must contain("先手の持駒：と　歩")
+    rendered must contain("後手の持駒：と二　歩")
+    KifParser.full(rendered) must beValid.like { case parsed =>
+      parsed.variant must_== Kyotoshogi
+      parsed.initialSfen.map(_.truncate) must beSome(sfen.truncate)
+    }
+  }
+
+  "kif render kyoto - tokin-only hands round trip" in {
+    val sfen     = Sfen("2k2/5/5/5/2K2 b Tt 1")
+    val rendered = Kif(Nil, Some(sfen), Kyotoshogi).render
+
+    rendered must contain("先手の持駒：と")
+    rendered must contain("後手の持駒：と")
+    KifParser.full(rendered) must beValid.like { case parsed =>
+      parsed.variant must_== Kyotoshogi
+      parsed.initialSfen.map(_.truncate) must beSome(sfen.truncate)
+    }
+  }
+
   "kif render kyoto - handicap" in {
     Kif(
       Nil,

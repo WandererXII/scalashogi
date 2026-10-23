@@ -206,7 +206,7 @@ object Kif {
   private def renderHand(hand: Hand, variant: Variant): String = {
     if (hand.isEmpty) "なし"
     else
-      Standard.handRoles
+      variant.handRoles
         .map { r =>
           val cnt = hand(r)
           val kif = KifUtils.toKif(r, variant).map(_.head) | ""
