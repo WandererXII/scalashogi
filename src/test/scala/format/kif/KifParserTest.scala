@@ -490,6 +490,29 @@ class KifParserTest extends ShogiTest {
   }
 
   "ending" should {
+    "count a sente two-step move as one turn before gote resigns" in {
+      parser("""
+        1手目一歩目 ▲6九獅子 （←7十）
+        1手目二歩目 ▲6八獅子 （←6九）
+        2 投了
+      """) must beValid.like { case p =>
+        p.variant.chushogi must beTrue
+        p.parsedSteps.value must haveSize(1)
+        p.tags(_.Result) must beSome("1-0")
+      }
+    }
+    "count a gote two-step move as one turn before sente resigns" in {
+      parser("""
+        1手目 ▲7八歩兵 （←7九）
+        2手目一歩目 △6四獅子 （←6三）
+        2手目二歩目 △6五獅子 （←6四）
+        3 投了
+      """) must beValid.like { case p =>
+        p.variant.chushogi must beTrue
+        p.parsedSteps.value must haveSize(2)
+        p.tags(_.Result) must beSome("0-1")
+      }
+    }
     "find end" in {
       parser("""
         # ---- Kifu for Windows95 V3.53 棋譜ファイル ----

@@ -101,8 +101,8 @@ object KifParser {
         )
         variant     = situation.variant
         initialSfen = situation.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
-        tags        = createTags(preTags, situation.color, strSteps.size, terminationOption)
         parsedSteps <- objSteps(strSteps, variant, variations)
+        tags = createTags(preTags, situation.color, parsedSteps.value.size, terminationOption)
       } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>
