@@ -75,7 +75,7 @@ final case class CsaMove(
 
   def toUsi(sit: Situation): Validated[String, Usi] =
     Validated.fromOption(sit.board(orig), s"No piece at $orig") map { p =>
-      Usi.Move(orig, dest, role != p.role, None)
+      Usi.Move(orig, dest, sit.variant.promote(p.role).contains(role), None)
     }
 
   def withMetas(m: Metas) = copy(metas = m)
