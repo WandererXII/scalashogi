@@ -131,15 +131,15 @@ object Color {
 
   def showResult(color: Option[Color]) =
     color match {
-      case Some(shogi.Sente) => "1-0"
-      case Some(shogi.Gote)  => "0-1"
-      case None              => "1/2-1/2"
+      case Some(shogi.Sente) => "sente"
+      case Some(shogi.Gote)  => "gote"
+      case None              => "draw"
     }
 
   def fromResult(result: String): Option[Color] =
     result match {
-      case "1-0" => Some(shogi.Sente)
-      case "0-1" => Some(shogi.Gote)
-      case _     => None
+      case "sente" => Some(shogi.Sente)
+      case "gote"  => Some(shogi.Gote)
+      case _       => None
     }
 }

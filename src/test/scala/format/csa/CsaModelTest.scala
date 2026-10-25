@@ -14,7 +14,7 @@ class CsaModelTest extends ShogiTest {
         createTerminationStep(status, winnerTurn = true, Some(winner)) must beSome.like {
           case termination =>
             CsaParser.full(s"PI\n+\n+7776FU\n$termination") must beValid.like { case p =>
-              p.tags(_.Result) must beSome(winner.fold("1-0", "0-1"))
+              p.tags(_.Result) must beSome(winner.fold("sente", "gote"))
             }
         }
       }

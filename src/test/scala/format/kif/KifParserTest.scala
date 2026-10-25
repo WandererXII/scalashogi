@@ -490,6 +490,14 @@ class KifParserTest extends ShogiTest {
   }
 
   "ending" should {
+    "preserve drawn results" in {
+      forall(List("持将棋", "千日手", "引き分け", "引分け")) { termination =>
+        parser(s"1 ７六歩(77)\n2 $termination") must beValid.like { case p =>
+          p.tags(_.Result) must beSome("draw")
+          p.tags.resultColor must_== Some(None)
+        }
+      }
+    }
     "count a sente two-step move as one turn before gote resigns" in {
       parser("""
         1手目一歩目 ▲6九獅子 （←7十）
@@ -498,7 +506,7 @@ class KifParserTest extends ShogiTest {
       """) must beValid.like { case p =>
         p.variant.chushogi must beTrue
         p.parsedSteps.value must haveSize(1)
-        p.tags(_.Result) must beSome("1-0")
+        p.tags(_.Result) must beSome("sente")
       }
     }
     "count a gote two-step move as one turn before sente resigns" in {
@@ -510,7 +518,7 @@ class KifParserTest extends ShogiTest {
       """) must beValid.like { case p =>
         p.variant.chushogi must beTrue
         p.parsedSteps.value must haveSize(2)
-        p.tags(_.Result) must beSome("0-1")
+        p.tags(_.Result) must beSome("gote")
       }
     }
     "find end" in {
@@ -532,7 +540,7 @@ class KifParserTest extends ShogiTest {
           tag.name == Tag.Termination && tag.value == "投了"
         }
         tags.value must contain { (tag: Tag) =>
-          tag.name == Tag.Result && tag.value == "0-1"
+          tag.name == Tag.Result && tag.value == "gote"
         }
       }
     }

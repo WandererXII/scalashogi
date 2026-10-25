@@ -60,6 +60,14 @@ class CsaParserTest extends ShogiTest {
   }
 
   "tags" should {
+    "preserve drawn results" in {
+      forall(List("JISHOGI", "SENNICHITE", "HIKIWAKE")) { termination =>
+        parser(s"PI\n+\n+7776FU\n%$termination") must beValid.like { case p =>
+          p.tags(_.Result) must beSome("draw")
+          p.tags.resultColor must_== Some(None)
+        }
+      }
+    }
     "preserve standard CSA time controls" in {
       parser("$TIME_LIMIT:00:10+20\nPI\n+\n+7776FU") must beValid.like { case p =>
         p.tags.clockConfig must beSome(Clock.Config(600, 0, 20, 1))
@@ -76,14 +84,14 @@ class CsaParserTest extends ShogiTest {
     "Sente illegal action awards Gote the win regardless of turn" in {
       forall(List("+7776FU", "+7776FU\n-3334FU")) { moves =>
         parser(s"PI\n+\n$moves\n%+ILLEGAL_ACTION") must beValid.like { case p =>
-          p.tags(_.Result) must beSome("0-1")
+          p.tags(_.Result) must beSome("gote")
         }
       }
     }
     "Gote illegal action awards Sente the win regardless of turn" in {
       forall(List("+7776FU", "+7776FU\n-3334FU")) { moves =>
         parser(s"PI\n+\n$moves\n%-ILLEGAL_ACTION") must beValid.like { case p =>
-          p.tags(_.Result) must beSome("1-0")
+          p.tags(_.Result) must beSome("sente")
         }
       }
     }
