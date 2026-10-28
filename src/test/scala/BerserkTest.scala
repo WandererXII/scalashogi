@@ -3,7 +3,11 @@ package shogi
 class BerserkTest extends ShogiTest {
 
   def senteBerserk(minutes: Int, seconds: Int, byo: Int) =
-    Clock(minutes * 60, seconds, byo, 1).goBerserk(Sente).currentClockFor(Sente).time.centis * .01
+    Clock(minutes * 60, seconds, byo, 1, Sente)
+      .goBerserk(Sente)
+      .currentClockFor(Sente)
+      .time
+      .centis * .01
 
   "berserkable" should {
     "yep" in {
@@ -21,12 +25,12 @@ class BerserkTest extends ShogiTest {
   }
   "berserk flags" should {
     "sente" in {
-      Clock(60, 0, 0, 1).berserked(Sente) must beFalse
-      Clock(60, 0, 0, 1).goBerserk(Sente).berserked(Sente) must beTrue
+      Clock(60, 0, 0, 1, Sente).berserked(Sente) must beFalse
+      Clock(60, 0, 0, 1, Sente).goBerserk(Sente).berserked(Sente) must beTrue
     }
     "gote" in {
-      Clock(60, 0, 0, 1).berserked(Gote) must beFalse
-      Clock(60, 0, 0, 1).goBerserk(Gote).berserked(Gote) must beTrue
+      Clock(60, 0, 0, 1, Sente).berserked(Gote) must beFalse
+      Clock(60, 0, 0, 1, Sente).goBerserk(Gote).berserked(Gote) must beTrue
     }
   }
   "initial time penalty, no byoyomi, no increment" should {

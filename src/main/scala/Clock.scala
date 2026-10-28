@@ -259,7 +259,7 @@ object Clock {
 
     def limitInMinutes = limitSeconds / 60d
 
-    def toClock = Clock(this)
+    def toClock(color: Color) = Clock(this, color)
 
     def startsAtZero = limitSeconds == 0 && hasByoyomi
 
@@ -357,15 +357,15 @@ object Clock {
       case _ => none
     }
 
-  def apply(limit: Int, increment: Int, byoyomi: Int, periods: Int): Clock = {
-    apply(Config(limit, increment, byoyomi, periods))
+  def apply(limit: Int, increment: Int, byoyomi: Int, periods: Int, color: Color): Clock = {
+    apply(Config(limit, increment, byoyomi, periods), color)
   }
 
-  def apply(config: Config): Clock = {
+  def apply(config: Config, color: Color): Clock = {
     val player = ClockPlayer.withConfig(config)
     Clock(
       config = config,
-      color = Sente,
+      color = color,
       players = Color.Map(player, player),
       timer = None,
     )

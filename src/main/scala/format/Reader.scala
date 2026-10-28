@@ -60,10 +60,5 @@ object Reader {
     }
 
   private def makeGame(initialSfen: Option[Sfen], variant: shogi.variant.Variant, tags: Tags) =
-    Game(
-      initialSfen,
-      variant,
-    ).copy(
-      clock = tags.clockConfig map Clock.apply,
-    )
+    Game(initialSfen, variant).withClockConfig(tags.clockConfig)
 }

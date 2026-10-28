@@ -66,6 +66,8 @@ final case class Game(
 
   def withClock(c: Option[Clock]) = copy(clock = c)
 
+  def withClockConfig(c: Option[Clock.Config]) = withClock(c.map(_.toClock(color)))
+
   def withPlies(p: Int) = copy(plies = p)
 
   def toSfen: Sfen = Sfen(this)

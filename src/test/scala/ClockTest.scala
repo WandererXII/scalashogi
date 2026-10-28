@@ -1,37 +1,37 @@
 package shogi
 
 class ClockTest extends ShogiTest {
-  val fakeClock60 = Clock(60, 0, 0, 0)
+  val fakeClock60 = Clock(60, 0, 0, 0, Sente)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)
     })
     .start
 
-  val fakeClock600 = Clock(600, 0, 0, 0)
+  val fakeClock600 = Clock(600, 0, 0, 0, Sente)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)
     })
     .start
 
-  val fakeClockByo = Clock(15, 0, 5, 1)
+  val fakeClockByo = Clock(15, 0, 5, 1, Sente)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)
     })
     .start
 
-  val fakeClockByo2 = Clock(60, 0, 10, 1)
+  val fakeClockByo2 = Clock(60, 0, 10, 1, Sente)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)
     })
     .start
 
-  val fakeClockZero = Clock(0, 0, 10, 1)
+  val fakeClockZero = Clock(0, 0, 10, 1, Sente)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)
     })
     .start
 
-  val fakeClockPeriods = Clock(10, 0, 10, 3)
+  val fakeClockPeriods = Clock(10, 0, 10, 3, Sente)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)
     })
@@ -43,7 +43,7 @@ class ClockTest extends ShogiTest {
     })
 
   "play with a clock" should {
-    val clock = Clock(5 * 60 * 1000, 0, 0, 0)
+    val clock = Clock(5 * 60 * 1000, 0, 0, 0, Sente)
     val game  = makeGame(shogi.variant.Standard) withClock clock.start
     "new game" in {
       game.clock map { _.color } must_== Some(Sente)
@@ -54,7 +54,7 @@ class ClockTest extends ShogiTest {
       }
     }
     "start after the second move of an active game" in {
-      val unstarted = makeGame(shogi.variant.Standard) withClock Clock(60, 0, 0, 0)
+      val unstarted = makeGame(shogi.variant.Standard) withClock Clock(60, 0, 0, 0, Sente)
       val first     = unstarted.playUsiStr("7g7f").toOption.get
       first.clock.map(_.isRunning) must_== Some(false)
       first.playUsiStr("3c3d") must beValid.like { case g: Game =>
@@ -64,7 +64,7 @@ class ClockTest extends ShogiTest {
     }
     "stay stopped when the second move ends a game loaded from SFEN" in {
       val sfen      = shogi.format.forsyth.Sfen("9/3gk4/9/2b6/9/6B2/9/4KG3/9 b - 12")
-      val unstarted = Game(Some(sfen), shogi.variant.Checkshogi) withClock Clock(60, 0, 0, 0)
+      val unstarted = Game(Some(sfen), shogi.variant.Checkshogi) withClock Clock(60, 0, 0, 0, Sente)
       val first     = unstarted.playUsiStr("4h4g").toOption.get
       first.situation.status must beNone
       first.clock.map(_.isRunning) must_== Some(false)
@@ -76,27 +76,69 @@ class ClockTest extends ShogiTest {
       }
     }
   }
+  "Gote-start games with a clock" should {
+    val sfen = shogi.format.forsyth.Sfen(
+      "lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1",
+    )
+    def game = {
+      val initial =
+        Game(Some(sfen), shogi.variant.Standard).withClockConfig(Some(fakeClock60.config))
+      initial.copy(clock = initial.clock.map(_.copy(timestamper = fakeClock60.timestamper)))
+    }
+    def afterOpening = game.playUsisStr(List("3c3d", "7g7f")).toOption.get
+
+    "start Gote's timer after the two untimed opening moves" in {
+      game.clock.map(_.color) must_== Some(Gote)
+      val first = game.playUsiStr("3c3d").toOption.get
+      first.clock.map(_.isRunning) must_== Some(false)
+      val second = first.playUsiStr("7g7f").toOption.get
+      second.color must_== Gote
+      second.clock.map(_.color) must_== Some(Gote)
+      second.clock.map(_.isRunning) must_== Some(true)
+    }
+    "charge each player's own elapsed time" in {
+      val opening  = afterOpening
+      val goteMove = opening
+        .copy(clock = opening.clock.map(advance(_, 1000)))
+        .playUsiStr("8c8d")
+        .toOption
+        .get
+      val senteMove = goteMove
+        .copy(clock = goteMove.clock.map(advance(_, 100)))
+        .playUsiStr("2g2f")
+        .toOption
+        .get
+      val clock = senteMove.clock.get
+      clock.currentClockFor(Gote).time must_== Centis(5000)
+      clock.currentClockFor(Sente).time must_== Centis(5900)
+    }
+    "flag Gote when Gote spends more than the time limit" in {
+      val clock = advance(afterOpening.clock.get, 6100)
+      clock.outOfTime(Gote, withGrace = false) must beTrue
+      clock.outOfTime(Sente, withGrace = false) must beFalse
+    }
+  }
   "create a clock" should {
     "with time" in {
-      Clock(60, 10, 0, 0).limitSeconds must_== 60
+      Clock(60, 10, 0, 0, Sente).limitSeconds must_== 60
     }
     "with increment" in {
-      Clock(60, 10, 0, 0).incrementSeconds must_== 10
+      Clock(60, 10, 0, 0, Sente).incrementSeconds must_== 10
     }
     "with few time" in {
-      Clock(0, 10, 0, 0).limitSeconds must_== 0
+      Clock(0, 10, 0, 0, Sente).limitSeconds must_== 0
     }
     "with 30 seconds" in {
-      Clock(30, 0, 0, 0).limitInMinutes must_== 0.5
+      Clock(30, 0, 0, 0, Sente).limitInMinutes must_== 0.5
     }
     "with time and byo" in {
-      val c = Clock(30, 0, 10, 1)
+      val c = Clock(30, 0, 10, 1, Sente)
       c.limitInMinutes must_== 0.5
       c.spentPeriodsOf(Sente) must_== 0
       c.spentPeriodsOf(Gote) must_== 0
     }
     "without limit, only byo" in {
-      val c = Clock(0, 0, 10, 1)
+      val c = Clock(0, 0, 10, 1, Sente)
       c.spentPeriodsOf(Sente) must_== 1
       c.spentPeriodsOf(Gote) must_== 1
     }
