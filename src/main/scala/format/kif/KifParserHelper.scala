@@ -31,7 +31,7 @@ object KifParserHelper {
 
     if (ranks.isEmpty)
       handicapString
-        .filterNot(h => KifUtils.defaultHandicaps.get(variant).exists(_.exists(_ == h)))
+        .filterNot(isDefaultHandicapOf(_, variant))
         .fold(valid(Situation(variant)): Validated[String, Situation])(parseHandicap(_, variant))
     else if (ranks.sizeIs == variant.numberOfRanks)
       for {
@@ -50,12 +50,12 @@ object KifParserHelper {
 
   // We need to somehow figure out if it's chushogi
   // looking for something like this - `△6五龍馬 （←4三）`
-  // but not strictly - focus on the two kanji representation
+  // shared Standard piece names only identify chushogi when an origin arrow is present.
   private val chushogiFullKanjiRoles = KifUtils.toKifChushogi map { case (_, v) =>
     v.head
   } mkString "|"
   private val chushogiKifMoveRegex =
-    raw"""^(${KifParser.colorsS})?(${KifParser.positionS})(${chushogiFullKanjiRoles})\s*(${KifParser.parsS})?←?(${KifParser.positionS})(${KifParser.parsS})?""".r.unanchored
+    raw"""^(${KifParser.colorsS})?(${KifParser.positionS})(${chushogiFullKanjiRoles})\s*(${KifParser.parsS})?(?<arrow>←)?(${KifParser.positionS})(${KifParser.parsS})?""".r.unanchored
   private def isDefaultHandicapOf(handicap: String, variant: Variant): Boolean =
     KifUtils.defaultHandicaps.get(variant).fold(false)(_.exists(_ == handicap.toLowerCase))
   private def detectVariant(
@@ -68,7 +68,16 @@ object KifParserHelper {
       ranks.sizeIs == 5 ||
       handicapString.exists(isDefaultHandicapOf(_, Minishogi))
     ) Minishogi.some
-    else if (ranks.sizeIs == 12 || steps.exists(s => chushogiKifMoveRegex.matches(s)))
+    else if (
+      ranks.sizeIs == 12 ||
+      handicapString
+        .exists(h => isDefaultHandicapOf(h, Chushogi) && !isDefaultHandicapOf(h, Standard)) ||
+      (ranks.isEmpty && steps.exists(s =>
+        chushogiKifMoveRegex
+          .findFirstMatchIn(s)
+          .exists(m => m.group("arrow") != null || KifUtils.toRole(m.group(3), Standard).isEmpty),
+      ))
+    )
       Chushogi.some
     else if (handicapString.exists(isDefaultHandicapOf(_, Annanshogi)))
       Annanshogi.some

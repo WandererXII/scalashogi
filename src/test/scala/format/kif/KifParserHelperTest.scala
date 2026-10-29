@@ -77,4 +77,15 @@ class KifParserHelperTest extends ShogiTest {
     parseAndCompare("", Some("王手将棋"), shogi.variant.Checkshogi.initialSfen.truncate)
     parseAndCompare("", Some("どうぶつしょうぎ"), shogi.variant.Dobutsu.initialSfen.truncate)
   }
+
+  "Chu Shogi move detection accepts distinctive pieces and arrow notation" in {
+    forall(List(None, Some("平手"))) { handicap =>
+      forall(List("7七歩兵 （←7八）", "7七獅子(78)")) { step =>
+        parseSituation("", handicap, List(step)) must beValid.like { case s =>
+          s.variant must_== shogi.variant.Chushogi
+          s.toSfen.truncate must_== shogi.variant.Chushogi.initialSfen.truncate
+        }
+      }
+    }
+  }
 }

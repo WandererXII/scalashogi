@@ -6,7 +6,29 @@ class KifParserTest extends ShogiTest {
 
   import shogi.format.kif.KifFixtures._
 
-  val parser                                               = KifParser.full _
+  val parser = KifParser.full _
+
+  "standard full piece names preserve the variant with and without a diagram" in {
+    import shogi.variant.Standard
+    val diagram = Kif.renderSituation(Situation(Standard))
+    forall(List("", diagram)) { setup =>
+      forall(List("歩兵", "香車", "金将", "銀将", "角行", "飛車", "龍馬", "龍王")) { role =>
+        parser(s"手合割：平手\n$setup\n1 ７六$role(77)") must beValid.like { case p =>
+          p.variant must_== Standard
+          p.initialSfen must beNone
+        }
+      }
+    }
+  }
+
+  "explicit Chu Shogi aliases identify an empty game" in {
+    forall(List("中将棋", "chushogi", "chuushogi", "CHUSHOGI")) { alias =>
+      parser(s"手合割：$alias") must beValid.like { case p =>
+        p.variant must_== shogi.variant.Chushogi
+        p.initialSfen must beNone
+      }
+    }
+  }
   def parseStep(str: String, lastDest: Option[Pos] = None) =
     KifParser.MoveDropParser(str, lastDest, None, shogi.variant.Standard)
   def parseChushogiMove(
