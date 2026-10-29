@@ -8,6 +8,23 @@ import shogi.format.usi._
 import shogi.variant._
 
 class KifModelTest extends ShogiTest {
+  "illegal-move termination preserves the winner on import" in {
+    forall(List(false, true)) { winnerTurn =>
+      val termination = createTerminationStep(Status.IllegalMove, winnerTurn).get
+      forall(List(1, 2)) { moveCount =>
+        val steps = List(
+          NotationStep(1, Usi.WithRole(Usi("7g7f").get, Pawn)),
+          NotationStep(2, Usi.WithRole(Usi("3c3d").get, Pawn)),
+        ).take(moveCount)
+        val record = Kif(steps.init :+ steps.last.copy(result = Some(termination)), None, Standard)
+        val expectedWinner = Color.fromSente((moveCount % 2 == 0) == winnerTurn)
+        KifParser.full(record.render) must beValid.like { case p =>
+          p.tags(_.Result) must beSome(expectedWinner.fold("sente", "gote"))
+        }
+      }
+    }
+  }
+
   "render steps" in {
     Kif.renderStep(Usi.WithRole(Usi("7h7g").get, Gold), None, Standard) must_== "７七金(78)"
     Kif.renderStep(Usi.WithRole(Usi("P*6d").get, Pawn), None, Standard) must_== "６四歩打"

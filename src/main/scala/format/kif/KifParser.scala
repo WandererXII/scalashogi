@@ -55,6 +55,12 @@ object KifParser {
   val moveOrDropLineRegex =
     raw"""^\s*(${numbersS}[\s\.。(?:手目)]{1,})?(${lionMoveS})?(${colorsS})?(${positionS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(?:${iguiS})?(${parsS})?←?${positionS}(${parsS})?)|${dropS})""".r.unanchored
 
+  private val terminationRegex =
+    """中断|投了|持将棋|千日手|引き分け|引分け|詰み|切れ負け|反則勝ち|反則負け|入玉勝ち|Time-up""".r
+
+  val terminationLineRegex =
+    raw"""^\s*(?:${numbersS}[\s\.。(?:手目)]{1,})?(?:${terminationRegex.regex})(?=$$|[\s(（*＊])""".r.unanchored
+
   val commentRegex =
     raw"""\*|＊""".r
 
@@ -393,8 +399,7 @@ object KifParser {
         }
       }
 
-    val termValue: Parser[String] =
-      "中断" | "投了" | "持将棋" | "千日手" | "引き分け" | "引分け" | "詰み" | "切れ負け" | "反則勝ち" | "反則負け" | "入玉勝ち" | "Time-up"
+    val termValue: Parser[String] = terminationRegex
   }
 
   object MoveDropParser extends RegexParsers with Logging {
@@ -512,7 +517,7 @@ object KifParser {
 
   private def splitKif(kif: String): Validated[String, (String, String, String)] = {
     augmentString(kif).linesIterator.map(_.trim).filter(_.nonEmpty) span { line =>
-      !moveOrDropLineRegex.matches(line)
+      !moveOrDropLineRegex.matches(line) && !terminationLineRegex.matches(line)
     } match {
       case (headerLines, rest) => {
         rest span { line =>

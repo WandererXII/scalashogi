@@ -168,9 +168,9 @@ object KifParserHelper {
 
   def createResult(termination: Option[Tag], color: Color): Option[Tag] = {
     termination.map(_.value.toLowerCase) match {
-      case Some("投了") | Some("反則負け") | Some("切れ負け") | Some("time-up") =>
+      case Some("投了") | Some("詰み") | Some("反則負け") | Some("切れ負け") | Some("time-up") =>
         Tag(_.Result, Color.showResult(Some(!color))).some
-      case Some("入玉勝ち") | Some("詰み") | Some("反則勝ち") =>
+      case Some("入玉勝ち") | Some("反則勝ち") =>
         Tag(_.Result, Color.showResult(Some(color))).some
       case Some("持将棋") | Some("千日手") | Some("引き分け") | Some("引分け") =>
         Tag(_.Result, Color.showResult(None)).some

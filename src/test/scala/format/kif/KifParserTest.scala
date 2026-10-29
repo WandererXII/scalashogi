@@ -16,6 +16,61 @@ class KifParserTest extends ShogiTest {
   ) =
     KifParser.MoveDropParser(str, lastDest, firstLionOrig, shogi.variant.Chushogi)
 
+  "mate awards the win to the player who made the last move" in {
+    forall(
+      List(
+        ("1 ７六歩(77)\n2 詰み", "sente"),
+        ("1 ７六歩(77)\n2 ３四歩(33)\n3 詰み", "gote"),
+        ("手合割：二枚落ち\n1 ３四歩(33)\n2 詰み", "gote"),
+      ),
+    ) { case (record, winner) =>
+      parser(record) must beValid.like { case p =>
+        p.tags(_.Result) must beSome(winner)
+      }
+    }
+  }
+
+  "termination before any moves preserves the outcome and comments" in {
+    forall(
+      List(
+        ("1 投了 (0:03/0:00:03)", Some("gote"), "投了"),
+        ("投了", Some("gote"), "投了"),
+        ("1 中断", None, "中断"),
+        ("1 千日手", Some("draw"), "千日手"),
+      ),
+    ) { case (termination, result, value) =>
+      parser(s"手合割：平手\n* initial\n$termination\n* final") must beValid.like { case p =>
+        p.parsedSteps.value must beEmpty
+        p.tags(_.Termination) must beSome(value)
+        p.tags(_.Result) must_== result
+        p.initialPosition.comments must_== List("initial")
+      }
+    }
+  }
+
+  "termination line detection recognizes tokens without matching header text" in {
+    forall(List("1 投了", "投了", "２手目 詰み", "1 中断(0:00/)", "投了* comment", "Time-up")) { line =>
+      KifParser.terminationLineRegex.matches(line) must beTrue
+    }
+    forall(List("先手: 投了", "* 投了", "投了について", "投了: a title", "1 ７六歩(77)")) { line =>
+      KifParser.terminationLineRegex.matches(line) must beFalse
+    }
+  }
+
+  "zero-move termination accepts inline comments" in {
+    parser("手合割：平手\n1 投了* final") must beValid.like { case p =>
+      p.tags(_.Termination) must beSome("投了")
+      p.tags(_.Result) must beSome("gote")
+    }
+  }
+
+  "zero-move handicap resignation awards the win to sente" in {
+    parser("手合割：二枚落ち\n1 投了") must beValid.like { case p =>
+      p.parsedSteps.value must beEmpty
+      p.tags(_.Result) must beSome("sente")
+    }
+  }
+
   "drop" in {
     parseStep("６四歩打") must beValid.like { case d: Drop =>
       d.role must_== Pawn
