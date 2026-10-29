@@ -62,7 +62,8 @@ final case class Tags(value: List[Tag]) extends AnyVal {
 object Tags {
   val empty = Tags(Nil)
 
-  private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
+  private val DateRegex =
+    """(\d{4}|\?{4})[./-](\d\d|\?\?)[./-](\d\d|\?\?)(?:[ T].*)?""".r
 }
 
 object Tag {
@@ -220,9 +221,7 @@ object Tag {
         val init =
           if (c.limit.roundSeconds % 60 == 0) f"00:${c.limit.roundSeconds / 60}%02d"
           else f"00:00:${c.limit.roundSeconds}%02d"
-        val byo =
-          if (c.hasByoyomi) f"+${c.byoyomi.roundSeconds}%02d"
-          else ""
+        val byo = f"+${c.byoyomi.roundSeconds}%02d"
         s"$init$byo"
       },
     )

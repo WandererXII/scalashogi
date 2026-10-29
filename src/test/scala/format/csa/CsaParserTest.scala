@@ -74,7 +74,14 @@ class CsaParserTest extends ShogiTest {
       }
     }
     "preserve generated CSA time controls" in {
-      forall(List(Clock.Config(600, 0, 20, 1), Clock.Config(90, 0, 30, 1))) { config =>
+      forall(
+        List(
+          Clock.Config(600, 0, 20, 1),
+          Clock.Config(90, 0, 30, 1),
+          Clock.Config(600, 0, 0, 1),
+          Clock.Config(90, 0, 0, 1),
+        ),
+      ) { config =>
         val header = Csa.renderHeader(Tags(List(Tag.timeControlCsa(Some(config)))))
         parser(s"$header\nPI\n+\n+7776FU") must beValid.like { case p =>
           p.tags.clockConfig must beSome(config)
