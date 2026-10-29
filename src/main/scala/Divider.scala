@@ -80,7 +80,8 @@ object Divider {
     Division(
       midGameOption.filter(m => endGameOption.fold(true)(m <)),
       endGameOption,
-      sits.size,
+      // The history includes the initial position, before any ply is played.
+      (sits.size - 1).max(0),
     )
   }
 

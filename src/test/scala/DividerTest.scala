@@ -4,6 +4,22 @@ class DividerTest extends ShogiTest {
 
   val usis = shogi.format.usi.Usi.readList(format.usi.Fixtures.fromProd2).get
 
+  "the divider counts played plies" should {
+    "handle an empty history" in {
+      Divider(Seq.empty) must_== Division.empty
+    }
+    "count no plies for only the initial position" in {
+      val situations = Replay.situations(Nil, None, variant.Standard).toOption.get
+      Divider(situations.toList) must_== Division.empty
+    }
+    "count one ply after one move" in {
+      val situations = Replay.situations(usis.take(1), None, variant.Standard).toOption.get
+      val divided    = Divider(situations.toList)
+      divided.plies must_== 1
+      divided.openingSize must_== 1
+    }
+  }
+
   "division phase sizes and bounds" should {
     "handle an opening followed directly by endgame" in {
       val divided = Division(None, Some(4), 10)
@@ -60,13 +76,14 @@ class DividerTest extends ShogiTest {
       val situations = Replay.situations(usis, None, variant.Standard).toOption.get
       val divided    = Divider(situations.toList)
       println("Game 1 => " + divided)
+      divided.plies must_== usis.size
       divided.middle must beSome.like { case x =>
         x must beBetween(10, 30)
       }
       divided.end must beNone
       divided.middleBounds must beSome.like { case (start, stop) =>
         Some(stop - start) must_== divided.middleSize
-        stop must_== situations.size
+        stop must_== usis.size
       }
     }
   }
