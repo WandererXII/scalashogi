@@ -2,20 +2,16 @@ package shogi
 
 final case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
 
-  def openingSize: Int        = middle | plies
+  def openingSize: Int        = middle.orElse(end) | plies
   def middleSize: Option[Int] =
     middle.map { m =>
       (end | plies) - m
     }
   def endSize = end.map(plies -)
 
-  def openingBounds = middle.map(0 -> _)
-  def middleBounds  =
-    for {
-      m <- middle
-      e <- end
-    } yield m -> e
-  def endBounds = end.map(_ -> plies)
+  def openingBounds = middle.orElse(end).map(0 -> _)
+  def middleBounds  = middle.map(m => m -> (end | plies))
+  def endBounds     = end.map(_ -> plies)
 }
 
 object Division {
