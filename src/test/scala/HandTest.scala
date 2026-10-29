@@ -5,6 +5,24 @@ import shogi.variant.Standard
 class HandTest extends ShogiTest {
   val hands = Hands.empty
 
+  "Hand count validation" should {
+    "clamp negative removals to zero" in {
+      hands.store(Sente, Pawn).take(Sente, Pawn, -2) must beSome(hands.store(Sente, Pawn))
+    }
+    "clamp negative stores to zero" in {
+      hands.store(Gote, Pawn, -1).isEmpty must beTrue
+    }
+    "saturate overflowing stores" in {
+      Hand.empty.store(Pawn, Int.MaxValue).store(Pawn)(Pawn) must_== Int.MaxValue
+    }
+    "allow removing zero from an empty hand" in {
+      Hand.empty.take(Pawn, 0) must beSome.like { h =>
+        h(Pawn) must_== 0
+        h.isEmpty must beTrue
+      }
+    }
+  }
+
   "Empty hand" should {
     "have no pieces" in {
       hands.size must_== 0

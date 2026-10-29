@@ -54,14 +54,17 @@ final case class Hand(handMap: HandMap) extends AnyVal {
   def apply(role: DroppableRole): Int =
     handMap.getOrElse(role, 0)
 
-  def take(role: DroppableRole, cnt: Int = 1) =
-    handMap
-      .get(role)
-      .filter(_ - cnt >= 0)
-      .map(cur => copy(handMap = handMap + (role -> (cur - cnt))))
+  def take(role: DroppableRole, cnt: Int = 1): Option[Hand] = {
+    val amountToTake = cnt.max(0)
+    val currentCount = apply(role)
+    if (amountToTake > currentCount) None
+    else Some(copy(handMap = handMap + (role -> (currentCount - amountToTake))))
+  }
 
-  def store(role: DroppableRole, cnt: Int = 1) =
-    copy(handMap = handMap + (role -> (apply(role) + cnt)))
+  def store(role: DroppableRole, cnt: Int = 1): Hand = {
+    val newCount = (apply(role).toLong + cnt.max(0)).min(Int.MaxValue).toInt
+    copy(handMap = handMap + (role -> newCount))
+  }
 
   def roles: List[DroppableRole] =
     handMap.view.filter(_._2 > 0).map(_._1).toList
