@@ -1,6 +1,7 @@
 package shogi
 
-final case class File private (index: Int) extends AnyVal with Ordered[File] {
+final class File private (val index: Int) extends AnyVal with Ordered[File] {
+
   @inline def -(that: File): Int           = index - that.index
   @inline override def compare(that: File) = this - that
 

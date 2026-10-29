@@ -6,6 +6,22 @@ class PosTest extends ShogiTest {
 
   "A position" should {
 
+    "reject out of bounds indices" in {
+      Pos(144) must beNone
+      Pos(-1) must beNone
+      Rank(12) must beNone
+      Rank(-1) must beNone
+      File(12) must beNone
+      File(-1) must beNone
+    }
+
+    "preserve value equality through validated factories" in {
+      Pos(143) must beSome(SQ12L)
+      Rank(11) must beSome(Rank.L)
+      File(11) must beSome(File.Twelfth)
+      Map(SQ12L -> "square").get(Pos(143).get) must beSome("square")
+    }
+
     "boolean directions" in {
       "isLeftOf" in {
         SQ2A.isLeftOf(SQ1A) must beTrue

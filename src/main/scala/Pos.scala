@@ -6,7 +6,7 @@ import scala.math.min
 
 // Coordinate system starts at top right
 // Directions are given from sente POV
-final case class Pos private (index: Int) extends AnyVal {
+final class Pos private (val index: Int) extends AnyVal {
 
   def xDist(other: Pos) = abs(file - other.file)
   def yDist(other: Pos) = abs(rank - other.rank)
@@ -50,8 +50,8 @@ final case class Pos private (index: Int) extends AnyVal {
       Pos.at(_, rank.index)
     }
 
-  // from down left corner to top right corner
-  def upTo(other: Pos): Seq[Pos] =
+  // All positions in the inclusive rectangle between the corners
+  def upTo(other: Pos): Iterable[Pos] =
     min(rank.index, other.rank.index) to max(rank.index, other.rank.index) flatMap {
       Pos.at(file.index, _)
     } flatMap { _ <-> other }
