@@ -505,6 +505,26 @@ class KifParserTest extends ShogiTest {
   }
 
   "variations" should {
+    "resolve same-square branches before a two-step lion move" in {
+      forall(List("仝", "同")) { same =>
+        parser(s"""
+          1手目 ▲7八歩兵 （←7九）
+          2手目一歩目 △6四獅子 （←6三）
+          2手目二歩目 △6五獅子 （←6四）
+          3手目 ▲仝獅子 （←7十）
+          変化：2手
+          2手目 △${same}獅子 （←6三）
+        """) must beValid.like { case p =>
+          p.parsedSteps.value must haveSize(3)
+          val lion = p.parsedSteps.value(1)
+          lion.positions must_== List(Pos.SQ6C, Pos.SQ6D, Pos.SQ6E)
+          lion.metas.variations must haveSize(1)
+          lion.metas.variations.head.value.head.positions.lastOption must beSome(Pos.SQ7H)
+          p.parsedSteps.value(2).positions.lastOption must beSome(Pos.SQ6E)
+        }
+      }
+    }
+
     "preserve branch clocks" in {
       forall(List("1:05/0:1:05", "1:05.006/0:1:05.006")) { clock =>
         val expected = if (clock.contains(".")) Centis(6501) else Centis(6500)

@@ -149,18 +149,21 @@ object KifParser {
                 variant,
               ) map { s =>
                 val s1 = s withComments comments withVariations {
-                  variations
-                    .withFilter(_.variationStart == (stepNumber | ply))
-                    .map { v =>
-                      objSteps(
-                        v.steps,
-                        variant,
-                        v.variations,
-                        lastDest,
-                        ply + 1,
-                      ) getOrElse ParsedSteps.empty
-                    }
-                    .filter(_.value.nonEmpty)
+                  if (variant.chushogi && secondLionMove && parsedSteps.nonEmpty)
+                    parsedSteps.head.metas.variations
+                  else
+                    variations
+                      .withFilter(_.variationStart == (stepNumber | ply))
+                      .map { v =>
+                        objSteps(
+                          v.steps,
+                          variant,
+                          v.variations,
+                          lastDest,
+                          ply + 1,
+                        ) getOrElse ParsedSteps.empty
+                      }
+                      .filter(_.value.nonEmpty)
                 }
                 if (uselessTimes) s1 else s1 withTimeSpent timeSpent withTimeTotal timeTotal
               } match {
