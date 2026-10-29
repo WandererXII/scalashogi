@@ -339,7 +339,7 @@ object KifUtils {
       Pawn   -> "ひ",
       Bishop -> "ぞ",
       Rook   -> "き",
-      Tokin  -> "に	",
+      Tokin  -> "に",
     )
 
   val allKif: List[String] = (Role.all flatMap { r: Role =>

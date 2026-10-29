@@ -317,4 +317,26 @@ class KifModelTest extends ShogiTest {
 先手の持駒：なし"""
   }
 
+  "kif render dobutsu - hands round trip" in {
+    forall(List("RBP", "2r2b2p", "RBPrbp")) { hands =>
+      val sfen     = Sfen(s"1k1/3/3/1K1 b $hands 1")
+      val rendered = Kif(Nil, Some(sfen), Dobutsu).render
+
+      KifParser.full(rendered) must beValid.like { case parsed =>
+        parsed.variant must_== Dobutsu
+        parsed.initialSfen.map(_.truncate) must beSome(sfen.truncate)
+      }
+    }
+  }
+
+  "kif render dobutsu - promoted board pieces round trip" in {
+    val sfen     = Sfen("1k1/1+p1/1+P1/1K1 w - 1")
+    val rendered = Kif(Nil, Some(sfen), Dobutsu).render
+
+    KifParser.full(rendered) must beValid.like { case parsed =>
+      parsed.variant must_== Dobutsu
+      parsed.initialSfen.map(_.truncate) must beSome(sfen.truncate)
+    }
+  }
+
 }

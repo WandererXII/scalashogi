@@ -129,10 +129,12 @@ object KifParserHelper {
     def parseHand(str: String): Validated[String, Hand] = {
       def parseHandPiece(str: String, hand: Hand): Validated[String, Hand] =
         for {
-          roleStr <- str.headOption toValid "Cannot parse hand"
-          num = KifUtils kanjiToInt str.tail
+          roleStr <- (if (variant == Dobutsu)
+                        str.inits.find(prefix => KifUtils.anyToRole(prefix, variant).isDefined)
+                      else str.headOption.map(_.toString)) toValid s"Unknown piece in hand: $str"
+          num = KifUtils kanjiToInt str.drop(roleStr.length)
           rolesBase <- KifUtils
-            .anyToRole(roleStr.toString, variant)
+            .anyToRole(roleStr, variant)
             .map(_.toList) toValid s"Unknown piece in hand: $roleStr"
           role <- variant.handRoles.find(
             rolesBase contains _,
