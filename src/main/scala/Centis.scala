@@ -8,7 +8,7 @@ import cats.Monoid
 final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 
   def roundTenths: Int =
-    if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
+    ((if (centis > 0) centis.toLong + 5 else centis.toLong - 4) / 10).toInt
   def roundSeconds: Int = math.round(centis * 0.01f)
 
   def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis.toLong, 2)
@@ -26,7 +26,7 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def /(div: Int)        = Option.when(div != 0)(Centis(centis / div))
   def unary_-            = Centis(-centis)
 
-  def avg(other: Centis) = Centis((centis + other.centis) >> 1)
+  def avg(other: Centis) = Centis((centis.toLong + other.centis.toLong) >> 1)
 
   def compare(other: Centis) = Integer.compare(centis, other.centis)
 
@@ -70,7 +70,7 @@ object Centis {
   def apply(f: Float): Centis  = Centis(math.round(f))
   def apply(d: Double): Centis = Centis(math.round(d))
 
-  def ofSeconds(s: Int) = Centis(100 * s)
-  def ofMillis(i: Int)  = Centis((if (i > 0) i + 5 else i - 4) / 10)
-  def ofMillis(l: Long) = Centis((if (l > 0) l + 5 else l - 4) / 10)
+  def ofSeconds(s: Int)         = Centis(100 * s)
+  def ofMillis(i: Int): Centis  = Centis(math.round(i.toDouble / 10.0))
+  def ofMillis(l: Long): Centis = Centis(math.round(l.toDouble / 10.0))
 }
