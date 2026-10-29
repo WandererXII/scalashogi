@@ -6,6 +6,29 @@ import shogi.Pos._
 
 class UsiTest extends ShogiTest {
 
+  "reject an invalid intermediate square" in {
+    Usi("7g13a7f") must beNone
+    Usi.Move("7g0a7f") must beNone
+    Usi.readList("7g13a7f") must beNone
+  }
+
+  "require the drop separator" in {
+    Usi.Drop("P15e") must beNone
+    Usi.Drop("P?5e") must beNone
+    Usi.Drop("P5e") must beNone
+    Usi.Drop("") must beNone
+    Usi.Drop("P*5e").map(_.usi) must beSome("P*5e")
+  }
+
+  "read empty and whitespace-separated move lists" in {
+    Usi.readList("") must beSome(List.empty[Usi])
+    Usi.readList(" \t\n ") must beSome(List.empty[Usi])
+    Usi.readList(" 7g7f  3c3d\tP*5e\n") must_== Usi.readList(
+      Seq("7g7f", "3c3d", "P*5e"),
+    )
+    Usi.readList("7g7f invalid 3c3d") must beNone
+  }
+
   "Usi" in {
     Usi("9i1a") must beSome.like { case u: Usi.Move =>
       u.orig must_== SQ9I

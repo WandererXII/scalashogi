@@ -1,5 +1,6 @@
 package shogi
-package format.usi
+package format
+package usi
 
 import cats.implicits._
 
@@ -37,10 +38,10 @@ object Usi {
       str match {
         case MoveRegex(origS, midStepS, destS, promS) =>
           for {
-            orig <- Pos.allKeys get origS
-            dest <- Pos.allKeys get destS
-            prom    = promS == "+"
-            midStep = Option(midStepS).flatMap(Pos.allKeys get _)
+            orig    <- Pos.allKeys get origS
+            dest    <- Pos.allKeys get destS
+            midStep <- Option(midStepS).traverse(Pos.allKeys get _)
+            prom = promS == "+"
           } yield Move(orig, dest, prom, midStep)
         case _ => None
       }
@@ -58,10 +59,12 @@ object Usi {
   object Drop {
 
     def apply(str: String): Option[Drop] =
-      for {
-        role <- usiToRole get str.take(1)
-        pos  <- Pos.allKeys get (str.drop(2))
-      } yield Drop(role, pos)
+      if (!str.lift(1).contains('*')) None
+      else
+        for {
+          role <- usiToRole get str.take(1)
+          pos  <- Pos.allKeys get (str.drop(2))
+        } yield Drop(role, pos)
 
     val roleToUsi: Map[DroppableRole, String] = Map(
       Pawn   -> "P",
@@ -85,7 +88,7 @@ object Usi {
     else Usi.Move(usiStr)
 
   def readList(steps: String): Option[List[Usi]] =
-    readList(steps.split(' ').toList)
+    readList(fieldSeparator.split(steps).filter(_.nonEmpty).toList)
 
   def readList(steps: Seq[String]): Option[List[Usi]] =
     steps.toList.map(apply).sequence

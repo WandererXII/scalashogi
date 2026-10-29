@@ -1,5 +1,6 @@
 package shogi
-package format.usi
+package format
+package usi
 
 import cats.implicits._
 
@@ -10,7 +11,7 @@ object UciToUsi {
     Usi(uciStr.map(Pos.fromUciMap))
 
   def readList(steps: String): Option[List[Usi]] =
-    readList(steps.split(' ').toList)
+    readList(fieldSeparator.split(steps).filter(_.nonEmpty).toList)
 
   def readList(steps: Seq[String]): Option[List[Usi]] =
     steps.toList.map(apply).sequence

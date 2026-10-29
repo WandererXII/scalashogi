@@ -45,7 +45,7 @@ final case class Sfen(value: String) extends AnyVal {
         .getOrElse(History.empty)
     else History.empty
 
-  private def fields: Array[String] = Sfen.fieldSeparator.split(value.trim)
+  private def fields: Array[String] = fieldSeparator.split(value.trim)
 
   def boardString: Option[String] =
     fields.lift(0)
@@ -199,9 +199,6 @@ object Sfen {
   }
 
   def clean(source: String): Sfen = Sfen(source.replace("_", " ").trim)
-
-
-  private val fieldSeparator = """\s+""".r
 
   private val maxHandCount = 99
 
