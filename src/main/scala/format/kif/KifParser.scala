@@ -262,8 +262,15 @@ object KifParser {
           (opt(number) ~ opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(
             commentary,
           )) <~
-          (stepExtras *) ^^ { case num ~ lionMove ~ stepStr ~ _ ~ comments =>
-            StrStep(num, stepStr, cleanComments(comments), lionMove.exists(_.contains("二歩目")))
+          (stepExtras *) ^^ { case num ~ lionMove ~ stepStr ~ clk ~ comments =>
+            StrStep(
+              num,
+              stepStr,
+              cleanComments(comments),
+              lionMove.exists(_.contains("二歩目")),
+              clk.flatMap(_._1),
+              clk.flatMap(_._2),
+            )
           }
       }
 
@@ -271,10 +278,13 @@ object KifParser {
       KifUtils.kanjiToInt(n.filterNot(c => List[Char]('.', '。', '手', '目').contains(c)).trim)
     }
 
-    def clock: Parser[String] =
-      as("clock") {
-        """[\(（][0-9０-９\/\s:／]{1,}[\)）]\+?""".r
+    def clock: Parser[(Option[Centis], Option[Centis])] = Parser { input =>
+      StepsParser.clock(input) match {
+        case StepsParser.Success(value, next) => Success(value, next)
+        case StepsParser.Failure(msg, next)   => Failure(msg, next)
+        case StepsParser.Error(msg, next)     => Error(msg, next)
       }
+    }
 
     def stepExtras: Parser[Unit] =
       as("stepExtras") {
@@ -347,15 +357,11 @@ object KifParser {
     private val clockHourMinuteSecondRegex = """(\d++):(\d++)[:\.](\d+(?:\.\d+)?)""".r
 
     private def readCentis(hours: String, minutes: String, seconds: String): Option[Centis] =
-      for {
-        h  <- hours.toIntOption
-        m  <- minutes.toIntOption
-        cs <- seconds.toDoubleOption match {
-          case Some(s) =>
-            Some(BigDecimal(s * 100).setScale(0, BigDecimal.RoundingMode.HALF_UP).toInt)
-          case _ => none
-        }
-      } yield Centis(h * 360000 + m * 6000 + cs)
+      scala.util.Try {
+        val total =
+          BigDecimal(hours) * 360000 + BigDecimal(minutes) * 6000 + BigDecimal(seconds) * 100
+        Centis(total.setScale(0, BigDecimal.RoundingMode.HALF_UP).bigDecimal.intValueExact())
+      }.toOption
 
     private def parseClock(str: String): Option[Centis] = {
       str match {
@@ -377,8 +383,11 @@ object KifParser {
       as("clock") {
         """[\(（]\s*""".r ~>
           clockMinuteSecondRegex ~ opt("/") ~ opt(clockHourMinuteSecondRegex) <~
-          """\s*[\)）]\+?""".r ^^ { case spent ~ _ ~ total =>
-            (parseClock(spent), total.flatMap(parseClock(_)))
+          """\s*[\)）]\+?""".r >> { case spent ~ _ ~ total =>
+            (parseClock(spent), total.traverse(parseClock)) match {
+              case (Some(s), Some(t)) => success((Some(s), t))
+              case _                  => err("Clock exceeds the supported centisecond range")
+            }
           }
       }
 

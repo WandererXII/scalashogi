@@ -8,6 +8,21 @@ import shogi.format.usi._
 import shogi.variant._
 
 class KifModelTest extends ShogiTest {
+  "move clocks preserve whole hours on export and import" in {
+    forall(List(59, 60, 3599, 3600, 3661, 7201)) { seconds =>
+      val step = NotationStep(
+        1,
+        Usi.WithRole(Usi("7g7f").get, Pawn),
+        secondsSpent = Some(seconds),
+        secondsTotal = Some(seconds),
+      )
+      KifParser.full(Kif(List(step), None, Standard).render) must beValid.like { case p =>
+        p.parsedSteps.value.head.metas.timeSpent must beSome(Centis(seconds * 100))
+        p.parsedSteps.value.head.metas.timeTotal must beSome(Centis(seconds * 100))
+      }
+    }
+  }
+
   "illegal-move termination preserves the winner on import" in {
     forall(List(false, true)) { winnerTurn =>
       val termination = createTerminationStep(Status.IllegalMove, winnerTurn).get

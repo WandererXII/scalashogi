@@ -272,22 +272,12 @@ object Kif {
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n").replace("\n", "\n* ")
 
   private def formatKifSpent(t: Int) =
-    ms.print(
-      org.joda.time.Duration.standardSeconds(t.toLong).toPeriod,
-    )
+    f"${t / 60}%02d:${t % 60}%02d"
 
   private def formatKifTotal(t: Int) =
     hms.print(
       org.joda.time.Duration.standardSeconds(t.toLong).toPeriod,
     )
-
-  private[this] val ms = new org.joda.time.format.PeriodFormatterBuilder().printZeroAlways
-    .minimumPrintedDigits(2)
-    .appendMinutes
-    .appendSeparator(":")
-    .minimumPrintedDigits(2)
-    .appendSeconds
-    .toFormatter
 
   private[this] val hms = new org.joda.time.format.PeriodFormatterBuilder().printZeroAlways
     .minimumPrintedDigits(2)

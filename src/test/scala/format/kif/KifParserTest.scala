@@ -357,6 +357,26 @@ class KifParserTest extends ShogiTest {
   }
 
   "times" should {
+    "reject clocks outside the centisecond range in main lines and variations" in {
+      forall(
+        List(
+          "0:01/6000:00:00",
+          "357913:56.48/0:00:01",
+          "0:01/5965:13:56.475",
+          "2147483648:00/0:00:01",
+          s"0:${"9" * 400}/0:00:01",
+        ),
+      ) { clock =>
+        parser(s"1 ７六歩(77) ($clock)") must beInvalid
+        parser(s"1 ７六歩(77)\n変化：1手\n1 ２六歩(27) ($clock)") must beInvalid
+      }
+    }
+    "accept and round clocks up to the centisecond limit" in {
+      parser("1 ７六歩(77) (357913:56.474/5965:13:56.474)") must beValid.like { case p =>
+        p.parsedSteps.value.head.metas.timeSpent must beSome(Centis(Int.MaxValue))
+        p.parsedSteps.value.head.metas.timeTotal must beSome(Centis(Int.MaxValue))
+      }
+    }
     "both times" in {
       parser("""29 ４八玉(59) (2:25/0:8:23)""") must beValid.like {
         case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
@@ -485,6 +505,16 @@ class KifParserTest extends ShogiTest {
   }
 
   "variations" should {
+    "preserve branch clocks" in {
+      forall(List("1:05/0:1:05", "1:05.006/0:1:05.006")) { clock =>
+        val expected = if (clock.contains(".")) Centis(6501) else Centis(6500)
+        parser(s"1 ７六歩(77)\n変化：1手\n1 ２六歩(27) ($clock)") must beValid.like { case p =>
+          val branch = p.parsedSteps.value.head.metas.variations.head.value.head
+          branch.metas.timeSpent must beSome(expected)
+          branch.metas.timeTotal must beSome(expected)
+        }
+      }
+    }
     "first step variation" in {
       parser("""
         後手：俺
