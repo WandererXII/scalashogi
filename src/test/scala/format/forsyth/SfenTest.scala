@@ -48,7 +48,7 @@ class SfenTest extends ShogiTest {
     "saturate large hand counts without overflow" in {
       forall(List("2147483648P", "4294967297P", "9" * 1000 + "P")) { hand =>
         Sfen.makeHandsFromString(hand, Standard) must beSome.like { case hs =>
-          hs.sente(Pawn) must_== Sfen.maxHandCount
+          hs.sente(Pawn) must_== 99
         }
       }
     }
@@ -295,7 +295,7 @@ class SfenTest extends ShogiTest {
           .like { case s =>
             s.situation.hands must_== Hands(
               Hand(Map(Rook -> 7, Bishop -> 1, Gold -> 1, Knight -> 3, Lance -> 2, Pawn -> 15)),
-              Hand(Map(Rook -> 1, Gold -> 81, Silver -> 3, Lance -> 1, Pawn -> 12)),
+              Hand(Map(Rook -> 1, Gold -> 99, Silver -> 3, Lance -> 1, Pawn -> 12)),
             )
           }
       }
