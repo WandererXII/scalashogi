@@ -12,6 +12,72 @@ import shogi.variant.Standard
 
 class SfenTest extends ShogiTest {
 
+  "SFEN regression cases" should {
+    "infer the checked side when the turn is omitted" in {
+      forall(
+        List(
+          "4k4/9/9/9/9/9/4r4/9/4K4" -> Sente,
+          "4k4/9/4R4/9/9/9/9/9/4K4" -> Gote,
+        ),
+      ) { case (board, expected) =>
+        Sfen(board).toSituation(Standard) must beSome.like { case sit =>
+          sit.color must_== expected
+          sit.playable(true) must beTrue
+        }
+      }
+    }
+    "keep explicit turns and the default turn" in {
+      val board = "4k4/9/9/9/9/9/4r4/9/4K4"
+      Sfen(s"$board w - 1").toSituation(Standard).get.color must_== Gote
+      Sfen(Standard.initialSfen.value.takeWhile(_ != ' '))
+        .toSituation(Standard)
+        .get
+        .color must_== Sente
+    }
+    "reject incomplete and overflowing ranks" in {
+      forall(
+        List(
+          "rbsgk/4p//P4/KGSBR",
+          "rbsgk/4p/6/P4/KGSBR",
+          "rbsgk/4p/5/P4/KGSB",
+          "rbsgk/4p/5/P4/",
+          "rbsgk/4p/5/P4/KGSBR1",
+        ),
+      ) { board => Sfen(board).toBoard(Minishogi) must beNone }
+    }
+    "saturate large hand counts without overflow" in {
+      forall(List("2147483648P", "4294967297P", "9" * 1000 + "P")) { hand =>
+        Sfen.makeHandsFromString(hand, Standard) must beSome.like { case hs =>
+          hs.sente(Pawn) must_== Sfen.maxHandCount
+        }
+      }
+    }
+    "accept a dash only as the complete hand field" in {
+      forall(List("P-", "P-junk", "-junk", "2-", "--")) { hand =>
+        Sfen.makeHandsFromString(hand, Standard) must beNone
+      }
+    }
+    "normalize whitespace consistently across fields" in {
+      val board = Standard.initialSfen.value.takeWhile(_ != ' ')
+      val input = Sfen(s"  $board \t w  2P \t 2  ")
+      input.toSituationPlus(Standard) must beSome.like { case sp =>
+        sp.toSfen must_== Sfen(s"$board w 2P 2")
+      }
+      input.truncate must_== Sfen(s"$board w 2P")
+    }
+    "round trip every variant and piece" in {
+      forall(shogi.variant.Variant.all) { variant =>
+        variant.initialSfen.toSituationPlus(variant).get.toSfen must_== variant.initialSfen
+        forall(variant.allRoles) { role =>
+          forall(Color.all) { color =>
+            val piece = Piece(color, role)
+            SfenUtils.toPiece(SfenUtils.toForsyth(piece, variant).get, variant) must beSome(piece)
+          }
+        }
+      }
+    }
+  }
+
   "the forsyth notation" should {
     "export" in {
       "game opening" in {

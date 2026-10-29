@@ -28,8 +28,9 @@ object Visual {
     val turn  =
       if (lines.map(_.toLowerCase).exists(l => l.startsWith("turn") && l.contains("gote"))) "w"
       else "b"
-    val sfenReversed = lines
+    val sfen = lines
       .filterNot(_ contains ":")
+      .map(line => line + "." * (variant.numberOfFiles - line.count(_ != '+')))
       .mkString("/")
       .foldLeft(List.empty[(Int, Char)]) {
         case (fp :: lp, cur) if fp._2 == cur && fp._2 == '.' =>
@@ -37,13 +38,14 @@ object Visual {
         case (fp, cur) =>
           (1, cur) :: fp
       }
+      .reverse
       .map(ic => s"${if (ic._2 == '.') ic._1 else ""}${ic._2}")
       .mkString("")
       .filter(_ != '.')
     val padStr =
-      s"${variant.numberOfFiles}/" * (variant.numberOfRanks - sfenReversed.count(_ == '/') - 1)
+      s"${variant.numberOfFiles}/" * (variant.numberOfRanks - sfen.count(_ == '/') - 1)
     val finalSfen =
-      List[String](padStr + sfenReversed.reverse, turn, hands)
+      List[String](padStr + sfen, turn, hands)
         .mkString(" ")
     Sfen(finalSfen).toSituation(variant)
   }

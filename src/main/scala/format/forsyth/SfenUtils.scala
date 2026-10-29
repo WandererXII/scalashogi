@@ -2,6 +2,8 @@ package shogi
 package format
 package forsyth
 
+import java.util.Locale
+
 import shogi.variant.Annanshogi
 import shogi.variant.Checkshogi
 import shogi.variant.Chushogi
@@ -43,11 +45,11 @@ object SfenUtils {
 
   def toForsyth(piece: Piece, variant: Variant): Option[String] =
     toForsyth(piece.role, variant) map { f =>
-      if (piece.color.sente) f.toUpperCase else f
+      if (piece.color.sente) f.toUpperCase(Locale.ROOT) else f
     }
 
   def toPiece(str: String, variant: Variant): Option[Piece] = {
-    val lower = str.toLowerCase
+    val lower = str.toLowerCase(Locale.ROOT)
     toRole(lower, variant) map { r =>
       Piece(Color.fromSente(lower != str), r)
     }

@@ -2,6 +2,8 @@ package shogi
 package format
 package forsyth
 
+import java.util.Locale
+
 import cats.implicits._
 
 import shogi.variant.Variant
@@ -21,7 +23,7 @@ final case class Sfen(value: String) extends AnyVal {
       history = toHistory(variant)
     } yield {
       val sit = Situation(board, hands, color | Sente, history, variant)
-      if (color.isEmpty && variant.noOppositeCheck && sit.check) sit.switch else sit
+      if (color.isEmpty && variant.noOppositeCheck && sit.switch.check) sit.switch else sit
     }
 
   def toBoard(variant: Variant): Option[Board] = {
@@ -43,19 +45,21 @@ final case class Sfen(value: String) extends AnyVal {
         .getOrElse(History.empty)
     else History.empty
 
+  private def fields: Array[String] = Sfen.fieldSeparator.split(value.trim)
+
   def boardString: Option[String] =
-    value.split(' ').lift(0)
+    fields.lift(0)
 
   def color: Option[Color] =
-    value.split(' ').lift(1) flatMap (_.headOption) flatMap Color.apply
+    fields.lift(1) flatMap (_.headOption) flatMap Color.apply
 
   def handsString: Option[String] =
-    value.split(' ').lift(2)
+    fields.lift(2)
 
   def stepNumber: Option[Int] =
-    value.split(' ').lift(3) flatMap (_.toIntOption)
+    fields.lift(3) flatMap (_.toIntOption)
 
-  def truncate = Sfen(value.split(' ') take 3 mkString " ")
+  def truncate = Sfen(fields take 3 mkString " ")
 
   def initialOf(variant: Variant) = value == variant.initialSfen.value
 
@@ -123,7 +127,7 @@ object Sfen {
 
   def handsToString(hands: Hands, variant: Variant): String =
     List[String](
-      handToString(hands.sente, variant).toUpperCase,
+      handToString(hands.sente, variant).toUpperCase(Locale.ROOT),
       handToString(hands.gote, variant),
     ).mkString("").some.filterNot(_.isEmpty) | "-"
 
@@ -138,8 +142,8 @@ object Sfen {
     ): Option[List[(Pos, Piece)]] =
       chars match {
         case Nil =>
-          Some(pieces)
-        case '/' :: rest if y < variant.numberOfRanks =>
+          Option.when(x == -1 && y == variant.numberOfRanks - 1)(pieces)
+        case '/' :: rest if x == -1 && y < variant.numberOfRanks - 1 =>
           piecesListRec(pieces, rest, variant.numberOfFiles - 1, y + 1)
         case '1' :: c :: rest if c.isDigit && x >= 0 =>
           piecesListRec(pieces, rest, x - (10 + c.asDigit), y)
@@ -174,22 +178,31 @@ object Sfen {
     def handsRec(hands: Hands, chars: List[Char], curCount: Option[Int]): Option[Hands] =
       chars match {
         case Nil                    => Some(hands)
-        case '-' :: _               => Some(Hands.empty)
         case d :: rest if d.isDigit =>
-          handsRec(hands, rest, curCount.map(_ * 10 + d.asDigit) orElse d.asDigit.some)
+          handsRec(
+            hands,
+            rest,
+            curCount.map(n => math.min(n * 10 + d.asDigit, maxHandCount)) orElse d.asDigit.some,
+          )
         case p :: rest =>
           SfenUtils.toPiece(p.toString, variant).flatMap { p =>
             variant.handRoles.find(_ == p.role).map((p.color, _))
           } match {
             case Some((color, role)) =>
-              handsRec(hands.store(color, role, curCount.fold(1)(math.min(_, 81))), rest, None)
+              handsRec(hands.store(color, role, curCount.fold(1)(math.min(_, maxHandCount))), rest, None)
             case _ => None
           }
       }
 
-    handsRec(Hands.empty, handsStr.toList, None)
+    if (handsStr == "-") Hands.empty.some
+    else handsRec(Hands.empty, handsStr.toList, None)
   }
 
   def clean(source: String): Sfen = Sfen(source.replace("_", " ").trim)
+
+
+  private val fieldSeparator = """\s+""".r
+
+  private val maxHandCount = 99
 
 }
