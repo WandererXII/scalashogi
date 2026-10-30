@@ -124,9 +124,9 @@ object CsaParser {
     def strStep: Parser[StrStep] =
       as("step") {
         (commentary *) ~>
-          (moveOrDropRegex ~ opt(clock) ~ rep(commentary)) <~
-          (stepExtras *) ^^ { case step ~ clk ~ comments =>
-            StrStep(step, cleanComments(comments), clk.flatten)
+          (moveOrDropRegex ~ rep(commentary) ~ opt(clock) ~ rep(commentary)) <~
+          (stepExtras *) ^^ { case step ~ beforeClock ~ clk ~ afterClock =>
+            StrStep(step, cleanComments(beforeClock ::: afterClock), clk.flatten)
           }
       }
 

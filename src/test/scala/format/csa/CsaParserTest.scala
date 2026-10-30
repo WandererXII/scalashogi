@@ -218,6 +218,31 @@ class CsaParserTest extends ShogiTest {
   }
 
   "comments" should {
+    "preserve comments before and after a move's clock" in {
+      forall(List("\n", "\r\n")) { newline =>
+        forall(List("+7776FU", "+0055FU")) { move =>
+          forall(List("", "\n-3334FU\nT2", "\n%TORYO")) { continuation =>
+            val record =
+              s"PI\n+\n$move\n'first\n'second\nT5\n'after$continuation"
+            parser(record.replace("\n", newline)) must beValid.like { case p =>
+              p.parsedSteps.value.headOption must beSome.like { case step =>
+                step.metas.comments must_== List("first", "second", "after")
+                step.metas.timeSpent must beSome(Centis(500))
+              }
+            }
+          }
+        }
+      }
+    }
+    "keep an untimed move's comments separate from the next move's clock" in {
+      parser("PI\n+\n+7776FU\n'first\n-3334FU\nT2\n'second") must beValid.like {
+        case ParsedNotation(ParsedSteps(List(first, second)), _, _, _, _) =>
+          first.metas.comments must_== List("first")
+          first.metas.timeSpent must beNone
+          second.metas.comments must_== List("second")
+          second.metas.timeSpent must beSome(Centis(200))
+      }
+    }
     "multiple comments" in {
       parser("""PI,+8483FU
       'such a neat comment
