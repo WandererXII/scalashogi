@@ -296,7 +296,9 @@ object CsaParser {
 
   private def splitHeaderAndSteps(csa: String): Validated[String, (String, String)] =
     augmentString(csa).linesIterator.map(_.trim).filter(_.nonEmpty) span { line =>
-      !moveOrDropRegex.matches(line)
+      val isStep = line.startsWith("%") || line.head.isDigit ||
+        (line.length > 1 && (line.startsWith("+") || line.startsWith("-")))
+      !isStep
     } match {
       case (headerLines, stepLines) => valid(headerLines.mkString("\n") -> stepLines.mkString("\n"))
     }

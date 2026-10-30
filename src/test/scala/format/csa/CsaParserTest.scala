@@ -25,6 +25,31 @@ class CsaParserTest extends ShogiTest {
   }
 
   "basic" should {
+    "accept an initial position without moves or termination" in {
+      forall(List("+", "-")) { turn =>
+        parser(s"PI\n$turn") must beValid.like { case p =>
+          p.parsedSteps.value must beEmpty
+          p.tags(_.Termination) must beNone
+          p.tags(_.Result) must beNone
+        }
+      }
+    }
+    "preserve termination before the first move" in {
+      forall(List(("+", "gote"), ("-", "sente"))) { case (turn, winner) =>
+        parser(s"PI\n$turn\n%TORYO") must beValid.like { case p =>
+          p.parsedSteps.value must beEmpty
+          p.tags(_.Termination) must beSome("TORYO")
+          p.tags(_.Result) must beSome(winner)
+        }
+      }
+    }
+    "reject malformed opening moves" in {
+      forall(List("+7776ZZ", "-3334ZZ", "7776ZZ", "+7776FUextra", "+777FU")) { move =>
+        forall(List("%TORYO", "+7776FU\n%TORYO")) { continuation =>
+          parser(s"PI\n+\n$move\n$continuation") must beInvalid
+        }
+      }
+    }
     "move" in {
       parser("PI,+5948OU") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case m: CsaMove =>
