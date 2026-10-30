@@ -211,7 +211,8 @@ abstract class Variant private[variant] (
     hands.roles.forall(handRoles contains _)
 
   def valid(board: Board, hands: Hands, strict: Boolean) =
-    validHands(hands) && Color.all.forall(validBoardSide(board, strict) _)
+    board.pieces.keys.forall(isInsideBoard) &&
+      validHands(hands) && Color.all.forall(validBoardSide(board, strict) _)
 
   def standard   = this == Standard
   def minishogi  = this == Minishogi
