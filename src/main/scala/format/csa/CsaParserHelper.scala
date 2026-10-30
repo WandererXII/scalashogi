@@ -13,24 +13,23 @@ object CsaParserHelper {
   def parseSituation(str: String): Validated[String, Situation] = {
     val lines        = augmentString(str.replace(",", "\n")).linesIterator.map(_.trim).toList
     val handicap     = lines.find(l => l.startsWith("PI"))
-    val isBoardSetup = lines.exists(l => l.startsWith("P1"))
+    val ranks        = lines.filter(l => l.startsWith("P") && l.lift(1).exists(_.isDigit))
+    val isBoardSetup = ranks.nonEmpty
+    val additions    = lines.filter(l => l.startsWith("P+") || l.startsWith("P-"))
     if (handicap.isDefined && isBoardSetup)
       invalid("Both handicap (PI) and whole board position (P1, P2, ...) provided")
-    else if (!handicap.isDefined && !isBoardSetup)
+    else if (!handicap.isDefined && !isBoardSetup && additions.isEmpty)
       invalid("No initial position provided (add 'PI' for standard position)")
     else {
       val initPieces = handicap.fold {
-        val ranks = lines.filter(l => l.startsWith("P") && l.lift(1).exists(_.isDigit))
-        parseWholeBoard(ranks)
+        if (isBoardSetup) parseWholeBoard(ranks)
+        else valid(Map.empty[Pos, Piece])
       }(h => parseHandicap(h))
       for {
         pieces <- initPieces
-        board     = Board(pieces)
-        color     = Color.fromSente(!lines.contains("-"))
-        additions = lines.filter(l =>
-          l.startsWith("P") && l.lift(1).exists(List[Char]('+', '-') contains _),
-        )
-        sit = Situation(board, Hands.empty, color, Standard)
+        board = Board(pieces)
+        color = Color.fromSente(!lines.contains("-"))
+        sit   = Situation(board, Hands.empty, color, Standard)
         sit2 <- parseAdditions(additions, sit)
       } yield sit2
     }

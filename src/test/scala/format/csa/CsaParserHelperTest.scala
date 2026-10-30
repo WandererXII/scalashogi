@@ -52,6 +52,31 @@ P-00HI00HI00KA00KA00KI00KI00GI00KE00KY00KY00KY00FU00FU00FU00FU00FU00FU00FU00FU00
     )
   }
 
+  "Standalone piece placements start from an empty board" in {
+    parseAndCompare(
+      "P+59OU\nP-51OU\n+",
+      Sfen("4k4/9/9/9/9/9/9/9/4K4 b -"),
+    )
+  }
+
+  "Standalone placements support hands and either side to move" in {
+    forall(List("+", "-")) { turn =>
+      val sfenTurn = if (turn == "+") "b" else "w"
+      parseAndCompare(
+        s"P+59OU00FU\nP-51OU00HI\n$turn",
+        Sfen(s"4k4/9/9/9/9/9/9/9/4K4 $sfenTurn Pr"),
+      )
+    }
+  }
+
+  "Standalone placements retain setup validation" in {
+    forall(
+      List("+", "P+59ZZ", "P+59OU\nP-59OU", "P1 * \nP+59OU", "P2 * \nP+59OU"),
+    ) { source =>
+      parseSituation(source) must beInvalid
+    }
+  }
+
   "00AL counts a tokin as a pawn already on the board" in {
     val board = (1 to 9)
       .map { rank =>

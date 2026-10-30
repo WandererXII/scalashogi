@@ -25,6 +25,19 @@ class CsaParserTest extends ShogiTest {
   }
 
   "basic" should {
+    "accept standalone piece placements followed by a move" in {
+      parser("P+59OU\nP-51OU\n+\n+5958OU") must beValid.like { case p =>
+        p.initialSfen.map(_.truncate) must beSome(
+          shogi.format.forsyth.Sfen("4k4/9/9/9/9/9/9/9/4K4 b -"),
+        )
+        p.parsedSteps.value must haveSize(1)
+        p.parsedSteps.value.headOption must beSome.like { case m: CsaMove =>
+          m.orig must_== Pos.SQ5I
+          m.dest must_== Pos.SQ5H
+          m.role must_== King
+        }
+      }
+    }
     "accept an initial position without moves or termination" in {
       forall(List("+", "-")) { turn =>
         parser(s"PI\n$turn") must beValid.like { case p =>
