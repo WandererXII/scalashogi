@@ -222,7 +222,8 @@ object Tag {
           if (c.limit.roundSeconds % 60 == 0) f"00:${c.limit.roundSeconds / 60}%02d"
           else f"00:00:${c.limit.roundSeconds}%02d"
         val byo = f"+${c.byoyomi.roundSeconds}%02d"
-        s"$init$byo"
+        val inc = if (c.hasIncrement) s"+${c.incrementSeconds}" else ""
+        s"$init$byo$inc"
       },
     )
 }

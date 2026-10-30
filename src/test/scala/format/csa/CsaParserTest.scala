@@ -118,6 +118,10 @@ class CsaParserTest extends ShogiTest {
           Clock.Config(90, 0, 30, 1),
           Clock.Config(600, 0, 0, 1),
           Clock.Config(90, 0, 0, 1),
+          Clock.Config(600, 5, 10, 1),
+          Clock.Config(90, 5, 10, 1),
+          Clock.Config(600, 5, 0, 1),
+          Clock.Config(90, 5, 0, 1),
         ),
       ) { config =>
         val header = Csa.renderHeader(Tags(List(Tag.timeControlCsa(Some(config)))))
