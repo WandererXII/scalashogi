@@ -97,6 +97,27 @@ class CsaParserTest extends ShogiTest {
     }
   }
 
+  "clocks" should {
+    "preserve representable whole seconds" in {
+      forall(List(0, 12, Int.MaxValue / 100)) { seconds =>
+        parser(s"PI\n+\n+7776FU\nT$seconds") must beValid.like { case p =>
+          p.parsedSteps.value.head.metas.timeSpent must beSome(Centis(seconds * 100))
+        }
+      }
+    }
+    "reject durations that overflow centiseconds" in {
+      parser("PI\n+\n+7776FU\nT21474837") must beInvalid
+    }
+    "reject durations beyond floating point range without throwing" in {
+      parser(s"PI\n+\n+7776FU\nT${"9" * 310}") must beInvalid
+    }
+    "reject out-of-range termination clocks" in {
+      forall(List("21474837", "9" * 310)) { seconds =>
+        parser(s"PI\n+\n+7776FU\n%TORYO\nT$seconds") must beInvalid
+      }
+    }
+  }
+
   "tags" should {
     "ignore empty metadata without consuming the following tag" in {
       forall(List("\n", "\r\n")) { newline =>

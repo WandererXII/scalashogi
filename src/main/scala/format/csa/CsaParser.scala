@@ -133,11 +133,7 @@ object CsaParser {
     private val clockSecondsRegex = """(\d++)""".r
 
     private def readCentis(seconds: String): Option[Centis] =
-      seconds.toDoubleOption match {
-        case Some(s) =>
-          Centis(BigDecimal(s * 100).setScale(0, BigDecimal.RoundingMode.HALF_UP).toInt).some
-        case _ => none
-      }
+      seconds.toIntOption.filter(_ <= Int.MaxValue / 100).map(s => Centis(s * 100))
 
     private def parseClock(str: String): Option[Centis] = {
       str match {
@@ -156,8 +152,11 @@ object CsaParser {
     def clock: Parser[Option[Centis]] =
       as("clock") {
         """T""".r ~>
-          clockSecondsRegex ^^ { case spent =>
-            parseClock(spent)
+          clockSecondsRegex >> { spent =>
+            parseClock(spent) match {
+              case Some(centis) => success(Some(centis))
+              case None         => failure("Clock duration exceeds the supported centisecond range")
+            }
           }
       }
 
