@@ -877,7 +877,7 @@ class KifParserTest extends ShogiTest {
   }
 
   "kyotoshogi" in {
-    parser("""
+    val record = """
 手合割：京都将棋
 先手：
 後手：
@@ -890,10 +890,20 @@ class KifParserTest extends ShogiTest {
    6   ２二飛打
    7   同　桂成(34)
    8   ４三歩打
-    """) must beValid.like { case p =>
-      p.parsedSteps.value.size must_== 8
-      p.initialSfen must beNone
-      p.variant.kyotoshogi must beTrue
+    """
+    forall(List(record, record.replace("成", ""))) { kif =>
+      parser(kif) must beValid.like { case p =>
+        p.parsedSteps.value.size must_== 8
+        p.initialSfen must beNone
+        p.variant.kyotoshogi must beTrue
+        // The final fixture drop has no pawn in hand; replay the seven legal moves.
+        Reader.fromParsedNotation(p, steps => ParsedSteps(steps.value.take(7))).valid must beValid
+          .like { case replay =>
+            replay.state.plies must_== 7
+            replay.state.situation.board(Pos.SQ2B) must beSome(Sente.gold)
+            replay.state.situation.board(Pos.SQ4D) must beSome(Sente.king)
+          }
+      }
     }
   }
 

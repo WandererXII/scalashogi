@@ -58,7 +58,11 @@ final case class KifMove(
     metas: Metas = Metas.empty,
 ) extends ParsedStep {
 
-  def toUsi(sit: Situation) = valid(Usi.Move(orig, dest, promotion, midStep))
+  def toUsi(sit: Situation) = {
+    val mandatoryFlip =
+      sit.variant.kyotoshogi && sit.board(orig).exists(sit.variant.forcePromote(_, dest))
+    valid(Usi.Move(orig, dest, promotion || mandatoryFlip, midStep))
+  }
 
   def withMetas(m: Metas) = copy(metas = m)
 
