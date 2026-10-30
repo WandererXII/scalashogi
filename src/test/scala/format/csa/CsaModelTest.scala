@@ -4,9 +4,37 @@ package csa
 
 import shogi.format.csa.Csa._
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 import shogi.variant.Standard
 
 class CsaModelTest extends ShogiTest {
+
+  "checkmate export and import preserve the winner for either color" in {
+    forall(
+      List(
+        (Sfen("4k4/9/4G4/4R4/9/9/9/9/4K4 b - 1"), "5c5b", Sente),
+        (Sfen("4k4/9/9/9/9/4r4/4g4/9/4K4 w - 1"), "5g5h", Gote),
+      ),
+    ) { case (sfen, move, winner) =>
+      val usi = Usi(move).get
+      Replay.replay(List(usi), Some(sfen), Standard) must beValid.like { case replay =>
+        replay.state.situation.status must_== Some(Status.Mate)
+        replay.state.situation.winner must beSome(winner)
+      }
+      createTerminationStep(Status.Mate, winnerTurn = false, Some(winner)) must beSome.like {
+        case termination =>
+          termination must_== "%TSUMI"
+          val csa = Csa(
+            steps = List(NotationStep(1, Usi.WithRole(usi, Gold), result = Some(termination))),
+            initialSfen = Some(sfen),
+          )
+          CsaParser.full(csa.render) must beValid.like { case parsed =>
+            parsed.tags(_.Termination) must beSome("TSUMI")
+            parsed.tags(_.Result) must beSome(winner.fold("sente", "gote"))
+          }
+      }
+    }
+  }
 
   "signed illegal-action terminations preserve the winner on import" in {
     forall(List(Status.PerpetualCheck, Status.Mate)) { status =>

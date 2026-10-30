@@ -7,6 +7,20 @@ import shogi.format.forsyth.Sfen
 
 class CsaParserHelperTest extends ShogiTest {
 
+  "TSUMI awards the win to the opponent of the side to move" in {
+    forall(List[Color](Sente, Gote)) { turn =>
+      createResult(Some(Tag(_.Termination, "TSUMI")), turn) must
+        beSome(Tag(_.Result, Color.showResult(Some(!turn))))
+    }
+  }
+
+  "KACHI awards the win to the side to move" in {
+    forall(List[Color](Sente, Gote)) { turn =>
+      createResult(Some(Tag(_.Termination, "KACHI")), turn) must
+        beSome(Tag(_.Result, Color.showResult(Some(turn))))
+    }
+  }
+
   def parseAndCompare(source: String, resSfen: Sfen) =
     parseSituation(source) must beValid.like { case s =>
       s.toSfen.truncate must_== resSfen

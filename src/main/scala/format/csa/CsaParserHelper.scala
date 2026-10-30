@@ -179,11 +179,11 @@ object CsaParserHelper {
 
   def createResult(termination: Option[Tag], color: Color): Option[Tag] =
     termination.map(_.value.toUpperCase) match {
-      case Some("TORYO") | Some("TIME_UP") | Some("ILLEGAL_MOVE") =>
+      case Some("TORYO") | Some("TIME_UP") | Some("ILLEGAL_MOVE") | Some("TSUMI") =>
         Tag(_.Result, Color.showResult(Some(!color))).some
-      case Some("+ILLEGAL_ACTION")       => Tag(_.Result, Color.showResult(Some(Gote))).some
-      case Some("-ILLEGAL_ACTION")       => Tag(_.Result, Color.showResult(Some(Sente))).some
-      case Some("KACHI") | Some("TSUMI") => Tag(_.Result, Color.showResult(Some(color))).some
+      case Some("+ILLEGAL_ACTION") => Tag(_.Result, Color.showResult(Some(Gote))).some
+      case Some("-ILLEGAL_ACTION") => Tag(_.Result, Color.showResult(Some(Sente))).some
+      case Some("KACHI")           => Tag(_.Result, Color.showResult(Some(color))).some
       case Some("JISHOGI") | Some("SENNICHITE") | Some("HIKIWAKE") =>
         Tag(_.Result, Color.showResult(None)).some
       case _ => None
