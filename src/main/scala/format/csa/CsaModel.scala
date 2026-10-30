@@ -32,11 +32,8 @@ final case class Csa(
       .reverse mkString "\n"
 
   def render: String = {
-    val initStr =
-      if (initial.comments.nonEmpty)
-        initial.comments.map(Csa.fixComment _).mkString("")
-      else ""
-    val header               = Csa renderHeader tags
+    val initStr = initial.comments.map(text => s"'${Csa.fixComment(text)}").mkString("\n")
+    val header  = Csa renderHeader tags
     val initialSfenOrDefault = initialSfen | variant.initialSfen
     val setup                =
       initialSfenOrDefault.toSituation(variant).fold("")(Csa renderSituation _)

@@ -9,6 +9,35 @@ import shogi.variant.Standard
 
 class CsaModelTest extends ShogiTest {
 
+  "initial comments render as separate CSA comment lines and survive import" in {
+    val comments = List("first", "second")
+    val rendered = Csa(Nil, None, Initial(comments)).render
+
+    rendered.linesIterator.filter(_.startsWith("'")).toList must_== List("'first", "'second")
+    CsaParser.full(rendered) must beValid.like { case parsed =>
+      parsed.initialPosition.comments must_== comments
+    }
+  }
+
+  "multiline initial comments prefix every line and preserve comment normalization" in {
+    val rendered = Csa(Nil, None, Initial(List("first\n\nsecond", "third, fourth"))).render
+
+    rendered.linesIterator.filter(_.startsWith("'")).toList must_==
+      List("'first", "'second", "'third, fourth")
+    CsaParser.full(rendered) must beValid.like { case parsed =>
+      parsed.initialPosition.comments must_== List("first", "second", "third, fourth")
+    }
+  }
+
+  "empty initial comments add no comment lines and survive import" in {
+    val rendered = Csa(Nil, None).render
+
+    rendered.linesIterator.exists(_.startsWith("'")) must beFalse
+    CsaParser.full(rendered) must beValid.like { case parsed =>
+      parsed.initialPosition.comments must beEmpty
+    }
+  }
+
   "checkmate export and import preserve the winner for either color" in {
     forall(
       List(
