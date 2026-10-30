@@ -98,6 +98,20 @@ class CsaParserTest extends ShogiTest {
   }
 
   "tags" should {
+    "ignore empty metadata without consuming the following tag" in {
+      forall(List("\n", "\r\n")) { newline =>
+        forall(List("", " \t")) { whitespace =>
+          forall(List(("$EVENT:cup", Tag.Event, "cup"), ("N+Alice", Tag.Sente, "Alice"))) {
+            case (nextTag, tagName, value) =>
+              parser(s"$$SITE:$whitespace$newline$nextTag${newline}PI${newline}+") must beValid
+                .like { case p =>
+                  p.tags(_.Site) must beNone
+                  p.tags(_ => tagName) must beSome(value)
+                }
+          }
+        }
+      }
+    }
     "preserve drawn results" in {
       forall(List("JISHOGI", "SENNICHITE", "HIKIWAKE")) { termination =>
         parser(s"PI\n+\n+7776FU\n%$termination") must beValid.like { case p =>

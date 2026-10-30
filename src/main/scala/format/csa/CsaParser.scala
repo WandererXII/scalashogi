@@ -258,8 +258,8 @@ object CsaParser {
 
     def tag: Parser[Tag] =
       "$" ~>
-        """\w+""".r ~ ":" ~ """.*""".r ^^ { case name ~ _ ~ value =>
-          Tag(normalizeCsaName(name), value)
+        """\w+""".r ~ """:.*""".r ^^ { case name ~ value =>
+          Tag(normalizeCsaName(name), value.drop(1).dropWhile(_.isWhitespace))
         }
 
     def playerTag: Parser[Tag] =
