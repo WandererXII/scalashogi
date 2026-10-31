@@ -897,11 +897,11 @@ class KifParserTest extends ShogiTest {
         p.initialSfen must beNone
         p.variant.kyotoshogi must beTrue
         // The final fixture drop has no pawn in hand; replay the seven legal moves.
-        Reader.fromParsedNotation(p, steps => ParsedSteps(steps.value.take(7))).valid must beValid
-          .like { case replay =>
-            replay.state.plies must_== 7
-            replay.state.situation.board(Pos.SQ2B) must beSome(Sente.gold)
-            replay.state.situation.board(Pos.SQ4D) must beSome(Sente.king)
+        Replay.fromParsedNotation(p, steps => ParsedSteps(steps.value.take(7))).valid must beValid
+          .like { case game =>
+            game.plies must_== 7
+            game.situation.board(Pos.SQ2B) must beSome(Sente.gold)
+            game.situation.board(Pos.SQ4D) must beSome(Sente.king)
           }
       }
     }
