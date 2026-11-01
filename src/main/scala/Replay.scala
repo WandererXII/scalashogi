@@ -9,7 +9,6 @@ import cats.implicits._
 
 import shogi.format.ParsedNotation
 import shogi.format.ParsedSteps
-import shogi.format.Tags
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
@@ -34,20 +33,18 @@ object Replay {
     playSteps(
       parsed.initialSfen,
       parsed.variant,
-      parsed.tags,
       op(parsed.parsedSteps).value,
     ) { (situation, step) =>
-      situation(step).map(_ -> step.metas.timeSpent)
+      situation(step)
     }
 
   def fromUsi(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
       variant: shogi.variant.Variant,
-      tags: Tags = Tags.empty,
   ): Result =
-    playSteps(initialSfen, variant, tags, usis) { (situation, usi) =>
-      situation(usi).map(_ -> None)
+    playSteps(initialSfen, variant, usis) { (situation, usi) =>
+      situation(usi)
     }
 
   def gamesWhileValid(
@@ -137,29 +134,23 @@ object Replay {
   private def playSteps[A](
       initialSfen: Option[Sfen],
       variant: shogi.variant.Variant,
-      tags: Tags,
       steps: Seq[A],
   )(
-      step: (Situation, A) => Validated[String, (Situation, Option[Centis])],
+      step: (Situation, A) => Validated[String, Situation],
   ): Result = {
     val setup = initialSfen.filterNot(_.initialOf(variant)).flatMap(_.toSituationPlus(variant))
     val initialSituation = setup.fold(Situation(variant))(_.situation)
     val startedAtPly     = setup.fold(0)(_.plies)
     val startedAtStep    = setup.fold(1)(_.stepNumber)
-    val clockConfig      = tags.clockConfig
 
     def finish(
         situation: Situation,
-        players: Option[Color.Map[ClockPlayer]],
         usis: Vector[Usi],
         error: Option[String],
     ) = {
       val game = Game(
         situation = situation,
         usis = usis,
-        clock = clockConfig.zip(players).map { case (config, ps) =>
-          Clock(config = config, color = situation.color, players = ps)
-        },
         plies = startedAtPly + usis.size,
         startedAtPly = startedAtPly,
         startedAtStep = startedAtStep,
@@ -170,23 +161,17 @@ object Replay {
     @scala.annotation.tailrec
     def loop(
         situation: Situation,
-        players: Option[Color.Map[ClockPlayer]],
         usis: Vector[Usi],
         remaining: List[A],
     ): Result =
       remaining match {
-        case Nil           => finish(situation, players, usis, None)
+        case Nil           => finish(situation, usis, None)
         case input :: rest =>
           step(situation, input) match {
-            case Invalid(err)             => finish(situation, players, usis, Some(err))
-            case Valid((next, timeSpent)) =>
+            case Invalid(err) => finish(situation, usis, Some(err))
+            case Valid(next)  =>
               loop(
                 next,
-                players.map { ps =>
-                  timeSpent.fold(ps) { spent =>
-                    ps.update(situation.color, takeRecordedTime(_, spent, next.status.isEmpty))
-                  }
-                },
                 next.history.lastUsi.fold(usis)(usis :+ _),
                 rest,
               )
@@ -195,36 +180,9 @@ object Replay {
 
     loop(
       initialSituation,
-      clockConfig.map { config =>
-        val player = ClockPlayer.withConfig(config)
-        Color.Map(player, player)
-      },
       Vector.empty,
       steps.toList,
     )
-  }
-
-  private def takeRecordedTime(
-      player: ClockPlayer,
-      spent: Centis,
-      gameActive: Boolean,
-  ): ClockPlayer = {
-    val stepTime   = spent.nonNeg
-    val remaining  = player.remaining - stepTime
-    val periodSpan =
-      if (!remaining.isPositive && player.byoyomi.isPositive)
-        math.min((-remaining.centis / player.byoyomi.centis) + 1, player.periodsLeft)
-      else 0
-    val active = gameActive && stepTime < player.remaining + player.periodsLeft * player.byoyomi
-    val reloadByoyomi =
-      active && player.byoyomi.isPositive && (player.spentPeriods > 0 || periodSpan > 0)
-    val next =
-      if (reloadByoyomi) player.setRemaining(remaining atLeast player.byoyomi)
-      else
-        player.takeTime(
-          stepTime - (if (active) player.increment else Centis(0)) - player.byoyomi * periodSpan,
-        )
-    next.spendPeriods(periodSpan).copy(lastTime = stepTime)
   }
 
 }

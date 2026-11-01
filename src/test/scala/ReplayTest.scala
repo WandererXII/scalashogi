@@ -37,7 +37,6 @@ class ReplayTest extends ShogiTest {
         game.toSfen must_== Game(Standard).toSfen
         game.usis must beEmpty
         game.playedPlies must_== 0
-        game.clock must beNone
       }
     }
 

@@ -10,6 +10,7 @@ import cats.data.Validated.Valid
 import cats.data.Validated.invalid
 import cats.data.Validated.valid
 import cats.implicits._
+import org.joda.time.Duration
 
 import shogi.format.forsyth.SfenUtils
 import shogi.variant._
@@ -69,8 +70,8 @@ object KifParser {
       step: String,
       comments: List[String],
       secondLionMove: Boolean, // only for chushogi
-      timeSpent: Option[Centis] = None,
-      timeTotal: Option[Centis] = None,
+      timeSpent: Option[Duration] = None,
+      timeTotal: Option[Duration] = None,
   )
 
   final case class StrVariation(
@@ -125,7 +126,7 @@ object KifParser {
     // No need to store 0s that mean nothing
     val uselessTimes =
       strSteps.forall(s =>
-        s.timeSpent.fold(true)(_ == Centis(0)) && s.timeTotal.fold(true)(_ == Centis(0)),
+        s.timeSpent.fold(true)(_ == Duration.ZERO) && s.timeTotal.fold(true)(_ == Duration.ZERO),
       )
 
     @scala.annotation.tailrec
@@ -281,7 +282,7 @@ object KifParser {
       KifUtils.kanjiToInt(n.filterNot(c => List[Char]('.', '。', '手', '目').contains(c)).trim)
     }
 
-    def clock: Parser[(Option[Centis], Option[Centis])] = Parser { input =>
+    def clock: Parser[(Option[Duration], Option[Duration])] = Parser { input =>
       StepsParser.clock(input) match {
         case StepsParser.Success(value, next) => Success(value, next)
         case StepsParser.Failure(msg, next)   => Failure(msg, next)
@@ -359,18 +360,20 @@ object KifParser {
     private val clockMinuteSecondRegex     = """(\d++):(\d+(?:\.\d+)?)""".r
     private val clockHourMinuteSecondRegex = """(\d++):(\d++)[:\.](\d+(?:\.\d+)?)""".r
 
-    private def readCentis(hours: String, minutes: String, seconds: String): Option[Centis] =
+    private def readDuration(hours: String, minutes: String, seconds: String): Option[Duration] =
       scala.util.Try {
-        val total =
-          BigDecimal(hours) * 360000 + BigDecimal(minutes) * 6000 + BigDecimal(seconds) * 100
-        Centis(total.setScale(0, BigDecimal.RoundingMode.HALF_UP).bigDecimal.intValueExact())
+        val total = new java.math.BigDecimal(hours)
+          .multiply(java.math.BigDecimal.valueOf(3600000))
+          .add(new java.math.BigDecimal(minutes).multiply(java.math.BigDecimal.valueOf(60000)))
+          .add(new java.math.BigDecimal(seconds).multiply(java.math.BigDecimal.valueOf(1000)))
+        new Duration(total.setScale(0, java.math.RoundingMode.HALF_UP).longValueExact())
       }.toOption
 
-    private def parseClock(str: String): Option[Centis] = {
+    private def parseClock(str: String): Option[Duration] = {
       str match {
-        case clockMinuteSecondRegex(minutes, seconds) => readCentis("0", minutes, seconds)
+        case clockMinuteSecondRegex(minutes, seconds) => readDuration("0", minutes, seconds)
         case clockHourMinuteSecondRegex(hours, minutes, seconds) =>
-          readCentis(hours, minutes, seconds)
+          readDuration(hours, minutes, seconds)
         case _ => None
       }
     }
@@ -382,14 +385,14 @@ object KifParser {
       }
     }
 
-    def clock: Parser[(Option[Centis], Option[Centis])] =
+    def clock: Parser[(Option[Duration], Option[Duration])] =
       as("clock") {
         """[\(（]\s*""".r ~>
           clockMinuteSecondRegex ~ opt("/") ~ opt(clockHourMinuteSecondRegex) <~
           """\s*[\)）]\+?""".r >> { case spent ~ _ ~ total =>
             (parseClock(spent), total.traverse(parseClock)) match {
               case (Some(s), Some(t)) => success((Some(s), t))
-              case _                  => err("Clock exceeds the supported centisecond range")
+              case _                  => err("Clock exceeds the supported millisecond range")
             }
           }
       }

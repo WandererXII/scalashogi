@@ -9,32 +9,20 @@ import shogi.format.usi.Usi
 final case class Game(
     situation: Situation,
     usis: Vector[Usi] = Vector.empty,
-    clock: Option[Clock] = None,
     plies: Int = 0,
     startedAtPly: Int = 0,
     startedAtStep: Int = 1,
 ) {
 
-  private def applySituation(sit: Situation, metrics: LagMetrics = LagMetrics.empty): Game =
+  private def applySituation(sit: Situation): Game =
     copy(
       situation = sit,
       plies = plies + 1,
       usis = sit.history.lastUsi.fold(usis)(usis :+ _),
-      clock = clock map { c =>
-        val gameActive = sit.status.isEmpty
-        val newC       = c.step(metrics, gameActive)
-        if (plies - startedAtPly == 1 && gameActive) newC.start else newC
-      },
     )
-
-  def apply(usi: Usi, metrics: LagMetrics): Validated[String, Game] =
-    situation(usi).map(applySituation(_, metrics))
 
   def apply(usi: Usi): Validated[String, Game] =
     situation(usi).map(applySituation(_))
-
-  def apply(parsedStep: ParsedStep, metrics: LagMetrics): Validated[String, Game] =
-    situation(parsedStep).map(applySituation(_, metrics))
 
   def apply(parsedStep: ParsedStep): Validated[String, Game] =
     situation(parsedStep).map(applySituation(_))
@@ -63,10 +51,6 @@ final case class Game(
   def withColor(c: Color) = copy(situation = situation.copy(color = c))
 
   def withHistory(h: History) = copy(situation = situation.copy(history = h))
-
-  def withClock(c: Option[Clock]) = copy(clock = c)
-
-  def withClockConfig(c: Option[Clock.Config]) = withClock(c.map(_.toClock(color)))
 
   def withPlies(p: Int) = copy(plies = p)
 

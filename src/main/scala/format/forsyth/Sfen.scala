@@ -189,7 +189,11 @@ object Sfen {
             variant.handRoles.find(_ == p.role).map((p.color, _))
           } match {
             case Some((color, role)) =>
-              handsRec(hands.store(color, role, curCount.fold(1)(math.min(_, maxHandCount))), rest, None)
+              handsRec(
+                hands.store(color, role, curCount.fold(1)(math.min(_, maxHandCount))),
+                rest,
+                None,
+              )
             case _ => None
           }
       }

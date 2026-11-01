@@ -4,6 +4,7 @@ package format
 import cats.data.NonEmptyList
 import cats.data.Validated
 import cats.data.Validated.valid
+import org.joda.time.Duration
 
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
@@ -38,9 +39,9 @@ sealed trait ParsedStep {
 
   def withVariations(s: List[ParsedSteps]): ParsedStep = withMetas(metas withVariations s)
 
-  def withTimeSpent(ts: Option[Centis]): ParsedStep = withMetas(metas withTimeSpent ts)
+  def withTimeSpent(ts: Option[Duration]): ParsedStep = withMetas(metas withTimeSpent ts)
 
-  def withTimeTotal(tt: Option[Centis]): ParsedStep = withMetas(metas withTimeTotal tt)
+  def withTimeTotal(tt: Option[Duration]): ParsedStep = withMetas(metas withTimeTotal tt)
 
   def mergeGlyphs(glyphs: Glyphs): ParsedStep =
     withMetas(
@@ -111,8 +112,8 @@ final case class Metas(
     comments: List[String],
     glyphs: Glyphs,
     variations: List[ParsedSteps],
-    timeSpent: Option[Centis],
-    timeTotal: Option[Centis],
+    timeSpent: Option[Duration],
+    timeTotal: Option[Duration],
 ) {
 
   def withSuffixes(s: Suffixes) =
@@ -126,9 +127,9 @@ final case class Metas(
 
   def withVariations(v: List[ParsedSteps]) = copy(variations = v)
 
-  def withTimeSpent(ts: Option[Centis]) = copy(timeSpent = ts)
+  def withTimeSpent(ts: Option[Duration]) = copy(timeSpent = ts)
 
-  def withTimeTotal(tt: Option[Centis]) = copy(timeTotal = tt)
+  def withTimeTotal(tt: Option[Duration]) = copy(timeTotal = tt)
 }
 
 object Metas {

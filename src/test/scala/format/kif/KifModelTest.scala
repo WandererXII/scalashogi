@@ -17,8 +17,8 @@ class KifModelTest extends ShogiTest {
         secondsTotal = Some(seconds),
       )
       KifParser.full(Kif(List(step), None, Standard).render) must beValid.like { case p =>
-        p.parsedSteps.value.head.metas.timeSpent must beSome(Centis(seconds * 100))
-        p.parsedSteps.value.head.metas.timeTotal must beSome(Centis(seconds * 100))
+        p.parsedSteps.value.head.metas.timeSpent must beSome(new org.joda.time.Duration(seconds.toLong * 1000))
+        p.parsedSteps.value.head.metas.timeTotal must beSome(new org.joda.time.Duration(seconds.toLong * 1000))
       }
     }
   }

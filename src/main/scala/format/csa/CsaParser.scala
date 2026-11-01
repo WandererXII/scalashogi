@@ -8,6 +8,7 @@ import cats.data.Validated
 import cats.data.Validated.invalid
 import cats.data.Validated.valid
 import cats.implicits._
+import org.joda.time.Duration
 
 import shogi.variant.Standard
 
@@ -27,7 +28,7 @@ object CsaParser {
   final case class StrStep(
       step: String,
       comments: List[String],
-      timeSpent: Option[Centis] = None,
+      timeSpent: Option[Duration] = None,
   )
 
   def full(csa: String): Validated[String, ParsedNotation] =
@@ -132,12 +133,12 @@ object CsaParser {
 
     private val clockSecondsRegex = """(\d++)""".r
 
-    private def readCentis(seconds: String): Option[Centis] =
-      seconds.toIntOption.filter(_ <= Int.MaxValue / 100).map(s => Centis(s * 100))
+    private def readDuration(seconds: String): Option[Duration] =
+      seconds.toLongOption.filter(_ <= Long.MaxValue / 1000).map(s => new Duration(s * 1000))
 
-    private def parseClock(str: String): Option[Centis] = {
+    private def parseClock(str: String): Option[Duration] = {
       str match {
-        case clockSecondsRegex(seconds) => readCentis(seconds)
+        case clockSecondsRegex(seconds) => readDuration(seconds)
         case _                          => None
       }
     }
@@ -149,13 +150,13 @@ object CsaParser {
       }
     }
 
-    def clock: Parser[Option[Centis]] =
+    def clock: Parser[Option[Duration]] =
       as("clock") {
         """T""".r ~>
           clockSecondsRegex >> { spent =>
             parseClock(spent) match {
               case Some(centis) => success(Some(centis))
-              case None         => failure("Clock duration exceeds the supported centisecond range")
+              case None         => failure("Clock duration exceeds the supported millisecond range")
             }
           }
       }

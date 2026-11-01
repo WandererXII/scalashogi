@@ -4,7 +4,9 @@ package csa
 
 class CsaParserTest extends ShogiTest {
 
-  import shogi.format.csa.CsaFixtures._
+  import org.joda.time.Duration
+
+import shogi.format.csa.CsaFixtures._
 
   val parser                 = CsaParser.full _
   def parseStep(str: String) = CsaParser.StepParser(str)
@@ -89,8 +91,8 @@ class CsaParserTest extends ShogiTest {
           m.dest must_== Pos.SQ8D
           m.orig must_== Pos.SQ8C
           m.role must_== Pawn
-          m.metas.timeSpent must beSome.like { case c: Centis =>
-            c must_== Centis(500)
+          m.metas.timeSpent must beSome.like { case c: Duration =>
+            c must_== new Duration(5000L)
           }
         }
       }
@@ -99,20 +101,20 @@ class CsaParserTest extends ShogiTest {
 
   "clocks" should {
     "preserve representable whole seconds" in {
-      forall(List(0, 12, Int.MaxValue / 100)) { seconds =>
+      forall(List(0L, 12L, Int.MaxValue.toLong / 100, 21474837L, Long.MaxValue / 1000)) { seconds =>
         parser(s"PI\n+\n+7776FU\nT$seconds") must beValid.like { case p =>
-          p.parsedSteps.value.head.metas.timeSpent must beSome(Centis(seconds * 100))
+          p.parsedSteps.value.head.metas.timeSpent must beSome(new Duration(seconds.toLong * 1000))
         }
       }
     }
-    "reject durations that overflow centiseconds" in {
-      parser("PI\n+\n+7776FU\nT21474837") must beInvalid
+    "reject durations that overflow milliseconds" in {
+      parser("PI\n+\n+7776FU\nT9223372036854776") must beInvalid
     }
     "reject durations beyond floating point range without throwing" in {
       parser(s"PI\n+\n+7776FU\nT${"9" * 310}") must beInvalid
     }
     "reject out-of-range termination clocks" in {
-      forall(List("21474837", "9" * 310)) { seconds =>
+      forall(List("9223372036854776", "9" * 310)) { seconds =>
         parser(s"PI\n+\n+7776FU\n%TORYO\nT$seconds") must beInvalid
       }
     }
@@ -141,28 +143,9 @@ class CsaParserTest extends ShogiTest {
         }
       }
     }
-    "preserve standard CSA time controls" in {
+    "preserve standard CSA time-control tags" in {
       parser("$TIME_LIMIT:00:10+20\nPI\n+\n+7776FU") must beValid.like { case p =>
-        p.tags.clockConfig must beSome(Clock.Config(600, 0, 20, 1))
-      }
-    }
-    "preserve generated CSA time controls" in {
-      forall(
-        List(
-          Clock.Config(600, 0, 20, 1),
-          Clock.Config(90, 0, 30, 1),
-          Clock.Config(600, 0, 0, 1),
-          Clock.Config(90, 0, 0, 1),
-          Clock.Config(600, 5, 10, 1),
-          Clock.Config(90, 5, 10, 1),
-          Clock.Config(600, 5, 0, 1),
-          Clock.Config(90, 5, 0, 1),
-        ),
-      ) { config =>
-        val header = Csa.renderHeader(Tags(List(Tag.timeControlCsa(Some(config)))))
-        parser(s"$header\nPI\n+\n+7776FU") must beValid.like { case p =>
-          p.tags.clockConfig must beSome(config)
-        }
+        p.tags(_.TimeControl) must beSome("00:10+20")
       }
     }
     "Sente illegal action awards Gote the win regardless of turn" in {
@@ -248,7 +231,7 @@ class CsaParserTest extends ShogiTest {
             parser(record.replace("\n", newline)) must beValid.like { case p =>
               p.parsedSteps.value.headOption must beSome.like { case step =>
                 step.metas.comments must_== List("first", "second", "after")
-                step.metas.timeSpent must beSome(Centis(500))
+                step.metas.timeSpent must beSome(new Duration(5000L))
               }
             }
           }
@@ -261,7 +244,7 @@ class CsaParserTest extends ShogiTest {
           first.metas.comments must_== List("first")
           first.metas.timeSpent must beNone
           second.metas.comments must_== List("second")
-          second.metas.timeSpent must beSome(Centis(200))
+          second.metas.timeSpent must beSome(new Duration(2000L))
       }
     }
     "multiple comments" in {

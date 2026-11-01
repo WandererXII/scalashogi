@@ -27,15 +27,6 @@ final case class Tags(value: List[Tag]) extends AnyVal {
   def apply(which: Tag.type => TagType): Option[String] =
     value find (_.name == which(Tag)) map (_.value)
 
-  def clockConfig: Option[Clock.Config] = {
-    val baseClk = value.collectFirst { case Tag(Tag.TimeControl, str) =>
-      str
-    } flatMap { c => Clock.readKifConfig(c) orElse Clock.readCsaConfig(c) }
-    apply(_.Byoyomi)
-      .flatMap(Clock.parseJPTime _)
-      .fold(baseClk)(byo => baseClk.map(_.copy(byoyomiSeconds = byo)))
-  }
-
   def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Start) orElse apply(_.End)
 
   def year: Option[Int] =
@@ -214,16 +205,4 @@ object Tag {
       "対局日" -> Tag.Start,
     )
 
-  def timeControlCsa(clock: Option[Clock.Config]) =
-    Tag(
-      TimeControl,
-      clock.fold("") { c =>
-        val init =
-          if (c.limit.roundSeconds % 60 == 0) f"00:${c.limit.roundSeconds / 60}%02d"
-          else f"00:00:${c.limit.roundSeconds}%02d"
-        val byo = f"+${c.byoyomi.roundSeconds}%02d"
-        val inc = if (c.hasIncrement) s"+${c.incrementSeconds}" else ""
-        s"$init$byo$inc"
-      },
-    )
 }
