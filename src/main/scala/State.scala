@@ -6,7 +6,7 @@ import shogi.format.ParsedStep
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
-final case class Game(
+final case class State(
     situation: Situation,
     usis: Vector[Usi] = Vector.empty,
     plies: Int = 0,
@@ -14,17 +14,17 @@ final case class Game(
     startedAtStep: Int = 1,
 ) {
 
-  private def applySituation(sit: Situation): Game =
+  private def applySituation(sit: Situation): State =
     copy(
       situation = sit,
       plies = plies + 1,
       usis = sit.history.lastUsi.fold(usis)(usis :+ _),
     )
 
-  def apply(usi: Usi): Validated[String, Game] =
+  def apply(usi: Usi): Validated[String, State] =
     situation(usi).map(applySituation(_))
 
-  def apply(parsedStep: ParsedStep): Validated[String, Game] =
+  def apply(parsedStep: ParsedStep): Validated[String, State] =
     situation(parsedStep).map(applySituation(_))
 
   def board = situation.board
@@ -57,14 +57,14 @@ final case class Game(
   def toSfen: Sfen = Sfen(this)
 }
 
-object Game {
-  def apply(situation: Situation): Game =
-    new Game(situation)
+object State {
+  def apply(situation: Situation): State =
+    new State(situation)
 
-  def apply(variant: shogi.variant.Variant): Game =
-    Game(Situation(variant))
+  def apply(variant: shogi.variant.Variant): State =
+    State(Situation(variant))
 
-  def apply(initialSfen: Option[Sfen], variant: shogi.variant.Variant): Game =
+  def apply(initialSfen: Option[Sfen], variant: shogi.variant.Variant): State =
     initialSfen
       .filterNot(_.initialOf(variant))
       .flatMap {

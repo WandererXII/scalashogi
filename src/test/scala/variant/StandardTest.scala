@@ -5,21 +5,21 @@ import shogi.format.forsyth.Sfen
 
 class StandardTest extends ShogiTest {
 
-  def perft(game: Game, depth: Int) = Perft.perft(game, depth)
+  def perft(state: State, depth: Int) = Perft.perft(state, depth)
 
   "starting position" should {
-    val game = Game(shogi.variant.Standard)
+    val state = State(shogi.variant.Standard)
     "1 depth" in {
-      perft(game, 1) must be equalTo 30
+      perft(state, 1) must be equalTo 30
     }
     "2 depth" in {
-      perft(game, 2) must be equalTo 900
+      perft(state, 2) must be equalTo 900
     }
     "3 depth" in {
-      perft(game, 3) must be equalTo 25470
+      perft(state, 3) must be equalTo 25470
     }
     "4 depth" in {
-      perft(game, 4) must be equalTo 719731
+      perft(state, 4) must be equalTo 719731
     }
     // "5 depth" in {
     //  perft(game, 5) must be equalTo 19861490
@@ -84,7 +84,7 @@ class StandardTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      Game(shogi.variant.Standard).toSfen must_== shogi.variant.Standard.initialSfen
+      State(shogi.variant.Standard).toSfen must_== shogi.variant.Standard.initialSfen
     }
   }
 
@@ -93,9 +93,9 @@ class StandardTest extends ShogiTest {
       forall(random) { line =>
         line match {
           case (sfenStr, d1, d2) => {
-            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Standard)
-            perft(game, 1) must be equalTo d1.toInt
-            perft(game, 2) must be equalTo d2.toInt
+            val state = State(Some(Sfen(sfenStr)), shogi.variant.Standard)
+            perft(state, 1) must be equalTo d1.toInt
+            perft(state, 2) must be equalTo d2.toInt
           }
         }
       }
@@ -107,8 +107,8 @@ class StandardTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Standard)
-            perft(game, 1) must be equalTo d1.toInt
+            val state = State(Some(Sfen(sfenStr)), shogi.variant.Standard)
+            perft(state, 1) must be equalTo d1.toInt
           }
         }
       }

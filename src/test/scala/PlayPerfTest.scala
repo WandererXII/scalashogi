@@ -10,7 +10,7 @@ class PlayPerfTest extends ShogiTest {
   // val iterations = 1
 
   def runOne =
-    makeGame(shogi.variant.Standard).playUsisStr(
+    makeState(shogi.variant.Standard).playUsisStr(
       List(
         "7g7f",
         "8c8d",

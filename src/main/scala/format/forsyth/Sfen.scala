@@ -69,8 +69,8 @@ final case class Sfen(value: String) extends AnyVal {
 
 object Sfen {
 
-  def apply(game: Game): Sfen =
-    apply(SituationPlus(game.situation, game.stepNumber))
+  def apply(state: State): Sfen =
+    apply(SituationPlus(state.situation, state.stepNumber))
 
   def apply(sp: SituationPlus): Sfen =
     Sfen(s"${situationToString(sp.situation)} ${sp.stepNumber}")

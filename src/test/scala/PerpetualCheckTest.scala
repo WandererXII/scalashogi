@@ -5,7 +5,7 @@ import shogi.format.forsyth.Sfen
 class PerpetualCheckTest extends ShogiTest {
 
   "Perpetual check" should {
-    val g = makeGame(shogi.variant.Standard)
+    val state = makeState(shogi.variant.Standard)
       .playUsisStr(List("5g5f", "5c5d", "2h5h", "5a5b", "5f5e", "5b5c", "5h5f", "5c6d"))
     val u = List(
       "5f6f",
@@ -43,31 +43,31 @@ class PerpetualCheckTest extends ShogiTest {
     )
     "not trigger" in {
       "after 2 repetitions" in {
-        g must beValid.like { case game =>
-          game.playUsisStr(u take 5) must beValid.like { case game2 =>
-            game2.situation.status must beNone
-            game2.situation.winner must beNone
+        state must beValid.like { case state =>
+          state.playUsisStr(u take 5) must beValid.like { case state2 =>
+            state2.situation.status must beNone
+            state2.situation.winner must beNone
           }
         }
       }
       "after 3 repetitions" in {
-        g must beValid.like { case game =>
-          game.playUsisStr(u take 9) must beValid.like { case game2 =>
-            game2.situation.status must beNone
-            game2.situation.winner must beNone
+        state must beValid.like { case state =>
+          state.playUsisStr(u take 9) must beValid.like { case state2 =>
+            state2.situation.status must beNone
+            state2.situation.winner must beNone
           }
         }
       }
       "if the checks weren't consecutive" in {
-        g must beValid.like { case game =>
-          game.playUsisStr(ui) must beValid.like { case game2 =>
-            game2.situation.status.contains(Status.Repetition) must beTrue
-            game2.situation.winner must beNone
+        state must beValid.like { case state =>
+          state.playUsisStr(ui) must beValid.like { case state2 =>
+            state2.situation.status.contains(Status.Repetition) must beTrue
+            state2.situation.winner must beNone
           }
         }
       }
       "5fPJUs7r" in {
-        val g = sfenToGame(
+        val state = sfenToState(
           Sfen("ln1skg1nl/1r1sg2b1/ppp1GSppp/3p1p3/9/9/PPPPPPPPP/1B5R1/LN1GK2NL b Sp 1"),
           shogi.variant.Standard,
         ).toOption.get
@@ -86,26 +86,26 @@ class PerpetualCheckTest extends ShogiTest {
           "S*6a",
           "4c5b+", // 4th
         )
-        g.playUsisStr(usis) must beValid.like { case game =>
-          game.situation.status.contains(Status.Repetition) must beTrue
-          game.situation.winner must beNone
+        state.playUsisStr(usis) must beValid.like { case state =>
+          state.situation.status.contains(Status.Repetition) must beTrue
+          state.situation.winner must beNone
         }
       }
     }
     "trigger" in {
-      def isPerpetualWith(g: Game, winner: Color): Boolean =
-        g.situation.status.contains(Status.PerpetualCheck) &&
-          g.situation.winner == Some(winner)
+      def isPerpetualWith(state: State, winner: Color): Boolean =
+        state.situation.status.contains(Status.PerpetualCheck) &&
+          state.situation.winner == Some(winner)
 
       "after 4 repetitions" in {
-        g must beValid.like { case game =>
-          game.playUsisStr(u) must beValid.like { case game2 =>
-            isPerpetualWith(game2, Gote) must beTrue
+        state must beValid.like { case state =>
+          state.playUsisStr(u) must beValid.like { case state2 =>
+            isPerpetualWith(state2, Gote) must beTrue
           }
         }
       }
       "on my turn" in {
-        val g = sfenToGame(
+        val state = sfenToState(
           Sfen("6k2/1+p7/9/9/9/9/9/1+P2R4/6K2 b - 1"),
           shogi.variant.Standard,
         ).toOption.get
@@ -124,12 +124,12 @@ class PerpetualCheckTest extends ShogiTest {
           "2a3a",
           "2h3h",
         )
-        g.playUsisStr(usis) must beValid.like { case game =>
-          isPerpetualWith(game, Gote) must beTrue
+        state.playUsisStr(usis) must beValid.like { case state =>
+          isPerpetualWith(state, Gote) must beTrue
         }
       }
       "on opponent's turn" in {
-        val g = sfenToGame(
+        val state = sfenToState(
           Sfen("l2g2B1l/1r2k2g1/p1nsppnp1/2pp4p/9/1pPS2s1P/P2PPPN1B/1PG6/LN2KG2L w S2Prp 66"),
           shogi.variant.Standard,
         ).toOption.get
@@ -150,12 +150,12 @@ class PerpetualCheckTest extends ShogiTest {
           "6b5c",
           "4b5a", // 4th
         )
-        g.playUsisStr(usis) must beValid.like { case game =>
-          isPerpetualWith(game, Gote) must beTrue
+        state.playUsisStr(usis) must beValid.like { case state =>
+          isPerpetualWith(state, Gote) must beTrue
         }
       }
       "on opponent's turn 2" in {
-        val g = sfenToGame(
+        val state = sfenToState(
           Sfen("l2gk3l/1r5g1/2ns+Bpnp1/p1pp4p/9/1pPS2s1P/P2PPPN1B/1PG6/LN2KG2L b S3Prp 69"),
           shogi.variant.Standard,
         ).toOption.get
@@ -173,12 +173,12 @@ class PerpetualCheckTest extends ShogiTest {
           "6b5c",
           "4b5a", // 4th
         )
-        g.playUsisStr(usis) must beValid.like { case game =>
-          isPerpetualWith(game, Gote) must beTrue
+        state.playUsisStr(usis) must beValid.like { case state =>
+          isPerpetualWith(state, Gote) must beTrue
         }
       }
       "on opponent's turn 3" in {
-        val g = sfenToGame(
+        val state = sfenToState(
           Sfen("1+s4k2/5r3/9/9/9/9/9/9/1+N4K2 w - 1"),
           shogi.variant.Standard,
         ).toOption.get
@@ -196,13 +196,13 @@ class PerpetualCheckTest extends ShogiTest {
           "3b4b",
           "4i3i",
         )
-        g.playUsisStr(usis) must beValid.like { case game =>
-          game.situation.winner must_== Some(Sente)
+        state.playUsisStr(usis) must beValid.like { case state =>
+          state.situation.winner must_== Some(Sente)
         }
       }
       "Sente starts in check" in {
-        val g =
-          sfenToGame(Sfen("k5r2/+s8/9/9/9/9/9/9/S5K2 b - 1"), shogi.variant.Standard).toOption.get
+        val state =
+          sfenToState(Sfen("k5r2/+s8/9/9/9/9/9/9/S5K2 b - 1"), shogi.variant.Standard).toOption.get
         val usis = List(
           "3i2i",
           "3a2a",
@@ -217,13 +217,13 @@ class PerpetualCheckTest extends ShogiTest {
           "2i3i",
           "2a3a",
         )
-        g.playUsisStr(usis) must beValid.like { case game =>
-          game.situation.winner must_== Some(Sente)
+        state.playUsisStr(usis) must beValid.like { case state =>
+          state.situation.winner must_== Some(Sente)
         }
       }
       "Gote starts in check" in {
-        val g =
-          sfenToGame(Sfen("7k1/9/9/9/9/9/9/+N8/K6R1 w - 1"), shogi.variant.Standard).toOption.get
+        val state =
+          sfenToState(Sfen("7k1/9/9/9/9/9/9/+N8/K6R1 w - 1"), shogi.variant.Standard).toOption.get
         val usis = List(
           "2a3a",
           "2i3i",
@@ -238,8 +238,8 @@ class PerpetualCheckTest extends ShogiTest {
           "3a2a",
           "3i2i",
         )
-        g.playUsisStr(usis) must beValid.like { case game =>
-          game.situation.winner must_== Some(Gote)
+        state.playUsisStr(usis) must beValid.like { case state =>
+          state.situation.winner must_== Some(Gote)
         }
       }
     }
@@ -247,8 +247,8 @@ class PerpetualCheckTest extends ShogiTest {
 
   "Chushogi perpetual check" should {
     "not trigger" in {
-      val dGame = Game(shogi.variant.Chushogi)
-      val dUsis = List(
+      val dState = State(shogi.variant.Chushogi)
+      val dUsis  = List(
         "4h4g",
         "9e9f",
         "4g4h",
@@ -266,13 +266,13 @@ class PerpetualCheckTest extends ShogiTest {
         "4g4h",
         "9f9e", // forth repetition
       )
-      dGame.playUsisStr(dUsis) must beValid.like { case game =>
-        game.situation.status.contains(Status.Repetition) must beTrue
-        game.situation.winner must beNone
+      dState.playUsisStr(dUsis) must beValid.like { case state =>
+        state.situation.status.contains(Status.Repetition) must beTrue
+        state.situation.winner must beNone
       }
     }
     "trigger" in {
-      val aGame = Game(
+      val aState = State(
         Some(
           Sfen(
             "lfcsgek1scfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/8i3/3I8/3g8/8I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL w",
@@ -300,9 +300,9 @@ class PerpetualCheckTest extends ShogiTest {
         "4f4e",
         "9f9e",
       )
-      aGame.playUsisStr(aUsis) must beValid.like { case game =>
-        game.situation.status.contains(Status.PerpetualCheck) must beTrue
-        game.situation.winner must_== Some(Gote)
+      aState.playUsisStr(aUsis) must beValid.like { case state =>
+        state.situation.status.contains(Status.PerpetualCheck) must beTrue
+        state.situation.winner must_== Some(Gote)
       }
     }
   }

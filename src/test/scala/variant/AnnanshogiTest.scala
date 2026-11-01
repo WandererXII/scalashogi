@@ -6,15 +6,15 @@ import shogi.format.usi.Usi
 
 class AnnanshogiTest extends ShogiTest {
 
-  def perft(game: Game, depth: Int) = Perft.perft(game, depth)
+  def perft(state: State, depth: Int) = Perft.perft(state, depth)
 
   "calculate annanshogi perfts" should {
-    val game = Game(shogi.variant.Annanshogi)
+    val state = State(shogi.variant.Annanshogi)
     "1 depth" in {
-      perft(game, 1) must be equalTo 28
+      perft(state, 1) must be equalTo 28
     }
     "2 depth" in {
-      perft(game, 2) must be equalTo 784
+      perft(state, 2) must be equalTo 784
     }
   }
 
@@ -33,7 +33,7 @@ class AnnanshogiTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      Game(shogi.variant.Annanshogi).toSfen must_== shogi.variant.Annanshogi.initialSfen
+      State(shogi.variant.Annanshogi).toSfen must_== shogi.variant.Annanshogi.initialSfen
     }
   }
 
@@ -42,8 +42,8 @@ class AnnanshogiTest extends ShogiTest {
       forall(annanPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Annanshogi)
-            perft(game, 1) must be equalTo d1.toInt
+            val state = State(Some(Sfen(sfenStr)), shogi.variant.Annanshogi)
+            perft(state, 1) must be equalTo d1.toInt
           }
         }
       }
@@ -70,7 +70,7 @@ class AnnanshogiTest extends ShogiTest {
 
       val sit2 = Sfen("5k3/9/9/7b1/5P3/5L3/9/9/5K3 w").toSituation(shogi.variant.Annanshogi).get
       sit2(Usi("2d4f").get).isValid must beTrue
-      perft(Game(sit2), 1) must_== 6
+      perft(State(sit2), 1) must_== 6
     }
     "capture move giver to defend from check with king" in {
       val sit = Sfen("9/8k/9/9/9/9/9/p+r7/K8 b").toSituation(shogi.variant.Annanshogi).get
@@ -88,11 +88,11 @@ class AnnanshogiTest extends ShogiTest {
 
       val sit2 = Sfen("3k5/9/9/3p5/3bG4/9/9/6K2/9 b").toSituation(shogi.variant.Annanshogi).get
       sit2(Usi("5e6d").get).isValid must beFalse
-      perft(Game(sit2), 1) must_== 13
+      perft(State(sit2), 1) must_== 13
 
       val sit3 = Sfen("6k2/p8/9/3Bs4/3R5/9/9/6K2/9 w").toSituation(shogi.variant.Annanshogi).get
       sit3(Usi("5d6e").get).isValid must beFalse
-      perft(Game(sit3), 1) must_== 10
+      perft(State(sit3), 1) must_== 10
     }
     "king captures protected piece" in {
       val sit = Sfen("k8/9/9/5K3/6g2/6p2/9/9/9 b").toSituation(shogi.variant.Annanshogi).get
@@ -100,7 +100,7 @@ class AnnanshogiTest extends ShogiTest {
     }
     "only friendly pieces give you moves" in {
       val sit = Sfen("9/9/9/4P4/4r4/9/9/9/K7k b").toSituation(shogi.variant.Annanshogi).get
-      perft(Game(sit), 1) must_== 5
+      perft(State(sit), 1) must_== 5
     }
     "pawn checkmate not valid" in {
       val sit = Sfen("4k4/9/4G4/9/9/9/9/9/9 b P").toSituation(shogi.variant.Annanshogi).get
@@ -172,9 +172,9 @@ class AnnanshogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Annanshogi)
-            game.situation.end must beFalse
-            perft(game, 1) must be equalTo d1.toInt
+            val state = State(Some(Sfen(sfenStr)), shogi.variant.Annanshogi)
+            state.situation.end must beFalse
+            perft(state, 1) must be equalTo d1.toInt
           }
         }
       }

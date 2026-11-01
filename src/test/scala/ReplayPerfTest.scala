@@ -11,7 +11,7 @@ class ReplayPerfTest extends ShogiTest {
   val iterations = 10
 
   def runOne(usis: List[Usi]) =
-    Replay.gamesWhileValid(usis, None, shogi.variant.Standard)
+    Replay.statesWhileValid(usis, None, shogi.variant.Standard)
   def run() = { usis foreach runOne }
 
   "playing a game" should {

@@ -6,8 +6,8 @@ class PlayTest extends ShogiTest {
 
   "playing a game" should {
     "opening one" in {
-      val game =
-        makeGame(shogi.variant.Standard)
+      val state =
+        makeState(shogi.variant.Standard)
           .playUsisStr(
             List(
               "7g7f",
@@ -16,8 +16,8 @@ class PlayTest extends ShogiTest {
             ),
           )
       "current game" in {
-        game must beValid.like { case g =>
-          addNewLines(g.situation.visual) must_== """
+        state must beValid.like { case state =>
+          addNewLines(state.situation.visual) must_== """
 l n s g k g s n l
 . r . . . . . B .
 p p p p p p . p p
@@ -33,8 +33,8 @@ Turn:Gote
         }
       }
       "after recapture" in {
-        game flatMap { _.playUsiStr("3a2b") } must beValid.like { case g =>
-          addNewLines(g.situation.visual) must_== """
+        state flatMap { _.playUsiStr("3a2b") } must beValid.like { case state =>
+          addNewLines(state.situation.visual) must_== """
 l n s g k g . n l
 . r . . . . . s .
 p p p p p p . p p

@@ -41,41 +41,41 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   implicit def richActor(actor: MoveActor): RichActor = RichActor(actor)
 
-  case class RichGame(game: Game) {
+  case class RichState(state: State) {
 
-    def as(color: Color): Game = game.withColor(color)
+    def as(color: Color): State = state.withColor(color)
 
-    def playUsisStr(usisStr: Seq[String]): Validated[String, Game] = {
-      val vg = usisStr.foldLeft[Validated[String, Game]](Validated.valid(game)) {
-        case (vg, usiStr) =>
-          vg.foreach { g =>
-            val _ = g.situation.moveActors.values.map { actor =>
+    def playUsisStr(usisStr: Seq[String]): Validated[String, State] = {
+      val validatedState = usisStr.foldLeft[Validated[String, State]](Validated.valid(state)) {
+        case (validatedState, usiStr) =>
+          validatedState.foreach { state =>
+            val _ = state.situation.moveActors.values.map { actor =>
               actor.destinations
             }
-            val _ = g.situation.dropActors.values.map { actor =>
+            val _ = state.situation.dropActors.values.map { actor =>
               actor.destinations
             }
           }
-          val ng = vg flatMap { g =>
-            g(Usi(usiStr).get)
+          val nextState = validatedState flatMap { state =>
+            state(Usi(usiStr).get)
           }
-          ng
+          nextState
       }
-      vg
+      validatedState
     }
 
     def playUsiStr(
         usiStr: String,
-    ): Validated[String, Game] =
-      game.apply(Usi(usiStr).get)
+    ): Validated[String, State] =
+      state.apply(Usi(usiStr).get)
 
   }
 
-  implicit def richGame(game: Game): RichGame = RichGame(game)
+  implicit def richState(state: State): RichState = RichState(state)
 
-  def sfenToGame(sfen: Sfen, variant: Variant) =
+  def sfenToState(sfen: Sfen, variant: Variant) =
     sfen.toSituation(variant) toValid "Could not construct situation from SFEN" map { sit =>
-      Game(variant).copy(
+      State(variant).copy(
         situation = sit,
       )
     }
@@ -94,17 +94,17 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       p.toList must containTheSameElementsAs(poss.toList)
     }
 
-  def makeGame(variant: Variant): Game =
-    Game(makeSituation(variant))
+  def makeState(variant: Variant): State =
+    State(makeSituation(variant))
 
   def bePoss(situation: Situation, visual: String): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>
       Visual.addNewLines(Visual.render(situation, Map(p -> 'x'))) must_== visual
     }
 
-  def beGame(visual: String, variant: Variant): Matcher[Validated[String, Game]] =
-    beValid.like { case g =>
-      g.situation.visual must_== Visual.parse(visual, variant).get.visual
+  def beState(visual: String, variant: Variant): Matcher[Validated[String, State]] =
+    beValid.like { case state =>
+      state.situation.visual must_== Visual.parse(visual, variant).get.visual
     }
 
   def pieceMoves(

@@ -6,21 +6,21 @@ import shogi.format.usi.Usi
 
 class CheckshogiTest extends ShogiTest {
 
-  def perft(game: Game, depth: Int) = Perft.perft(game, depth)
+  def perft(state: State, depth: Int) = Perft.perft(state, depth)
 
   "starting position" should {
-    val game = Game(shogi.variant.Checkshogi)
+    val state = State(shogi.variant.Checkshogi)
     "1 depth" in {
-      perft(game, 1) must be equalTo 30
+      perft(state, 1) must be equalTo 30
     }
     "2 depth" in {
-      perft(game, 2) must be equalTo 900
+      perft(state, 2) must be equalTo 900
     }
     "3 depth" in {
-      perft(game, 3) must be equalTo 25470
+      perft(state, 3) must be equalTo 25470
     }
     "4 depth" in {
-      perft(game, 4) must be equalTo 719408
+      perft(state, 4) must be equalTo 719408
     }
     // "5 depth" in {
     //  perft(game, 5) must be equalTo 19839626
@@ -29,7 +29,7 @@ class CheckshogiTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      Game(shogi.variant.Checkshogi).toSfen must_== shogi.variant.Checkshogi.initialSfen
+      State(shogi.variant.Checkshogi).toSfen must_== shogi.variant.Checkshogi.initialSfen
     }
   }
 

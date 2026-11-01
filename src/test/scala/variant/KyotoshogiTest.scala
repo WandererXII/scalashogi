@@ -6,21 +6,21 @@ import shogi.format.usi.Usi
 
 class KyotoshogiTest extends ShogiTest {
 
-  def perft(game: Game, depth: Int, log: Boolean = false) = Perft.perft(game, depth, log)
+  def perft(state: State, depth: Int, log: Boolean = false) = Perft.perft(state, depth, log)
 
   "calculate kyotoshogi perfts" should {
-    val game = Game(shogi.variant.Kyotoshogi)
+    val state = State(shogi.variant.Kyotoshogi)
     "1 depth" in {
-      perft(game, 1) must be equalTo 12
+      perft(state, 1) must be equalTo 12
     }
     "2 depth" in {
-      perft(game, 2) must be equalTo 137
+      perft(state, 2) must be equalTo 137
     }
     "3 depth" in {
-      perft(game, 3) must be equalTo 1636
+      perft(state, 3) must be equalTo 1636
     }
     "4 depth" in {
-      perft(game, 4) must be equalTo 18268
+      perft(state, 4) must be equalTo 18268
     }
     // "5 depth" in {
     //  perft(game, 5) must be equalTo 225903
@@ -38,8 +38,8 @@ class KyotoshogiTest extends ShogiTest {
       forall(kyotoPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
-            perft(game, 1) must be equalTo d1.toInt
+            val state = State(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
+            perft(state, 1) must be equalTo d1.toInt
           }
         }
       }
@@ -48,7 +48,7 @@ class KyotoshogiTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      Game(shogi.variant.Kyotoshogi).toSfen must_== shogi.variant.Kyotoshogi.initialSfen
+      State(shogi.variant.Kyotoshogi).toSfen must_== shogi.variant.Kyotoshogi.initialSfen
     }
   }
 
@@ -98,8 +98,8 @@ class KyotoshogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val game = Game(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
-            perft(game, 1) must be equalTo d1.toInt
+            val state = State(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
+            perft(state, 1) must be equalTo d1.toInt
           }
         }
       }

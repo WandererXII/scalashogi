@@ -10,9 +10,9 @@ K . . . . . . . .
 Hands:
 Turn:Gote
 """
-    val game      = Game(situation)
+    val state     = State(situation)
     "promote to a tokin" in {
-      game.playUsiStr("7g7h+") must beGame(
+      state.playUsiStr("7g7h+") must beState(
         """
 . . . . . . . . .
 . . . . . . . . .
@@ -30,7 +30,7 @@ Turn:Sente
       )
     }
     "don't force promotion by default" in {
-      game.playUsiStr("7g7h") must beGame(
+      state.playUsiStr("7g7h") must beState(
         """
 . . . . . . . . .
 . . . . . . . . .
@@ -48,12 +48,12 @@ Turn:Sente
       )
     }
     "promotion by killing" in {
-      Game(
+      State(
         """
 . . p . . . . . .
 K . R . . . . . .
 Turn:Gote""",
-      ).playUsiStr("7h7i+") must beGame(
+      ).playUsiStr("7h7i+") must beState(
         """
 . . . . . . . . .
 . . . . . . . . .

@@ -16,15 +16,15 @@ object Replay {
 
   // Both outcomes expose the last valid game, including the setup if no move was accepted.
   sealed trait Result {
-    def game: Game
-    def valid: Validated[String, Game]
+    def state: State
+    def valid: Validated[String, State]
   }
 
   object Result {
-    final case class Complete(game: Game) extends Result {
-      def valid = Validated.valid(game)
+    final case class Complete(state: State) extends Result {
+      def valid = Validated.valid(state)
     }
-    final case class Incomplete(game: Game, failures: String) extends Result {
+    final case class Incomplete(state: State, failures: String) extends Result {
       def valid = Validated.invalid(failures)
     }
   }
@@ -47,25 +47,25 @@ object Replay {
       situation(usi)
     }
 
-  def gamesWhileValid(
+  def statesWhileValid(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
       variant: shogi.variant.Variant,
-  ): (NonEmptyList[Game], Option[String]) = {
+  ): (NonEmptyList[State], Option[String]) = {
 
     @scala.annotation.tailrec
-    def mk(games: NonEmptyList[Game], usis: List[Usi]): (NonEmptyList[Game], Option[String]) =
+    def mk(states: NonEmptyList[State], usis: List[Usi]): (NonEmptyList[State], Option[String]) =
       usis match {
-        case Nil         => (games, None)
+        case Nil         => (states, None)
         case usi :: rest =>
-          games.head(usi) match {
-            case Valid(newGame) => mk(newGame :: games, rest)
-            case Invalid(err)   => (games, err.some)
+          states.head(usi) match {
+            case Valid(newState) => mk(newState :: states, rest)
+            case Invalid(err)    => (states, err.some)
           }
       }
 
-    mk(NonEmptyList.one(Game(initialSfen, variant)), usis.toList) match {
-      case (games, err) => (games.reverse, err)
+    mk(NonEmptyList.one(State(initialSfen, variant)), usis.toList) match {
+      case (states, err) => (states.reverse, err)
     }
   }
 
@@ -148,14 +148,14 @@ object Replay {
         usis: Vector[Usi],
         error: Option[String],
     ) = {
-      val game = Game(
+      val state = State(
         situation = situation,
         usis = usis,
         plies = startedAtPly + usis.size,
         startedAtPly = startedAtPly,
         startedAtStep = startedAtStep,
       )
-      error.fold[Result](Result.Complete(game))(Result.Incomplete(game, _))
+      error.fold[Result](Result.Complete(state))(Result.Incomplete(state, _))
     }
 
     @scala.annotation.tailrec
