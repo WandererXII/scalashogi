@@ -1,10 +1,11 @@
 package shogi
 package format
 
+import java.time.Duration
+
 import cats.data.NonEmptyList
 import cats.data.Validated
 import cats.data.Validated.valid
-import org.joda.time.Duration
 
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi

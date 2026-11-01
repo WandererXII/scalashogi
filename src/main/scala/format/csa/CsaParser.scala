@@ -2,13 +2,13 @@ package shogi
 package format
 package csa
 
+import java.time.Duration
 import scala.util.parsing.combinator._
 
 import cats.data.Validated
 import cats.data.Validated.invalid
 import cats.data.Validated.valid
 import cats.implicits._
-import org.joda.time.Duration
 
 import shogi.variant.Standard
 
@@ -134,7 +134,7 @@ object CsaParser {
     private val clockSecondsRegex = """(\d++)""".r
 
     private def readDuration(seconds: String): Option[Duration] =
-      seconds.toLongOption.filter(_ <= Long.MaxValue / 1000).map(s => new Duration(s * 1000))
+      seconds.toLongOption.filter(_ <= Long.MaxValue / 1000).map(s => Duration.ofMillis(s * 1000))
 
     private def parseClock(str: String): Option[Duration] = {
       str match {

@@ -4,9 +4,9 @@ package csa
 
 class CsaParserTest extends ShogiTest {
 
-  import org.joda.time.Duration
+  import java.time.Duration
 
-import shogi.format.csa.CsaFixtures._
+  import shogi.format.csa.CsaFixtures._
 
   val parser                 = CsaParser.full _
   def parseStep(str: String) = CsaParser.StepParser(str)
@@ -92,7 +92,7 @@ import shogi.format.csa.CsaFixtures._
           m.orig must_== Pos.SQ8C
           m.role must_== Pawn
           m.metas.timeSpent must beSome.like { case c: Duration =>
-            c must_== new Duration(5000L)
+            c must_== Duration.ofMillis(5000L)
           }
         }
       }
@@ -103,7 +103,9 @@ import shogi.format.csa.CsaFixtures._
     "preserve representable whole seconds" in {
       forall(List(0L, 12L, Int.MaxValue.toLong / 100, 21474837L, Long.MaxValue / 1000)) { seconds =>
         parser(s"PI\n+\n+7776FU\nT$seconds") must beValid.like { case p =>
-          p.parsedSteps.value.head.metas.timeSpent must beSome(new Duration(seconds.toLong * 1000))
+          p.parsedSteps.value.head.metas.timeSpent must beSome(
+            Duration.ofMillis(seconds.toLong * 1000),
+          )
         }
       }
     }
@@ -231,7 +233,7 @@ import shogi.format.csa.CsaFixtures._
             parser(record.replace("\n", newline)) must beValid.like { case p =>
               p.parsedSteps.value.headOption must beSome.like { case step =>
                 step.metas.comments must_== List("first", "second", "after")
-                step.metas.timeSpent must beSome(new Duration(5000L))
+                step.metas.timeSpent must beSome(Duration.ofMillis(5000L))
               }
             }
           }
@@ -244,7 +246,7 @@ import shogi.format.csa.CsaFixtures._
           first.metas.comments must_== List("first")
           first.metas.timeSpent must beNone
           second.metas.comments must_== List("second")
-          second.metas.timeSpent must beSome(new Duration(2000L))
+          second.metas.timeSpent must beSome(Duration.ofMillis(2000L))
       }
     }
     "multiple comments" in {

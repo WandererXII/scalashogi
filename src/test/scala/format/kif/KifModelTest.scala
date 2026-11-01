@@ -9,7 +9,7 @@ import shogi.variant._
 
 class KifModelTest extends ShogiTest {
   "move clocks preserve whole hours on export and import" in {
-    forall(List(59, 60, 3599, 3600, 3661, 7201)) { seconds =>
+    forall(List(59, 60, 3599, 3600, 3661, 7201, 86400, 360001, Int.MaxValue)) { seconds =>
       val step = NotationStep(
         1,
         Usi.WithRole(Usi("7g7f").get, Pawn),
@@ -17,8 +17,12 @@ class KifModelTest extends ShogiTest {
         secondsTotal = Some(seconds),
       )
       KifParser.full(Kif(List(step), None, Standard).render) must beValid.like { case p =>
-        p.parsedSteps.value.head.metas.timeSpent must beSome(new org.joda.time.Duration(seconds.toLong * 1000))
-        p.parsedSteps.value.head.metas.timeTotal must beSome(new org.joda.time.Duration(seconds.toLong * 1000))
+        p.parsedSteps.value.head.metas.timeSpent must beSome(
+          java.time.Duration.ofSeconds(seconds.toLong),
+        )
+        p.parsedSteps.value.head.metas.timeTotal must beSome(
+          java.time.Duration.ofSeconds(seconds.toLong),
+        )
       }
     }
   }

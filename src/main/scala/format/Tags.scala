@@ -1,8 +1,8 @@
 package shogi
 package format
 
-import org.joda.time.DateTimeZone
-import org.joda.time.format.DateTimeFormat
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 final case class Tag(name: TagType, value: String) {
 
@@ -64,10 +64,10 @@ object Tag {
   case object Start   extends TagType
   case object End     extends TagType
   case object UTCDate extends TagType {
-    val format = DateTimeFormat forPattern "yyyy/MM/dd" withZone DateTimeZone.UTC
+    val format = DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(ZoneOffset.UTC)
   }
   case object UTCTime extends TagType {
-    val format = DateTimeFormat forPattern "HH:mm:ss" withZone DateTimeZone.UTC
+    val format = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneOffset.UTC)
   }
   case object Sente                   extends TagType
   case object Gote                    extends TagType

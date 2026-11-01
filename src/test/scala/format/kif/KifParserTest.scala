@@ -4,9 +4,9 @@ package kif
 
 class KifParserTest extends ShogiTest {
 
-  import org.joda.time.Duration
+  import java.time.Duration
 
-import shogi.format.kif.KifFixtures._
+  import shogi.format.kif.KifFixtures._
 
   val parser = KifParser.full _
 
@@ -375,49 +375,57 @@ import shogi.format.kif.KifFixtures._
     }
     "accept clocks beyond the old centisecond limit" in {
       parser("1 ７六歩(77) (357913:56.474/5965:13:56.474)") must beValid.like { case p =>
-        p.parsedSteps.value.head.metas.timeSpent must beSome(new Duration(21474836474L))
-        p.parsedSteps.value.head.metas.timeTotal must beSome(new Duration(21474836474L))
+        p.parsedSteps.value.head.metas.timeSpent must beSome(Duration.ofMillis(21474836474L))
+        p.parsedSteps.value.head.metas.timeTotal must beSome(Duration.ofMillis(21474836474L))
       }
     }
     "round submillisecond fractions once with HALF_UP precision" in {
-      forall(List("0.0004" -> 0L, "0.0005" -> 1L, "0.0014" -> 1L,
-        "0.0015" -> 2L, "0.0045" -> 5L, "0.00049999999999999999999999999999999999999" -> 0L)) { case (seconds, millis) =>
+      forall(
+        List(
+          "0.0004"                                      -> 0L,
+          "0.0005"                                      -> 1L,
+          "0.0014"                                      -> 1L,
+          "0.0015"                                      -> 2L,
+          "0.0045"                                      -> 5L,
+          "0.00049999999999999999999999999999999999999" -> 0L,
+        ),
+      ) { case (seconds, millis) =>
         parser(s"1 ７六歩(77) (0:$seconds/0:0:01)") must beValid.like { case p =>
-          p.parsedSteps.value.head.metas.timeSpent.map(_.getMillis) must beSome(millis)
+          p.parsedSteps.value.head.metas.timeSpent.map(_.toMillis) must beSome(millis)
         }
       }
     }
     "accept Long millisecond boundaries and reject rounded overflow" in {
       parser("1 ７六歩(77) (0:9223372036854775.807/0:0:01)") must beValid.like { case p =>
-        p.parsedSteps.value.head.metas.timeSpent.map(_.getMillis) must beSome(Long.MaxValue)
+        p.parsedSteps.value.head.metas.timeSpent.map(_.toMillis) must beSome(Long.MaxValue)
       }
       parser("1 ７六歩(77) (0:9223372036854775.8075/0:0:01)") must beInvalid
     }
     "both times" in {
       parser("""29 ４八玉(59) (2:25/0:8:23)""") must beValid.like {
         case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-          step.metas.timeSpent must_== Some(new Duration(145000L))
-          step.metas.timeTotal must_== Some(new Duration(503000L))
+          step.metas.timeSpent must_== Some(Duration.ofMillis(145000L))
+          step.metas.timeTotal must_== Some(Duration.ofMillis(503000L))
       }
     }
     "both times with spaces" in {
       parser("""29 ４八玉(59) ( 2:25 / 0:8:23 )""") must beValid.like {
         case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-          step.metas.timeSpent must_== Some(new Duration(145000L))
-          step.metas.timeTotal must_== Some(new Duration(503000L))
+          step.metas.timeSpent must_== Some(Duration.ofMillis(145000L))
+          step.metas.timeTotal must_== Some(Duration.ofMillis(503000L))
       }
     }
     "fractional time" in {
       parser("""29 ４八玉(59) (2:25.006/0:8:23.006)""") must beValid.like {
         case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-          step.metas.timeSpent must_== Some(new Duration(145006L))
-          step.metas.timeTotal must_== Some(new Duration(503006L))
+          step.metas.timeSpent must_== Some(Duration.ofMillis(145006L))
+          step.metas.timeTotal must_== Some(Duration.ofMillis(503006L))
       }
     }
     "only step time" in {
       parser("""29 ４八玉(59) ( 2:25/)""") must beValid.like {
         case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-          step.metas.timeSpent must_== Some(new Duration(145000L))
+          step.metas.timeSpent must_== Some(Duration.ofMillis(145000L))
           step.metas.timeTotal must_== None
       }
     }
@@ -431,8 +439,8 @@ import shogi.format.kif.KifFixtures._
     "ignore + at the end?" in {
       parser("""29 ４八玉(59) (2:25/0:8:23)+""") must beValid.like {
         case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
-          step.metas.timeSpent must_== Some(new Duration(145000L))
-          step.metas.timeTotal must_== Some(new Duration(503000L))
+          step.metas.timeSpent must_== Some(Duration.ofMillis(145000L))
+          step.metas.timeTotal must_== Some(Duration.ofMillis(503000L))
       }
     }
     "ignore zero times" in {
@@ -543,7 +551,8 @@ import shogi.format.kif.KifFixtures._
 
     "preserve branch clocks" in {
       forall(List("1:05/0:1:05", "1:05.006/0:1:05.006")) { clock =>
-        val expected = if (clock.contains(".")) new Duration(65006L) else new Duration(65000L)
+        val expected =
+          if (clock.contains(".")) Duration.ofMillis(65006L) else Duration.ofMillis(65000L)
         parser(s"1 ７六歩(77)\n変化：1手\n1 ２六歩(27) ($clock)") must beValid.like { case p =>
           val branch = p.parsedSteps.value.head.metas.variations.head.value.head
           branch.metas.timeSpent must beSome(expected)

@@ -2,6 +2,7 @@ package shogi
 package format
 package kif
 
+import java.time.Duration
 import scala.util.parsing.combinator._
 
 import cats.data.Validated
@@ -10,7 +11,6 @@ import cats.data.Validated.Valid
 import cats.data.Validated.invalid
 import cats.data.Validated.valid
 import cats.implicits._
-import org.joda.time.Duration
 
 import shogi.format.forsyth.SfenUtils
 import shogi.variant._
@@ -366,7 +366,7 @@ object KifParser {
           .multiply(java.math.BigDecimal.valueOf(3600000))
           .add(new java.math.BigDecimal(minutes).multiply(java.math.BigDecimal.valueOf(60000)))
           .add(new java.math.BigDecimal(seconds).multiply(java.math.BigDecimal.valueOf(1000)))
-        new Duration(total.setScale(0, java.math.RoundingMode.HALF_UP).longValueExact())
+        Duration.ofMillis(total.setScale(0, java.math.RoundingMode.HALF_UP).longValueExact())
       }.toOption
 
     private def parseClock(str: String): Option[Duration] = {
