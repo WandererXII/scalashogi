@@ -1,6 +1,16 @@
 package shogi
+import shogi.format.usi.Usi
 
 class DividerPerfTest extends ShogiTest {
+  private def completeReplay(
+      usis: Seq[Usi],
+      initial: Option[shogi.format.forsyth.Sfen],
+      v: shogi.variant.Variant,
+  ) = {
+    val (situations, error) = Replay.statesWhileValid(usis, initial, v)
+    require(error.isEmpty, error.getOrElse(""))
+    situations
+  }
 
   // args(skipAll = true)
 
@@ -10,7 +20,7 @@ class DividerPerfTest extends ShogiTest {
   // val iterations = 1
 
   val usis        = shogi.format.usi.Usi.readList(format.usi.Fixtures.fromProd2).get
-  val gameReplay  = Replay.situations(usis, None, variant.Standard).toOption.get
+  val gameReplay  = completeReplay(usis, None, variant.Standard)
   def runOne      = Divider(gameReplay.toList)
   def run(): Unit = { for (_ <- 1 to nb) runOne }
 

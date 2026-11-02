@@ -4,7 +4,6 @@ import cats.data.NonEmptyList
 import cats.data.Validated
 import cats.data.Validated.Invalid
 import cats.data.Validated.Valid
-import cats.data.Validated.valid
 import cats.implicits._
 
 import shogi.format.ParsedNotation
@@ -16,15 +15,15 @@ object Replay {
 
   // Both outcomes expose the last valid game, including the setup if no move was accepted.
   sealed trait Result {
-    def state: State
-    def valid: Validated[String, State]
+    def state: Situation
+    def valid: Validated[String, Situation]
   }
 
   object Result {
-    final case class Complete(state: State) extends Result {
+    final case class Complete(state: Situation) extends Result {
       def valid = Validated.valid(state)
     }
-    final case class Incomplete(state: State, failures: String) extends Result {
+    final case class Incomplete(state: Situation, failures: String) extends Result {
       def valid = Validated.invalid(failures)
     }
   }
@@ -47,42 +46,30 @@ object Replay {
       situation(usi)
     }
 
+  // Chronological snapshots, setup first; retain the accepted prefix and first error.
   def statesWhileValid(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
       variant: shogi.variant.Variant,
-  ): (NonEmptyList[State], Option[String]) = {
+  ): (NonEmptyList[Situation], Option[String]) = {
 
     @scala.annotation.tailrec
-    def mk(states: NonEmptyList[State], usis: List[Usi]): (NonEmptyList[State], Option[String]) =
+    def mk(
+        states: NonEmptyList[Situation],
+        usis: List[Usi],
+    ): (NonEmptyList[Situation], Option[String]) =
       usis match {
         case Nil         => (states, None)
         case usi :: rest =>
           states.head(usi) match {
-            case Valid(newState) => mk(newState :: states, rest)
-            case Invalid(err)    => (states, err.some)
+            case Valid(newSituation) => mk(newSituation :: states, rest)
+            case Invalid(err)        => (states, err.some)
           }
       }
 
-    mk(NonEmptyList.one(State(initialSfen, variant)), usis.toList) match {
+    mk(NonEmptyList.one(Situation(initialSfen, variant)), usis.toList) match {
       case (states, err) => (states.reverse, err)
     }
-  }
-
-  def situations(
-      usis: Seq[Usi],
-      initialSfen: Option[Sfen],
-      variant: shogi.variant.Variant,
-  ): Validated[String, NonEmptyList[Situation]] = {
-    val init = initialSfenToSituation(initialSfen, variant)
-    usis.foldLeft[Validated[String, NonEmptyList[Situation]]](valid(NonEmptyList.one(init))) {
-      case (acc, usi) =>
-        acc andThen { sits =>
-          sits.head(usi) andThen { sit =>
-            valid(sit :: sits)
-          }
-        }
-    } map (_.reverse)
   }
 
   // Use for trusted usis
@@ -121,15 +108,9 @@ object Replay {
           }
       }
 
-    val init = initialSfenToSituation(initialSfen, variant)
+    val init = Situation(initialSfen, variant)
     mk(init.board.pieces.map { case (k, v) => k -> v.role }, usis.toList, Nil).reverse
   }
-
-  private def initialSfenToSituation(
-      initialSfen: Option[Sfen],
-      variant: shogi.variant.Variant,
-  ): Situation =
-    initialSfen.flatMap(_.toSituation(variant)) | Situation(variant)
 
   private def playSteps[A](
       initialSfen: Option[Sfen],
@@ -138,51 +119,18 @@ object Replay {
   )(
       step: (Situation, A) => Validated[String, Situation],
   ): Result = {
-    val setup = initialSfen.filterNot(_.initialOf(variant)).flatMap(_.toSituationPlus(variant))
-    val initialSituation = setup.fold(Situation(variant))(_.situation)
-    val startedAtPly     = setup.fold(0)(_.plies)
-    val startedAtStep    = setup.fold(1)(_.stepNumber)
-
-    def finish(
-        situation: Situation,
-        usis: Vector[Usi],
-        error: Option[String],
-    ) = {
-      val state = State(
-        situation = situation,
-        usis = usis,
-        plies = startedAtPly + usis.size,
-        startedAtPly = startedAtPly,
-        startedAtStep = startedAtStep,
-      )
-      error.fold[Result](Result.Complete(state))(Result.Incomplete(state, _))
-    }
-
     @scala.annotation.tailrec
-    def loop(
-        situation: Situation,
-        usis: Vector[Usi],
-        remaining: List[A],
-    ): Result =
+    def loop(situation: Situation, remaining: List[A]): Result =
       remaining match {
-        case Nil           => finish(situation, usis, None)
+        case Nil           => Result.Complete(situation)
         case input :: rest =>
           step(situation, input) match {
-            case Invalid(err) => finish(situation, usis, Some(err))
-            case Valid(next)  =>
-              loop(
-                next,
-                next.history.lastUsi.fold(usis)(usis :+ _),
-                rest,
-              )
+            case Invalid(err) => Result.Incomplete(situation, err)
+            case Valid(next)  => loop(next, rest)
           }
       }
 
-    loop(
-      initialSituation,
-      Vector.empty,
-      steps.toList,
-    )
+    loop(Situation(initialSfen, variant), steps.toList)
   }
 
 }

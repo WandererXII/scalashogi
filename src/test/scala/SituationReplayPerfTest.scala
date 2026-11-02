@@ -10,8 +10,11 @@ class SituationReplayPerfTest extends ShogiTest {
   val iterations = 10
 
   val usis = format.usi.Fixtures.prod500standard.take(nb).map(Usi.readList(_).get)
-  def runOne(usis: List[Usi]) =
-    Replay.situations(usis, None, variant.Standard)
+  def runOne(usis: List[Usi]) = {
+    val (situations, error) = Replay.statesWhileValid(usis, None, variant.Standard)
+    require(error.isEmpty, error.getOrElse(""))
+    require(situations.size == usis.size + 1, s"expected ${usis.size + 1} situations, got ${situations.size}")
+  }
   def run() = { usis foreach runOne }
 
   "playing a game" should {
@@ -30,7 +33,7 @@ class SituationReplayPerfTest extends ShogiTest {
       val microsPerGame = (1000 * durations.sum) / nbGames
       println(s"Average = $microsPerGame microseconds per game")
       println(s"          ${1000000 / microsPerGame} games per second")
-      true === true
+      success
     }
   }
 }

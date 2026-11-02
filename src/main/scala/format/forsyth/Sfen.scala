@@ -10,20 +10,18 @@ import shogi.variant.Variant
 
 final case class Sfen(value: String) extends AnyVal {
 
-  def toSituationPlus(variant: Variant): Option[Sfen.SituationPlus] =
-    toSituation(variant) map { sit =>
-      val sn = stepNumber map (_ max 1 min 9999)
-      Sfen.SituationPlus(sit, sn | 1)
-    }
-
   def toSituation(variant: Variant): Option[Situation] =
     for {
       board <- toBoard(variant)
       hands <- toHands(variant)
       history = toHistory(variant)
     } yield {
-      val sit = Situation(board, hands, color | Sente, history, variant)
-      if (color.isEmpty && variant.noOppositeCheck && sit.switch.check) sit.switch else sit
+      val sit      = Situation(board, hands, color | Sente, history, variant)
+      val position =
+        if (color.isEmpty && variant.noOppositeCheck && sit.switch.check) sit.switch else sit
+      val sn    = stepNumber.fold(1)(_ max 1 min 9999)
+      val plies = sn - (if ((sn % 2 == 1) == position.color.sente) 1 else 0)
+      position.withHistory(history.copy(plies = plies, startedAtPly = plies, startedAtStep = sn))
     }
 
   def toBoard(variant: Variant): Option[Board] = {
@@ -69,19 +67,8 @@ final case class Sfen(value: String) extends AnyVal {
 
 object Sfen {
 
-  def apply(state: State): Sfen =
-    apply(SituationPlus(state.situation, state.stepNumber))
-
-  def apply(sp: SituationPlus): Sfen =
-    Sfen(s"${situationToString(sp.situation)} ${sp.stepNumber}")
-
   def apply(sit: Situation): Sfen =
-    Sfen(s"${situationToString(sit)}")
-
-  final case class SituationPlus(situation: Situation, stepNumber: Int) {
-    def plies        = stepNumber - (if ((stepNumber % 2 == 1) == situation.color.sente) 1 else 0)
-    def toSfen: Sfen = apply(this)
-  }
+    Sfen(s"${situationToString(sit)} ${sit.stepNumber}")
 
   def situationToString(sit: Situation): String =
     List[String](

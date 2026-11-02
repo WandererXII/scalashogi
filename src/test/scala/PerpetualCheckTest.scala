@@ -45,24 +45,24 @@ class PerpetualCheckTest extends ShogiTest {
       "after 2 repetitions" in {
         state must beValid.like { case state =>
           state.playUsisStr(u take 5) must beValid.like { case state2 =>
-            state2.situation.status must beNone
-            state2.situation.winner must beNone
+            state2.status must beNone
+            state2.winner must beNone
           }
         }
       }
       "after 3 repetitions" in {
         state must beValid.like { case state =>
           state.playUsisStr(u take 9) must beValid.like { case state2 =>
-            state2.situation.status must beNone
-            state2.situation.winner must beNone
+            state2.status must beNone
+            state2.winner must beNone
           }
         }
       }
       "if the checks weren't consecutive" in {
         state must beValid.like { case state =>
           state.playUsisStr(ui) must beValid.like { case state2 =>
-            state2.situation.status.contains(Status.Repetition) must beTrue
-            state2.situation.winner must beNone
+            state2.status.contains(Status.Repetition) must beTrue
+            state2.winner must beNone
           }
         }
       }
@@ -87,15 +87,15 @@ class PerpetualCheckTest extends ShogiTest {
           "4c5b+", // 4th
         )
         state.playUsisStr(usis) must beValid.like { case state =>
-          state.situation.status.contains(Status.Repetition) must beTrue
-          state.situation.winner must beNone
+          state.status.contains(Status.Repetition) must beTrue
+          state.winner must beNone
         }
       }
     }
     "trigger" in {
-      def isPerpetualWith(state: State, winner: Color): Boolean =
-        state.situation.status.contains(Status.PerpetualCheck) &&
-          state.situation.winner == Some(winner)
+      def isPerpetualWith(state: Situation, winner: Color): Boolean =
+        state.status.contains(Status.PerpetualCheck) &&
+          state.winner == Some(winner)
 
       "after 4 repetitions" in {
         state must beValid.like { case state =>
@@ -197,7 +197,7 @@ class PerpetualCheckTest extends ShogiTest {
           "4i3i",
         )
         state.playUsisStr(usis) must beValid.like { case state =>
-          state.situation.winner must_== Some(Sente)
+          state.winner must_== Some(Sente)
         }
       }
       "Sente starts in check" in {
@@ -218,7 +218,7 @@ class PerpetualCheckTest extends ShogiTest {
           "2a3a",
         )
         state.playUsisStr(usis) must beValid.like { case state =>
-          state.situation.winner must_== Some(Sente)
+          state.winner must_== Some(Sente)
         }
       }
       "Gote starts in check" in {
@@ -239,7 +239,7 @@ class PerpetualCheckTest extends ShogiTest {
           "3i2i",
         )
         state.playUsisStr(usis) must beValid.like { case state =>
-          state.situation.winner must_== Some(Gote)
+          state.winner must_== Some(Gote)
         }
       }
     }
@@ -247,7 +247,7 @@ class PerpetualCheckTest extends ShogiTest {
 
   "Chushogi perpetual check" should {
     "not trigger" in {
-      val dState = State(shogi.variant.Chushogi)
+      val dState = Situation(shogi.variant.Chushogi)
       val dUsis  = List(
         "4h4g",
         "9e9f",
@@ -267,12 +267,12 @@ class PerpetualCheckTest extends ShogiTest {
         "9f9e", // forth repetition
       )
       dState.playUsisStr(dUsis) must beValid.like { case state =>
-        state.situation.status.contains(Status.Repetition) must beTrue
-        state.situation.winner must beNone
+        state.status.contains(Status.Repetition) must beTrue
+        state.winner must beNone
       }
     }
     "trigger" in {
-      val aState = State(
+      val aState = Situation(
         Some(
           Sfen(
             "lfcsgek1scfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/8i3/3I8/3g8/8I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL w",
@@ -301,8 +301,8 @@ class PerpetualCheckTest extends ShogiTest {
         "9f9e",
       )
       aState.playUsisStr(aUsis) must beValid.like { case state =>
-        state.situation.status.contains(Status.PerpetualCheck) must beTrue
-        state.situation.winner must_== Some(Gote)
+        state.status.contains(Status.PerpetualCheck) must beTrue
+        state.winner must_== Some(Gote)
       }
     }
   }

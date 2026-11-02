@@ -5,10 +5,10 @@ import shogi.format.forsyth.Sfen
 
 class StandardTest extends ShogiTest {
 
-  def perft(state: State, depth: Int) = Perft.perft(state, depth)
+  def perft(state: Situation, depth: Int) = Perft.perft(state, depth)
 
   "starting position" should {
-    val state = State(shogi.variant.Standard)
+    val state = Situation(shogi.variant.Standard)
     "1 depth" in {
       perft(state, 1) must be equalTo 30
     }
@@ -84,7 +84,7 @@ class StandardTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      State(shogi.variant.Standard).toSfen must_== shogi.variant.Standard.initialSfen
+      Situation(shogi.variant.Standard).toSfen must_== shogi.variant.Standard.initialSfen
     }
   }
 
@@ -93,7 +93,7 @@ class StandardTest extends ShogiTest {
       forall(random) { line =>
         line match {
           case (sfenStr, d1, d2) => {
-            val state = State(Some(Sfen(sfenStr)), shogi.variant.Standard)
+            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Standard)
             perft(state, 1) must be equalTo d1.toInt
             perft(state, 2) must be equalTo d2.toInt
           }
@@ -107,7 +107,7 @@ class StandardTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = State(Some(Sfen(sfenStr)), shogi.variant.Standard)
+            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Standard)
             perft(state, 1) must be equalTo d1.toInt
           }
         }

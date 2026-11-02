@@ -6,10 +6,10 @@ import shogi.format.usi.Usi
 
 class DobutsuTest extends ShogiTest {
 
-  def perft(state: State, depth: Int, log: Boolean = false) = Perft.perft(state, depth, log)
+  def perft(state: Situation, depth: Int, log: Boolean = false) = Perft.perft(state, depth, log)
 
   "calculate dobutsu perfts" should {
-    val state = State(shogi.variant.Dobutsu)
+    val state = Situation(shogi.variant.Dobutsu)
     "1 depth" in {
       perft(state, 1) must be equalTo 4
     }

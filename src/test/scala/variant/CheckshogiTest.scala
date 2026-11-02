@@ -6,10 +6,10 @@ import shogi.format.usi.Usi
 
 class CheckshogiTest extends ShogiTest {
 
-  def perft(state: State, depth: Int) = Perft.perft(state, depth)
+  def perft(state: Situation, depth: Int) = Perft.perft(state, depth)
 
   "starting position" should {
-    val state = State(shogi.variant.Checkshogi)
+    val state = Situation(shogi.variant.Checkshogi)
     "1 depth" in {
       perft(state, 1) must be equalTo 30
     }
@@ -29,7 +29,7 @@ class CheckshogiTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      State(shogi.variant.Checkshogi).toSfen must_== shogi.variant.Checkshogi.initialSfen
+      Situation(shogi.variant.Checkshogi).toSfen must_== shogi.variant.Checkshogi.initialSfen
     }
   }
 

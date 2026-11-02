@@ -6,10 +6,10 @@ import shogi.format.usi.Usi
 
 class ChushogiTest extends ShogiTest {
 
-  def perft(state: State, depth: Int) = Perft.perft(state, depth)
+  def perft(state: Situation, depth: Int) = Perft.perft(state, depth)
 
   "calculate chushogi perfts" should {
-    val state = State(shogi.variant.Chushogi)
+    val state = Situation(shogi.variant.Chushogi)
     "1 depth" in {
       perft(state, 1) must be equalTo 36
     }
@@ -20,7 +20,7 @@ class ChushogiTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      State(shogi.variant.Chushogi).toSfen must_== shogi.variant.Chushogi.initialSfen
+      Situation(shogi.variant.Chushogi).toSfen must_== shogi.variant.Chushogi.initialSfen
     }
   }
 
@@ -40,7 +40,7 @@ class ChushogiTest extends ShogiTest {
       forall(chushogiPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = State(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
+            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
             perft(state, 1) must be equalTo d1.toInt
           }
         }
@@ -363,8 +363,8 @@ class ChushogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = State(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
-            state.situation.end must beFalse
+            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
+            state.end must beFalse
             perft(state, 1) must be equalTo d1.toInt
           }
         }

@@ -41,18 +41,18 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   implicit def richActor(actor: MoveActor): RichActor = RichActor(actor)
 
-  case class RichState(state: State) {
+  case class RichState(state: Situation) {
 
-    def as(color: Color): State = state.withColor(color)
+    def as(color: Color): Situation = state.withColor(color)
 
-    def playUsisStr(usisStr: Seq[String]): Validated[String, State] = {
-      val validatedState = usisStr.foldLeft[Validated[String, State]](Validated.valid(state)) {
+    def playUsisStr(usisStr: Seq[String]): Validated[String, Situation] = {
+      val validatedState = usisStr.foldLeft[Validated[String, Situation]](Validated.valid(state)) {
         case (validatedState, usiStr) =>
           validatedState.foreach { state =>
-            val _ = state.situation.moveActors.values.map { actor =>
+            val _ = state.moveActors.values.map { actor =>
               actor.destinations
             }
-            val _ = state.situation.dropActors.values.map { actor =>
+            val _ = state.dropActors.values.map { actor =>
               actor.destinations
             }
           }
@@ -66,19 +66,15 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
     def playUsiStr(
         usiStr: String,
-    ): Validated[String, State] =
+    ): Validated[String, Situation] =
       state.apply(Usi(usiStr).get)
 
   }
 
-  implicit def richState(state: State): RichState = RichState(state)
+  implicit def richState(state: Situation): RichState = RichState(state)
 
   def sfenToState(sfen: Sfen, variant: Variant) =
-    sfen.toSituation(variant) toValid "Could not construct situation from SFEN" map { sit =>
-      State(variant).copy(
-        situation = sit,
-      )
-    }
+    sfen.toSituation(variant) toValid "Could not construct situation from SFEN"
 
   def makeSituation(variant: Variant): Situation =
     Situation(variant)
@@ -94,17 +90,17 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       p.toList must containTheSameElementsAs(poss.toList)
     }
 
-  def makeState(variant: Variant): State =
-    State(makeSituation(variant))
+  def makeState(variant: Variant): Situation =
+    makeSituation(variant)
 
   def bePoss(situation: Situation, visual: String): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>
       Visual.addNewLines(Visual.render(situation, Map(p -> 'x'))) must_== visual
     }
 
-  def beState(visual: String, variant: Variant): Matcher[Validated[String, State]] =
+  def beState(visual: String, variant: Variant): Matcher[Validated[String, Situation]] =
     beValid.like { case state =>
-      state.situation.visual must_== Visual.parse(visual, variant).get.visual
+      state.visual must_== Visual.parse(visual, variant).get.visual
     }
 
   def pieceMoves(

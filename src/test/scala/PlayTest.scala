@@ -17,7 +17,7 @@ class PlayTest extends ShogiTest {
           )
       "current game" in {
         state must beValid.like { case state =>
-          addNewLines(state.situation.visual) must_== """
+          addNewLines(state.visual) must_== """
 l n s g k g s n l
 . r . . . . . B .
 p p p p p p . p p
@@ -34,7 +34,7 @@ Turn:Gote
       }
       "after recapture" in {
         state flatMap { _.playUsiStr("3a2b") } must beValid.like { case state =>
-          addNewLines(state.situation.visual) must_== """
+          addNewLines(state.visual) must_== """
 l n s g k g . n l
 . r . . . . . s .
 p p p p p p . p p

@@ -11,6 +11,10 @@ final case class History(
     consecutiveAttacks: ConsecutiveAttacks,
     positionHashes: PositionHash,
     initialSfen: Option[Sfen],
+    usis: Vector[Usi] = Vector.empty,
+    plies: Int = 0,
+    startedAtPly: Int = 0,
+    startedAtStep: Int = 1,
 ) {
 
   // only hashes for positions with the same side to play
@@ -54,6 +58,9 @@ final case class History(
 
   lazy val threefoldRepetition = isRepetition(3)
   lazy val fourfoldRepetition  = isRepetition(4)
+
+  private[shogi] def record(usi: Usi): History =
+    copy(lastUsi = usi.some, usis = usis :+ usi, plies = plies + 1)
 
   def withLastUsi(u: Usi) = copy(lastUsi = u.some)
 

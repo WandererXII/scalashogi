@@ -8,8 +8,11 @@ class SituationReplayTest extends ShogiTest {
   "all 500 fixtures" should {
     "have no errors and correct size" in {
       usis forall { u =>
-        Replay.situations(u, None, shogi.variant.Standard) must beValid.like { case sits =>
-          (sits.size - 1) must_== u.size
+        val (sits, error) = Replay.statesWhileValid(u, None, shogi.variant.Standard)
+        error must beNone
+        (sits.size - 1) must_== u.size
+        forall(sits.toList.zipWithIndex) { case (sit, index) =>
+          sit.usis must_== u.take(index).toVector
         }
       }
     }

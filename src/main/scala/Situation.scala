@@ -137,7 +137,7 @@ final case class Situation(
   ): Situation = {
     val newSit = copy(board = updatedBoard, hands = updatedHands).switch
     val h      = history
-      .withLastUsi(usi)
+      .record(usi)
       .withLastLionCapture {
         val roleOpt = usi.positions.headOption.flatMap(board(_).map(_.role))
         if (variant.chushogi && roleOpt.exists(!Role.allLions.contains(_)))
@@ -205,6 +205,16 @@ final case class Situation(
       acc + variant.valueOfRole(r) * c.fold(1, -1)
     } + (hands(Sente).sum(variant.valueOfRole) - hands(Gote).sum(variant.valueOfRole))
 
+  def usis: Vector[Usi]   = history.usis
+  def plies: Int          = history.plies
+  def startedAtPly: Int   = history.startedAtPly
+  def startedAtStep: Int  = history.startedAtStep
+  def playedPlies: Int    = plies - startedAtPly
+  def stepNumber: Int     = startedAtStep + playedPlies
+  def fullTurnNumber: Int = 1 + plies / 2
+
+  def withPlies(plies: Int): Situation = withHistory(history.copy(plies = plies))
+
   def withBoard(board: Board)                     = copy(board = board)
   def withHands(hands: Hands)                     = copy(hands = hands)
   def withColor(color: Color)                     = copy(color = color)
@@ -217,11 +227,16 @@ final case class Situation(
 
   def toSfen: Sfen = Sfen(this)
 
+  def toSfenWithoutMoveNumber: Sfen = Sfen(Sfen.situationToString(this))
+
   override def toString =
     s"${variant.name}\n$visual\nLast USI: ${history.lastUsi.fold("-")(_.usi)}\n"
 }
 
 object Situation {
+
+  def apply(initialSfen: Option[Sfen], variant: Variant): Situation =
+    initialSfen.flatMap(_.toSituation(variant)).getOrElse(apply(variant))
 
   def apply(variant: shogi.variant.Variant): Situation =
     Situation(

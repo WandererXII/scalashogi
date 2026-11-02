@@ -20,7 +20,7 @@ class ReplayTest extends ShogiTest {
       )
       forall(variants) { variant =>
         forall(List(None, Some(variant.initialSfen))) { initialSfen =>
-          val expected = State(initialSfen, variant)
+          val expected = Situation(initialSfen, variant)
           Replay.fromUsi(Nil, initialSfen, variant).valid must beValid.like { case state =>
             state.toSfen must_== expected.toSfen
             state.plies must_== expected.plies
@@ -34,7 +34,7 @@ class ReplayTest extends ShogiTest {
 
     "return the initial game for an empty record" in {
       Replay.fromUsi(Nil, None, Standard).valid must beValid.like { case state =>
-        state.toSfen must_== State(Standard).toSfen
+        state.toSfen must_== Situation(Standard).toSfen
         state.usis must beEmpty
         state.playedPlies must_== 0
       }
@@ -42,7 +42,7 @@ class ReplayTest extends ShogiTest {
 
     "preserve the valid prefix and original error after a later illegal move" in {
       val moves = Usi.readList("7g7f 7g7f 3c3d").get
-      val first = State(Standard)(moves.head).toOption.get
+      val first = Situation(Standard)(moves.head).toOption.get
       val error = first(moves(1)).swap.toOption.get
       Replay.fromUsi(moves, None, Standard) must beLike {
         case result @ Replay.Result.Incomplete(state, failure) =>
@@ -58,16 +58,29 @@ class ReplayTest extends ShogiTest {
       val moves = Usi.readList("3c3d 7g7f").get
       Replay.fromUsi(moves, None, Standard) must beLike {
         case result @ Replay.Result.Incomplete(state, _) =>
-          state.toSfen must_== State(Standard).toSfen
+          state.toSfen must_== Situation(Standard).toSfen
           state.usis must beEmpty
           state.playedPlies must_== 0
           result.valid must beInvalid
       }
     }
 
+    "preserve the valid prefix and error for parsed notation" in {
+      val parsed   = format.csa.CsaParser.full("PI\n+\n+7776FU\n-3334FU\n+7776FU").toOption.get
+      val result   = Replay.fromParsedNotation(parsed, identity)
+      val moves    = Usi.readList("7g7f 3c3d").get
+      val expected = Replay.fromUsi(moves, None, Standard).state
+      result must beLike { case Replay.Result.Incomplete(sit, error) =>
+        sit.toSfen must_== expected.toSfen
+        sit.usis must_== moves.toVector
+        sit.plies must_== 2
+        error must_== expected(parsed.parsedSteps.value.last).swap.toOption.get
+      }
+    }
+
     "preserve SFEN numbering and a Gote starting turn" in {
       val sfen    = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 42")
-      val initial = State(Some(sfen), Standard)
+      val initial = Situation(Some(sfen), Standard)
       val moves   = Usi.readList("3c3d 7g7f").get
       Replay.fromUsi(moves, Some(sfen), Standard).valid must beValid.like { case state =>
         state.startedAtPly must_== initial.plies

@@ -18,7 +18,7 @@ class DrawTest extends ShogiTest {
         makeState(Standard)
           .playUsisStr(List("5g5f", "5c5d", "7g7f", "5d5e", "5f5e"))
           .toOption
-          .flatMap(_.situation.status) must beNone
+          .flatMap(_.status) must beNone
       }
       "two kings with nothing in hand" in {
         """
@@ -46,8 +46,8 @@ K . . . . N .""".status.contains(Status.Draw) must beFalse
     "on two kings with something in hand" in {
       val position = Sfen("4k4/9/9/9/9/9/9/9/5K3 b p 1")
       sfenToState(position, Standard) must beValid.like { case state =>
-        state.situation.status.contains(Status.Draw) must beFalse
-        state.situation.end must beFalse
+        state.status.contains(Status.Draw) must beFalse
+        state.end must beFalse
       }
     }
     "on a single pawn" in {
@@ -55,8 +55,8 @@ K . . . . N .""".status.contains(Status.Draw) must beFalse
       val state    = sfenToState(position, Standard)
       val newState = state flatMap (_.playUsiStr("5i5h"))
       newState must beValid.like { case state =>
-        state.situation.status.contains(Status.Draw) must beFalse
-        state.situation.end must beFalse
+        state.status.contains(Status.Draw) must beFalse
+        state.end must beFalse
       }
     }
   }

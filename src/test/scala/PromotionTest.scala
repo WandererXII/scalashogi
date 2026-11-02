@@ -3,14 +3,14 @@ package shogi
 class PromotionTest extends ShogiTest {
 
   "pawn promotion" should {
-    val situation = """
+    val situation: Situation = """
 . . p . . . . . .
 . . . . . . . . .
 K . . . . . . . .
 Hands:
 Turn:Gote
 """
-    val state     = State(situation)
+    val state                = situation
     "promote to a tokin" in {
       state.playUsiStr("7g7h+") must beState(
         """
@@ -48,7 +48,7 @@ Turn:Sente
       )
     }
     "promotion by killing" in {
-      State(
+      stringToSituation(
         """
 . . p . . . . . .
 K . R . . . . . .

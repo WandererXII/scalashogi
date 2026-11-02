@@ -12,11 +12,11 @@ object Perft {
     sit.moveActors.values.toList
       .flatMap(_.toUsis)
 
-  def perft(state: State, depth: Int, log: Boolean = false): Int =
+  def perft(state: Situation, depth: Int, log: Boolean = false): Int =
     if (depth > 0) {
-      if (state.situation.end) 0
+      if (state.end) 0
       else {
-        val mds: List[Usi] = moves(state.situation) ::: drops(state.situation)
+        val mds: List[Usi] = moves(state) ::: drops(state)
         mds.foldLeft(0) { (p, u) =>
           val newState = state(u).toOption.get
           val cnt      = perft(newState, depth - 1)

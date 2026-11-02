@@ -494,7 +494,7 @@ class KifParserTest extends ShogiTest {
     """) must beValid.like { case p =>
       p.tags.value.size must_== 1
       p.initialSfen must beSome.like { sfen =>
-        sfen.value == "3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p"
+        sfen.value must_== "3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1"
       }
       p.tags.value must contain { (tag: Tag) =>
         tag.name == Tag.Sente && tag.value == "先手"
@@ -511,7 +511,7 @@ class KifParserTest extends ShogiTest {
       1 ７六歩(77) (00:00/00:00:00)
     """) must beValid.like { case p =>
       p.initialSfen must beSome.like { sfen =>
-        sfen.value == "4k4/9/9/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 3p"
+        sfen.value must_== "4k4/9/9/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 3p 1"
       }
     }
   }
@@ -658,6 +658,14 @@ class KifParserTest extends ShogiTest {
       """) must beValid.like { case p =>
         p.variant.chushogi must beTrue
         p.parsedSteps.value must haveSize(1)
+        // This notation-only fixture crosses occupied squares in the default setup.
+        val setup = forsyth.Sfen("k11/12/12/12/12/12/12/12/12/5N6/12/11K b - 1")
+        Replay.fromParsedNotation(p.copy(initialSfen = Some(setup)), identity).valid must beValid
+          .like { case sit =>
+            sit.usis.map(_.usi) must_== Vector("7j6i6h")
+            sit.plies must_== 1
+            sit.stepNumber must_== 2
+          }
         p.tags(_.Result) must beSome("sente")
       }
     }
@@ -851,7 +859,7 @@ class KifParserTest extends ShogiTest {
         tag.name == Tag.Sente && tag.value == "先手"
       }
       p.initialSfen must beSome.like { sfen =>
-        sfen.value == "rbsgk/4p/P4/5/KGSBR w -"
+        sfen.value must_== "rbsgk/4p/P4/5/KGSBR w - 1"
       }
       p.variant.minishogi must beTrue
     }
@@ -895,7 +903,7 @@ class KifParserTest extends ShogiTest {
       先手の持駒：なし
     """) must beValid.like { case p =>
       p.initialSfen must beSome.like { sfen =>
-        sfen.value == "3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p"
+        sfen.value must_== "3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1"
       }
       p.variant.annanshogi must beTrue
     }
@@ -925,8 +933,8 @@ class KifParserTest extends ShogiTest {
         Replay.fromParsedNotation(p, steps => ParsedSteps(steps.value.take(7))).valid must beValid
           .like { case state =>
             state.plies must_== 7
-            state.situation.board(Pos.SQ2B) must beSome(Sente.gold)
-            state.situation.board(Pos.SQ4D) must beSome(Sente.king)
+            state.board(Pos.SQ2B) must beSome(Sente.gold)
+            state.board(Pos.SQ4D) must beSome(Sente.king)
           }
       }
     }

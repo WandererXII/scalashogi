@@ -6,10 +6,10 @@ import shogi.format.usi.Usi
 
 class KyotoshogiTest extends ShogiTest {
 
-  def perft(state: State, depth: Int, log: Boolean = false) = Perft.perft(state, depth, log)
+  def perft(state: Situation, depth: Int, log: Boolean = false) = Perft.perft(state, depth, log)
 
   "calculate kyotoshogi perfts" should {
-    val state = State(shogi.variant.Kyotoshogi)
+    val state = Situation(shogi.variant.Kyotoshogi)
     "1 depth" in {
       perft(state, 1) must be equalTo 12
     }
@@ -38,7 +38,7 @@ class KyotoshogiTest extends ShogiTest {
       forall(kyotoPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = State(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
+            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
             perft(state, 1) must be equalTo d1.toInt
           }
         }
@@ -48,7 +48,7 @@ class KyotoshogiTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      State(shogi.variant.Kyotoshogi).toSfen must_== shogi.variant.Kyotoshogi.initialSfen
+      Situation(shogi.variant.Kyotoshogi).toSfen must_== shogi.variant.Kyotoshogi.initialSfen
     }
   }
 
@@ -98,7 +98,7 @@ class KyotoshogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = State(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
+            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
             perft(state, 1) must be equalTo d1.toInt
           }
         }

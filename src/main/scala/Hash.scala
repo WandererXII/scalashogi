@@ -9,7 +9,7 @@ object Hash {
   private def apply(str: String): PositionHash =
     MessageDigest getInstance "MD5" digest (str getBytes "UTF-8") take size
 
-  def apply(sit: Situation): PositionHash = apply(sit.toSfen.value)
+  def apply(sit: Situation): PositionHash = apply(sit.toSfenWithoutMoveNumber.value)
 
   def debug(hashes: PositionHash) = hashes.map(_.toInt).sum.toString
 
