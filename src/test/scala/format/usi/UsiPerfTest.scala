@@ -13,21 +13,7 @@ class UsiPerfTest extends ShogiTest {
 
   "reading a game" should {
     "many times" in {
-      println("warming up")
-      run()
-      println("running tests")
-      val durations = for (_ <- 1 to iterations) yield {
-        val start = System.currentTimeMillis
-        run()
-        val duration = System.currentTimeMillis - start
-        println(s"${usis.size} games in $duration ms")
-        duration
-      }
-      val nbGames       = iterations * usis.size
-      val microsPerGame = (1000 * durations.sum) / nbGames
-      println(s"Average = $microsPerGame microseconds per game")
-      println(s"          ${1000000 / microsPerGame} games per second")
-      true === true
+      benchmark(usis.size, iterations)(run())
     }
   }
 }

@@ -1,7 +1,9 @@
 package shogi
 
+import cats.data.NonEmptyList
 import cats.data.Validated
 import cats.syntax.option._
+import org.specs2.execute.Result
 import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
@@ -85,6 +87,31 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   def makeEmptyPosition(variant: Variant): Position =
     Position(variant).withBoard(Board.empty)
+
+  def completeReplay(usis: Seq[Usi]): NonEmptyList[Position] = {
+    val (positions, error) = Replay.positionsWhileValid(usis, None, Standard)
+    require(error.isEmpty, error.getOrElse(""))
+    positions
+  }
+
+  def benchmark(nb: Int, iterations: Int)(run: => Unit): Result = {
+    if (nb * iterations > 1) {
+      println("warming up")
+      run
+    }
+    println("running tests")
+    val durations = for (_ <- 1 to iterations) yield {
+      val start = System.nanoTime
+      run
+      val duration = System.nanoTime - start
+      println(s"$nb games in ${duration / 1000000} ms")
+      duration
+    }
+    val nanosPerGame = durations.sum.toDouble / (iterations * nb)
+    println(f"Average = ${nanosPerGame / 1000}%.1f microseconds per game")
+    println(f"          ${1e9 / nanosPerGame}%.0f games per second")
+    success
+  }
 
   def beSquares(squares: Square*): Matcher[Option[Iterable[Square]]] =
     beSome.like { case actual =>
