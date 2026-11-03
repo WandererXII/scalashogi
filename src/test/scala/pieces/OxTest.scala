@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class OxTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class OxTest extends ShogiTest {
     val ox     = Sente - Ox
     val oxGote = Gote - Ox
 
-    "move to valid positions" in {
-      pieceMoves(ox, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(ox, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ11A,
         SQ1A,
         SQ10B,
@@ -45,7 +45,7 @@ class OxTest extends ShogiTest {
         SQ6K,
         SQ6L,
       )
-      pieceMoves(oxGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(oxGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ11A,
         SQ1A,
         SQ10B,

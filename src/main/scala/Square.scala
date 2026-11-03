@@ -6,54 +6,55 @@ import scala.math.min
 
 // Coordinate system starts at top right
 // Directions are given from sente POV
-final class Pos private (val index: Int) extends AnyVal {
+final class Square private (val index: Int) extends AnyVal {
 
-  def xDist(other: Pos) = abs(file - other.file)
-  def yDist(other: Pos) = abs(rank - other.rank)
-  def dist(other: Pos)  = max(xDist(other), yDist(other))
+  def xDist(other: Square) = abs(file - other.file)
+  def yDist(other: Square) = abs(rank - other.rank)
+  def dist(other: Square)  = max(xDist(other), yDist(other))
 
-  def down: Option[Pos]      = Pos.at(file.index, rank.index + 1)
-  def left: Option[Pos]      = Pos.at(file.index + 1, rank.index)
-  def downLeft: Option[Pos]  = Pos.at(file.index + 1, rank.index + 1)
-  def downRight: Option[Pos] = Pos.at(file.index - 1, rank.index + 1)
-  def up: Option[Pos]        = Pos.at(file.index, rank.index - 1)
-  def right: Option[Pos]     = Pos.at(file.index - 1, rank.index)
-  def upLeft: Option[Pos]    = Pos.at(file.index + 1, rank.index - 1)
-  def upRight: Option[Pos]   = Pos.at(file.index - 1, rank.index - 1)
+  def down: Option[Square]      = Square.at(file.index, rank.index + 1)
+  def left: Option[Square]      = Square.at(file.index + 1, rank.index)
+  def downLeft: Option[Square]  = Square.at(file.index + 1, rank.index + 1)
+  def downRight: Option[Square] = Square.at(file.index - 1, rank.index + 1)
+  def up: Option[Square]        = Square.at(file.index, rank.index - 1)
+  def right: Option[Square]     = Square.at(file.index - 1, rank.index)
+  def upLeft: Option[Square]    = Square.at(file.index + 1, rank.index - 1)
+  def upRight: Option[Square]   = Square.at(file.index - 1, rank.index - 1)
 
-  def isLeftOf(other: Pos): Boolean  = file > other.file
-  def isRightOf(other: Pos): Boolean = file < other.file
-  def isBelow(other: Pos): Boolean   = rank > other.rank
-  def isAbove(other: Pos): Boolean   = rank < other.rank
+  def isLeftOf(other: Square): Boolean  = file > other.file
+  def isRightOf(other: Square): Boolean = file < other.file
+  def isBelow(other: Square): Boolean   = rank > other.rank
+  def isAbove(other: Square): Boolean   = rank < other.rank
 
-  def isSameFile(other: Pos): Boolean = file == other.file
-  def isSameRank(other: Pos): Boolean = rank == other.rank
+  def isSameFile(other: Square): Boolean = file == other.file
+  def isSameRank(other: Square): Boolean = rank == other.rank
 
-  def onSameDiagonal(other: Pos): Boolean =
+  def onSameDiagonal(other: Square): Boolean =
     file.index - rank.index == other.file.index - other.rank.index || file.index + rank.index == other.file.index + other.rank.index
-  def onSameLine(other: Pos): Boolean = isSameRank(other) || isSameFile(other)
+  def onSameLine(other: Square): Boolean = isSameRank(other) || isSameFile(other)
 
-  def touches(other: Pos): Boolean = dist(other) == 1
+  def touches(other: Square): Boolean = dist(other) == 1
 
-  def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
-  def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
+  def >|(stop: Square => Boolean): List[Square] = |<>|(stop, _.right)
+  def |<(stop: Square => Boolean): List[Square] = |<>|(stop, _.left)
 
   @scala.annotation.tailrec
-  def |<>|(stop: Pos => Boolean, dir: Direction, acc: List[Pos] = Nil): List[Pos] =
+  def |<>|(stop: Square => Boolean, dir: Direction, acc: List[Square] = Nil): List[Square] =
     dir(this) match {
-      case Some(p) => if (stop(p)) (p :: acc).reverse else p.|<>|(stop, dir, p :: acc)
-      case _       => acc.reverse
+      case Some(next) =>
+        if (stop(next)) (next :: acc).reverse else next.|<>|(stop, dir, next :: acc)
+      case _ => acc.reverse
     }
 
-  def <->(other: Pos): Seq[Pos] =
+  def <->(other: Square): Seq[Square] =
     min(file.index, other.file.index) to max(file.index, other.file.index) flatMap {
-      Pos.at(_, rank.index)
+      Square.at(_, rank.index)
     }
 
-  // All positions in the inclusive rectangle between the corners
-  def upTo(other: Pos): Iterable[Pos] =
+  // All squares in the inclusive rectangle between the corners
+  def upTo(other: Square): Iterable[Square] =
     min(rank.index, other.rank.index) to max(rank.index, other.rank.index) flatMap {
-      Pos.at(file.index, _)
+      Square.at(file.index, _)
     } flatMap { _ <-> other }
 
   @inline def file = File of this
@@ -66,21 +67,21 @@ final class Pos private (val index: Int) extends AnyVal {
   override def toString = key
 }
 
-object Pos {
+object Square {
 
   val MaxFiles = 12
   val MaxRanks = 12
 
-  def apply(index: Int): Option[Pos] =
-    if (0 <= index && index < MaxFiles * MaxRanks) Some(new Pos(index))
+  def apply(index: Int): Option[Square] =
+    if (0 <= index && index < MaxFiles * MaxRanks) Some(new Square(index))
     else None
 
-  def apply(file: File, rank: Rank): Pos =
-    new Pos(file.index + MaxFiles * rank.index)
+  def apply(file: File, rank: Rank): Square =
+    new Square(file.index + MaxFiles * rank.index)
 
-  def at(x: Int, y: Int): Option[Pos] =
+  def at(x: Int, y: Int): Option[Square] =
     if (0 <= x && x < MaxFiles && 0 <= y && y < MaxRanks)
-      Some(new Pos(y * MaxFiles + x))
+      Some(new Square(y * MaxFiles + x))
     else None
 
   private[shogi] def fromUciMap(c: Char): Char =
@@ -92,12 +93,12 @@ object Pos {
       case _ => c
     }
 
-  def fromKey(key: String): Option[Pos] =
+  def fromKey(key: String): Option[Square] =
     allKeys.get(key) orElse allKanjiKeys.get(key) orElse allKanjiFullWidthKeys.get(key) orElse {
       allKeys get key.map(fromUciMap)
     }
 
-  val all: List[Pos] = (0 until (MaxFiles * MaxRanks)).map(new Pos(_)).toList
+  val all: List[Square] = (0 until (MaxFiles * MaxRanks)).map(new Square(_)).toList
 
   // 12a 11a 10a 9a 8a 7a 6a 5a 4a 3a 2a 1a
   // 12b 11b 10b 9b 8b 7b 6b 5b 4b 3b 2b 1b
@@ -268,7 +269,7 @@ object Pos {
   val SQ11L = all(142)
   val SQ12L = all(143)
 
-  def findDirection(from: Pos, to: Pos): Option[Direction] = {
+  def findDirection(from: Square, to: Square): Option[Direction] = {
     if (to == from) None
     else if (to isSameFile from)
       Some(
@@ -292,16 +293,16 @@ object Pos {
   val allDirections: Directions =
     List[Direction](_.up, _.down, _.left, _.right, _.upLeft, _.upRight, _.downLeft, _.downRight)
 
-  val allKeys: Map[String, Pos] = all.map { pos =>
-    pos.key -> pos
+  val allKeys: Map[String, Square] = all.map { square =>
+    square.key -> square
   }.toMap
 
-  val allKanjiKeys: Map[String, Pos] = all.map { pos =>
-    pos.kanjiKey -> pos
+  val allKanjiKeys: Map[String, Square] = all.map { square =>
+    square.kanjiKey -> square
   }.toMap
 
-  val allKanjiFullWidthKeys: Map[String, Pos] = all.map { pos =>
-    pos.kanjiFullWidthKey -> pos
+  val allKanjiFullWidthKeys: Map[String, Square] = all.map { square =>
+    square.kanjiFullWidthKey -> square
   }.toMap
 
 }

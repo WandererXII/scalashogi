@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class LanceTest extends ShogiTest {
 
@@ -10,9 +10,9 @@ class LanceTest extends ShogiTest {
     val senteRook = Sente - Lance
     val goteRook  = Gote - Lance
 
-    "move to any position in front" in {
-      pieceMoves(senteRook, SQ5E, shogi.variant.Standard) must bePoss(SQ5D, SQ5C, SQ5B, SQ5A)
-      pieceMoves(goteRook, SQ5E, shogi.variant.Standard) must bePoss(SQ5I, SQ5H, SQ5G, SQ5F)
+    "move to any square in front" in {
+      pieceMoves(senteRook, SQ5E, shogi.variant.Standard) must beSquares(SQ5D, SQ5C, SQ5B, SQ5A)
+      pieceMoves(goteRook, SQ5E, shogi.variant.Standard) must beSquares(SQ5I, SQ5H, SQ5G, SQ5F)
     }
 
     "threaten" in {

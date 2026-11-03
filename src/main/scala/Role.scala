@@ -14,9 +14,9 @@ sealed trait Role {
   // Moving inside direct dirs by 1 dist, it can move again inside direct dirs by 1 dist
   val hasLionPower: Boolean = false
 
-  // Can move from `from` position to `to` position assuming empty max-sized board, for optimization
-  def senteEyes(from: Pos, to: Pos): Boolean
-  def goteEyes(from: Pos, to: Pos): Boolean
+  // Can move from `from` square to `to` square assuming empty max-sized board, for optimization
+  def senteEyes(from: Square, to: Square): Boolean
+  def goteEyes(from: Square, to: Square): Boolean
 }
 
 sealed trait DroppableRole extends Role
@@ -28,8 +28,8 @@ case object Bishop extends DroppableRole {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) = (from onSameDiagonal to) && from != to
-  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = (from onSameDiagonal to) && from != to
+  def goteEyes(from: Square, to: Square)  = senteEyes(from, to)
 }
 
 case object BishopPromoted extends Role {
@@ -39,8 +39,8 @@ case object BishopPromoted extends Role {
   val senteDirectDirs = Bishop.senteDirectDirs
   val goteDirectDirs  = Bishop.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Bishop.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Bishop.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Bishop.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Bishop.goteEyes(from, to)
 }
 
 case object Boar extends Role {
@@ -50,9 +50,9 @@ case object Boar extends Role {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     ((from onSameDiagonal to) || (from isSameRank to)) && from != to
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object Chariot extends Role {
@@ -62,8 +62,8 @@ case object Chariot extends Role {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) = (from isSameFile to) && from != to
-  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = (from isSameFile to) && from != to
+  def goteEyes(from: Square, to: Square)  = senteEyes(from, to)
 }
 
 case object Copper extends Role {
@@ -73,9 +73,9 @@ case object Copper extends Role {
   val senteDirectDirs = List(_.up, _.upLeft, _.upRight, _.down)
   val goteDirectDirs  = List(_.up, _.down, _.downLeft, _.downRight)
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from touches to) && ((from isSameFile to) || (from isBelow to))
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     (from touches to) && ((from isSameFile to) || (from isAbove to))
 }
 
@@ -86,9 +86,9 @@ case object Dragon extends Role {
   val senteDirectDirs = Bishop.senteProjectionDirs
   val goteDirectDirs  = Bishop.goteProjectionDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from touches to) || Rook.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object DragonPromoted extends Role {
@@ -98,8 +98,8 @@ case object DragonPromoted extends Role {
   val senteDirectDirs = Dragon.senteDirectDirs
   val goteDirectDirs  = Dragon.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Dragon.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Dragon.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Dragon.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Dragon.goteEyes(from, to)
 }
 
 case object Eagle extends Role {
@@ -108,25 +108,25 @@ case object Eagle extends Role {
 
   val senteDirectDirs: Directions = List(
     _.upRight,
-    p => Pos.at(p.file.index + 2, p.rank.index - 2),
+    square => Square.at(square.file.index + 2, square.rank.index - 2),
     _.upLeft,
-    p => Pos.at(p.file.index - 2, p.rank.index - 2),
+    square => Square.at(square.file.index - 2, square.rank.index - 2),
   )
   val goteDirectDirs: Directions = List(
     _.downRight,
-    p => Pos.at(p.file.index + 2, p.rank.index + 2),
+    square => Square.at(square.file.index + 2, square.rank.index + 2),
     _.downLeft,
-    p => Pos.at(p.file.index - 2, p.rank.index + 2),
+    square => Square.at(square.file.index - 2, square.rank.index + 2),
   )
 
   override val hasLionPower = true
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (Rook.senteEyes(
       from,
       to,
     ) || ((from onSameDiagonal to) && ((from isAbove to) || (from xDist to) <= 2))) && from != to
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     (Rook.senteEyes(
       from,
       to,
@@ -140,9 +140,9 @@ case object Elephant extends Role {
   val senteDirectDirs = List(_.up, _.upLeft, _.upRight, _.left, _.right, _.downLeft, _.downRight)
   val goteDirectDirs  = List(_.down, _.downLeft, _.downRight, _.left, _.right, _.upRight, _.upLeft)
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from touches to) && (!(from isSameFile to) || (from isBelow to))
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     (from touches to) && (!(from isSameFile to) || (from isAbove to))
 }
 
@@ -153,8 +153,8 @@ case object ElephantPromoted extends Role {
   val senteDirectDirs = Elephant.senteDirectDirs
   val goteDirectDirs  = Elephant.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Elephant.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Elephant.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Elephant.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Elephant.goteEyes(from, to)
 }
 
 case object Falcon extends Role {
@@ -164,21 +164,21 @@ case object Falcon extends Role {
 
   val senteDirectDirs = List(
     _.up,
-    p => Pos.at(p.file.index, p.rank.index - 2),
+    square => Square.at(square.file.index, square.rank.index - 2),
   )
   val goteDirectDirs = List(
     _.down,
-    p => Pos.at(p.file.index, p.rank.index + 2),
+    square => Square.at(square.file.index, square.rank.index + 2),
   )
 
   override val hasLionPower = true
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (Bishop.senteEyes(
       from,
       to,
     ) || (from isSameRank to) || ((from isSameFile to) && ((from isAbove to) || (from yDist to) <= 2))) && from != to
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     (Bishop.senteEyes(
       from,
       to,
@@ -193,9 +193,9 @@ case object GoBetween extends Role {
   val senteDirectDirs = List(_.up, _.down)
   val goteDirectDirs  = senteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from isSameFile to) && ((from yDist to) == 1)
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object Gold extends DroppableRole {
@@ -205,9 +205,9 @@ case object Gold extends DroppableRole {
   val senteDirectDirs = List(_.up, _.down, _.left, _.right, _.upLeft, _.upRight)
   val goteDirectDirs  = List(_.up, _.down, _.left, _.right, _.downLeft, _.downRight)
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from touches to) && ((to isAbove from) || (to onSameLine from))
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     (from touches to) && ((to isBelow from) || (to onSameLine from))
 }
 
@@ -218,9 +218,9 @@ case object Horse extends Role {
   val senteDirectDirs = Rook.senteProjectionDirs
   val goteDirectDirs  = Rook.goteProjectionDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from touches to) || Bishop.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object HorsePromoted extends Role {
@@ -230,8 +230,8 @@ case object HorsePromoted extends Role {
   val senteDirectDirs = Horse.senteDirectDirs
   val goteDirectDirs  = Horse.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Horse.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Horse.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Horse.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Horse.goteEyes(from, to)
 }
 
 case object King extends Role {
@@ -241,8 +241,8 @@ case object King extends Role {
   val senteDirectDirs = Rook.senteProjectionDirs ::: Bishop.senteProjectionDirs
   val goteDirectDirs  = senteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = from touches to
-  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = from touches to
+  def goteEyes(from: Square, to: Square)  = senteEyes(from, to)
 }
 
 case object Kirin extends Role {
@@ -250,16 +250,16 @@ case object Kirin extends Role {
   val goteProjectionDirs  = Nil
 
   val senteDirectDirs: Directions = List[Direction](
-    p => Pos.at(p.file.index, p.rank.index - 2),
-    p => Pos.at(p.file.index + 2, p.rank.index),
-    p => Pos.at(p.file.index, p.rank.index + 2),
-    p => Pos.at(p.file.index - 2, p.rank.index),
+    square => Square.at(square.file.index, square.rank.index - 2),
+    square => Square.at(square.file.index + 2, square.rank.index),
+    square => Square.at(square.file.index, square.rank.index + 2),
+    square => Square.at(square.file.index - 2, square.rank.index),
   ) ::: Bishop.senteProjectionDirs
   val goteDirectDirs = senteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     ((from touches to) && !(from onSameLine to)) || ((from onSameLine to) && (from dist to) == 2)
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object Knight extends DroppableRole {
@@ -267,17 +267,17 @@ case object Knight extends DroppableRole {
   val goteProjectionDirs  = Nil
 
   val senteDirectDirs: Directions = List(
-    p => Pos.at(p.file.index - 1, p.rank.index - 2),
-    p => Pos.at(p.file.index + 1, p.rank.index - 2),
+    square => Square.at(square.file.index - 1, square.rank.index - 2),
+    square => Square.at(square.file.index + 1, square.rank.index - 2),
   )
   val goteDirectDirs: Directions = List(
-    p => Pos.at(p.file.index - 1, p.rank.index + 2),
-    p => Pos.at(p.file.index + 1, p.rank.index + 2),
+    square => Square.at(square.file.index - 1, square.rank.index + 2),
+    square => Square.at(square.file.index + 1, square.rank.index + 2),
   )
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from xDist to) == 1 && (from yDist to) == 2 && (to isAbove from)
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     (from xDist to) == 1 && (from yDist to) == 2 && (to isBelow from)
 }
 
@@ -288,9 +288,9 @@ case object Lance extends DroppableRole {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from isSameFile to) && (from isBelow to)
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     (from isSameFile to) && (from isAbove to)
 }
 
@@ -301,9 +301,9 @@ case object Leopard extends Role {
   val senteDirectDirs = List(_.up, _.upLeft, _.upRight, _.down, _.downLeft, _.downRight)
   val goteDirectDirs  = senteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from touches to) && !(from isSameRank to)
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object Lion extends Role {
@@ -312,29 +312,29 @@ case object Lion extends Role {
 
   val senteDirectDirs: Directions =
     List[Direction](
-      p => Pos.at(p.file.index, p.rank.index + 2),
-      p => Pos.at(p.file.index + 1, p.rank.index + 2),
-      p => Pos.at(p.file.index + 2, p.rank.index + 2),
-      p => Pos.at(p.file.index + 2, p.rank.index + 1),
-      p => Pos.at(p.file.index + 2, p.rank.index),
-      p => Pos.at(p.file.index + 2, p.rank.index - 1),
-      p => Pos.at(p.file.index + 2, p.rank.index - 2),
-      p => Pos.at(p.file.index + 1, p.rank.index - 2),
-      p => Pos.at(p.file.index, p.rank.index - 2),
-      p => Pos.at(p.file.index - 1, p.rank.index - 2),
-      p => Pos.at(p.file.index - 2, p.rank.index - 2),
-      p => Pos.at(p.file.index - 2, p.rank.index - 1),
-      p => Pos.at(p.file.index - 2, p.rank.index),
-      p => Pos.at(p.file.index - 2, p.rank.index + 1),
-      p => Pos.at(p.file.index - 2, p.rank.index + 2),
-      p => Pos.at(p.file.index - 1, p.rank.index + 2),
+      square => Square.at(square.file.index, square.rank.index + 2),
+      square => Square.at(square.file.index + 1, square.rank.index + 2),
+      square => Square.at(square.file.index + 2, square.rank.index + 2),
+      square => Square.at(square.file.index + 2, square.rank.index + 1),
+      square => Square.at(square.file.index + 2, square.rank.index),
+      square => Square.at(square.file.index + 2, square.rank.index - 1),
+      square => Square.at(square.file.index + 2, square.rank.index - 2),
+      square => Square.at(square.file.index + 1, square.rank.index - 2),
+      square => Square.at(square.file.index, square.rank.index - 2),
+      square => Square.at(square.file.index - 1, square.rank.index - 2),
+      square => Square.at(square.file.index - 2, square.rank.index - 2),
+      square => Square.at(square.file.index - 2, square.rank.index - 1),
+      square => Square.at(square.file.index - 2, square.rank.index),
+      square => Square.at(square.file.index - 2, square.rank.index + 1),
+      square => Square.at(square.file.index - 2, square.rank.index + 2),
+      square => Square.at(square.file.index - 1, square.rank.index + 2),
     ) ::: King.senteDirectDirs
   val goteDirectDirs = senteDirectDirs
 
   override val hasLionPower = true
 
-  def senteEyes(from: Pos, to: Pos) = (from dist to) <= 2 && from != to
-  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = (from dist to) <= 2 && from != to
+  def goteEyes(from: Square, to: Square)  = senteEyes(from, to)
 }
 
 case object LionPromoted extends Role {
@@ -346,8 +346,8 @@ case object LionPromoted extends Role {
 
   override val hasLionPower = Lion.hasLionPower
 
-  def senteEyes(from: Pos, to: Pos) = Lion.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Lion.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Lion.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Lion.goteEyes(from, to)
 }
 
 case object Ox extends Role {
@@ -357,9 +357,9 @@ case object Ox extends Role {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     ((from isSameFile to) || (from onSameDiagonal to)) && from != to
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object Pawn extends DroppableRole {
@@ -369,8 +369,8 @@ case object Pawn extends DroppableRole {
   val senteDirectDirs = List(_.up)
   val goteDirectDirs  = List(_.down)
 
-  def senteEyes(from: Pos, to: Pos) = from.up.exists(_ == to)
-  def goteEyes(from: Pos, to: Pos)  = from.down.exists(_ == to)
+  def senteEyes(from: Square, to: Square) = from.up.exists(_ == to)
+  def goteEyes(from: Square, to: Square)  = from.down.exists(_ == to)
 }
 
 case object Phoenix extends Role {
@@ -379,16 +379,16 @@ case object Phoenix extends Role {
 
   val senteDirectDirs: Directions =
     List[Direction](
-      p => Pos.at(p.file.index + 2, p.rank.index + 2),
-      p => Pos.at(p.file.index + 2, p.rank.index - 2),
-      p => Pos.at(p.file.index - 2, p.rank.index + 2),
-      p => Pos.at(p.file.index - 2, p.rank.index - 2),
+      square => Square.at(square.file.index + 2, square.rank.index + 2),
+      square => Square.at(square.file.index + 2, square.rank.index - 2),
+      square => Square.at(square.file.index - 2, square.rank.index + 2),
+      square => Square.at(square.file.index - 2, square.rank.index - 2),
     ) ::: Rook.senteProjectionDirs
   val goteDirectDirs = senteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     ((from touches to) && (from onSameLine to)) || ((from xDist to) == 2 && (from onSameDiagonal to))
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object Prince extends Role {
@@ -398,8 +398,8 @@ case object Prince extends Role {
   val senteDirectDirs = King.senteDirectDirs
   val goteDirectDirs  = King.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = King.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = King.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = King.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = King.goteEyes(from, to)
 }
 
 case object PromotedKnight extends Role {
@@ -409,8 +409,8 @@ case object PromotedKnight extends Role {
   val senteDirectDirs = Gold.senteDirectDirs
   val goteDirectDirs  = Gold.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Gold.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Gold.goteEyes(from, to)
 }
 
 case object PromotedLance extends Role {
@@ -420,8 +420,8 @@ case object PromotedLance extends Role {
   val senteDirectDirs = Gold.senteDirectDirs
   val goteDirectDirs  = Gold.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Gold.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Gold.goteEyes(from, to)
 }
 
 case object PromotedPawn extends Role {
@@ -431,8 +431,8 @@ case object PromotedPawn extends Role {
   val senteDirectDirs = Gold.senteDirectDirs
   val goteDirectDirs  = Gold.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Gold.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Gold.goteEyes(from, to)
 }
 
 case object PromotedSilver extends Role {
@@ -442,8 +442,8 @@ case object PromotedSilver extends Role {
   val senteDirectDirs = Gold.senteDirectDirs
   val goteDirectDirs  = Gold.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Gold.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Gold.goteEyes(from, to)
 }
 
 case object Queen extends Role {
@@ -453,9 +453,9 @@ case object Queen extends Role {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     Rook.senteEyes(from, to) || Bishop.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object QueenPromoted extends Role {
@@ -465,8 +465,8 @@ case object QueenPromoted extends Role {
   val senteDirectDirs = Queen.senteDirectDirs
   val goteDirectDirs  = Queen.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Queen.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Queen.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Queen.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Queen.goteEyes(from, to)
 }
 
 case object Rook extends DroppableRole {
@@ -476,8 +476,8 @@ case object Rook extends DroppableRole {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) = (from onSameLine to) && from != to
-  def goteEyes(from: Pos, to: Pos)  = senteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = (from onSameLine to) && from != to
+  def goteEyes(from: Square, to: Square)  = senteEyes(from, to)
 }
 
 case object RookPromoted extends Role {
@@ -487,8 +487,8 @@ case object RookPromoted extends Role {
   val senteDirectDirs = Rook.senteDirectDirs
   val goteDirectDirs  = Rook.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Rook.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Rook.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Rook.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Rook.goteEyes(from, to)
 }
 
 case object SideMover extends Role {
@@ -498,9 +498,9 @@ case object SideMover extends Role {
   val senteDirectDirs = List(_.up, _.down)
   val goteDirectDirs  = senteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     ((from isSameRank to) && from != to) || GoBetween.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object SideMoverPromoted extends Role {
@@ -510,8 +510,8 @@ case object SideMoverPromoted extends Role {
   val senteDirectDirs = SideMover.senteDirectDirs
   val goteDirectDirs  = SideMover.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = SideMover.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = SideMover.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = SideMover.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = SideMover.goteEyes(from, to)
 }
 
 case object Silver extends DroppableRole {
@@ -521,9 +521,9 @@ case object Silver extends DroppableRole {
   val senteDirectDirs = List(_.up, _.upLeft, _.upRight, _.downLeft, _.downRight)
   val goteDirectDirs  = List(_.down, _.upLeft, _.upRight, _.downLeft, _.downRight)
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     (from touches to) && !(from isSameRank to) && (!(from isSameFile to) || (to isAbove from))
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     (from touches to) && !(from isSameRank to) && (!(from isSameFile to) || (to isBelow from))
 }
 
@@ -534,9 +534,9 @@ case object Stag extends Role {
   val senteDirectDirs = List(_.upRight, _.right, _.downRight, _.downLeft, _.left, _.upLeft)
   val goteDirectDirs  = senteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     ((from isSameFile to) && from != to) || (from touches to)
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object Tiger extends Role {
@@ -546,8 +546,8 @@ case object Tiger extends Role {
   val senteDirectDirs = List(_.down, _.downLeft, _.downRight, _.left, _.right, _.upRight, _.upLeft)
   val goteDirectDirs  = List(_.up, _.upLeft, _.upRight, _.left, _.right, _.downLeft, _.downRight)
 
-  def senteEyes(from: Pos, to: Pos) = Elephant.goteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Elephant.senteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Elephant.goteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Elephant.senteEyes(from, to)
 }
 
 // kyotoshogi
@@ -558,8 +558,8 @@ case object Tokin extends DroppableRole {
   val senteDirectDirs = Gold.senteDirectDirs
   val goteDirectDirs  = Gold.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = Gold.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = Gold.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = Gold.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = Gold.goteEyes(from, to)
 }
 
 case object VerticalMover extends Role {
@@ -569,9 +569,9 @@ case object VerticalMover extends Role {
   val senteDirectDirs = List(_.left, _.right)
   val goteDirectDirs  = senteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     Chariot.senteEyes(from, to) || ((from isSameRank to) && ((from xDist to) == 1))
-  def goteEyes(from: Pos, to: Pos) = senteEyes(from, to)
+  def goteEyes(from: Square, to: Square) = senteEyes(from, to)
 }
 
 case object VerticalMoverPromoted extends Role {
@@ -581,8 +581,8 @@ case object VerticalMoverPromoted extends Role {
   val senteDirectDirs = VerticalMover.senteDirectDirs
   val goteDirectDirs  = VerticalMover.goteDirectDirs
 
-  def senteEyes(from: Pos, to: Pos) = VerticalMover.senteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = VerticalMover.goteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = VerticalMover.senteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = VerticalMover.goteEyes(from, to)
 }
 
 case object Whale extends Role {
@@ -592,8 +592,8 @@ case object Whale extends Role {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) = WhiteHorse.goteEyes(from, to)
-  def goteEyes(from: Pos, to: Pos)  = WhiteHorse.senteEyes(from, to)
+  def senteEyes(from: Square, to: Square) = WhiteHorse.goteEyes(from, to)
+  def goteEyes(from: Square, to: Square)  = WhiteHorse.senteEyes(from, to)
 }
 
 case object WhiteHorse extends Role {
@@ -603,9 +603,9 @@ case object WhiteHorse extends Role {
   val senteDirectDirs = Nil
   val goteDirectDirs  = Nil
 
-  def senteEyes(from: Pos, to: Pos) =
+  def senteEyes(from: Square, to: Square) =
     ((from isSameFile to) && from != to) || ((from onSameDiagonal to) && (from isBelow to))
-  def goteEyes(from: Pos, to: Pos) =
+  def goteEyes(from: Square, to: Square) =
     ((from isSameFile to) && from != to) || ((from onSameDiagonal to) && (from isAbove to))
 }
 

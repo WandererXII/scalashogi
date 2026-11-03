@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class SilverTest extends ShogiTest {
 
@@ -11,15 +11,21 @@ class SilverTest extends ShogiTest {
     val silverGote = Gote - Silver
 
     "move in 6 directions" in {
-      pieceMoves(silver, SQ5E, shogi.variant.Standard) must bePoss(SQ5D, SQ4D, SQ4F, SQ6F, SQ6D)
-      pieceMoves(silverGote, SQ5E, shogi.variant.Standard) must bePoss(SQ5F, SQ4F, SQ4D, SQ6D, SQ6F)
+      pieceMoves(silver, SQ5E, shogi.variant.Standard) must beSquares(SQ5D, SQ4D, SQ4F, SQ6F, SQ6D)
+      pieceMoves(silverGote, SQ5E, shogi.variant.Standard) must beSquares(
+        SQ5F,
+        SQ4F,
+        SQ4D,
+        SQ6D,
+        SQ6F,
+      )
     }
 
     "move in 2 directions, when at the edges" in {
-      pieceMoves(silver, SQ1A, shogi.variant.Standard) must bePoss(SQ2B)
+      pieceMoves(silver, SQ1A, shogi.variant.Standard) must beSquares(SQ2B)
     }
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to squares that are occupied by the same colour" in {
       val position = """
 k . B . . . . . .
 . . . . . . . . .
@@ -33,7 +39,7 @@ P P P P P P P . P
 Hands:
 Turn:Sente
 """
-      position moveDestsFrom SQ7E must bePoss(
+      position moveDestsFrom SQ7E must beSquares(
         position,
         """
 k . B . . . . . .
@@ -65,7 +71,7 @@ P P P P P P P . P
 Hands:
 Turn:Sente
 """
-      position moveDestsFrom SQ7E must bePoss(
+      position moveDestsFrom SQ7E must beSquares(
         position,
         """
 k . B . . . . . .

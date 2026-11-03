@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class WhiteHorseTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class WhiteHorseTest extends ShogiTest {
     val whiteHorse     = Sente - WhiteHorse
     val whiteHorseGote = Gote - WhiteHorse
 
-    "move to valid positions" in {
-      pieceMoves(whiteHorse, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(whiteHorse, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6A,
         SQ6B,
         SQ6C,
@@ -34,7 +34,7 @@ class WhiteHorseTest extends ShogiTest {
         SQ7E,
         SQ5E,
       )
-      pieceMoves(whiteHorseGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(whiteHorseGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6A,
         SQ6B,
         SQ6C,

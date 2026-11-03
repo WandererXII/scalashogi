@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class BishopTest extends ShogiTest {
 
@@ -11,7 +11,7 @@ class BishopTest extends ShogiTest {
     val bishopGote = Gote - Bishop
 
     "move in 4 directions" in {
-      pieceMoves(bishop, SQ5E, shogi.variant.Standard) must bePoss(
+      pieceMoves(bishop, SQ5E, shogi.variant.Standard) must beSquares(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -29,7 +29,7 @@ class BishopTest extends ShogiTest {
         SQ9I,
         SQ9A,
       )
-      pieceMoves(bishopGote, SQ5E, shogi.variant.Standard) must bePoss(
+      pieceMoves(bishopGote, SQ5E, shogi.variant.Standard) must beSquares(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -50,7 +50,7 @@ class BishopTest extends ShogiTest {
     }
 
     "move in 2 directions, when at the edges" in {
-      pieceMoves(bishop, SQ1C, shogi.variant.Standard) must bePoss(
+      pieceMoves(bishop, SQ1C, shogi.variant.Standard) must beSquares(
         SQ2B,
         SQ3A,
         SQ2D,
@@ -62,7 +62,7 @@ class BishopTest extends ShogiTest {
       )
     }
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to squares that are occupied by the same colour" in {
       val position = """
 k . B . . . . . .
 . . . . . . . . .
@@ -76,7 +76,7 @@ P P P P P P P . P
 Hands:
 Turn:Sente
 """
-      position moveDestsFrom SQ7E must bePoss(
+      position moveDestsFrom SQ7E must beSquares(
         position,
         """
 k . B . . . x . .
@@ -108,7 +108,7 @@ P P P P P P P . P
 Hands:
 Turn:Sente
 """
-      position moveDestsFrom SQ7E must bePoss(
+      position moveDestsFrom SQ7E must beSquares(
         position,
         """
 k . B . . . . . .

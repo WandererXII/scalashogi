@@ -41,12 +41,12 @@ class HashTest extends ShogiTest {
 
     "include Chu lion-capture metadata and side to play in position hashes" in {
       val original = Position(shogi.variant.Chushogi)
-      val captured = original.withHistory(original.history.withLastLionCapture(Some(Pos.SQ5H)))
+      val captured = original.withHistory(original.history.withLastLionCapture(Some(Square.SQ5H)))
       captured.toSfenWithoutMoveNumber.value must endWith(" b 5h")
       Hash(captured).toList mustNotEqual (Hash(original).toList)
       Hash(original.switch).toList mustNotEqual (Hash(original).toList)
       val imported = captured.toSfen.toPosition(shogi.variant.Chushogi).get
-      imported.history.lastLionCapture must beSome(Pos.SQ5H)
+      imported.history.lastLionCapture must beSome(Square.SQ5H)
       imported.history.initialSfen must beNone
       Hash(imported).toList must_== Hash(captured).toList
     }
@@ -54,7 +54,7 @@ class HashTest extends ShogiTest {
     "be consistent" in {
       val sfen     = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
       val position = sfen.toPosition(Standard).get
-      val positionAfterMove = position(Usi.Move(Pos.SQ8H, Pos.SQ2B, false, None)).toOption.get
+      val positionAfterMove = position(Usi.Move(Square.SQ8H, Square.SQ2B, false, None)).toOption.get
       val hashAfterMove     = Hash(positionAfterMove)
 
       val sfenAfter     = Sfen("lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4")

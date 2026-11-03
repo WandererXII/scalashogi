@@ -2,11 +2,11 @@ package shogi
 
 object Impasse {
   def apply(position: Position): Boolean =
-    position.variant.allPositions.sizeIs == (9 * 9) && !position.check && {
+    position.variant.allSquares.sizeIs == (9 * 9) && !position.check && {
       val color        = position.color
       val ranks        = position.variant.promotionRanks(color)
       val enteredRoles = position.board.pieces.collect {
-        case (pos, piece) if (piece is color) && (ranks contains pos.rank) => piece.role
+        case (square, piece) if (piece is color) && (ranks contains square.rank) => piece.role
       }.toList
       def impassePoints: Int =
         enteredRoles.map(impasseValueOf).sum + position.hands(color).sum(impasseValueOf)

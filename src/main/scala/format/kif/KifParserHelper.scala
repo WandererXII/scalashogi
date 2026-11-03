@@ -55,7 +55,7 @@ object KifParserHelper {
     v.head
   } mkString "|"
   private val chushogiKifMoveRegex =
-    raw"""^(${KifParser.colorsS})?(${KifParser.positionS})(${chushogiFullKanjiRoles})\s*(${KifParser.parsS})?(?<arrow>←)?(${KifParser.positionS})(${KifParser.parsS})?""".r.unanchored
+    raw"""^(${KifParser.colorsS})?(${KifParser.squareS})(${chushogiFullKanjiRoles})\s*(${KifParser.parsS})?(?<arrow>←)?(${KifParser.squareS})(${KifParser.parsS})?""".r.unanchored
   private def isDefaultHandicapOf(handicap: String, variant: Variant): Boolean =
     KifUtils.defaultHandicaps.get(variant).fold(false)(_.exists(_ == handicap.toLowerCase))
   private def detectVariant(
@@ -91,12 +91,12 @@ object KifParserHelper {
   private def parseBoard(ranks: List[String], variant: Variant): Validated[String, PieceMap] = {
     @scala.annotation.tailrec
     def makePiecesList(
-        pieces: List[(Pos, Piece)],
+        pieces: List[(Square, Piece)],
         chars: List[Char],
         pieceSoFar: String,
         x: Int,
         y: Int,
-    ): Validated[String, List[(Pos, Piece)]] =
+    ): Validated[String, List[(Square, Piece)]] =
       chars match {
         case Nil                                   => valid(pieces)
         case '・' :: rest                           => makePiecesList(pieces, rest, "", x - 1, y)
@@ -104,7 +104,7 @@ object KifParserHelper {
           makePiecesList(pieces, rest, pieceSoFar + c.toString, x, y)
         case p :: rest =>
           (for {
-            pos <- Pos.at(x, y) toValid s"Too many files in board setup on rank $y"
+            square <- Square.at(x, y) toValid s"Too many files in board setup on rank $y"
             pieceStr = pieceSoFar + p
             piece <- KifUtils.toPieceBoard(
               pieceStr,
@@ -115,12 +115,12 @@ object KifParserHelper {
               (),
               s"${piece.role} is not valid in $variant variant",
             )
-          } yield pos -> piece :: pieces) match {
+          } yield square -> piece :: pieces) match {
             case cats.data.Validated.Valid(ps) => makePiecesList(ps, rest, "", x - 1, y)
             case e                             => e
           }
       }
-    ranks.zipWithIndex.foldLeft[Validated[String, List[(Pos, Piece)]]](valid(Nil)) {
+    ranks.zipWithIndex.foldLeft[Validated[String, List[(Square, Piece)]]](valid(Nil)) {
       case (acc, cur) =>
         for {
           pieces     <- acc

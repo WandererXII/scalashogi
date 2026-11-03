@@ -27,17 +27,17 @@ final case class Position(
 
   // Moves
 
-  lazy val moveActors: Map[Pos, MoveActor] = board.pieces collect {
-    case (pos, piece) if piece.color == color =>
-      (pos, MoveActor(piece, pos, this))
+  lazy val moveActors: Map[Square, MoveActor] = board.pieces collect {
+    case (square, piece) if piece.color == color =>
+      (square, MoveActor(piece, square, this))
   }
 
-  def moveActorAt(at: Pos): Option[MoveActor] = moveActors get at
+  def moveActorAt(at: Square): Option[MoveActor] = moveActors get at
 
   lazy val hasMoveDestinations: Boolean =
     moveActors.values.exists(_.destinations.nonEmpty)
 
-  def moveDestsFrom(from: Pos): Option[List[Pos]] = moveActorAt(from) map (_.destinations)
+  def moveDestsFrom(from: Square): Option[List[Square]] = moveActorAt(from) map (_.destinations)
 
   def move(usi: Usi.Move): Validated[String, Position] =
     for {
@@ -112,17 +112,21 @@ final case class Position(
       )
       piece = Piece(color, usi.role)
       actor <- dropActorOf(usi.role) toValid s"No actor of $piece"
-      _ <- Validated.cond(actor.destinations.contains(usi.pos), (), s"Dropping $piece is not valid")
+      _     <- Validated.cond(
+        actor.destinations.contains(usi.square),
+        (),
+        s"Dropping $piece is not valid",
+      )
       roleToTake =
         if (variant.supportsDroppingEitherSide) variant.unpromoteRoleForHand(usi.role)
         else usi.role.some
       updatedHands <- roleToTake.flatMap(
         hands.take(color, _),
-      ) toValid s"No ${usi.role} to drop on ${usi.pos}"
+      ) toValid s"No ${usi.role} to drop on ${usi.square}"
       updatedBoard <- board.place(
         piece,
-        usi.pos,
-      ) toValid s"Can't drop ${usi.role} on ${usi.pos}, it's occupied"
+        usi.square,
+      ) toValid s"Can't drop ${usi.role} on ${usi.square}, it's occupied"
     } yield finalizeAfterUsi(updatedBoard, updatedHands, usi)
 
   // Moves and drops
@@ -139,13 +143,13 @@ final case class Position(
     val h           = history
       .record(usi)
       .withLastLionCapture {
-        val roleOpt = usi.positions.headOption.flatMap(board(_).map(_.role))
+        val roleOpt = usi.squares.headOption.flatMap(board(_).map(_.role))
         if (variant.chushogi && roleOpt.exists(!Role.allLions.contains(_)))
-          usi.positions
+          usi.squares
             .drop(1) // drop orig
             .reverse // start from the final dest
-            .find(pos =>
-              board(pos)
+            .find(square =>
+              board(square)
                 .exists(p => (p is newPosition.color) && Role.allLions.contains(p.role)),
             )
         else None
@@ -169,14 +173,14 @@ final case class Position(
 
   lazy val check: Boolean = variant.check(board, color)
 
-  lazy val checkSquares: List[Pos] = variant.checkSquares(board, color)
+  lazy val checkSquares: List[Square] = variant.checkSquares(board, color)
 
   // Not taking into account specific drop rules, cached here
-  lazy val possibleDropDests: List[Pos] =
+  lazy val possibleDropDests: List[Square] =
     Some(checkSquares)
       .filter(_.size == 1)
       .fold(
-        variant.allPositions.filterNot(board.pieces contains _),
+        variant.allSquares.filterNot(board.pieces contains _),
       ) { royals =>
         DropActor.blockades(this, royals.head)
       }

@@ -1,6 +1,6 @@
 package shogi
 
-import shogi.Pos._
+import shogi.Square._
 import shogi.variant._
 
 class RoleTest extends ShogiTest {
@@ -15,8 +15,8 @@ class RoleTest extends ShogiTest {
       ).moveDestsFrom(SQ5E).get
 
       s"$color-$role" in {
-        forall(variant.allPositions) { pos =>
-          piece.eyes(SQ5E, pos) must_== (dests contains pos)
+        forall(variant.allSquares) { square =>
+          piece.eyes(SQ5E, square) must_== (dests contains square)
         }
       }
     }

@@ -9,7 +9,7 @@ final case class Piece(color: Color, role: Role) {
   def directDirs     = if (color.sente) role.senteDirectDirs else role.goteDirectDirs
   def projectionDirs = if (color.sente) role.senteProjectionDirs else role.goteProjectionDirs
 
-  def eyes(from: Pos, to: Pos) =
+  def eyes(from: Square, to: Square) =
     if (color.sente) role.senteEyes(from, to) else role.goteEyes(from, to)
 
   def updateRole(f: Role => Option[Role]): Option[Piece] =

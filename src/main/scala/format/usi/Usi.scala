@@ -8,17 +8,17 @@ sealed trait Usi {
 
   def usi: String
 
-  def positions: List[Pos]
+  def squares: List[Square]
 
 }
 
 object Usi {
 
   final case class Move(
-      orig: Pos,
-      dest: Pos,
+      orig: Square,
+      dest: Square,
       promotion: Boolean = false,
-      midStep: Option[Pos] = None,
+      midStep: Option[Square] = None,
   ) extends Usi {
 
     def keys = orig.key + midStep.fold("")(_.key) + dest.key
@@ -26,7 +26,7 @@ object Usi {
 
     def promotionString = if (promotion) "+" else ""
 
-    def positions = midStep.fold(List(orig, dest))(ms => List(orig, ms, dest))
+    def squares = midStep.fold(List(orig, dest))(ms => List(orig, ms, dest))
 
   }
 
@@ -38,9 +38,9 @@ object Usi {
       str match {
         case MoveRegex(origS, midStepS, destS, promS) =>
           for {
-            orig    <- Pos.allKeys get origS
-            dest    <- Pos.allKeys get destS
-            midStep <- Option(midStepS).traverse(Pos.allKeys get _)
+            orig    <- Square.allKeys get origS
+            dest    <- Square.allKeys get destS
+            midStep <- Option(midStepS).traverse(Square.allKeys get _)
             prom = promS == "+"
           } yield Move(orig, dest, prom, midStep)
         case _ => None
@@ -48,11 +48,11 @@ object Usi {
 
   }
 
-  final case class Drop(role: DroppableRole, pos: Pos) extends Usi {
+  final case class Drop(role: DroppableRole, square: Square) extends Usi {
 
-    def usi = s"${Drop.roleToUsi.getOrElse(role, "")}*${pos.key}"
+    def usi = s"${Drop.roleToUsi.getOrElse(role, "")}*${square.key}"
 
-    def positions = List(pos)
+    def squares = List(square)
 
   }
 
@@ -62,9 +62,9 @@ object Usi {
       if (!str.lift(1).contains('*')) None
       else
         for {
-          role <- usiToRole get str.take(1)
-          pos  <- Pos.allKeys get (str.drop(2))
-        } yield Drop(role, pos)
+          role   <- usiToRole get str.take(1)
+          square <- Square.allKeys get (str.drop(2))
+        } yield Drop(role, square)
 
     val roleToUsi: Map[DroppableRole, String] = Map(
       Pawn   -> "P",

@@ -1,6 +1,6 @@
 package shogi
 
-import shogi.Pos._
+import shogi.Square._
 import shogi.variant._
 
 class VariantTest extends ShogiTest {

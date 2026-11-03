@@ -34,12 +34,12 @@ class DobutsuTest extends ShogiTest {
   "moving into check and being captured" should {
     "allow king capture behavior" in {
       val position = Sfen("3/1k1/3/1K1 b - 1").toPosition(shogi.variant.Dobutsu).get
-      position.moveActorAt(Pos.SQ2D).get.destinations.size must_== 5
+      position.moveActorAt(Square.SQ2D).get.destinations.size must_== 5
 
       val move1 = Usi("2d2c").get
       position(move1).isValid must beTrue
       val position2 = position(move1).toOption.get
-      position2.moveActorAt(Pos.SQ2B).get.destinations.size must_== 8
+      position2.moveActorAt(Square.SQ2B).get.destinations.size must_== 8
 
       val move2 = Usi("2b2c").get
       position2(move2).isValid must beTrue
@@ -56,7 +56,7 @@ class DobutsuTest extends ShogiTest {
   "try rule" should {
     "win by reaching other side" in {
       val position = Sfen("k2/2K/3/3 b - 1").toPosition(shogi.variant.Dobutsu).get
-      position.moveActorAt(Pos.SQ1B).get.destinations.size must_== 5
+      position.moveActorAt(Square.SQ1B).get.destinations.size must_== 5
 
       val move = Usi("1b1a").get
       position(move).isValid must beTrue
@@ -69,7 +69,7 @@ class DobutsuTest extends ShogiTest {
 
     "work in check" in {
       val position = Sfen("1r1/bpK/k2/3 b -").toPosition(shogi.variant.Dobutsu).get
-      position.moveActorAt(Pos.SQ1B).get.destinations.size must_== 5
+      position.moveActorAt(Square.SQ1B).get.destinations.size must_== 5
 
       val moveTry = Usi("1b1a").get
       position(moveTry).isValid must beTrue

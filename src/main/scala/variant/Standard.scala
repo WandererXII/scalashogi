@@ -1,7 +1,7 @@
 package shogi
 package variant
 
-import shogi.Pos._
+import shogi.Square._
 import shogi.format.forsyth.Sfen
 
 case object Standard
@@ -16,7 +16,7 @@ case object Standard
   val numberOfRanks = 9
   val numberOfFiles = 9
 
-  val allPositions = (SQ9I upTo SQ1A).toList
+  val allSquares = (SQ9I upTo SQ1A).toList
 
   val pieces =
     Map(

@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class KirinTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class KirinTest extends ShogiTest {
     val kirin     = Sente - Kirin
     val kirinGote = Gote - Kirin
 
-    "move to valid positions" in {
-      pieceMoves(kirin, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(kirin, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6D,
         SQ7E,
         SQ5E,
@@ -21,7 +21,7 @@ class KirinTest extends ShogiTest {
         SQ5G,
         SQ6H,
       )
-      pieceMoves(kirinGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(kirinGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6D,
         SQ7E,
         SQ5E,

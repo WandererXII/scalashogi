@@ -6,7 +6,7 @@ import shogi.format.usi.Usi
 
 final case class MoveActor(
     piece: Piece,
-    pos: Pos,
+    square: Square,
     position: Position,
 ) {
 
@@ -17,23 +17,23 @@ final case class MoveActor(
 
   def check = position.check
 
-  lazy val attackingPiece = variant.attackingPiece(piece, pos, board)
+  lazy val attackingPiece = variant.attackingPiece(piece, square, board)
 
-  lazy val destinations: List[Pos] = variant.moveFilter(this)
+  lazy val destinations: List[Square] = variant.moveFilter(this)
 
   // Destinations where the piece can end up after the entire move
   // without move filter - e.g. not taking defending the king into account
-  def unfilteredDestinations: List[Pos] =
+  def unfilteredDestinations: List[Square] =
     shortUnfilteredDestinations ::: longRange(attackingPiece.projectionDirs)
 
   lazy val shortUnfilteredDestinations = shortRange(attackingPiece.directDirs)
 
-  lazy val lionMoveDestinationsMap: Map[Pos, List[Pos]] =
+  lazy val lionMoveDestinationsMap: Map[Square, List[Square]] =
     if (piece.role.hasLionPower)
       shortUnfilteredDestinations
-        .withFilter(ms => ms.dist(pos) == 1 && destinations.contains(ms))
+        .withFilter(ms => ms.dist(square) == 1 && destinations.contains(ms))
         .map { ms =>
-          (ms, pos :: shogi.variant.Chushogi.lionMoveFilter(this, ms))
+          (ms, square :: shogi.variant.Chushogi.lionMoveFilter(this, ms))
         }
         .toMap
     else Map.empty
@@ -41,28 +41,28 @@ final case class MoveActor(
   def toUsis: List[Usi.Move] = {
     val normalMoves = destinations
       .withFilter(!variant.forcePromote(piece, _))
-      .map(Usi.Move(pos, _, false, None))
+      .map(Usi.Move(square, _, false, None))
     val promotedMoves = destinations
-      .withFilter(d => variant.canPromote(piece, pos, d, board(d).isDefined))
-      .map(Usi.Move(pos, _, true, None))
+      .withFilter(d => variant.canPromote(piece, square, d, board(d).isDefined))
+      .map(Usi.Move(square, _, true, None))
     val lionMoves = lionMoveDestinationsMap.flatMap { case (ms, dests) =>
-      dests.map(d => Usi.Move(pos, d, false, Some(ms)))
+      dests.map(d => Usi.Move(square, d, false, Some(ms)))
     }.toList
 
     normalMoves ::: promotedMoves ::: lionMoves
   }
 
-  private def shortRange(dirs: Directions): List[Pos] =
-    dirs flatMap { _(pos) } filter { to =>
+  private def shortRange(dirs: Directions): List[Square] =
+    dirs flatMap { _(square) } filter { to =>
       variant
         .isInsideBoard(to) && board.pieces.get(to).fold(true)(_.color != color)
     }
 
-  private def longRange(dirs: Directions): List[Pos] = {
-    val buf = new ArrayBuffer[Pos]
+  private def longRange(dirs: Directions): List[Square] = {
+    val buf = new ArrayBuffer[Square]
     @scala.annotation.tailrec
-    def addAll(p: Pos, dir: Direction): Unit = {
-      dir(p) match {
+    def addAll(from: Square, dir: Direction): Unit = {
+      dir(from) match {
         case Some(to) if variant.isInsideBoard(to) =>
           board.pieces.get(to) match {
             case None => {
@@ -77,7 +77,7 @@ final case class MoveActor(
       }
     }
 
-    dirs foreach { addAll(pos, _) }
+    dirs foreach { addAll(square, _) }
     buf.toList
   }
 }

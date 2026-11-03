@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class DragonTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class DragonTest extends ShogiTest {
     val dragon     = Sente - Dragon
     val dragonGote = Gote - Dragon
 
-    "move to any position along the same rank or file and directly around" in {
-      pieceMoves(dragon, SQ5E, shogi.variant.Standard) must bePoss(
+    "move to any square along the same rank or file and directly around" in {
+      pieceMoves(dragon, SQ5E, shogi.variant.Standard) must beSquares(
         SQ5D,
         SQ5C,
         SQ5B,
@@ -33,7 +33,7 @@ class DragonTest extends ShogiTest {
         SQ4F,
         SQ4D,
       )
-      pieceMoves(dragonGote, SQ5E, shogi.variant.Standard) must bePoss(
+      pieceMoves(dragonGote, SQ5E, shogi.variant.Standard) must beSquares(
         SQ5D,
         SQ5C,
         SQ5B,
@@ -57,8 +57,8 @@ class DragonTest extends ShogiTest {
       )
     }
 
-    "move to any position along the same rank or file, even when at the edges" in {
-      pieceMoves(dragon, SQ1A, shogi.variant.Standard) must bePoss(
+    "move to any square along the same rank or file, even when at the edges" in {
+      pieceMoves(dragon, SQ1A, shogi.variant.Standard) must beSquares(
         SQ1B,
         SQ1C,
         SQ1D,
@@ -79,7 +79,7 @@ class DragonTest extends ShogiTest {
       )
     }
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to squares that are occupied by the same colour" in {
       """
 k . B . . . . . .
 . . . . . . . . .
@@ -92,7 +92,7 @@ P P P P P P P . P
 . . . . K . . . .
 Hands:
 Turn:Sente
-""" moveDestsFrom SQ7E must bePoss(
+""" moveDestsFrom SQ7E must beSquares(
         SQ7F,
         SQ7D,
         SQ7C,
@@ -122,7 +122,7 @@ P P P P P P P P P
 . . . . K . . . .
 Hands:
 Turn:Sente
-""" moveDestsFrom SQ7E must bePoss(
+""" moveDestsFrom SQ7E must beSquares(
         SQ7F,
         SQ7D,
         SQ7C,

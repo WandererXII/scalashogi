@@ -28,7 +28,7 @@ sealed trait ParsedStep {
 
   def toUsi(position: Position): Validated[String, Usi]
 
-  def positions: List[Pos]
+  def squares: List[Square]
 
   def metas: Metas
 
@@ -52,10 +52,10 @@ sealed trait ParsedStep {
 }
 
 final case class KifMove(
-    dest: Pos,
-    orig: Pos,
+    dest: Square,
+    orig: Square,
     roles: NonEmptyList[Role], // in chushogi some kanji map to many roles
-    midStep: Option[Pos] = None,
+    midStep: Option[Square] = None,
     promotion: Boolean = false,
     metas: Metas = Metas.empty,
 ) extends ParsedStep {
@@ -70,13 +70,13 @@ final case class KifMove(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def positions = midStep.fold(List(orig, dest))(ms => List(orig, ms, dest))
+  def squares = midStep.fold(List(orig, dest))(ms => List(orig, ms, dest))
 
 }
 
 final case class CsaMove(
-    dest: Pos,
-    orig: Pos,
+    dest: Square,
+    orig: Square,
     role: Role,
     metas: Metas = Metas.empty,
 ) extends ParsedStep {
@@ -88,23 +88,23 @@ final case class CsaMove(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def positions = List(orig, dest)
+  def squares = List(orig, dest)
 
 }
 
 // All notations can share drop
 final case class Drop(
     role: DroppableRole,
-    pos: Pos,
+    square: Square,
     metas: Metas = Metas.empty,
 ) extends ParsedStep {
 
   def toUsi(position: Position) =
-    valid(Usi.Drop(role, pos))
+    valid(Usi.Drop(role, square))
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def positions = List(pos)
+  def squares = List(square)
 }
 
 final case class InitialPosition(

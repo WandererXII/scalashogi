@@ -14,10 +14,10 @@ final class File private (val index: Int) extends AnyVal with Ordered[File] {
 
 object File {
   def apply(index: Int): Option[File] =
-    if (0 <= index && index < Pos.MaxFiles) Some(new File(index))
+    if (0 <= index && index < Square.MaxFiles) Some(new File(index))
     else None
 
-  @inline def of(pos: Pos): File = new File(pos.index % Pos.MaxFiles)
+  @inline def of(square: Square): File = new File(square.index % Square.MaxFiles)
 
   val First    = new File(0)
   val Second   = new File(1)

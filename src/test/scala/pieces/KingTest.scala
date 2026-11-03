@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class KingTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class KingTest extends ShogiTest {
     val king     = Sente - King
     val kingGote = Gote - King
 
-    "move 1 position in any direction" in {
-      pieceMoves(king, SQ6F, shogi.variant.Standard) must bePoss(
+    "move 1 square in any direction" in {
+      pieceMoves(king, SQ6F, shogi.variant.Standard) must beSquares(
         SQ6G,
         SQ7G,
         SQ7F,
@@ -21,7 +21,7 @@ class KingTest extends ShogiTest {
         SQ5F,
         SQ5G,
       )
-      pieceMoves(kingGote, SQ6F, shogi.variant.Standard) must bePoss(
+      pieceMoves(kingGote, SQ6F, shogi.variant.Standard) must beSquares(
         SQ6G,
         SQ7G,
         SQ7F,
@@ -33,17 +33,17 @@ class KingTest extends ShogiTest {
       )
     }
 
-    "move 1 position in any direction, even from the edges" in {
-      pieceMoves(king, SQ1A, shogi.variant.Standard) must bePoss(SQ1B, SQ2B, SQ2A)
+    "move 1 square in any direction, even from the edges" in {
+      pieceMoves(king, SQ1A, shogi.variant.Standard) must beSquares(SQ1B, SQ2B, SQ2A)
     }
 
     "move behind pawn barrier" in {
       """
 P P P P P P P P P
-L N . G K . . N L""" moveDestsFrom SQ5I must bePoss(SQ4I)
+L N . G K . . N L""" moveDestsFrom SQ5I must beSquares(SQ4I)
     }
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to squares that are occupied by the same colour" in {
       val position = """
 . . . P . . . . .
 N P K L . . . P .
@@ -54,7 +54,7 @@ P . P . P P P . P
 Hands:
 Turn:Sente
 """
-      position moveDestsFrom SQ7E must bePoss(
+      position moveDestsFrom SQ7E must beSquares(
         position,
         """
 . . . . . . . . .
@@ -86,7 +86,7 @@ l . . . . . . . .
 Hands:
 Turn:Sente
 """
-      position moveDestsFrom SQ7G must bePoss(
+      position moveDestsFrom SQ7G must beSquares(
         position,
         """
 k . . . . . . . .
@@ -131,7 +131,7 @@ Turn:Sente
       """
 . . . k
 . K . .
-""" moveDestsFrom SQ8I must bePoss(SQ9I, SQ9H, SQ8H)
+""" moveDestsFrom SQ8I must beSquares(SQ9I, SQ9H, SQ8H)
     }
   }
 }

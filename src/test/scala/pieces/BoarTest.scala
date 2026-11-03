@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class BoarTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class BoarTest extends ShogiTest {
     val boar     = Sente - Boar
     val boarGote = Gote - Boar
 
-    "move to valid positions" in {
-      pieceMoves(boar, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(boar, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ12F,
         SQ11F,
         SQ10F,
@@ -45,7 +45,7 @@ class BoarTest extends ShogiTest {
         SQ11K,
         SQ12L,
       )
-      pieceMoves(boarGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(boarGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ12F,
         SQ11F,
         SQ10F,

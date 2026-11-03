@@ -5,7 +5,7 @@ import scala.annotation.unused
 
 import cats.syntax.option._
 
-import shogi.Pos._
+import shogi.Square._
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
@@ -21,7 +21,7 @@ case object Dobutsu
   val numberOfRanks = 4
   val numberOfFiles = 3
 
-  val allPositions = (SQ3D upTo SQ1A).toList
+  val allSquares = (SQ3D upTo SQ1A).toList
 
   val pieces =
     Map(
@@ -49,8 +49,8 @@ case object Dobutsu
     Pawn,
   )
 
-  override def dropFilter(a: DropActor): List[Pos] =
-    allPositions.filterNot(a.board.pieces contains _)
+  override def dropFilter(a: DropActor): List[Square] =
+    allSquares.filterNot(a.board.pieces contains _)
 
   def promote(role: Role): Option[Role] =
     role match {
@@ -69,15 +69,15 @@ case object Dobutsu
 
   def promotionRanks(color: Color) = List(backrank(color))
 
-  override def posThreatened(
+  override def squareThreatened(
       board: Board,
       color: Color,
-      pos: Pos,
+      square: Square,
       @unused filter: Piece => Boolean = _ => true,
   ): Boolean =
     board.pieces exists {
       case (from, piece) =>
-        piece.color == color && piece.eyes(from, pos) && from.dist(pos) == 1
+        piece.color == color && piece.eyes(from, square) && from.dist(square) == 1
       case _ => false
     }
 
@@ -91,8 +91,8 @@ case object Dobutsu
     }
 
   // filters to one dist moves, ignores king safety
-  override def moveFilter(a: MoveActor): List[Pos] =
-    a.unfilteredDestinations.filter(_.dist(a.pos) == 1)
+  override def moveFilter(a: MoveActor): List[Square] =
+    a.unfilteredDestinations.filter(_.dist(a.square) == 1)
 
   override def noOppositeCheck = false
 
@@ -103,15 +103,15 @@ case object Dobutsu
     false
 
   def tryRule(board: Board, color: Color): Boolean =
-    board.singleRoyalPosOf(color).exists { kingPos =>
-      promotionRanks(color).contains(kingPos.rank) &&
+    board.singleRoyalSquareOf(color).exists { kingSquare =>
+      promotionRanks(color).contains(kingSquare.rank) &&
       !check(board, color)
     }
 
   override def isInsufficientMaterial(@unused board: Board, @unused hands: Hands) = false
 
   override def status(position: Position): Option[Status] =
-    if (position.board.royalPossOf(position.color).isEmpty) Status.RoyalsLost.some
+    if (position.board.royalSquaresOf(position.color).isEmpty) Status.RoyalsLost.some
     else if (tryRule(position.board, Sente) && tryRule(position.board, Gote)) Status.Draw.some
     else if (tryRule(position.board, Sente) || tryRule(position.board, Gote)) Status.TryRule.some
     else if (!position.hasDestinations) Status.Stalemate.some

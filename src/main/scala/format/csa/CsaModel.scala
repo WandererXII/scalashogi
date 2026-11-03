@@ -62,12 +62,12 @@ object Csa {
 
   def renderCsaStep(usiWithRole: Usi.WithRole, turn: Option[Color]) =
     usiWithRole.usi match {
-      case Usi.Drop(role, pos) =>
-        s"${turn.fold("")(_.fold("+", "-"))}00${CsaUtils.makeCsaPos(pos)}${CsaUtils.toCsa(role) | ""}"
+      case Usi.Drop(role, square) =>
+        s"${turn.fold("")(_.fold("+", "-"))}00${CsaUtils.makeCsaSquare(square)}${CsaUtils.toCsa(role) | ""}"
       case Usi.Move(orig, dest, prom, _) => {
         val finalRole = Standard.promote(usiWithRole.role).filter(_ => prom) | usiWithRole.role
-        s"${turn.fold("")(_.fold("+", "-"))}${CsaUtils.makeCsaPos(orig)}${CsaUtils
-            .makeCsaPos(dest)}${CsaUtils.toCsa(finalRole) | ""}"
+        s"${turn.fold("")(_.fold("+", "-"))}${CsaUtils.makeCsaSquare(orig)}${CsaUtils
+            .makeCsaSquare(dest)}${CsaUtils.toCsa(finalRole) | ""}"
       }
     }
 

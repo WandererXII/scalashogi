@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class SideMoverTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class SideMoverTest extends ShogiTest {
     val sideMover     = Sente - SideMover
     val sideMoverGote = Gote - SideMover
 
-    "move to valid positions" in {
-      pieceMoves(sideMover, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(sideMover, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6E,
         SQ6G,
         SQ12F,
@@ -26,7 +26,7 @@ class SideMoverTest extends ShogiTest {
         SQ2F,
         SQ1F,
       )
-      pieceMoves(sideMoverGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(sideMoverGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6E,
         SQ6G,
         SQ12F,

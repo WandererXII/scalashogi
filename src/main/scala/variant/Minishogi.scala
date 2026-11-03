@@ -1,7 +1,7 @@
 package shogi
 package variant
 
-import shogi.Pos._
+import shogi.Square._
 import shogi.format.forsyth.Sfen
 
 case object Minishogi
@@ -16,7 +16,7 @@ case object Minishogi
   val numberOfRanks = 5
   val numberOfFiles = 5
 
-  val allPositions = (SQ5E upTo SQ1A).toList
+  val allSquares = (SQ5E upTo SQ1A).toList
 
   val pieces =
     Map(

@@ -19,7 +19,7 @@ case object Checkshogi
   def numberOfRanks = Standard.numberOfRanks
   def numberOfFiles = Standard.numberOfFiles
 
-  def allPositions = Standard.allPositions
+  def allSquares = Standard.allSquares
 
   def pieces = Standard.pieces
 
@@ -42,7 +42,7 @@ case object Checkshogi
   ): Boolean =
     false
 
-  override def dropFilterPawnCheckmate(@unused a: DropActor, @unused d: Pos): Boolean =
+  override def dropFilterPawnCheckmate(@unused a: DropActor, @unused d: Square): Boolean =
     false
 
   override def status(position: Position): Option[Status] =

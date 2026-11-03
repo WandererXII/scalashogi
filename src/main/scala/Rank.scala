@@ -17,10 +17,10 @@ final class Rank private (val index: Int) extends AnyVal with Ordered[Rank] {
 
 object Rank {
   def apply(index: Int): Option[Rank] =
-    if (0 <= index && index < Pos.MaxRanks) Some(new Rank(index))
+    if (0 <= index && index < Square.MaxRanks) Some(new Rank(index))
     else None
 
-  @inline def of(pos: Pos): Rank = new Rank(pos.index / Pos.MaxFiles)
+  @inline def of(square: Square): Rank = new Rank(square.index / Square.MaxFiles)
 
   private val kanjiKeys =
     Vector("一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二")

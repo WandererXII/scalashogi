@@ -31,12 +31,12 @@ class KifParserTest extends ShogiTest {
       }
     }
   }
-  def parseStep(str: String, lastDest: Option[Pos] = None) =
+  def parseStep(str: String, lastDest: Option[Square] = None) =
     KifParser.MoveDropParser(str, lastDest, None, shogi.variant.Standard)
   def parseChushogiMove(
       str: String,
-      lastDest: Option[Pos] = None,
-      firstLionOrig: Option[Pos] = None,
+      lastDest: Option[Square] = None,
+      firstLionOrig: Option[Square] = None,
   ) =
     KifParser.MoveDropParser(str, lastDest, firstLionOrig, shogi.variant.Chushogi)
 
@@ -98,14 +98,14 @@ class KifParserTest extends ShogiTest {
   "drop" in {
     parseStep("６四歩打") must beValid.like { case d: Drop =>
       d.role must_== Pawn
-      d.pos must_== Pos.SQ6D
+      d.square must_== Square.SQ6D
     }
   }
 
   "move" in {
     parseStep("７七金(78)") must beValid.like { case m: KifMove =>
-      m.dest must_== Pos.SQ7G
-      m.orig must_== Pos.SQ7H
+      m.dest must_== Square.SQ7G
+      m.orig must_== Square.SQ7H
       m.roles.head must_== Gold
       m.promotion must beFalse
     }
@@ -113,8 +113,8 @@ class KifParserTest extends ShogiTest {
 
   "chushogi move" in {
     parseChushogiMove("2八龍馬 (←4十)") must beValid.like { case m: KifMove =>
-      m.dest must_== Pos.SQ2H
-      m.orig must_== Pos.SQ4J
+      m.dest must_== Square.SQ2H
+      m.orig must_== Square.SQ4J
       m.roles.head must_== Horse
       m.roles.tail must_== List(HorsePromoted)
       m.promotion must beFalse
@@ -122,10 +122,10 @@ class KifParserTest extends ShogiTest {
   }
 
   "chushogi second lion move" in {
-    parseChushogiMove("2八龍馬 (←4十)", None, Some(Pos.SQ5E)) must beValid.like { case m: KifMove =>
-      m.orig must_== Pos.SQ5E
-      m.midStep must_== Some(Pos.SQ4J)
-      m.dest must_== Pos.SQ2H
+    parseChushogiMove("2八龍馬 (←4十)", None, Some(Square.SQ5E)) must beValid.like { case m: KifMove =>
+      m.orig must_== Square.SQ5E
+      m.midStep must_== Some(Square.SQ4J)
+      m.dest must_== Square.SQ2H
       m.roles.head must_== Horse
       m.roles.tail must_== List(HorsePromoted)
       m.promotion must beFalse
@@ -136,8 +136,8 @@ class KifParserTest extends ShogiTest {
     "move" in {
       parser("☗７七金(78)") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case m: KifMove =>
-          m.dest must_== Pos.SQ7G
-          m.orig must_== Pos.SQ7H
+          m.dest must_== Square.SQ7G
+          m.orig must_== Square.SQ7H
           m.roles.head must_== Gold
           m.promotion must beFalse
         }
@@ -147,7 +147,7 @@ class KifParserTest extends ShogiTest {
       parser("７四歩打") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case d: Drop =>
           d.role must_== Pawn
-          d.pos must_== Pos.SQ7D
+          d.square must_== Square.SQ7D
         }
       }
     }
@@ -155,15 +155,15 @@ class KifParserTest extends ShogiTest {
       parser("７四P打") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case d: Drop =>
           d.role must_== Pawn
-          d.pos must_== Pos.SQ7D
+          d.square must_== Square.SQ7D
         }
       }
     }
     "move with number" in {
       parser("1 ７七G(78)") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case m: KifMove =>
-          m.dest must_== Pos.SQ7G
-          m.orig must_== Pos.SQ7H
+          m.dest must_== Square.SQ7G
+          m.orig must_== Square.SQ7H
           m.roles.head must_== Gold
           m.promotion must beFalse
         }
@@ -172,18 +172,18 @@ class KifParserTest extends ShogiTest {
     "move with number and a dot" in {
       parser("42. ７7金(78)") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case m: KifMove =>
-          m.dest must_== Pos.SQ7G
-          m.orig must_== Pos.SQ7H
+          m.dest must_== Square.SQ7G
+          m.orig must_== Square.SQ7H
           m.roles.head must_== Gold
           m.promotion must beFalse
         }
       }
     }
-    "move with unconventional position string" in {
+    "move with unconventional square string" in {
       parser("42. ７g金(7h)") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case m: KifMove =>
-          m.dest must_== Pos.SQ7G
-          m.orig must_== Pos.SQ7H
+          m.dest must_== Square.SQ7G
+          m.orig must_== Square.SQ7H
           m.roles.head must_== Gold
           m.promotion must beFalse
         }
@@ -195,8 +195,8 @@ class KifParserTest extends ShogiTest {
       2 ７六飛(77) (0:12/)
       """) must beValid.like { case p =>
         p.parsedSteps.value.lastOption must beSome.like { case m: KifMove =>
-          m.dest must_== Pos.SQ7F
-          m.orig must_== Pos.SQ7G
+          m.dest must_== Square.SQ7F
+          m.orig must_== Square.SQ7G
           m.roles.head must_== Rook
           m.promotion must beFalse
         }
@@ -223,9 +223,9 @@ class KifParserTest extends ShogiTest {
 
   "同" should {
     "simple move with 同" in {
-      parseStep("同 金(78)", Some(Pos.SQ7G)) must beValid.like { case m: KifMove =>
-        m.dest must_== Pos.SQ7G
-        m.orig must_== Pos.SQ7H
+      parseStep("同 金(78)", Some(Square.SQ7G)) must beValid.like { case m: KifMove =>
+        m.dest must_== Square.SQ7G
+        m.orig must_== Square.SQ7H
         m.roles.head must_== Gold
         m.promotion must beFalse
       }
@@ -236,8 +236,8 @@ class KifParserTest extends ShogiTest {
       2 同 飛(77) (0:12/0:0:12)
       """) must beValid.like { case p =>
         p.parsedSteps.value.lastOption must beSome.like { case m: KifMove =>
-          m.dest must_== Pos.SQ7F
-          m.orig must_== Pos.SQ7G
+          m.dest must_== Square.SQ7F
+          m.orig must_== Square.SQ7G
           m.roles.head must_== Rook
           m.promotion must beFalse
         }
@@ -251,8 +251,8 @@ class KifParserTest extends ShogiTest {
       """) must beValid.like { case p =>
         p.parsedSteps.value must haveSize(3)
         p.parsedSteps.value.lastOption must beSome.like { case m: KifMove =>
-          m.dest must_== Pos.SQ7F
-          m.orig must_== Pos.SQ5E
+          m.dest must_== Square.SQ7F
+          m.orig must_== Square.SQ5E
           m.roles.head must_== Bishop
           m.promotion must beFalse
         }
@@ -541,10 +541,10 @@ class KifParserTest extends ShogiTest {
         """) must beValid.like { case p =>
           p.parsedSteps.value must haveSize(3)
           val lion = p.parsedSteps.value(1)
-          lion.positions must_== List(Pos.SQ6C, Pos.SQ6D, Pos.SQ6E)
+          lion.squares must_== List(Square.SQ6C, Square.SQ6D, Square.SQ6E)
           lion.metas.variations must haveSize(1)
-          lion.metas.variations.head.value.head.positions.lastOption must beSome(Pos.SQ7H)
-          p.parsedSteps.value(2).positions.lastOption must beSome(Pos.SQ6E)
+          lion.metas.variations.head.value.head.squares.lastOption must beSome(Square.SQ7H)
+          p.parsedSteps.value(2).squares.lastOption must beSome(Square.SQ6E)
         }
       }
     }
@@ -933,8 +933,8 @@ class KifParserTest extends ShogiTest {
         Replay.fromParsedNotation(p, steps => ParsedSteps(steps.value.take(7))).valid must beValid
           .like { case position =>
             position.plies must_== 7
-            position.board(Pos.SQ2B) must beSome(Sente.gold)
-            position.board(Pos.SQ4D) must beSome(Sente.king)
+            position.board(Square.SQ2B) must beSome(Sente.gold)
+            position.board(Square.SQ4D) must beSome(Sente.king)
           }
       }
     }

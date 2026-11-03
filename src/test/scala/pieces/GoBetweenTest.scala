@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class GoBetweenTest extends ShogiTest {
 
@@ -10,12 +10,12 @@ class GoBetweenTest extends ShogiTest {
     val goBetween     = Sente - GoBetween
     val goBetweenGote = Gote - GoBetween
 
-    "move to valid positions" in {
-      pieceMoves(goBetween, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(goBetween, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6E,
         SQ6G,
       )
-      pieceMoves(goBetweenGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(goBetweenGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6E,
         SQ6G,
       )

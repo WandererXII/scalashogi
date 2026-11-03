@@ -3,7 +3,7 @@ package variant
 
 import cats.syntax.option._
 
-import shogi.Pos._
+import shogi.Square._
 import shogi.format.forsyth.Sfen
 
 case object Kyotoshogi
@@ -18,7 +18,7 @@ case object Kyotoshogi
   val numberOfRanks = 5
   val numberOfFiles = 5
 
-  val allPositions = (SQ5E upTo SQ1A).toList
+  val allSquares = (SQ5E upTo SQ1A).toList
 
   val pieces =
     Map(
@@ -64,7 +64,7 @@ case object Kyotoshogi
     Rook,
   )
 
-  override def dropFilter(a: DropActor): List[Pos] = a.unfilteredDestinations
+  override def dropFilter(a: DropActor): List[Square] = a.unfilteredDestinations
 
   def promote(role: Role): Option[Role] =
     role match {
@@ -95,10 +95,10 @@ case object Kyotoshogi
       case _                     => 3
     }
 
-  override def forcePromote(piece: Piece, to: Pos): Boolean =
+  override def forcePromote(piece: Piece, to: Square): Boolean =
     promote(piece.role).isDefined
 
-  override def canPromote(piece: Piece, orig: Pos, dest: Pos, capture: Boolean): Boolean =
+  override def canPromote(piece: Piece, orig: Square, dest: Square, capture: Boolean): Boolean =
     forcePromote(piece, dest)
 
   override def supportsDroppingEitherSide = true

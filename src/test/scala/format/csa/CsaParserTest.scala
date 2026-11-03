@@ -14,14 +14,14 @@ class CsaParserTest extends ShogiTest {
   "drop" in {
     parseStep("-0077FU") must beValid.like { case d: Drop =>
       d.role must_== Pawn
-      d.pos must_== Pos.SQ7G
+      d.square must_== Square.SQ7G
     }
   }
 
   "move" in {
     parseStep("5948OU") must beValid.like { case m: CsaMove =>
-      m.dest must_== Pos.SQ4H
-      m.orig must_== Pos.SQ5I
+      m.dest must_== Square.SQ4H
+      m.orig must_== Square.SQ5I
       m.role must_== King
     }
   }
@@ -34,8 +34,8 @@ class CsaParserTest extends ShogiTest {
         )
         p.parsedSteps.value must haveSize(1)
         p.parsedSteps.value.headOption must beSome.like { case m: CsaMove =>
-          m.orig must_== Pos.SQ5I
-          m.dest must_== Pos.SQ5H
+          m.orig must_== Square.SQ5I
+          m.dest must_== Square.SQ5H
           m.role must_== King
         }
       }
@@ -68,8 +68,8 @@ class CsaParserTest extends ShogiTest {
     "move" in {
       parser("PI,+5948OU") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case m: CsaMove =>
-          m.dest must_== Pos.SQ4H
-          m.orig must_== Pos.SQ5I
+          m.dest must_== Square.SQ4H
+          m.orig must_== Square.SQ5I
           m.role must_== King
         }
       }
@@ -78,7 +78,7 @@ class CsaParserTest extends ShogiTest {
       parser("PI,0077KI") must beValid.like { case p =>
         p.parsedSteps.value.headOption must beSome.like { case d: Drop =>
           d.role must_== Gold
-          d.pos must_== Pos.SQ7G
+          d.square must_== Square.SQ7G
         }
       }
     }
@@ -88,8 +88,8 @@ class CsaParserTest extends ShogiTest {
       -8384FU,T5
       """) must beValid.like { case p =>
         p.parsedSteps.value.lastOption must beSome.like { case m: CsaMove =>
-          m.dest must_== Pos.SQ8D
-          m.orig must_== Pos.SQ8C
+          m.dest must_== Square.SQ8D
+          m.orig must_== Square.SQ8C
           m.role must_== Pawn
           m.metas.timeSpent must beSome.like { case c: Duration =>
             c must_== Duration.ofMillis(5000L)

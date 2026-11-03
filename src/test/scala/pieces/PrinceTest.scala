@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class PrinceTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class PrinceTest extends ShogiTest {
     val prince     = Sente - Prince
     val princeGote = Gote - Prince
 
-    "move 1 position in any direction" in {
-      pieceMoves(prince, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move 1 square in any direction" in {
+      pieceMoves(prince, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6G,
         SQ7G,
         SQ7F,
@@ -21,7 +21,7 @@ class PrinceTest extends ShogiTest {
         SQ5F,
         SQ5G,
       )
-      pieceMoves(princeGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(princeGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6G,
         SQ7G,
         SQ7F,
@@ -33,17 +33,17 @@ class PrinceTest extends ShogiTest {
       )
     }
 
-    "move 1 position in any direction, even from the edges" in {
-      pieceMoves(prince, SQ1A, shogi.variant.Chushogi) must bePoss(SQ1B, SQ2B, SQ2A)
+    "move 1 square in any direction, even from the edges" in {
+      pieceMoves(prince, SQ1A, shogi.variant.Chushogi) must beSquares(SQ1B, SQ2B, SQ2A)
     }
 
     "move behind pawn barrier" in {
       """
 P P P P P P P P P P P P
-L N . G+E . . . . . N L""" moveDestsFrom SQ8L must bePoss(SQ7L)
+L N . G+E . . . . . N L""" moveDestsFrom SQ8L must beSquares(SQ7L)
     }
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to squares that are occupied by the same colour" in {
       val position = """
 . . . P . . . . . . . .
 N P+E L . . . P . . . .
@@ -56,7 +56,7 @@ P . P . P P P . P . . .
 . . . . . . . . . . . .
 Turn:Sente
 """
-      position moveDestsFrom SQ10E must bePoss(
+      position moveDestsFrom SQ10E must beSquares(
         position,
         """
 . . . . . . . . . . . .

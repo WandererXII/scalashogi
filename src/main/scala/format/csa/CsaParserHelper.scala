@@ -23,7 +23,7 @@ object CsaParserHelper {
     else {
       val initPieces = handicap.fold {
         if (isBoardSetup) parseWholeBoard(ranks)
-        else valid(Map.empty[Pos, Piece])
+        else valid(Map.empty[Square, Piece])
       }(h => parseHandicap(h))
       for {
         pieces <- initPieces
@@ -41,19 +41,21 @@ object CsaParserHelper {
         _ <-
           if (squarePiece.sizeIs == 4) valid(squarePiece)
           else invalid(s"Incorrect square and piece format in handicap setup: $squarePiece")
-        posStr  = squarePiece.slice(0, 2)
-        roleStr = squarePiece.slice(2, 4)
-        pos <- CsaUtils.parseCsaPos(posStr) toValid s"Incorrect position in handicap setup: $posStr"
-        _   <-
-          if (pieces contains pos) valid(pos)
-          else invalid(s"No piece to remove from $posStr in handicap setup")
+        squareStr = squarePiece.slice(0, 2)
+        roleStr   = squarePiece.slice(2, 4)
+        square <- CsaUtils.parseCsaSquare(
+          squareStr,
+        ) toValid s"Incorrect square in handicap setup: $squareStr"
+        _ <-
+          if (pieces contains square) valid(square)
+          else invalid(s"No piece to remove from $squareStr in handicap setup")
         role <- CsaUtils.toRole(
           roleStr,
         ) toValid s"Non existent piece role in handicap setup: $roleStr"
         _ <-
-          if (pieces.get(pos).exists(_.role == role)) valid(role)
-          else invalid(s"$role not present on $posStr in handicap setup")
-      } yield pieces - pos
+          if (pieces.get(square).exists(_.role == role)) valid(role)
+          else invalid(s"$role not present on $squareStr in handicap setup")
+      } yield pieces - square
     }
 
     handicap.drop(2).grouped(4).foldLeft[Validated[String, PieceMap]](valid(Standard.pieces)) {
@@ -65,12 +67,12 @@ object CsaParserHelper {
   private def parseWholeBoard(ranks: List[String]): Validated[String, PieceMap] = {
     def parseSquare(sq: String, i: Int, pieces: PieceMap): Validated[String, PieceMap] =
       for {
-        pos <- Pos.at(
+        square <- Square.at(
           8 - i % 9,
           i / 9,
         ) toValid s"Invalid board setup - too many squares"
         piece <- CsaUtils.toPiece(sq) toValid s"Non existent piece (${sq}) in board setup"
-      } yield pieces + (pos -> piece)
+      } yield pieces + (square -> piece)
 
     val squares = ranks.flatMap(_.drop(2).grouped(3)).zipWithIndex
     if (ranks.size != 9)
@@ -141,15 +143,17 @@ object CsaParserHelper {
           _ <-
             if (str.sizeIs == 4) valid(str)
             else invalid(s"Incorrect square piece format (${str}) in: $line")
-          posStr  = str.slice(0, 2)
-          roleStr = str.slice(2, 4)
-          pos  <- CsaUtils.parseCsaPos(posStr) toValid s"Incorrect position (${posStr}) in: $line"
+          squareStr = str.slice(0, 2)
+          roleStr   = str.slice(2, 4)
+          square <- CsaUtils.parseCsaSquare(
+            squareStr,
+          ) toValid s"Incorrect square (${squareStr}) in: $line"
           role <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
           boardWithPiece <- position.board
             .place(
               Piece(color, role),
-              pos,
-            ) toValid s"Cannot place $role on $posStr - already occupied - in: $line"
+              square,
+            ) toValid s"Cannot place $role on $squareStr - already occupied - in: $line"
         } yield position.withBoard(boardWithPiece)
       }
 

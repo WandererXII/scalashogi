@@ -24,10 +24,10 @@ final case class Kif(
 
   def renderStepsAndVariations(steps: List[NotationStep]): String = {
     val mainline = steps
-      .foldLeft[(List[String], Option[Pos])]((Nil, None)) { case ((acc, lastDest), cur) =>
+      .foldLeft[(List[String], Option[Square])]((Nil, None)) { case ((acc, lastDest), cur) =>
         (
           Kif.renderNotationStep(cur, lastDest, variant) :: acc,
-          cur.usiWithRole.usi.positions.lastOption,
+          cur.usiWithRole.usi.squares.lastOption,
         )
       }
       ._1
@@ -58,7 +58,7 @@ final case class Kif(
 
 object Kif {
 
-  def renderNotationStep(cur: NotationStep, lastDest: Option[Pos], variant: Variant): String = {
+  def renderNotationStep(cur: NotationStep, lastDest: Option[Square], variant: Variant): String = {
     val suf           = if (variant.chushogi) "手目" else ""
     val stepNumberStr = stepNumberOffset(cur.stepNumber, suf)
     val resultStr     =
@@ -81,7 +81,7 @@ object Kif {
     }
   }
 
-  private def renderDest(dest: Pos, lastDest: Option[Pos], variant: Variant): String = {
+  private def renderDest(dest: Square, lastDest: Option[Square], variant: Variant): String = {
     val useLastDest = lastDest.fold(false)(_ == dest)
     variant match {
       case Chushogi => if (useLastDest) "仝" else dest.kanjiKey
@@ -89,17 +89,17 @@ object Kif {
     }
   }
 
-  private def renderOrig(orig: Pos, variant: Variant): String =
+  private def renderOrig(orig: Square, variant: Variant): String =
     variant match {
       case Chushogi => s" （←${orig.kanjiKey}）"
       case _        => s"(${orig.file.key}${orig.rank.number})"
     }
 
-  def renderStep(usiWithRole: Usi.WithRole, lastDest: Option[Pos], variant: Variant): String =
+  def renderStep(usiWithRole: Usi.WithRole, lastDest: Option[Square], variant: Variant): String =
     usiWithRole.usi match {
-      case Usi.Drop(role, pos) =>
+      case Usi.Drop(role, square) =>
         val roleStr = KifUtils.toKif(role, variant).map(_.head) | ""
-        s"${pos.kanjiFullWidthKey}${roleStr}打"
+        s"${square.kanjiFullWidthKey}${roleStr}打"
       case Usi.Move(orig, dest, prom, _) => {
         val promStr = if (prom) "成" else ""
         val roleStr = KifUtils.toKif(usiWithRole.role, variant).map(_.head) | ""

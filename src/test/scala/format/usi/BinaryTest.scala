@@ -180,35 +180,35 @@ class BinaryTest extends ShogiTest {
     }
     "for all move combinations (standard)" in {
       val allMoves = for {
-        orig <- Standard.allPositions
-        dest <- Standard.allPositions
+        orig <- Standard.allSquares
+        dest <- Standard.allSquares
       } yield Usi.Move(orig, dest, true, None)
       forall(allMoves.map(_.keys))(compareStrAndBin(_, Standard)) // no promotion
       forall(allMoves.map(_.usi))(compareStrAndBin(_, Standard))
     }
     "for all drop combinations (standard)" in {
       val allDrops = for {
-        role <- Standard.handRoles
-        pos  <- Standard.allPositions
-      } yield Usi.Drop(role, pos)
+        role   <- Standard.handRoles
+        square <- Standard.allSquares
+      } yield Usi.Drop(role, square)
       forall(allDrops.map(_.usi))(compareStrAndBin(_, Standard))
     }
     "for all moves chushogi" in {
       val promRanks = Chushogi.promotionRanks(Sente) ::: Chushogi.promotionRanks(Gote)
       val allMoves  = for {
-        orig <- Chushogi.allPositions
-        dest <- Chushogi.allPositions
+        orig <- Chushogi.allSquares
+        dest <- Chushogi.allSquares
       } yield Usi.Move(orig, dest, false, None)
       // Based around 5E
       val allIguis = for {
-        dir <- Pos.allDirections
-      } yield Usi.Move(Pos.SQ5E, Pos.SQ5E, false, dir(Pos.SQ5E))
+        dir <- Square.allDirections
+      } yield Usi.Move(Square.SQ5E, Square.SQ5E, false, dir(Square.SQ5E))
       val allLionMoves = for {
-        dir1    <- Pos.allDirections
-        dir2    <- Pos.allDirections
-        midStep <- dir1(Pos.SQ5E)
-        dest    <- dir2(midStep).filterNot(_ == Pos.SQ5E)
-      } yield Usi.Move(Pos.SQ5E, dest, false, Some(midStep))
+        dir1    <- Square.allDirections
+        dir2    <- Square.allDirections
+        midStep <- dir1(Square.SQ5E)
+        dest    <- dir2(midStep).filterNot(_ == Square.SQ5E)
+      } yield Usi.Move(Square.SQ5E, dest, false, Some(midStep))
       forall(allMoves.map(_.usi))(compareStrAndBin(_, Chushogi))
       forall(
         allMoves

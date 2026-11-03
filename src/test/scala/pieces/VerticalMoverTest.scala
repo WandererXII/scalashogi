@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class VerticalMoverTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class VerticalMoverTest extends ShogiTest {
     val verticalMover     = Sente - VerticalMover
     val verticalMoverGote = Gote - VerticalMover
 
-    "move to valid positions" in {
-      pieceMoves(verticalMover, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(verticalMover, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6A,
         SQ6B,
         SQ6C,
@@ -26,7 +26,7 @@ class VerticalMoverTest extends ShogiTest {
         SQ7F,
         SQ5F,
       )
-      pieceMoves(verticalMoverGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(verticalMoverGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6A,
         SQ6B,
         SQ6C,

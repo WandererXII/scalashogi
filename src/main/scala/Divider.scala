@@ -86,8 +86,8 @@ object Divider {
   }
 
   private def countInvaders(position: Position, color: Color): Int =
-    position.board.pieces.count { case (pos, piece) =>
-      piece.color == color && position.variant.promotionRanks(color).contains(pos.rank)
+    position.board.pieces.count { case (square, piece) =>
+      piece.color == color && position.variant.promotionRanks(color).contains(square.rank)
     }
 
   private def majorsAndMinors(position: Position): Int =
@@ -95,8 +95,8 @@ object Divider {
 
   // Sparse back-rank indicates that pieces have been developed
   private def isBackrankSparse(position: Position): Boolean =
-    position.board.pieces.count { case (pos, piece) =>
-      position.variant.backrank(!piece.color) == pos.rank
+    position.board.pieces.count { case (square, piece) =>
+      position.variant.backrank(!piece.color) == square.rank
     } < 4
 
 }

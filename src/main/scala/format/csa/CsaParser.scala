@@ -17,13 +17,13 @@ object CsaParser {
 
   // Helper strings for regex, so we don't have to repeat ourselves that much
   val colorsS     = """\+|-"""
-  val positionS   = """[1-9][1-9]"""
+  val squareS     = """[1-9][1-9]"""
   val dropOriginS = """00"""
   val piecesS     = """OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO"""
   val handPiecesS = """HI|KA|KI|GI|KE|KY|FU"""
 
   val moveOrDropRegex =
-    raw"""($colorsS)?($positionS|$dropOriginS)($positionS)($piecesS)""".r
+    raw"""($colorsS)?($squareS|$dropOriginS)($squareS)($piecesS)""".r
 
   final case class StrStep(
       step: String,
@@ -185,8 +185,8 @@ object CsaParser {
   object StepParser extends RegexParsers with Logging {
 
     val MoveRegex =
-      raw"""^(?:${colorsS})?($positionS)($positionS)($piecesS)""".r
-    val DropRegex = raw"""^(?:${colorsS})?(?:$dropOriginS)($positionS)($handPiecesS)""".r
+      raw"""^(?:${colorsS})?($squareS)($squareS)($piecesS)""".r
+    val DropRegex = raw"""^(?:${colorsS})?(?:$dropOriginS)($squareS)($handPiecesS)""".r
 
     override def skipWhitespace = false
 
@@ -194,14 +194,16 @@ object CsaParser {
       str match {
         case MoveRegex(origS, destS, roleS) => {
           for {
-            role <- CsaUtils.toRole(roleS) toValid s"Uknown role in move: $str"
+            role <- CsaUtils.toRole(roleS) toValid s"Unknown role in move: $str"
             _    <-
               if (Standard.allRoles contains role) valid(role)
               else invalid(s"$role not supported in standard shogi")
-            dest <- CsaUtils.parseCsaPos(
+            dest <- CsaUtils.parseCsaSquare(
               destS,
-            ) toValid s"Cannot parse destination sqaure in move: $str"
-            orig <- CsaUtils.parseCsaPos(origS) toValid s"Cannot parse origin sqaure in move: $str"
+            ) toValid s"Cannot parse destination square in move: $str"
+            orig <- CsaUtils.parseCsaSquare(
+              origS,
+            ) toValid s"Cannot parse origin square in move: $str"
           } yield CsaMove(
             dest = dest,
             role = role,
@@ -215,18 +217,18 @@ object CsaParser {
             ),
           )
         }
-        case DropRegex(posS, roleS) =>
+        case DropRegex(destS, roleS) =>
           for {
-            roleBase <- CsaUtils.toRole(roleS) toValid s"Uknown role in drop: $str"
+            roleBase <- CsaUtils.toRole(roleS) toValid s"Unknown role in drop: $str"
             role     <- Standard.handRoles.find(
               _ == roleBase,
             ) toValid s"$roleBase can't be dropped in standard shogi"
-            pos <- CsaUtils.parseCsaPos(
-              posS,
-            ) toValid s"Cannot parse destination sqaure in drop: $str"
+            square <- CsaUtils.parseCsaSquare(
+              destS,
+            ) toValid s"Cannot parse destination square in drop: $str"
           } yield Drop(
             role = role,
-            pos = pos,
+            square = square,
             metas = Metas(
               comments = Nil,
               glyphs = Glyphs.empty,

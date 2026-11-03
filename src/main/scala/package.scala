@@ -5,10 +5,10 @@ package object shogi {
   val Sente = Color.Sente
   val Gote  = Color.Gote
 
-  type Direction  = Pos => Option[Pos]
+  type Direction  = Square => Option[Square]
   type Directions = List[Direction]
 
-  type PieceMap = Map[Pos, Piece]
+  type PieceMap = Map[Square, Piece]
   type HandMap  = Map[DroppableRole, Int]
   type HandsMap = Color.Map[HandMap]
 

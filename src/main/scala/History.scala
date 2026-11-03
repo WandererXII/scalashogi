@@ -7,7 +7,7 @@ import shogi.format.usi.Usi
 
 final case class History(
     lastUsi: Option[Usi],
-    lastLionCapture: Option[Pos],
+    lastLionCapture: Option[Square],
     consecutiveAttacks: ConsecutiveAttacks,
     positionHashes: PositionHash,
     initialSfen: Option[Sfen],
@@ -64,7 +64,7 @@ final case class History(
 
   def withLastUsi(u: Usi) = copy(lastUsi = u.some)
 
-  def withLastLionCapture(op: Option[Pos]) = copy(lastLionCapture = op)
+  def withLastLionCapture(squareOpt: Option[Square]) = copy(lastLionCapture = squareOpt)
 
   def withConsecutiveAttacks(ca: ConsecutiveAttacks) = copy(consecutiveAttacks = ca)
 

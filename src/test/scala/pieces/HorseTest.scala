@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class HorseTest extends ShogiTest {
 
@@ -11,7 +11,7 @@ class HorseTest extends ShogiTest {
     val horseGote = Gote - Horse
 
     "move diagonally in 4 directions and all around" in {
-      pieceMoves(horse, SQ5E, shogi.variant.Standard) must bePoss(
+      pieceMoves(horse, SQ5E, shogi.variant.Standard) must beSquares(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -33,7 +33,7 @@ class HorseTest extends ShogiTest {
         SQ5D,
         SQ5F,
       )
-      pieceMoves(horseGote, SQ5E, shogi.variant.Standard) must bePoss(
+      pieceMoves(horseGote, SQ5E, shogi.variant.Standard) must beSquares(
         SQ4F,
         SQ4D,
         SQ3G,
@@ -58,7 +58,7 @@ class HorseTest extends ShogiTest {
     }
 
     "move in 2 directions, when at the edges" in {
-      pieceMoves(horse, SQ1C, shogi.variant.Standard) must bePoss(
+      pieceMoves(horse, SQ1C, shogi.variant.Standard) must beSquares(
         SQ2B,
         SQ3A,
         SQ2D,
@@ -73,7 +73,7 @@ class HorseTest extends ShogiTest {
       )
     }
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to squares that are occupied by the same colour" in {
       val position = """
 k . B . . . . . .
 . . . . . . . . .
@@ -87,7 +87,7 @@ P P P P P P P . P
 Hands:
 Turn:Sente
 """
-      position moveDestsFrom SQ7E must bePoss(
+      position moveDestsFrom SQ7E must beSquares(
         position,
         """
 k . B . . . x . .
@@ -119,7 +119,7 @@ P P P P P P P . P
 Hands:
 Turn:Sente
 """
-      position moveDestsFrom SQ7E must bePoss(
+      position moveDestsFrom SQ7E must beSquares(
         position,
         """
 k . B . . . . . .

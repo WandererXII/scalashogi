@@ -4,7 +4,7 @@ package format.usi
 import shogi.variant.Chushogi
 import shogi.variant.Variant
 
-// Assumes usis are valid - no positions outside of variant board size or promotions not touching the promotion zone
+// Assumes usis are valid - no squares outside of variant board size or promotions not touching the promotion zone
 object Binary {
 
   def decode(bs: Seq[Byte], variant: Variant, nb: Int): Vector[Usi] =
@@ -38,14 +38,14 @@ object Binary {
 
       private def decodeMove(i1: Int, i2: Int, variant: Variant): Usi =
         Usi.Move(
-          pos(right(i1, 7), variant.numberOfFiles),
-          pos(right(i2, 7), variant.numberOfFiles),
+          square(right(i1, 7), variant.numberOfFiles),
+          square(right(i2, 7), variant.numberOfFiles),
           bitAt(i2, 7),
           None,
         )
 
       private def decodeDrop(i1: Int, i2: Int, variant: Variant): Usi =
-        Usi.Drop(Encoding.intToRole(right(i1, 7)), pos(right(i2, 7), variant.numberOfFiles))
+        Usi.Drop(Encoding.intToRole(right(i1, 7)), square(right(i2, 7), variant.numberOfFiles))
     }
 
     private object ChushogiDecoder {
@@ -67,11 +67,11 @@ object Binary {
       }
 
       private def decodeLionMove(i1: Int, i2: Int): Usi = {
-        val orig    = pos(i1, 12)
-        val midStep = posDirection(orig, i2 >> 3)
+        val orig    = square(i1, 12)
+        val midStep = squareDirection(orig, i2 >> 3)
         Usi.Move(
           orig,
-          posDirection(midStep, right(i2, 3)),
+          squareDirection(midStep, right(i2, 3)),
           false,
           Some(midStep),
         )
@@ -79,26 +79,26 @@ object Binary {
 
       // or jitto
       private def decodeIguiMove(i1: Int, i2: Int): Usi = {
-        val origDest = pos(i1, 12)
+        val origDest = square(i1, 12)
         Usi.Move(
           origDest,
           origDest,
           false,
-          Some(posDirection(origDest, normalizeDirection(i2))),
+          Some(squareDirection(origDest, normalizeDirection(i2))),
         )
       }
 
       private def decodeMove(i1: Int, i2: Int): Usi =
         Usi.Move(
-          pos(normalizePromotionPos(i1), 12),
-          pos(normalizePromotionPos(i2), 12),
+          square(normalizePromotionSquare(i1), 12),
+          square(normalizePromotionSquare(i2), 12),
           isPromotion(i1, i2),
           None,
         )
 
-      private def posDirection(pos: Pos, dir: Int): Pos =
-        Encoding.directions(dir % 8)(pos) getOrElse !!(
-          s"Invalid direction (pos: $pos, dir: ${showByte(dir)})",
+      private def squareDirection(square: Square, dir: Int): Square =
+        Encoding.directions(dir % 8)(square) getOrElse !!(
+          s"Invalid direction (square: $square, dir: ${showByte(dir)})",
         )
 
       //   0..143 - base board
@@ -106,9 +106,9 @@ object Binary {
       // 192..239 - promotion zone bottom
       // 240..247 - igui/jitto direction
       // 255      - flag for three byte move
-      private def lionMoveType(i: Int)          = i == 255
-      private def iguiMoveType(i: Int)          = i >= 240 && i <= 247
-      private def normalizePromotionPos(i: Int) =
+      private def lionMoveType(i: Int)             = i == 255
+      private def iguiMoveType(i: Int)             = i >= 240 && i <= 247
+      private def normalizePromotionSquare(i: Int) =
         (i % 144) + ((i / 192) * 48)
       private def normalizeDirection(i: Int) =
         i - 240
@@ -116,9 +116,9 @@ object Binary {
         i1 > 143 || i2 > 143
     }
 
-    private def pos(i: Int, files: Int): Pos =
-      Pos.at(i % files, i / files) getOrElse !!(
-        s"Invalid position (files: $files, byte: ${showByte(i)})",
+    private def square(i: Int, files: Int): Square =
+      Square.at(i % files, i / files) getOrElse !!(
+        s"Invalid square (files: $files, byte: ${showByte(i)})",
       )
 
     // right x bits
@@ -143,19 +143,24 @@ object Binary {
       def encode(usi: Usi, variant: Variant): Seq[Byte] =
         usi match {
           case Usi.Move(orig, dest, prom, _) => encodeMove(orig, dest, prom, variant)
-          case Usi.Drop(role, pos)           => encodeDrop(role, pos, variant)
+          case Usi.Drop(role, square)        => encodeDrop(role, square, variant)
         }
 
-      private def encodeMove(orig: Pos, dest: Pos, prom: Boolean, variant: Variant): Seq[Byte] =
+      private def encodeMove(
+          orig: Square,
+          dest: Square,
+          prom: Boolean,
+          variant: Variant,
+      ): Seq[Byte] =
         Seq(
-          posInt(orig, variant.numberOfFiles),
-          (if (prom) 1 << 7 else 0) | posInt(dest, variant.numberOfFiles),
+          squareInt(orig, variant.numberOfFiles),
+          (if (prom) 1 << 7 else 0) | squareInt(dest, variant.numberOfFiles),
         ).map(_.toByte)
 
-      private def encodeDrop(role: DroppableRole, pos: Pos, variant: Variant): Seq[Byte] =
+      private def encodeDrop(role: DroppableRole, square: Square, variant: Variant): Seq[Byte] =
         Seq(
           (1 << 7) | Encoding.roleToInt(role),
-          posInt(pos, variant.numberOfFiles),
+          squareInt(square, variant.numberOfFiles),
         ).map(_.toByte)
     }
 
@@ -171,35 +176,37 @@ object Binary {
           case _                                      => Nil
         }
 
-      private def encodeMove(orig: Pos, dest: Pos, prom: Boolean) =
+      private def encodeMove(orig: Square, dest: Square, prom: Boolean) =
         if (prom)
           Seq(
-            if (promotionRanks contains orig.rank) promotionZoneInt(orig) else posInt(orig, files),
-            if (promotionRanks contains dest.rank) promotionZoneInt(dest) else posInt(dest, files),
+            if (promotionRanks contains orig.rank) promotionZoneInt(orig)
+            else squareInt(orig, files),
+            if (promotionRanks contains dest.rank) promotionZoneInt(dest)
+            else squareInt(dest, files),
           ).map(_.toByte)
-        else Seq(posInt(orig, files), posInt(dest, files)).map(_.toByte)
+        else Seq(squareInt(orig, files), squareInt(dest, files)).map(_.toByte)
 
-      private def encodeLionMove(orig: Pos, dest: Pos, midStep: Pos): Seq[Byte] =
+      private def encodeLionMove(orig: Square, dest: Square, midStep: Square): Seq[Byte] =
         if (orig == dest)
-          Seq(posInt(orig, files), 240 + encodeDirection(orig, midStep)).map(_.toByte)
+          Seq(squareInt(orig, files), 240 + encodeDirection(orig, midStep)).map(_.toByte)
         else
           Seq(
             255,
-            posInt(orig, files),
+            squareInt(orig, files),
             (encodeDirection(orig, midStep) << 3) | (encodeDirection(midStep, dest)),
           ).map(_.toByte)
 
-      private def promotionZoneInt(pos: Pos): Int = {
-        val pInt = posInt(pos, files)
-        144 + pInt - (if (pInt < 48) 0 else 48)
+      private def promotionZoneInt(square: Square): Int = {
+        val index = squareInt(square, files)
+        144 + index - (if (index < 48) 0 else 48)
       }
 
-      private def encodeDirection(p1: Pos, p2: Pos): Int =
-        ((p1.file - p2.file + 1) + 3 * (p1.rank - p2.rank + 1) + 4) % 9
+      private def encodeDirection(from: Square, to: Square): Int =
+        ((from.file - to.file + 1) + 3 * (from.rank - to.rank + 1) + 4) % 9
     }
 
-    private def posInt(pos: Pos, files: Int): Int =
-      files * pos.rank.index + pos.file.index
+    private def squareInt(square: Square, files: Int): Int =
+      files * square.rank.index + square.file.index
   }
 
   private object Encoding {

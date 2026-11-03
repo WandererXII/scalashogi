@@ -3,7 +3,7 @@ package variant
 
 import cats.syntax.option._
 
-import shogi.Pos._
+import shogi.Square._
 import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
@@ -21,7 +21,7 @@ case object Chushogi
   val numberOfRanks = 12
   val numberOfFiles = 12
 
-  val allPositions = Pos.all
+  val allSquares = Square.all
 
   val pieces =
     Map(
@@ -258,9 +258,9 @@ case object Chushogi
       case _                     => 0
     }
 
-  override def forcePromote(piece: Piece, to: Pos): Boolean = false
+  override def forcePromote(piece: Piece, to: Square): Boolean = false
 
-  override def canPromote(piece: Piece, orig: Pos, dest: Pos, capture: Boolean): Boolean = {
+  override def canPromote(piece: Piece, orig: Square, dest: Square, capture: Boolean): Boolean = {
     val pRanks = promotionRanks(piece.color)
     promote(piece.role).isDefined &&
     (
@@ -274,14 +274,14 @@ case object Chushogi
   override def supportsDrops = false
 
   // filters out illegal lion captures
-  override def moveFilter(a: MoveActor): List[Pos] =
+  override def moveFilter(a: MoveActor): List[Square] =
     if (Role.allLions.contains(a.piece.role)) {
       val oppLions = a.board.pieces.collect {
-        case (pos, piece) if Role.allLions.contains(piece.role) && (piece is !a.color) => pos
+        case (square, piece) if Role.allLions.contains(piece.role) && (piece is !a.color) => square
       }.toList
       a.unfilteredDestinations filterNot { dest =>
-        oppLions.contains(dest) && a.pos.dist(dest) > 1 && posThreatened(
-          a.board.forceTake(a.pos),
+        oppLions.contains(dest) && a.square.dist(dest) > 1 && squareThreatened(
+          a.board.forceTake(a.square),
           !a.color,
           dest,
           _ => true,
@@ -294,22 +294,22 @@ case object Chushogi
         }
       }
 
-  def lionMoveFilter(a: MoveActor, midStep: Pos): List[Pos] =
+  def lionMoveFilter(a: MoveActor, midStep: Square): List[Square] =
     if (Role.allLions.contains(a.piece.role))
       a.shortUnfilteredDestinations filter { d =>
         d.dist(midStep) == 1 && a.board(d).filter(_.color != a.color).fold(true) { capture =>
-          d.dist(a.pos) == 1 || !Role.allLions.contains(capture.role) ||
+          d.dist(a.square) == 1 || !Role.allLions.contains(capture.role) ||
           a
             .board(midStep)
             .exists(midCapture => !(midCapture is Pawn) && !(midCapture is GoBetween)) ||
-          (!posThreatened(
-            a.board.forceTake(a.pos).forceTake(midStep),
+          (!squareThreatened(
+            a.board.forceTake(a.square).forceTake(midStep),
             !a.color,
             d,
             _ => true,
           ) &&
-            !posThreatened(
-              a.board.forceTake(a.pos),
+            !squareThreatened(
+              a.board.forceTake(a.square),
               !a.color,
               d,
               p => (p is Pawn) || (p is GoBetween),
@@ -352,21 +352,21 @@ case object Chushogi
   // from color's side - was color king bared
   private def bareKing(board: Board, color: Color): Boolean = {
     val ourPiecesFiltered = board.pieces.view.collect {
-      case (pos, piece)
+      case (square, piece)
           if (piece is color) && !(((piece is Pawn) || (piece is Lance)) && backrank(
             piece.color,
-          ) == pos.rank) =>
-        pos
+          ) == square.rank) =>
+        square
     }
-    lazy val ourKing             = board.royalPossOf(color)
+    lazy val ourKing             = board.royalSquaresOf(color)
     lazy val theirPiecesFiltered = board.pieces.collect {
-      case (pos, piece)
+      case (square, piece)
           if (piece is !color) && !((piece is Pawn) || (piece is GoBetween)) && !((piece is Lance) && backrank(
             piece.color,
-          ) == pos.rank) =>
-        pos
+          ) == square.rank) =>
+        square
     }
-    lazy val theirKing = board.royalPossOf(!color)
+    lazy val theirKing = board.royalSquaresOf(!color)
 
     ourPiecesFiltered.sizeIs == 1 &&  // we have only a single piece
     ourKing.sizeIs == 1 &&            // and that piece is royal
@@ -376,31 +376,31 @@ case object Chushogi
       board,
       !color,
     ) && // no threat of immediate royal capture (maybe should be based on turn?)
-    (theirPiecesFiltered.sizeIs > 2 || !theirPiecesFiltered.exists(p =>
-      ourKing.headOption.fold(false)(_.dist(p) == 1),
+    (theirPiecesFiltered.sizeIs > 2 || !theirPiecesFiltered.exists(square =>
+      ourKing.headOption.fold(false)(_.dist(square) == 1),
     )) // opponent either has more pieces than we can capture, or we don't threaten to bare their king
   }
 
   override def isInsufficientMaterial(board: Board, hands: Hands) = {
     // don't count dead pieces
-    lazy val piecesFiltered = board.pieces.view.filter { case (pos, piece) =>
+    lazy val piecesFiltered = board.pieces.view.filter { case (square, piece) =>
       if (
         ((piece is Pawn) || (piece is Lance)) && backrank(
           piece.color,
-        ) == pos.rank
+        ) == square.rank
       ) false
       else true
     }
 
     piecesFiltered.sizeIs == 2 &&
-    board.royalPossOf(Sente).sizeIs == 1 &&
-    board.royalPossOf(Gote).sizeIs == 1 &&
+    board.royalSquaresOf(Sente).sizeIs == 1 &&
+    board.royalSquaresOf(Gote).sizeIs == 1 &&
     !check(board, Sente) &&
     !check(board, Gote)
   }
 
   override def status(position: Position): Option[Status] =
-    if (position.board.royalPossOf(position.color).isEmpty) Status.RoyalsLost.some
+    if (position.board.royalSquaresOf(position.color).isEmpty) Status.RoyalsLost.some
     else if (bareKing(position.board, Sente) || bareKing(position.board, Gote)) Status.BareKing.some
     else if (!position.hasDestinations) Status.Stalemate.some
     else if (position.history.fourfoldRepetition) {

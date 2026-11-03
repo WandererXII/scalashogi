@@ -4,15 +4,15 @@ package csa
 
 object CsaUtils {
 
-  def parseCsaPos(str: String): Option[Pos] =
+  def parseCsaSquare(str: String): Option[Square] =
     for {
-      x   <- str.take(1).toIntOption
-      y   <- str.drop(1).toIntOption
-      pos <- Pos.at(x - 1, y - 1)
-    } yield pos
+      x      <- str.take(1).toIntOption
+      y      <- str.drop(1).toIntOption
+      square <- Square.at(x - 1, y - 1)
+    } yield square
 
-  def makeCsaPos(pos: Pos): String =
-    s"${pos.file.key}${pos.rank.number}"
+  def makeCsaSquare(square: Square): String =
+    s"${square.file.key}${square.rank.number}"
 
   def toPiece(s: String): Option[Piece] =
     toRole(s.drop(1)) map {

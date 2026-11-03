@@ -82,7 +82,7 @@ object Replay {
 
     @scala.annotation.tailrec
     def mk(
-        roleMap: Map[Pos, Role],
+        roleMap: Map[Square, Role],
         usis: List[Usi],
         roles: List[Usi.WithRole],
     ): List[Usi.WithRole] =
@@ -94,7 +94,7 @@ object Replay {
               roleMap.get(orig) match {
                 case Some(role) => {
                   val maybePromoted = variant.promote(role).filter(_ => prom) | role
-                  val toRemove      = List[Option[Pos]](Some(orig), midStep).flatten
+                  val toRemove      = List[Option[Square]](Some(orig), midStep).flatten
                   mk(
                     roleMap -- toRemove + (dest -> maybePromoted),
                     rest,
@@ -103,8 +103,8 @@ object Replay {
                 }
                 case None => roles
               }
-            case Usi.Drop(role, pos) =>
-              mk(roleMap + (pos -> role), rest, Usi.WithRole(usi, role) :: roles)
+            case Usi.Drop(role, square) =>
+              mk(roleMap + (square -> role), rest, Usi.WithRole(usi, role) :: roles)
           }
       }
 

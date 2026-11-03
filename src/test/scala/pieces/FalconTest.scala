@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class FalconTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class FalconTest extends ShogiTest {
     val falcon     = Sente - Falcon
     val falconGote = Gote - Falcon
 
-    "move to valid positions" in {
-      pieceMoves(falcon, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(falcon, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ12F,
         SQ11F,
         SQ10F,
@@ -53,7 +53,7 @@ class FalconTest extends ShogiTest {
         SQ6K,
         SQ6L,
       )
-      pieceMoves(falconGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(falconGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ12F,
         SQ11F,
         SQ10F,

@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class ChariotTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class ChariotTest extends ShogiTest {
     val chariot     = Sente - Chariot
     val chariotGote = Gote - Chariot
 
-    "move to valid positions" in {
-      pieceMoves(chariot, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(chariot, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6A,
         SQ6B,
         SQ6C,
@@ -24,7 +24,7 @@ class ChariotTest extends ShogiTest {
         SQ6K,
         SQ6L,
       )
-      pieceMoves(chariotGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(chariotGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ6A,
         SQ6B,
         SQ6C,

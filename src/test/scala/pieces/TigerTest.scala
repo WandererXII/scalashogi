@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class TigerTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class TigerTest extends ShogiTest {
     val tiger     = Sente - Tiger
     val tigerGote = Gote - Tiger
 
-    "move to valid positions" in {
-      pieceMoves(tiger, SQ6F, shogi.variant.Chushogi) must bePoss(
+    "move to valid squares" in {
+      pieceMoves(tiger, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ7E,
         SQ5E,
         SQ7F,
@@ -20,7 +20,7 @@ class TigerTest extends ShogiTest {
         SQ5G,
         SQ6G,
       )
-      pieceMoves(tigerGote, SQ6F, shogi.variant.Chushogi) must bePoss(
+      pieceMoves(tigerGote, SQ6F, shogi.variant.Chushogi) must beSquares(
         SQ7E,
         SQ6E,
         SQ5E,

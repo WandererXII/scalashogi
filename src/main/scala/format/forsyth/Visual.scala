@@ -50,16 +50,16 @@ object Visual {
     Sfen(finalSfen).toPosition(variant)
   }
 
-  def render(position: Position, marks: Map[Iterable[Pos], Char] = Map.empty): String = {
-    val markedPoss: Map[Pos, Char] = marks.foldLeft[Map[Pos, Char]](Map.empty) {
-      case (marks, (poss, char)) =>
-        marks ++ (poss.toList map { pos =>
-          (pos, char)
+  def render(position: Position, marks: Map[Iterable[Square], Char] = Map.empty): String = {
+    val markedSquares: Map[Square, Char] = marks.foldLeft[Map[Square, Char]](Map.empty) {
+      case (marks, (squares, char)) =>
+        marks ++ (squares.toList map { square =>
+          (square, char)
         })
     }
     for (y <- 0 to (position.variant.numberOfRanks - 1)) yield {
       for (x <- (position.variant.numberOfFiles - 1) to 0 by -1) yield {
-        "%2s" format (Pos.at(x, y).flatMap(markedPoss.get).map(_.toString) | (position
+        "%2s" format (Square.at(x, y).flatMap(markedSquares.get).map(_.toString) | (position
           .board(x, y)
           .flatMap(p => SfenUtils.toForsyth(p, position.variant))
           | "."))

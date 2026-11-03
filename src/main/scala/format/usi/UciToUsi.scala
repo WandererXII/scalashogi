@@ -8,7 +8,7 @@ import cats.implicits._
 object UciToUsi {
 
   def apply(uciStr: String): Option[Usi] =
-    Usi(uciStr.map(Pos.fromUciMap))
+    Usi(uciStr.map(Square.fromUciMap))
 
   def readList(steps: String): Option[List[Usi]] =
     readList(fieldSeparator.split(steps).filter(_.nonEmpty).toList)

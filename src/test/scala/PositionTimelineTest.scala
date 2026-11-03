@@ -90,7 +90,7 @@ class PositionTimelineTest extends ShogiTest {
                 else position.board(m.orig).get.role,
               ),
             )
-          case d: Usi.Drop => position(Drop(d.role, d.pos))
+          case d: Usi.Drop => position(Drop(d.role, d.square))
         }
         forall(List(position(usi), direct, parsed)) { result =>
           result must beValid.like { case next =>

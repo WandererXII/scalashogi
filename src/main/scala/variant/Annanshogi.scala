@@ -1,7 +1,7 @@
 package shogi
 package variant
 
-import shogi.Pos._
+import shogi.Square._
 import shogi.format.forsyth.Sfen
 
 case object Annanshogi
@@ -16,7 +16,7 @@ case object Annanshogi
   val numberOfRanks = 9
   val numberOfFiles = 9
 
-  val allPositions = (SQ9I upTo SQ1A).toList
+  val allSquares = (SQ9I upTo SQ1A).toList
 
   val pieces =
     Map(
@@ -75,34 +75,34 @@ case object Annanshogi
 
   def valueOfRole(r: Role): Int = Standard.valueOfRole(r)
 
-  override def forcePromote(piece: Piece, to: Pos): Boolean = false
+  override def forcePromote(piece: Piece, to: Square): Boolean = false
 
-  private def directlyBehind(pos: Pos, color: Color): Option[Pos] =
-    color.fold(pos.down, pos.up)
+  private def directlyBehind(square: Square, color: Color): Option[Square] =
+    color.fold(square.down, square.up)
 
   private def toAnnanAttackPieceMap(pieces: PieceMap): PieceMap =
-    pieces.foldLeft(Map.empty[Pos, Piece]) { case (acc, (pos, piece)) =>
+    pieces.foldLeft(Map.empty[Square, Piece]) { case (acc, (square, piece)) =>
       acc.updated(
-        pos,
-        directlyBehind(pos, piece.color)
+        square,
+        directlyBehind(square, piece.color)
           .flatMap(pieces.get)
           .filter(_.color == piece.color)
           .getOrElse(piece),
       )
     }
 
-  override def posThreatened(
+  override def squareThreatened(
       board: Board,
       color: Color,
-      pos: Pos,
+      square: Square,
       filter: Piece => Boolean = _ => true,
   ): Boolean = {
     val updatedBoard = Board(toAnnanAttackPieceMap(board.pieces))
-    super.posThreatened(updatedBoard, color, pos, _ => true)
+    super.squareThreatened(updatedBoard, color, square, _ => true)
   }
 
-  override def attackingPiece(piece: Piece, pos: Pos, board: Board): Piece =
-    directlyBehind(pos, piece.color)
+  override def attackingPiece(piece: Piece, square: Square, board: Board): Piece =
+    directlyBehind(square, piece.color)
       .flatMap(board.apply)
       .filter(_.color == piece.color)
       .getOrElse(piece)

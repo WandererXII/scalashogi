@@ -375,9 +375,9 @@ class SfenTest extends ShogiTest {
       Sfen("11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b").toPosition(Chushogi) must beSome.like {
         case s =>
           s.toSfen.truncate.value must_== "11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b -"
-          s.board(Pos.SQ1F) must beSome
-          s.board(Pos.SQ2G) must beSome
-          s.board(Pos.SQ3H) must beSome
+          s.board(Square.SQ1F) must beSome
+          s.board(Square.SQ2G) must beSome
+          s.board(Square.SQ3H) must beSome
       }
     }
     "last lion capture" in {

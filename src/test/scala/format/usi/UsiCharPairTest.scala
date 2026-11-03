@@ -16,22 +16,22 @@ class UsiCharPairTest extends ShogiTest {
     def convStrChushogi(str: String) = convChushogi(Usi(str).get)
 
     val allMoves = for {
-      orig <- Standard.allPositions
-      dest <- Standard.allPositions
+      orig <- Standard.allSquares
+      dest <- Standard.allSquares
     } yield Move(orig, dest, false, None)
     val allMovesChushogi = for {
-      orig <- Chushogi.allPositions
-      dest <- Chushogi.allPositions
+      orig <- Chushogi.allSquares
+      dest <- Chushogi.allSquares
     } yield Move(orig, dest, false, None)
     val allDrops = for {
-      role <- variant.Standard.handRoles
-      pos  <- Standard.allPositions
-    } yield Drop(role, pos)
+      role   <- variant.Standard.handRoles
+      square <- Standard.allSquares
+    } yield Drop(role, square)
 
     val lionMoves = for {
-      midStep <- Chushogi.allPositions.filter(_.dist(Pos.SQ5E) == 1)
-      dest    <- Chushogi.allPositions.filter(_.dist(midStep) == 1)
-    } yield Move(Pos.SQ5E, dest, false, Some(midStep))
+      midStep <- Chushogi.allSquares.filter(_.dist(Square.SQ5E) == 1)
+      dest    <- Chushogi.allSquares.filter(_.dist(midStep) == 1)
+    } yield Move(Square.SQ5E, dest, false, Some(midStep))
 
     val allMovesCharPairs = allMoves.map(conv)
     val allDropsCharPairs = allDrops.map(conv)

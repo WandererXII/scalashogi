@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class PawnTest extends ShogiTest {
 
@@ -12,16 +12,16 @@ class PawnTest extends ShogiTest {
         shogi.variant.Standard,
         Sente,
         SQ9F -> Sente.pawn,
-      ) moveDestsFrom SQ9F must bePoss(SQ9E)
+      ) moveDestsFrom SQ9F must beSquares(SQ9E)
     }
 
-    "not move to positions that are occupied by the same color" in {
+    "not move to squares that are occupied by the same color" in {
       makePositionWithBoard(
         shogi.variant.Standard,
         Sente,
         SQ9F -> Sente.pawn,
         SQ9E -> Sente.pawn,
-      ) moveDestsFrom SQ9F must bePoss()
+      ) moveDestsFrom SQ9F must beSquares()
     }
 
     "capture forward" in {
@@ -30,7 +30,7 @@ class PawnTest extends ShogiTest {
         Sente,
         SQ6F -> Sente.pawn,
         SQ6E -> Gote.pawn,
-      ) moveDestsFrom SQ6F must bePoss(SQ6E)
+      ) moveDestsFrom SQ6F must beSquares(SQ6E)
     }
   }
 
@@ -41,16 +41,16 @@ class PawnTest extends ShogiTest {
         shogi.variant.Standard,
         Gote,
         SQ9E -> Gote.pawn,
-      ) moveDestsFrom SQ9E must bePoss(SQ9F)
+      ) moveDestsFrom SQ9E must beSquares(SQ9F)
     }
 
-    "not move to positions that are occupied by the same color" in {
+    "not move to squares that are occupied by the same color" in {
       makePositionWithBoard(
         shogi.variant.Standard,
         Gote,
         SQ9F -> Gote.pawn,
         SQ9G -> Gote.pawn,
-      ) moveDestsFrom SQ9F must bePoss()
+      ) moveDestsFrom SQ9F must beSquares()
     }
 
     "capture forward" in {
@@ -59,7 +59,7 @@ class PawnTest extends ShogiTest {
         Gote,
         SQ6E -> Gote.pawn,
         SQ6F -> Sente.pawn,
-      ) moveDestsFrom SQ6E must bePoss(SQ6F)
+      ) moveDestsFrom SQ6E must beSquares(SQ6F)
     }
   }
 }

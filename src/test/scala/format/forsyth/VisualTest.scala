@@ -2,7 +2,7 @@ package shogi
 package format
 package forsyth
 
-import shogi.Pos._
+import shogi.Square._
 
 class VisualTest extends ShogiTest {
 

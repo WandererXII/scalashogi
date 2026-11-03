@@ -26,9 +26,9 @@ final case class Sfen(value: String) extends AnyVal {
     }
 
   def toBoard(variant: Variant): Option[Board] = {
-    val positions = boardString | ""
-    if (positions.count(_ == '/') == (variant.numberOfRanks - 1)) {
-      Sfen.makePieceMapFromString(positions, variant) map Board.apply
+    val boardStr = boardString | ""
+    if (boardStr.count(_ == '/') == (variant.numberOfRanks - 1)) {
+      Sfen.makePieceMapFromString(boardStr, variant) map Board.apply
     } else None
   }
 
@@ -40,7 +40,7 @@ final case class Sfen(value: String) extends AnyVal {
   def toHistory(variant: Variant): History =
     if (variant == shogi.variant.Chushogi)
       handsString
-        .map(s => History.empty withLastLionCapture Pos.fromKey(s))
+        .map(s => History.empty withLastLionCapture Square.fromKey(s))
         .getOrElse(History.empty)
     else History.empty
 
@@ -123,11 +123,11 @@ object Sfen {
 
     @scala.annotation.tailrec
     def piecesListRec(
-        pieces: List[(Pos, Piece)],
+        pieces: List[(Square, Piece)],
         chars: List[Char],
         x: Int,
         y: Int,
-    ): Option[List[(Pos, Piece)]] =
+    ): Option[List[(Square, Piece)]] =
       chars match {
         case Nil =>
           Option.when(x == -1 && y == variant.numberOfRanks - 1)(pieces)
@@ -138,19 +138,19 @@ object Sfen {
         case c :: rest if c.isDigit && x >= 0 => piecesListRec(pieces, rest, x - c.asDigit, y)
         case '+' :: c :: rest                 =>
           (for {
-            pos   <- Pos.at(x, y)
-            _     <- Option.when(variant.isInsideBoard(pos))(())
-            piece <- SfenUtils.toPiece("+" + c, variant)
-          } yield pos -> piece :: pieces) match {
+            square <- Square.at(x, y)
+            _      <- Option.when(variant.isInsideBoard(square))(())
+            piece  <- SfenUtils.toPiece("+" + c, variant)
+          } yield square -> piece :: pieces) match {
             case Some(ps) => piecesListRec(ps, rest, x - 1, y)
             case _        => None
           }
         case c :: rest => {
           (for {
-            pos   <- Pos.at(x, y)
-            _     <- Option.when(variant.isInsideBoard(pos))(())
-            piece <- SfenUtils.toPiece(c.toString, variant)
-          } yield pos -> piece :: pieces) match {
+            square <- Square.at(x, y)
+            _      <- Option.when(variant.isInsideBoard(square))(())
+            piece  <- SfenUtils.toPiece(c.toString, variant)
+          } yield square -> piece :: pieces) match {
             case Some(ps) => piecesListRec(ps, rest, x - 1, y)
             case _        => None
           }

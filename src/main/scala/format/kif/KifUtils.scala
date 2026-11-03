@@ -11,14 +11,14 @@ import shogi.variant._
 
 object KifUtils {
 
-  def parseKifPos(str: String): Option[Pos] = {
-    Pos.fromKey(str) orElse {
+  def parseKifSquare(str: String): Option[Square] = {
+    Square.fromKey(str) orElse {
       for {
         numStr <- if (str.sizeIs == 2) str.map(toDigit).some else none
         x      <- numStr.take(1).toIntOption
         y      <- numStr.drop(1).toIntOption
-        pos    <- Pos.at(x - 1, y - 1)
-      } yield pos
+        square <- Square.at(x - 1, y - 1)
+      } yield square
     }
   }
 

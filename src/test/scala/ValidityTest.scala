@@ -6,9 +6,9 @@ import shogi.variant._
 class ValidityTest extends ShogiTest {
   "board bounds" should {
     "reject a standard king outside the board" in {
-      forall(List(Pos.at(9, 8).get, Pos.at(4, 9).get, Pos.at(11, 11).get)) { dest =>
+      forall(List(Square.at(9, 8).get, Square.at(4, 9).get, Square.at(11, 11).get)) { dest =>
         val position = Position(Standard)
-        val invalid  = position.copy(board = position.board.move(Pos.SQ5I, dest).get)
+        val invalid  = position.copy(board = position.board.move(Square.SQ5I, dest).get)
         invalid.playable(strict = true) must beFalse
         invalid.playable(strict = false) must beFalse
       }
@@ -18,7 +18,7 @@ class ValidityTest extends ShogiTest {
       forall(Variant.all.filterNot(_ == Chushogi)) { variant =>
         val position = Position(variant)
         val orig     = position.board.pieces.find { case (_, piece) => piece.role != King }.get._1
-        val invalid  = position.copy(board = position.board.move(orig, Pos.at(11, 11).get).get)
+        val invalid  = position.copy(board = position.board.move(orig, Square.at(11, 11).get).get)
         invalid.valid(strict = true) must beFalse
         invalid.valid(strict = false) must beFalse
       }

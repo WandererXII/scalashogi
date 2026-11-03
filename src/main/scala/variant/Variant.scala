@@ -20,7 +20,7 @@ abstract class Variant private[variant] (
   def numberOfRanks: Int
   def numberOfFiles: Int
 
-  def allPositions: List[Pos]
+  def allSquares: List[Square]
 
   def pieces: PieceMap
   def hands: HandsMap = Color.Map(Map.empty, Map.empty)
@@ -45,14 +45,14 @@ abstract class Variant private[variant] (
 
   def valueOfRole(role: Role): Int
 
-  def forcePromote(piece: Piece, to: Pos): Boolean =
+  def forcePromote(piece: Piece, to: Square): Boolean =
     piece.role match {
       case Pawn | Knight | Lance if backrank(piece.color) == to.rank            => true
       case Knight if math.abs(backrank(piece.color).index - to.rank.index) == 1 => true
       case _                                                                    => false
     }
 
-  def canPromote(piece: Piece, orig: Pos, dest: Pos, @unused capture: Boolean): Boolean =
+  def canPromote(piece: Piece, orig: Square, dest: Square, @unused capture: Boolean): Boolean =
     promote(piece.role).isDefined &&
       promotionRanks(piece.color).exists(r => r == dest.rank || r == orig.rank)
 
@@ -60,39 +60,41 @@ abstract class Variant private[variant] (
 
   def supportsDroppingEitherSide = false
 
-  def isInsideBoard(pos: Pos): Boolean =
-    pos.file.index < numberOfFiles && pos.rank.index < numberOfRanks
+  def isInsideBoard(square: Square): Boolean =
+    square.file.index < numberOfFiles && square.rank.index < numberOfRanks
 
   // Optimized for performance
-  // Exists a piece of color on board, which passes the filter and attacks pos
-  def posThreatened(
+  // Exists a piece of color on board, which passes the filter and attacks square
+  def squareThreatened(
       board: Board,
       color: Color,
-      pos: Pos,
+      square: Square,
       filter: Piece => Boolean = _ => true,
   ): Boolean =
     board.pieces exists {
-      case (from, piece) if piece.color == color && filter(piece) && piece.eyes(from, pos) =>
-        piece.projectionDirs.isEmpty || piece.directDirs.exists(dir => dir(from).contains(pos)) ||
-        Pos.findDirection(from, pos).exists { dir =>
-          longRangeThreatens(board, from, dir, pos)
+      case (from, piece) if piece.color == color && filter(piece) && piece.eyes(from, square) =>
+        piece.projectionDirs.isEmpty || piece.directDirs.exists(dir =>
+          dir(from).contains(square),
+        ) ||
+        Square.findDirection(from, square).exists { dir =>
+          longRangeThreatens(board, from, dir, square)
         }
       case _ => false
     }
 
-  def attackingPiece(piece: Piece, @unused pos: Pos, @unused board: Board): Piece = piece
+  def attackingPiece(piece: Piece, @unused square: Square, @unused board: Board): Piece = piece
 
   // Filters out moves that would put the king in danger
   // Critical function - optimize for performance
-  def moveFilter(a: MoveActor): List[Pos] = {
+  def moveFilter(a: MoveActor): List[Square] = {
     // only long range roles, since you can only unpin a check from a role with projection
     val filter: Piece => Boolean =
       if ((a.piece is King) || a.check) _ => true else (_.projectionDirs.nonEmpty)
-    val stableKingPos = if (a.piece is King) None else a.board.singleRoyalPosOf(a.color)
+    val stableKingSquare = if (a.piece is King) None else a.board.singleRoyalSquareOf(a.color)
     a.unfilteredDestinations filterNot { dest =>
-      (stableKingPos orElse Option.when(a.piece is King)(dest)) exists {
-        posThreatened(
-          a.board.forceMove(a.piece, a.pos, dest),
+      (stableKingSquare orElse Option.when(a.piece is King)(dest)) exists {
+        squareThreatened(
+          a.board.forceMove(a.piece, a.square, dest),
           !a.color,
           _,
           filter,
@@ -104,37 +106,37 @@ abstract class Variant private[variant] (
   def noOppositeCheck = true
 
   def check(board: Board, color: Color): Boolean =
-    board.royalPossOf(color).exists(posThreatened(board, !color, _))
+    board.royalSquaresOf(color).exists(squareThreatened(board, !color, _))
 
-  def checkSquares(board: Board, color: Color): List[Pos] =
-    board.royalPossOf(color).filter(posThreatened(board, !color, _))
+  def checkSquares(board: Board, color: Color): List[Square] =
+    board.royalSquaresOf(color).filter(squareThreatened(board, !color, _))
 
-  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
-    dir(p) exists { next =>
+  def longRangeThreatens(board: Board, from: Square, dir: Direction, to: Square): Boolean =
+    dir(from) exists { next =>
       next == to || (isInsideBoard(next) && !board.pieces
         .contains(next) && longRangeThreatens(board, next, dir, to))
     }
 
   def dropRoles = handRoles
 
-  def dropFilterDoublePawn(a: DropActor, d: Pos): Boolean =
+  def dropFilterDoublePawn(a: DropActor, d: Square): Boolean =
     (a.piece is Pawn) && (
-      a.board.pieces.exists { case (pos, piece) =>
-        a.piece == piece && pos.file == d.file
+      a.board.pieces.exists { case (square, piece) =>
+        a.piece == piece && square.file == d.file
       }
     )
 
-  def dropFilterPawnCheckmate(a: DropActor, d: Pos): Boolean =
+  def dropFilterPawnCheckmate(a: DropActor, d: Square): Boolean =
     (a.piece is Pawn) && (
-      a.board.singleRoyalPosOf(!a.color).fold(false) { kingPos =>
-        a.piece.eyes(d, kingPos) && !(a.position
+      a.board.singleRoyalSquareOf(!a.color).fold(false) { kingSquare =>
+        a.piece.eyes(d, kingSquare) && !(a.position
           .withBoard(a.board.forcePlace(a.piece, d))
           .switch
           .hasDestinations)
       }
     )
 
-  def dropFilter(a: DropActor): List[Pos] = {
+  def dropFilter(a: DropActor): List[Square] = {
     a.unfilteredDestinations.filterNot { d =>
       forcePromote(a.piece, d) || dropFilterDoublePawn(a, d) || dropFilterPawnCheckmate(a, d)
     }
@@ -185,14 +187,14 @@ abstract class Variant private[variant] (
     }
 
   protected def hasUnmovablePieces(board: Board) =
-    board.pieces.exists { case (pos, piece) =>
-      forcePromote(piece, pos)
+    board.pieces.exists { case (square, piece) =>
+      forcePromote(piece, square)
     }
 
   protected def hasDoublePawns(board: Board, color: Color) = {
     val pawnFiles = board.pieces.collect {
-      case (pos, piece) if (piece is Pawn) && (piece is color) =>
-        pos.file
+      case (square, piece) if (piece is Pawn) && (piece is color) =>
+        square.file
     }.toList
     pawnFiles.distinct.size != pawnFiles.size
   }

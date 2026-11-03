@@ -1,7 +1,7 @@
 package shogi
 package pieces
 
-import shogi.Pos._
+import shogi.Square._
 
 class RookTest extends ShogiTest {
 
@@ -10,8 +10,8 @@ class RookTest extends ShogiTest {
     val rook     = Sente - Rook
     val rookGote = Gote - Rook
 
-    "move to any position along the same rank or file" in {
-      pieceMoves(rook, SQ5E, shogi.variant.Standard) must bePoss(
+    "move to any square along the same rank or file" in {
+      pieceMoves(rook, SQ5E, shogi.variant.Standard) must beSquares(
         SQ5D,
         SQ5C,
         SQ5B,
@@ -29,7 +29,7 @@ class RookTest extends ShogiTest {
         SQ8E,
         SQ9E,
       )
-      pieceMoves(rookGote, SQ5E, shogi.variant.Standard) must bePoss(
+      pieceMoves(rookGote, SQ5E, shogi.variant.Standard) must beSquares(
         SQ5D,
         SQ5C,
         SQ5B,
@@ -49,8 +49,8 @@ class RookTest extends ShogiTest {
       )
     }
 
-    "move to any position along the same rank or file, even when at the edges" in {
-      pieceMoves(rook, SQ1A, shogi.variant.Standard) must bePoss(
+    "move to any square along the same rank or file, even when at the edges" in {
+      pieceMoves(rook, SQ1A, shogi.variant.Standard) must beSquares(
         SQ1B,
         SQ1C,
         SQ1D,
@@ -70,7 +70,7 @@ class RookTest extends ShogiTest {
       )
     }
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to squares that are occupied by the same colour" in {
       """
 k . B . . . . . .
 . . . . . . . . .
@@ -83,7 +83,7 @@ P P P P P P P . P
 . . . . K . . . .
 Hands:
 Turn:Sente
-""" moveDestsFrom SQ7E must bePoss(SQ7F, SQ7D, SQ7C, SQ7B, SQ8E, SQ6E, SQ5E, SQ4E, SQ3E)
+""" moveDestsFrom SQ7E must beSquares(SQ7F, SQ7D, SQ7C, SQ7B, SQ8E, SQ6E, SQ5E, SQ4E, SQ3E)
     }
 
     "capture opponent pieces" in {
@@ -99,7 +99,7 @@ P P P P P P P P P
 . . . . K . . . .
 Hands:
 Turn:Sente
-""" moveDestsFrom SQ7E must bePoss(SQ7F, SQ7D, SQ7C, SQ7B, SQ8E, SQ9E, SQ6E, SQ5E, SQ4E, SQ3E)
+""" moveDestsFrom SQ7E must beSquares(SQ7F, SQ7D, SQ7C, SQ7B, SQ8E, SQ9E, SQ6E, SQ5E, SQ4E, SQ3E)
     }
     "threaten" in {
       val position = """

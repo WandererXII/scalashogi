@@ -29,12 +29,12 @@ trait ShogiTest extends Specification with ValidatedMatchers {
     }
 
   case class RichActor(actor: MoveActor) {
-    def threatens(to: Pos): Boolean =
-      actor.piece.eyes(actor.pos, to) && {
+    def threatens(to: Square): Boolean =
+      actor.piece.eyes(actor.square, to) && {
         (actor.piece.projectionDirs.isEmpty) ||
-        (actor.piece.directDirs.exists(_(actor.pos).contains(to))) ||
-        Pos.findDirection(actor.pos, to).exists { dir =>
-          actor.variant.longRangeThreatens(actor.board, actor.pos, dir, to)
+        (actor.piece.directDirs.exists(_(actor.square).contains(to))) ||
+        Square.findDirection(actor.square, to).exists { dir =>
+          actor.variant.longRangeThreatens(actor.board, actor.square, dir, to)
         }
       }
   }
@@ -80,20 +80,20 @@ trait ShogiTest extends Specification with ValidatedMatchers {
   def makePosition(variant: Variant): Position =
     Position(variant)
 
-  def makePositionWithBoard(variant: Variant, color: Color, pieces: (Pos, Piece)*): Position =
+  def makePositionWithBoard(variant: Variant, color: Color, pieces: (Square, Piece)*): Position =
     makePosition(variant).withColor(color).withBoard(Board(pieces))
 
   def makeEmptyPosition(variant: Variant): Position =
     Position(variant).withBoard(Board.empty)
 
-  def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] =
-    beSome.like { case p =>
-      p.toList must containTheSameElementsAs(poss.toList)
+  def beSquares(squares: Square*): Matcher[Option[Iterable[Square]]] =
+    beSome.like { case actual =>
+      actual.toList must containTheSameElementsAs(squares.toList)
     }
 
-  def bePoss(position: Position, visual: String): Matcher[Option[Iterable[Pos]]] =
-    beSome.like { case p =>
-      Visual.addNewLines(Visual.render(position, Map(p -> 'x'))) must_== visual
+  def beSquares(position: Position, visual: String): Matcher[Option[Iterable[Square]]] =
+    beSome.like { case actual =>
+      Visual.addNewLines(Visual.render(position, Map(actual -> 'x'))) must_== visual
     }
 
   def bePosition(visual: String, variant: Variant): Matcher[Validated[String, Position]] =
@@ -103,13 +103,13 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   def pieceMoves(
       piece: Piece,
-      pos: Pos,
+      square: Square,
       variant: Variant,
-  ): Option[List[Pos]] = {
+  ): Option[List[Square]] = {
     val position = makeEmptyPosition(variant)
     position
       .withColor(piece.color)
-      .withBoard(position.board.place(piece, pos).get)
-      .moveActorAt(pos) map (_.destinations)
+      .withBoard(position.board.place(piece, square).get)
+      .moveActorAt(square) map (_.destinations)
   }
 }

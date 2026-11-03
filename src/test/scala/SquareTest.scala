@@ -1,14 +1,14 @@
 package shogi
 
-import shogi.Pos._
+import shogi.Square._
 
-class PosTest extends ShogiTest {
+class SquareTest extends ShogiTest {
 
-  "A position" should {
+  "A square" should {
 
     "reject out of bounds indices" in {
-      Pos(144) must beNone
-      Pos(-1) must beNone
+      Square(144) must beNone
+      Square(-1) must beNone
       Rank(12) must beNone
       Rank(-1) must beNone
       File(12) must beNone
@@ -16,10 +16,10 @@ class PosTest extends ShogiTest {
     }
 
     "preserve value equality through validated factories" in {
-      Pos(143) must beSome(SQ12L)
+      Square(143) must beSome(SQ12L)
       Rank(11) must beSome(Rank.L)
       File(11) must beSome(File.Twelfth)
-      Map(SQ12L -> "square").get(Pos(143).get) must beSome("square")
+      Map(SQ12L -> "square").get(Square(143).get) must beSome("square")
     }
 
     "boolean directions" in {
@@ -54,18 +54,18 @@ class PosTest extends ShogiTest {
     }
 
     "project from to" in {
-      Pos.findDirection(SQ5E, SQ5D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ5D) }
-      Pos.findDirection(SQ5E, SQ4D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4D) }
-      Pos.findDirection(SQ5E, SQ4E) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4E) }
-      Pos.findDirection(SQ5E, SQ4F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4F) }
-      Pos.findDirection(SQ5E, SQ5F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ5F) }
-      Pos.findDirection(SQ5E, SQ6F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6F) }
-      Pos.findDirection(SQ5E, SQ6E) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6E) }
-      Pos.findDirection(SQ5E, SQ6D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6D) }
-      Pos.findDirection(SQ5E, SQ2G) must beNone
+      Square.findDirection(SQ5E, SQ5D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ5D) }
+      Square.findDirection(SQ5E, SQ4D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4D) }
+      Square.findDirection(SQ5E, SQ4E) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4E) }
+      Square.findDirection(SQ5E, SQ4F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ4F) }
+      Square.findDirection(SQ5E, SQ5F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ5F) }
+      Square.findDirection(SQ5E, SQ6F) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6F) }
+      Square.findDirection(SQ5E, SQ6E) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6E) }
+      Square.findDirection(SQ5E, SQ6D) must beSome.like { dir => dir(SQ5E) must_== Some(SQ6D) }
+      Square.findDirection(SQ5E, SQ2G) must beNone
     }
 
-    "be used to derive a relative list of positions" in {
+    "be used to derive a relative list of squares" in {
       "SQ6F >| false" in { SQ6F >| (_ => false) must contain(SQ5F, SQ4F, SQ3F, SQ2F, SQ1F) }
       "SQ6F |< false" in { SQ6F |< (_ => false) must contain(SQ7F, SQ8F, SQ9F) }
       "SQ6F >| (==SQ3F)" in { SQ6F >| (SQ3F ==) must contain(SQ5F, SQ4F, SQ3F) }
@@ -100,21 +100,21 @@ class PosTest extends ShogiTest {
     }
 
     "UCI" in {
-      Pos.fromKey("i9") must_== Some(SQ1A)
-      Pos.fromKey("a1") must_== Some(SQ9I)
-      Pos.fromKey("e5") must_== Some(SQ5E)
-      Pos.fromKey("d7") must_== Some(SQ6C)
+      Square.fromKey("i9") must_== Some(SQ1A)
+      Square.fromKey("a1") must_== Some(SQ9I)
+      Square.fromKey("e5") must_== Some(SQ5E)
+      Square.fromKey("d7") must_== Some(SQ6C)
     }
 
     "all" in {
-      Pos.all.map(_.key).map(k => Pos.fromKey(k).get) must_== Pos.all
-      Pos.all.map(_.kanjiKey).map(k => Pos.fromKey(k).get) must_== Pos.all
-      Pos.all.map(_.kanjiFullWidthKey).map(k => Pos.fromKey(k).get) must_== Pos.all
+      Square.all.map(_.key).map(k => Square.fromKey(k).get) must_== Square.all
+      Square.all.map(_.kanjiKey).map(k => Square.fromKey(k).get) must_== Square.all
+      Square.all.map(_.kanjiFullWidthKey).map(k => Square.fromKey(k).get) must_== Square.all
     }
 
     "board sizes" in {
       "12x12" in {
-        Pos.all must have size 144
+        Square.all must have size 144
       }
       "9x9" in {
         (SQ9I upTo SQ1A).toList must have size 81
