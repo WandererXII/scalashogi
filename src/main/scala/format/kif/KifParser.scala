@@ -168,12 +168,12 @@ object KifParser {
                 }
                 if (uselessTimes) s1 else s1 withTimeSpent timeSpent withTimeTotal timeTotal
               } match {
-                case Valid(step) => {
+                case Valid(parsedStep) => {
                   val newSteps =
                     if (variant.chushogi && secondLionMove && parsedSteps.nonEmpty)
-                      step :: parsedSteps.tail
-                    else step :: parsedSteps
-                  mk(newSteps, rest, step.positions.lastOption, ply + 1)
+                      parsedStep :: parsedSteps.tail
+                    else parsedStep :: parsedSteps
+                  mk(newSteps, rest, parsedStep.positions.lastOption, ply + 1)
                 }
                 case Invalid(err) => invalid(err)
               }

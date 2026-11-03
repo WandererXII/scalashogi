@@ -94,36 +94,36 @@ class SfenTest extends ShogiTest {
           )
         }
         "one step" in {
-          state.playUsisStr(steps take 1) must beValid.like { case state =>
-            state.toSfen must_== Sfen(
+          state.playUsisStr(steps take 1) must beValid.like { case sit =>
+            sit.toSfen must_== Sfen(
               "lnsgkgsnl/1r5b1/ppppppppp/9/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL w - 2",
             )
           }
         }
         "2 steps" in {
-          state.playUsisStr(steps take 2) must beValid.like { case state =>
-            state.toSfen must_== Sfen(
+          state.playUsisStr(steps take 2) must beValid.like { case sit =>
+            sit.toSfen must_== Sfen(
               "lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3",
             )
           }
         }
         "3 steps" in {
-          state.playUsisStr(steps take 3) must beValid.like { case state =>
-            state.toSfen must_== Sfen(
+          state.playUsisStr(steps take 3) must beValid.like { case sit =>
+            sit.toSfen must_== Sfen(
               "lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4",
             )
           }
         }
         "4 steps" in {
-          state.playUsisStr(steps take 4) must beValid.like { case state =>
-            state.toSfen must_== Sfen(
+          state.playUsisStr(steps take 4) must beValid.like { case sit =>
+            sit.toSfen must_== Sfen(
               "lnsgkg1nl/1r5s1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL b Bb 5",
             )
           }
         }
         "5 drop" in {
-          state.playUsisStr(steps take 4) must beValid.like { case state =>
-            state.playUsiStr("B*5e") must beValid.like { case state2 =>
+          state.playUsisStr(steps take 4) must beValid.like { case sit =>
+            sit.playUsiStr("B*5e") must beValid.like { case state2 =>
               state2.toSfen must_== Sfen(
                 "lnsgkg1nl/1r5s1/pppppp1pp/6p2/4B4/2P6/PP1PPPPPP/7R1/LNSGKGSNL w b 6",
               )
@@ -136,8 +136,8 @@ class SfenTest extends ShogiTest {
     "import" in {
       val steps                                = List("7g7f", "3c3d", "8h2b", "3a2b")
       def compare(u: List[String], sfen: Sfen) =
-        makeState(Standard).playUsisStr(u) must beValid.like { case state =>
-          sfen must_== state.toSfen
+        makeState(Standard).playUsisStr(u) must beValid.like { case sit =>
+          sfen must_== sit.toSfen
         }
       "new game" in {
         compare(

@@ -99,8 +99,8 @@ trait ShogiTest extends Specification with ValidatedMatchers {
     }
 
   def beState(visual: String, variant: Variant): Matcher[Validated[String, Situation]] =
-    beValid.like { case state =>
-      state.visual must_== Visual.parse(visual, variant).get.visual
+    beValid.like { case sit =>
+      sit.visual must_== Visual.parse(visual, variant).get.visual
     }
 
   def pieceMoves(

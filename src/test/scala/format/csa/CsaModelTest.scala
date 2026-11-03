@@ -46,9 +46,9 @@ class CsaModelTest extends ShogiTest {
       ),
     ) { case (sfen, move, winner) =>
       val usi = Usi(move).get
-      Replay.fromUsi(List(usi), Some(sfen), Standard).valid must beValid.like { case state =>
-        state.status must_== Some(Status.Mate)
-        state.winner must beSome(winner)
+      Replay.fromUsi(List(usi), Some(sfen), Standard).valid must beValid.like { case sit =>
+        sit.status must_== Some(Status.Mate)
+        sit.winner must beSome(winner)
       }
       createTerminationStep(Status.Mate, winnerTurn = false, Some(winner)) must beSome.like {
         case termination =>

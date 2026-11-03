@@ -43,24 +43,24 @@ class PerpetualCheckTest extends ShogiTest {
     )
     "not trigger" in {
       "after 2 repetitions" in {
-        state must beValid.like { case state =>
-          state.playUsisStr(u take 5) must beValid.like { case state2 =>
+        state must beValid.like { case sit =>
+          sit.playUsisStr(u take 5) must beValid.like { case state2 =>
             state2.status must beNone
             state2.winner must beNone
           }
         }
       }
       "after 3 repetitions" in {
-        state must beValid.like { case state =>
-          state.playUsisStr(u take 9) must beValid.like { case state2 =>
+        state must beValid.like { case sit =>
+          sit.playUsisStr(u take 9) must beValid.like { case state2 =>
             state2.status must beNone
             state2.winner must beNone
           }
         }
       }
       "if the checks weren't consecutive" in {
-        state must beValid.like { case state =>
-          state.playUsisStr(ui) must beValid.like { case state2 =>
+        state must beValid.like { case sit =>
+          sit.playUsisStr(ui) must beValid.like { case state2 =>
             state2.status.contains(Status.Repetition) must beTrue
             state2.winner must beNone
           }
@@ -86,9 +86,9 @@ class PerpetualCheckTest extends ShogiTest {
           "S*6a",
           "4c5b+", // 4th
         )
-        state.playUsisStr(usis) must beValid.like { case state =>
-          state.status.contains(Status.Repetition) must beTrue
-          state.winner must beNone
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          sit.status.contains(Status.Repetition) must beTrue
+          sit.winner must beNone
         }
       }
     }
@@ -98,8 +98,8 @@ class PerpetualCheckTest extends ShogiTest {
           state.winner == Some(winner)
 
       "after 4 repetitions" in {
-        state must beValid.like { case state =>
-          state.playUsisStr(u) must beValid.like { case state2 =>
+        state must beValid.like { case sit =>
+          sit.playUsisStr(u) must beValid.like { case state2 =>
             isPerpetualWith(state2, Gote) must beTrue
           }
         }
@@ -124,8 +124,8 @@ class PerpetualCheckTest extends ShogiTest {
           "2a3a",
           "2h3h",
         )
-        state.playUsisStr(usis) must beValid.like { case state =>
-          isPerpetualWith(state, Gote) must beTrue
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          isPerpetualWith(sit, Gote) must beTrue
         }
       }
       "on opponent's turn" in {
@@ -150,8 +150,8 @@ class PerpetualCheckTest extends ShogiTest {
           "6b5c",
           "4b5a", // 4th
         )
-        state.playUsisStr(usis) must beValid.like { case state =>
-          isPerpetualWith(state, Gote) must beTrue
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          isPerpetualWith(sit, Gote) must beTrue
         }
       }
       "on opponent's turn 2" in {
@@ -173,8 +173,8 @@ class PerpetualCheckTest extends ShogiTest {
           "6b5c",
           "4b5a", // 4th
         )
-        state.playUsisStr(usis) must beValid.like { case state =>
-          isPerpetualWith(state, Gote) must beTrue
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          isPerpetualWith(sit, Gote) must beTrue
         }
       }
       "on opponent's turn 3" in {
@@ -196,8 +196,8 @@ class PerpetualCheckTest extends ShogiTest {
           "3b4b",
           "4i3i",
         )
-        state.playUsisStr(usis) must beValid.like { case state =>
-          state.winner must_== Some(Sente)
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          sit.winner must_== Some(Sente)
         }
       }
       "Sente starts in check" in {
@@ -217,8 +217,8 @@ class PerpetualCheckTest extends ShogiTest {
           "2i3i",
           "2a3a",
         )
-        state.playUsisStr(usis) must beValid.like { case state =>
-          state.winner must_== Some(Sente)
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          sit.winner must_== Some(Sente)
         }
       }
       "Gote starts in check" in {
@@ -238,8 +238,8 @@ class PerpetualCheckTest extends ShogiTest {
           "3a2a",
           "3i2i",
         )
-        state.playUsisStr(usis) must beValid.like { case state =>
-          state.winner must_== Some(Gote)
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          sit.winner must_== Some(Gote)
         }
       }
     }
@@ -266,9 +266,9 @@ class PerpetualCheckTest extends ShogiTest {
         "4g4h",
         "9f9e", // forth repetition
       )
-      dState.playUsisStr(dUsis) must beValid.like { case state =>
-        state.status.contains(Status.Repetition) must beTrue
-        state.winner must beNone
+      dState.playUsisStr(dUsis) must beValid.like { case sit =>
+        sit.status.contains(Status.Repetition) must beTrue
+        sit.winner must beNone
       }
     }
     "trigger" in {
@@ -300,9 +300,9 @@ class PerpetualCheckTest extends ShogiTest {
         "4f4e",
         "9f9e",
       )
-      aState.playUsisStr(aUsis) must beValid.like { case state =>
-        state.status.contains(Status.PerpetualCheck) must beTrue
-        state.winner must_== Some(Gote)
+      aState.playUsisStr(aUsis) must beValid.like { case sit =>
+        sit.status.contains(Status.PerpetualCheck) must beTrue
+        sit.winner must_== Some(Gote)
       }
     }
   }

@@ -12,37 +12,37 @@ class ImpasseTest extends ShogiTest {
           Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1"),
           Standard,
         )
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beFalse
-          state.winner must beNone
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beFalse
+          sit.winner must beNone
         }
       }
       "position with less than 10 other pieces in promotion zone" in {
         val state = sfenToState(Sfen("2SGS4/+B+RGKG2RB/9/9/7pp/8k/9/9/9 b g2s4n4l16p 1"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beFalse
-          state.winner must beNone
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beFalse
+          sit.winner must beNone
         }
       }
       "position without the king in promotion zone" in {
         val state = sfenToState(Sfen("2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 b - 1"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beFalse
-          state.winner must beNone
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beFalse
+          sit.winner must beNone
         }
       }
       "position without enough value" in {
         val state =
           sfenToState(Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beFalse
-          state.winner must beNone
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beFalse
+          sit.winner must beNone
         }
       }
       "one move away" in {
         val state = sfenToState(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/9/9/9 b - 1"), Standard)
-        state must beValid.like { case state =>
-          state.playUsiStr("8e8b") must beValid.like { case state2 =>
+        state must beValid.like { case sit =>
+          sit.playUsiStr("8e8b") must beValid.like { case state2 =>
             state2.status.contains(Status.Impasse27) must beFalse
             state2.winner must beNone
           }
@@ -50,8 +50,8 @@ class ImpasseTest extends ShogiTest {
       }
       "opponent prevents impasse" in {
         val state = sfenToState(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/6b2/9/9 b - 1"), Standard)
-        state must beValid.like { case state =>
-          state.playUsisStr(List("8e8b", "3g2f")) must beValid.like { case state2 =>
+        state must beValid.like { case sit =>
+          sit.playUsisStr(List("8e8b", "3g2f")) must beValid.like { case state2 =>
             state2.status.contains(Status.Impasse27) must beFalse
             state2.winner must beNone
           }
@@ -59,16 +59,16 @@ class ImpasseTest extends ShogiTest {
       }
       "26 points for gote" in {
         val state = sfenToState(Sfen("9/9/9/9/9/9/3r1lllg/+P+P1+bkssgg/K+P4ssg w r 2"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beFalse
-          state.winner must beNone
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beFalse
+          sit.winner must beNone
         }
       }
       "21 points for gote (uwate) plus 1 piece handicap" in {
         val state = sfenToState(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgr/K+P4ssg w r 2"), Standard)
-        state must beValid.like { case state =>
-          val handicapState = state.withHistory(
-            state.history.withInitialSfen(
+        state must beValid.like { case sit =>
+          val handicapState = sit.withHistory(
+            sit.history.withInitialSfen(
               Sfen("lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
             ),
           )
@@ -78,9 +78,9 @@ class ImpasseTest extends ShogiTest {
       }
       "17 points for gote (uwate) and pieces in opponent hand - not missing" in {
         val state = sfenToState(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Standard)
-        state must beValid.like { case state =>
-          val handicapState = state.withHistory(
-            state.history.withInitialSfen(
+        state must beValid.like { case sit =>
+          val handicapState = sit.withHistory(
+            sit.history.withInitialSfen(
               Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB 1"),
             ),
           )
@@ -91,35 +91,35 @@ class ImpasseTest extends ShogiTest {
       "27 points for sente" in {
         val state =
           sfenToState(Sfen("G3+R3S/GG5SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 b - 1"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beFalse
-          state.winner must beNone
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beFalse
+          sit.winner must beNone
         }
       }
     }
     "be enough" in {
       "all pieces on the board" in {
         val state = sfenToState(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beTrue
-          state.winner must beSome.like { case color =>
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beTrue
+          sit.winner must beSome.like { case color =>
             color.sente
           }
         }
       }
       "some from hand" in {
         val state = sfenToState(Sfen("G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2R2B 1"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beTrue
-          state.winner must beSome.like { case color =>
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beTrue
+          sit.winner must beSome.like { case color =>
             color.sente
           }
         }
       }
       "after moves" in {
         val state = sfenToState(Sfen("2SGS4/+B1GKGLLRB/3G5/9/1+R5pp/8k/9/9/9 b - 1"), Standard)
-        state must beValid.like { case state =>
-          state.playUsisStr(List("8e8b", "2e2f")) must beValid.like { case state2 =>
+        state must beValid.like { case sit =>
+          sit.playUsisStr(List("8e8b", "2e2f")) must beValid.like { case state2 =>
             state2.status.contains(Status.Impasse27) must beTrue
             state2.winner must beSome.like { case color =>
               color.sente
@@ -129,18 +129,18 @@ class ImpasseTest extends ShogiTest {
       }
       "27 points for gote" in {
         val state = sfenToState(Sfen("9/9/9/9/9/9/3r1llll/+P+P1+bkssgg/K+P3ssgg w r 2"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beTrue
-          state.winner must beSome.like { case color =>
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beTrue
+          sit.winner must beSome.like { case color =>
             color.gote
           }
         }
       }
       "17 points for gote (uwate), but 2 piece handicap" in {
         val state = sfenToState(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Standard)
-        state must beValid.like { case state =>
-          val handicapState = state.withHistory(
-            state.history.withInitialSfen(
+        state must beValid.like { case sit =>
+          val handicapState = sit.withHistory(
+            sit.history.withInitialSfen(
               Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
             ),
           )
@@ -153,9 +153,9 @@ class ImpasseTest extends ShogiTest {
       "28 points for sente" in {
         val state =
           sfenToState(Sfen("G3+R3S/GG2P2SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 b - 1"), Standard)
-        state must beValid.like { case state =>
-          state.status.contains(Status.Impasse27) must beTrue
-          state.winner must beSome.like { case color =>
+        state must beValid.like { case sit =>
+          sit.status.contains(Status.Impasse27) must beTrue
+          sit.winner must beSome.like { case color =>
             color.sente
           }
         }
@@ -165,27 +165,27 @@ class ImpasseTest extends ShogiTest {
       "yes" in {
         "all pieces on the board" in {
           val state = sfenToState(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"), Annanshogi)
-          state must beValid.like { case state =>
-            state.status.contains(Status.Impasse27) must beTrue
-            state.winner must beSome.like { case color =>
+          state must beValid.like { case sit =>
+            sit.status.contains(Status.Impasse27) must beTrue
+            sit.winner must beSome.like { case color =>
               color.sente
             }
           }
         }
         "some from hand" in {
           val state = sfenToState(Sfen("G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2R2B 1"), Annanshogi)
-          state must beValid.like { case state =>
-            state.status.contains(Status.Impasse27) must beTrue
-            state.winner must beSome.like { case color =>
+          state must beValid.like { case sit =>
+            sit.status.contains(Status.Impasse27) must beTrue
+            sit.winner must beSome.like { case color =>
               color.sente
             }
           }
         }
         "17 points for gote (uwate), but annanshogi handicap" in {
           val state = sfenToState(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Annanshogi)
-          state must beValid.like { case state =>
-            val handicapState = state.withHistory(
-              state.history.withInitialSfen(
+          state must beValid.like { case sit =>
+            val handicapState = sit.withHistory(
+              sit.history.withInitialSfen(
                 Sfen("lnsgkgsnl/9/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1"),
               ),
             )
@@ -200,16 +200,16 @@ class ImpasseTest extends ShogiTest {
         "position with less than 10 other pieces in promotion zone" in {
           val state =
             sfenToState(Sfen("2SGS4/+B+RGKG2RB/9/9/7pp/8k/9/9/9 b g2s4n4l16p 1"), Annanshogi)
-          state must beValid.like { case state =>
-            state.status.contains(Status.Impasse27) must beFalse
-            state.winner must beNone
+          state must beValid.like { case sit =>
+            sit.status.contains(Status.Impasse27) must beFalse
+            sit.winner must beNone
           }
         }
         "position without the king in promotion zone" in {
           val state = sfenToState(Sfen("2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 b - 1"), Annanshogi)
-          state must beValid.like { case state =>
-            state.status.contains(Status.Impasse27) must beFalse
-            state.winner must beNone
+          state must beValid.like { case sit =>
+            sit.status.contains(Status.Impasse27) must beFalse
+            sit.winner must beNone
           }
         }
         "position without enough value" in {
@@ -218,16 +218,16 @@ class ImpasseTest extends ShogiTest {
               Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"),
               Annanshogi,
             )
-          state must beValid.like { case state =>
-            state.status.contains(Status.Impasse27) must beFalse
-            state.winner must beNone
+          state must beValid.like { case sit =>
+            sit.status.contains(Status.Impasse27) must beFalse
+            sit.winner must beNone
           }
         }
         "17 points for gote (uwate), but standard handicap" in {
           val state = sfenToState(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Annanshogi)
-          state must beValid.like { case state =>
-            val handicapState = state.withHistory(
-              state.history.withInitialSfen(
+          state must beValid.like { case sit =>
+            val handicapState = sit.withHistory(
+              sit.history.withInitialSfen(
                 Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
               ),
             )
@@ -241,9 +241,9 @@ class ImpasseTest extends ShogiTest {
       "yes" in {
         "all pieces on the board" in {
           val state = sfenToState(Sfen("2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 b - 1"), Checkshogi)
-          state must beValid.like { case state =>
-            state.status.contains(Status.Impasse27) must beTrue
-            state.winner must beSome.like { case color =>
+          state must beValid.like { case sit =>
+            sit.status.contains(Status.Impasse27) must beTrue
+            sit.winner must beSome.like { case color =>
               color.sente
             }
           }

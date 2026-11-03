@@ -21,22 +21,22 @@ class ReplayTest extends ShogiTest {
       forall(variants) { variant =>
         forall(List(None, Some(variant.initialSfen))) { initialSfen =>
           val expected = Situation(initialSfen, variant)
-          Replay.fromUsi(Nil, initialSfen, variant).valid must beValid.like { case state =>
-            state.toSfen must_== expected.toSfen
-            state.plies must_== expected.plies
-            state.startedAtPly must_== expected.startedAtPly
-            state.startedAtStep must_== expected.startedAtStep
-            state.usis must beEmpty
+          Replay.fromUsi(Nil, initialSfen, variant).valid must beValid.like { case sit =>
+            sit.toSfen must_== expected.toSfen
+            sit.plies must_== expected.plies
+            sit.startedAtPly must_== expected.startedAtPly
+            sit.startedAtStep must_== expected.startedAtStep
+            sit.usis must beEmpty
           }
         }
       }
     }
 
     "return the initial game for an empty record" in {
-      Replay.fromUsi(Nil, None, Standard).valid must beValid.like { case state =>
-        state.toSfen must_== Situation(Standard).toSfen
-        state.usis must beEmpty
-        state.playedPlies must_== 0
+      Replay.fromUsi(Nil, None, Standard).valid must beValid.like { case sit =>
+        sit.toSfen must_== Situation(Standard).toSfen
+        sit.usis must beEmpty
+        sit.playedPlies must_== 0
       }
     }
 
@@ -82,30 +82,30 @@ class ReplayTest extends ShogiTest {
       val sfen    = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 42")
       val initial = Situation(Some(sfen), Standard)
       val moves   = Usi.readList("3c3d 7g7f").get
-      Replay.fromUsi(moves, Some(sfen), Standard).valid must beValid.like { case state =>
-        state.startedAtPly must_== initial.plies
-        state.startedAtStep must_== 42
-        state.plies must_== initial.plies + 2
-        state.stepNumber must_== 44
-        state.color must_== Gote
-        state.usis must_== moves.toVector
+      Replay.fromUsi(moves, Some(sfen), Standard).valid must beValid.like { case sit =>
+        sit.startedAtPly must_== initial.plies
+        sit.startedAtStep must_== 42
+        sit.plies must_== initial.plies + 2
+        sit.stepNumber must_== 44
+        sit.color must_== Gote
+        sit.usis must_== moves.toVector
       }
     }
   }
 
   "all 500 fixtures" should {
     "have no errors and correct size" in {
-      usis forall { u =>
+      forall(usis) { u =>
         val r = Replay.statesWhileValid(u, None, shogi.variant.Standard)
         r._1.tail.size must_== u.size
         r._2 must beEmpty
-        Replay.fromUsi(u, None, Standard).valid must beValid.like { case state =>
+        Replay.fromUsi(u, None, Standard).valid must beValid.like { case sit =>
           val expected = r._1.last
-          state.toSfen must_== expected.toSfen
-          state.usis must_== expected.usis
-          state.plies must_== expected.plies
-          state.history.positionHashes.toList must_== expected.history.positionHashes.toList
-          state.history.consecutiveAttacks must_== expected.history.consecutiveAttacks
+          sit.toSfen must_== expected.toSfen
+          sit.usis must_== expected.usis
+          sit.plies must_== expected.plies
+          sit.history.positionHashes.toList must_== expected.history.positionHashes.toList
+          sit.history.consecutiveAttacks must_== expected.history.consecutiveAttacks
         }
         val r2 = Replay.usiWithRoleWhilePossible(u, None, shogi.variant.Standard)
         r2.size must_== u.size

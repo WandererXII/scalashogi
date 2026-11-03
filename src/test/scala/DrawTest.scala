@@ -45,18 +45,18 @@ K . . . . N .""".status.contains(Status.Draw) must beFalse
   "do not detect insufficient material" should {
     "on two kings with something in hand" in {
       val position = Sfen("4k4/9/9/9/9/9/9/9/5K3 b p 1")
-      sfenToState(position, Standard) must beValid.like { case state =>
-        state.status.contains(Status.Draw) must beFalse
-        state.end must beFalse
+      sfenToState(position, Standard) must beValid.like { case sit =>
+        sit.status.contains(Status.Draw) must beFalse
+        sit.end must beFalse
       }
     }
     "on a single pawn" in {
       val position = Sfen("2p2k3/9/9/9/9/9/9/9/4K4 b - 1")
       val state    = sfenToState(position, Standard)
       val newState = state flatMap (_.playUsiStr("5i5h"))
-      newState must beValid.like { case state =>
-        state.status.contains(Status.Draw) must beFalse
-        state.end must beFalse
+      newState must beValid.like { case sit =>
+        sit.status.contains(Status.Draw) must beFalse
+        sit.end must beFalse
       }
     }
   }

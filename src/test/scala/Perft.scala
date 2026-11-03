@@ -19,7 +19,7 @@ object Perft {
         val mds: List[Usi] = moves(state) ::: drops(state)
         mds.foldLeft(0) { (p, u) =>
           val newState = state(u).toOption.get
-          val cnt      = perft(newState, depth - 1)
+          val cnt      = perft(newState, depth - 1, log = false)
           if (log) println(s"${u.usi.padTo(5, ' ')} - $cnt")
           p + cnt
         }

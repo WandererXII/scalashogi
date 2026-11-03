@@ -17,16 +17,16 @@ class RepetitionTest extends ShogiTest {
       )
       val usis = List.fill(3)(List("7j7i7j", "6c6d6c")).flatten
       "should be fourfold" in {
-        state.playUsisStr(usis) must beValid.like { case state =>
-          state.history.fourfoldRepetition must beTrue
-          state.status.contains(Status.Repetition) must beTrue
-          state.winner must beNone
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          sit.history.fourfoldRepetition must beTrue
+          sit.status.contains(Status.Repetition) must beTrue
+          sit.winner must beNone
         }
       }
       "should not end before the fourth occurrence" in {
-        state.playUsisStr(usis.dropRight(1)) must beValid.like { case state =>
-          state.history.fourfoldRepetition must beFalse
-          state.status must beNone
+        state.playUsisStr(usis.dropRight(1)) must beValid.like { case sit =>
+          sit.history.fourfoldRepetition must beFalse
+          sit.status must beNone
         }
       }
     }
@@ -46,15 +46,15 @@ class RepetitionTest extends ShogiTest {
         "7b8b",
       )
       "should be fourfold" in {
-        state.playUsisStr(usis) must beValid.like { case state =>
-          state.status.contains(Status.Repetition) must beTrue
-          state.winner must beNone
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          sit.status.contains(Status.Repetition) must beTrue
+          sit.winner must beNone
         }
       }
       "should not be fourfold" in {
-        state.playUsisStr(usis.dropRight(1)) must beValid.like { case state =>
-          state.status must beNone
-          state.winner must beNone
+        state.playUsisStr(usis.dropRight(1)) must beValid.like { case sit =>
+          sit.status must beNone
+          sit.winner must beNone
         }
       }
     }
@@ -76,20 +76,20 @@ class RepetitionTest extends ShogiTest {
         "2b2a",
       )
       "should be fourfold" in {
-        state.playUsisStr(usis) must beValid.like { case state =>
-          state.status.contains(Status.Repetition) must beTrue
-          state.winner must_== Some(Gote)
-          val stateNoInitialSfen = state.withHistory(state.history.copy(initialSfen = None))
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          sit.status.contains(Status.Repetition) must beTrue
+          sit.winner must_== Some(Gote)
+          val stateNoInitialSfen = sit.withHistory(sit.history.copy(initialSfen = None))
           stateNoInitialSfen.winner must_== Some(Gote)
           val stateOppositeColorSfen =
-            state.withHistory(state.history.withInitialSfen(Sfen("rbsgk/4p/5/P4/KGSBR w - 1")))
+            sit.withHistory(sit.history.withInitialSfen(Sfen("rbsgk/4p/5/P4/KGSBR w - 1")))
           stateOppositeColorSfen.winner must_== Some(Sente)
         }
       }
       "should not be fourfold" in {
-        state.playUsisStr(usis.dropRight(1)) must beValid.like { case state =>
-          state.status must beNone
-          state.winner must beNone
+        state.playUsisStr(usis.dropRight(1)) must beValid.like { case sit =>
+          sit.status must beNone
+          sit.winner must beNone
         }
       }
     }
@@ -106,15 +106,15 @@ class RepetitionTest extends ShogiTest {
         "3b2a+",
       )
       "should be threefold" in {
-        state.playUsisStr(usis) must beValid.like { case state =>
-          state.status.contains(Status.Repetition) must beTrue
-          state.winner must beNone
+        state.playUsisStr(usis) must beValid.like { case sit =>
+          sit.status.contains(Status.Repetition) must beTrue
+          sit.winner must beNone
         }
       }
       "should not be threefold" in {
-        state.playUsisStr(usis.dropRight(1)) must beValid.like { case state =>
-          state.status must beNone
-          state.winner must beNone
+        state.playUsisStr(usis.dropRight(1)) must beValid.like { case sit =>
+          sit.status must beNone
+          sit.winner must beNone
         }
       }
     }

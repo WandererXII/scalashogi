@@ -69,8 +69,8 @@ final case class MoveActor(
               buf += to
               addAll(to, dir)
             }
-            case Some(piece) =>
-              if (piece.color != color)
+            case Some(other) =>
+              if (other.color != color)
                 buf += to
           }
         case _ => ()
