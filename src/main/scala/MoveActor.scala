@@ -7,15 +7,15 @@ import shogi.format.usi.Usi
 final case class MoveActor(
     piece: Piece,
     pos: Pos,
-    situation: Situation,
+    position: Position,
 ) {
 
-  def board   = situation.board
-  def color   = situation.color
-  def history = situation.history
-  def variant = situation.variant
+  def board   = position.board
+  def color   = position.color
+  def history = position.history
+  def variant = position.variant
 
-  def check = situation.check
+  def check = position.check
 
   lazy val attackingPiece = variant.attackingPiece(piece, pos, board)
 

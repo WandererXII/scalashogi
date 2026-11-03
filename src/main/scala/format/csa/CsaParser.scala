@@ -50,11 +50,11 @@ object CsaParser {
         preTags     <- TagParser(metaStr)
         parsedSteps <- StepsParser(stepsStr)
         (strSteps, terminationOption) = parsedSteps
-        init      <- getComments(headerStr)
-        situation <- CsaParserHelper.parseSituation(boardStr)
-        variant     = situation.variant
-        initialSfen = situation.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
-        tags        = createTags(preTags, situation.color, strSteps.size, terminationOption)
+        init     <- getComments(headerStr)
+        position <- CsaParserHelper.parsePosition(boardStr)
+        variant     = position.variant
+        initialSfen = position.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
+        tags        = createTags(preTags, position.color, strSteps.size, terminationOption)
         parsedSteps <- objSteps(strSteps)
       } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)
     } catch {

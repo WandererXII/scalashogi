@@ -12,7 +12,7 @@ class KifParserTest extends ShogiTest {
 
   "standard full piece names preserve the variant with and without a diagram" in {
     import shogi.variant.Standard
-    val diagram = Kif.renderSituation(Situation(Standard))
+    val diagram = Kif.renderPosition(Position(Standard))
     forall(List("", diagram)) { setup =>
       forall(List("歩兵", "香車", "金将", "銀将", "角行", "飛車", "龍馬", "龍王")) { role =>
         parser(s"手合割：平手\n$setup\n1 ７六$role(77)") must beValid.like { case p =>
@@ -661,10 +661,10 @@ class KifParserTest extends ShogiTest {
         // This notation-only fixture crosses occupied squares in the default setup.
         val setup = forsyth.Sfen("k11/12/12/12/12/12/12/12/12/5N6/12/11K b - 1")
         Replay.fromParsedNotation(p.copy(initialSfen = Some(setup)), identity).valid must beValid
-          .like { case sit =>
-            sit.usis.map(_.usi) must_== Vector("7j6i6h")
-            sit.plies must_== 1
-            sit.stepNumber must_== 2
+          .like { case position =>
+            position.usis.map(_.usi) must_== Vector("7j6i6h")
+            position.plies must_== 1
+            position.stepNumber must_== 2
           }
         p.tags(_.Result) must beSome("sente")
       }
@@ -931,10 +931,10 @@ class KifParserTest extends ShogiTest {
         p.variant.kyotoshogi must beTrue
         // The final fixture drop has no pawn in hand; replay the seven legal moves.
         Replay.fromParsedNotation(p, steps => ParsedSteps(steps.value.take(7))).valid must beValid
-          .like { case sit =>
-            sit.plies must_== 7
-            sit.board(Pos.SQ2B) must beSome(Sente.gold)
-            sit.board(Pos.SQ4D) must beSome(Sente.king)
+          .like { case position =>
+            position.plies must_== 7
+            position.board(Pos.SQ2B) must beSome(Sente.gold)
+            position.board(Pos.SQ4D) must beSome(Sente.king)
           }
       }
     }

@@ -7,9 +7,9 @@ class DividerTest extends ShogiTest {
       initial: Option[shogi.format.forsyth.Sfen],
       v: shogi.variant.Variant,
   ) = {
-    val (situations, error) = Replay.statesWhileValid(usis, initial, v)
+    val (positions, error) = Replay.positionsWhileValid(usis, initial, v)
     require(error.isEmpty, error.getOrElse(""))
-    situations
+    positions
   }
 
   val usis = shogi.format.usi.Usi.readList(format.usi.Fixtures.fromProd2).get
@@ -19,12 +19,12 @@ class DividerTest extends ShogiTest {
       Divider(Seq.empty) must_== Division.empty
     }
     "count no plies for only the initial position" in {
-      val situations = completeReplay(Nil, None, variant.Standard)
-      Divider(situations.toList) must_== Division.empty
+      val positions = completeReplay(Nil, None, variant.Standard)
+      Divider(positions.toList) must_== Division.empty
     }
     "count one ply after one move" in {
-      val situations = completeReplay(usis.take(1), None, variant.Standard)
-      val divided    = Divider(situations.toList)
+      val positions = completeReplay(usis.take(1), None, variant.Standard)
+      val divided   = Divider(positions.toList)
       divided.plies must_== 1
       divided.openingSize must_== 1
     }
@@ -83,8 +83,8 @@ class DividerTest extends ShogiTest {
   // more tests wanted
   "the divider finds middlegame and endgame" should {
     "game1" in {
-      val situations = completeReplay(usis, None, variant.Standard)
-      val divided    = Divider(situations.toList)
+      val positions = completeReplay(usis, None, variant.Standard)
+      val divided   = Divider(positions.toList)
       println("Game 1 => " + divided)
       divided.plies must_== usis.size
       divided.middle must beSome.like { case x =>

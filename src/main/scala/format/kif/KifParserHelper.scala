@@ -11,11 +11,11 @@ import shogi.variant._
 
 object KifParserHelper {
 
-  def parseSituation(
+  def parsePosition(
       str: String,
       handicapString: Option[String],
       steps: List[String],
-  ): Validated[String, Situation] = {
+  ): Validated[String, Position] = {
     val lines =
       augmentString(str).linesIterator.map(_.trim.replace("：", ":").replace("　", " ")).toList
     val ranks = lines
@@ -32,7 +32,7 @@ object KifParserHelper {
     if (ranks.isEmpty)
       handicapString
         .filterNot(isDefaultHandicapOf(_, variant))
-        .fold(valid(Situation(variant)): Validated[String, Situation])(parseHandicap(_, variant))
+        .fold(valid(Position(variant)): Validated[String, Position])(parseHandicap(_, variant))
     else if (ranks.sizeIs == variant.numberOfRanks)
       for {
         pieces <- parseBoard(ranks, variant)
@@ -41,7 +41,7 @@ object KifParserHelper {
         goteHandStr  = lines.find(l => l.startsWith("後手の持駒:") || l.startsWith("上手の持駒:"))
         hands <- parseHands(senteHandStr, goteHandStr, variant)
         color = Color.fromSente(!lines.exists(l => l.startsWith("後手番") || l.startsWith("上手番")))
-      } yield Situation(board, hands, color, variant)
+      } yield Position(board, hands, color, variant)
     else
       invalid(
         s"Cannot parse board setup (wrong number of ranks provided ${ranks.size}/${variant.numberOfRanks})",
@@ -165,7 +165,7 @@ object KifParserHelper {
     else valid(Hands(variant))
   }
 
-  private def parseHandicap(str: String, variant: Variant): Validated[String, Situation] =
+  private def parseHandicap(str: String, variant: Variant): Validated[String, Position] =
     for {
       handicap <- Handicap.allByVariant
         .get(variant)
@@ -174,8 +174,8 @@ object KifParserHelper {
             _.japanese == str,
           ),
         ) toValid s"Unknown handicap: $str"
-      situation <- handicap.sfen.toSituation(variant) toValid s"Cannot parse handicap: $str"
-    } yield situation
+      position <- handicap.sfen.toPosition(variant) toValid s"Cannot parse handicap: $str"
+    } yield position
 
   def createResult(termination: Option[Tag], color: Color): Option[Tag] = {
     termination.map(_.value.toLowerCase) match {

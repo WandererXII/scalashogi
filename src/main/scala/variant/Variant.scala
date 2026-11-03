@@ -127,7 +127,7 @@ abstract class Variant private[variant] (
   def dropFilterPawnCheckmate(a: DropActor, d: Pos): Boolean =
     (a.piece is Pawn) && (
       a.board.singleRoyalPosOf(!a.color).fold(false) { kingPos =>
-        a.piece.eyes(d, kingPos) && !(a.situation
+        a.piece.eyes(d, kingPos) && !(a.position
           .withBoard(a.board.forcePlace(a.piece, d))
           .switch
           .hasDestinations)
@@ -148,7 +148,7 @@ abstract class Variant private[variant] (
   ): Boolean = false
 
   // for perpetual check
-  def isAttacking(after: Situation, @unused usi: Usi): Boolean =
+  def isAttacking(after: Position, @unused usi: Usi): Boolean =
     after.check
 
   def unpromoteRoleForHand(role: Role): Option[DroppableRole] =
@@ -163,23 +163,23 @@ abstract class Variant private[variant] (
     hands.isEmpty && board.pieces.sizeIs <= 2 &&
       board.pieces.forall { p => p._2 is King }
 
-  def status(sit: Situation): Option[Status] =
-    if (!sit.hasDestinations) {
-      if (sit.check) Status.Mate.some
+  def status(position: Position): Option[Status] =
+    if (!position.hasDestinations) {
+      if (position.check) Status.Mate.some
       else Status.Stalemate.some
-    } else if (Impasse(sit)) Status.Impasse27.some
-    else if (sit.history.fourfoldRepetition) {
-      if (sit.history.perpetualCheckAttacker.isDefined) Status.PerpetualCheck.some
+    } else if (Impasse(position)) Status.Impasse27.some
+    else if (position.history.fourfoldRepetition) {
+      if (position.history.perpetualCheckAttacker.isDefined) Status.PerpetualCheck.some
       else Status.Repetition.some
-    } else if (isInsufficientMaterial(sit.board, sit.hands)) Status.Draw.some
+    } else if (isInsufficientMaterial(position.board, position.hands)) Status.Draw.some
     else none
 
-  def winner(sit: Situation): Option[Color] =
-    sit.status flatMap { status =>
+  def winner(position: Position): Option[Color] =
+    position.status flatMap { status =>
       status match {
-        case Status.Mate | Status.Stalemate | Status.Check => (!sit.color).some
-        case Status.Impasse27                              => (sit.color).some
-        case Status.PerpetualCheck => sit.history.perpetualCheckAttacker.map(!_)
+        case Status.Mate | Status.Stalemate | Status.Check => (!position.color).some
+        case Status.Impasse27                              => (position.color).some
+        case Status.PerpetualCheck => position.history.perpetualCheckAttacker.map(!_)
         case _                     => none
       }
     }

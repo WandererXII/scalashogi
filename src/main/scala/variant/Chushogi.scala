@@ -338,7 +338,7 @@ case object Chushogi
       case _ => false
     }
 
-  override def isAttacking(after: Situation, usi: Usi): Boolean =
+  override def isAttacking(after: Position, usi: Usi): Boolean =
     after.check || {
       usi match {
         case Usi.Move(_, dest, _, _) =>
@@ -399,23 +399,23 @@ case object Chushogi
     !check(board, Gote)
   }
 
-  override def status(sit: Situation): Option[Status] =
-    if (sit.board.royalPossOf(sit.color).isEmpty) Status.RoyalsLost.some
-    else if (bareKing(sit.board, Sente) || bareKing(sit.board, Gote)) Status.BareKing.some
-    else if (!sit.hasDestinations) Status.Stalemate.some
-    else if (sit.history.fourfoldRepetition) {
-      if (sit.history.perpetualCheckAttacker.isDefined) Status.PerpetualCheck.some
+  override def status(position: Position): Option[Status] =
+    if (position.board.royalPossOf(position.color).isEmpty) Status.RoyalsLost.some
+    else if (bareKing(position.board, Sente) || bareKing(position.board, Gote)) Status.BareKing.some
+    else if (!position.hasDestinations) Status.Stalemate.some
+    else if (position.history.fourfoldRepetition) {
+      if (position.history.perpetualCheckAttacker.isDefined) Status.PerpetualCheck.some
       else Status.Repetition.some
-    } else if (isInsufficientMaterial(sit.board, sit.hands)) Status.Draw.some
+    } else if (isInsufficientMaterial(position.board, position.hands)) Status.Draw.some
     else none
 
-  override def winner(sit: Situation): Option[Color] =
-    sit.status flatMap { status =>
+  override def winner(position: Position): Option[Color] =
+    position.status flatMap { status =>
       status match {
-        case Status.RoyalsLost | Status.Stalemate => (!sit.color).some
+        case Status.RoyalsLost | Status.Stalemate => (!position.color).some
         case Status.BareKing                      =>
-          if (bareKing(sit.board, Sente)) Gote.some else Sente.some
-        case Status.PerpetualCheck => sit.history.perpetualCheckAttacker.map(!_)
+          if (bareKing(position.board, Sente)) Gote.some else Sente.some
+        case Status.PerpetualCheck => position.history.perpetualCheckAttacker.map(!_)
         case _                     => none
       }
     }

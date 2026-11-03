@@ -50,9 +50,9 @@ class KifModelTest extends ShogiTest {
     Kif.renderStep(Usi.WithRole(Usi("4j2h").get, Horse), None, Chushogi) must_== "2八龍馬 （←4十）"
   }
 
-  "render kif situation - board, hands, turn, from random sfen" in {
-    renderSituation(
-      Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p").toSituation(Standard).get,
+  "render kif position - board, hands, turn, from random sfen" in {
+    renderPosition(
+      Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p").toPosition(Standard).get,
     ) must_== """後手の持駒：飛二　角二　金二　銀　桂　香三　歩十五
   ９ ８ ７ ６ ５ ４ ３ ２ １
 +---------------------------+
@@ -70,16 +70,16 @@ class KifModelTest extends ShogiTest {
 後手番"""
   }
 
-  "render kif situation - default minishogi" in {
+  "render kif position - default minishogi" in {
     renderSetup(
       Some(Sfen("rbsgk/4p/5/P4/KGSBR b - 1")),
       Minishogi,
     ) must_== """手合割：5五将棋"""
   }
 
-  "render kif situation - minishogi" in {
-    renderSituation(
-      Sfen("rbsgk/4p/P4/5/KGSBR w - 2").toSituation(Minishogi).get,
+  "render kif position - minishogi" in {
+    renderPosition(
+      Sfen("rbsgk/4p/P4/5/KGSBR w - 2").toPosition(Minishogi).get,
     ) must_== """手合割：5五将棋
 後手の持駒：なし
   ５ ４ ３ ２ １
@@ -134,9 +134,9 @@ class KifModelTest extends ShogiTest {
    3手目二歩目 1一龍馬 （←2八）"""
 
     // not aware of any standard - so not sure about this...
-    renderSituation(
+    renderPosition(
       Sfen("12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b - 1")
-        .toSituation(Chushogi)
+        .toPosition(Chushogi)
         .get,
     ) must_== """ １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １
 +------------------------------------------------+
@@ -156,7 +156,7 @@ class KifModelTest extends ShogiTest {
 
   }
 
-  "render kif situation - default annanshogi" in {
+  "render kif position - default annanshogi" in {
     renderHeader(
       Some(Sfen("lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1")),
       Annanshogi,
@@ -170,7 +170,7 @@ class KifModelTest extends ShogiTest {
 後手："""
   }
 
-  "render kif situation with handicap - annanshogi" in {
+  "render kif position with handicap - annanshogi" in {
     renderHeader(
       Some(Sfen("ln2k2nl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL w - 1")),
       Annanshogi,
@@ -199,7 +199,7 @@ class KifModelTest extends ShogiTest {
 上手："""
   }
 
-  "render kif situation - annanshogi" in {
+  "render kif position - annanshogi" in {
     renderHeader(
       Some(Sfen("3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p")),
       Annanshogi,
@@ -322,8 +322,8 @@ class KifModelTest extends ShogiTest {
   }
 
   "render kif board - dobutsu" in {
-    renderSituation(
-      Dobutsu.initialSfen.toSituation(Dobutsu).get,
+    renderPosition(
+      Dobutsu.initialSfen.toPosition(Dobutsu).get,
     ) must_== """手合割：どうぶつしょうぎ
 後手の持駒：なし
   ３ ２ １

@@ -97,7 +97,7 @@ case object Dobutsu
   override def noOppositeCheck = false
 
   override def isAttacking(
-      @unused after: Situation,
+      @unused after: Position,
       @unused usi: Usi,
   ): Boolean =
     false
@@ -110,20 +110,20 @@ case object Dobutsu
 
   override def isInsufficientMaterial(@unused board: Board, @unused hands: Hands) = false
 
-  override def status(sit: Situation): Option[Status] =
-    if (sit.board.royalPossOf(sit.color).isEmpty) Status.RoyalsLost.some
-    else if (tryRule(sit.board, Sente) && tryRule(sit.board, Gote)) Status.Draw.some
-    else if (tryRule(sit.board, Sente) || tryRule(sit.board, Gote)) Status.TryRule.some
-    else if (!sit.hasDestinations) Status.Stalemate.some
-    else if (sit.history.threefoldRepetition) Status.Repetition.some
+  override def status(position: Position): Option[Status] =
+    if (position.board.royalPossOf(position.color).isEmpty) Status.RoyalsLost.some
+    else if (tryRule(position.board, Sente) && tryRule(position.board, Gote)) Status.Draw.some
+    else if (tryRule(position.board, Sente) || tryRule(position.board, Gote)) Status.TryRule.some
+    else if (!position.hasDestinations) Status.Stalemate.some
+    else if (position.history.threefoldRepetition) Status.Repetition.some
     else none
 
-  override def winner(sit: Situation): Option[Color] =
-    sit.status flatMap { status =>
+  override def winner(position: Position): Option[Color] =
+    position.status flatMap { status =>
       status match {
-        case Status.RoyalsLost | Status.Stalemate => (!sit.color).some
+        case Status.RoyalsLost | Status.Stalemate => (!position.color).some
         case Status.TryRule                       =>
-          if (tryRule(sit.board, Sente)) Sente.some else Gote.some
+          if (tryRule(position.board, Sente)) Sente.some else Gote.some
         case _ => none
       }
     }

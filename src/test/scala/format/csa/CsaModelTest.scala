@@ -46,9 +46,9 @@ class CsaModelTest extends ShogiTest {
       ),
     ) { case (sfen, move, winner) =>
       val usi = Usi(move).get
-      Replay.fromUsi(List(usi), Some(sfen), Standard).valid must beValid.like { case sit =>
-        sit.status must_== Some(Status.Mate)
-        sit.winner must beSome(winner)
+      Replay.fromUsi(List(usi), Some(sfen), Standard).valid must beValid.like { case position =>
+        position.status must_== Some(Status.Mate)
+        position.winner must beSome(winner)
       }
       createTerminationStep(Status.Mate, winnerTurn = false, Some(winner)) must beSome.like {
         case termination =>
@@ -78,9 +78,9 @@ class CsaModelTest extends ShogiTest {
     }
   }
 
-  "render csa situation - board, hands, turn, from random sfen" in {
-    renderSituation(
-      Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p").toSituation(Standard).get,
+  "render csa position - board, hands, turn, from random sfen" in {
+    renderPosition(
+      Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p").toPosition(Standard).get,
     ) must_== """P1-KY-KE+KI *  *  *  *  *  * 
 P2 *  * +TO *  *  *  * +NG-KE
 P3-OU-FU *  *  * +NG *  *  * 

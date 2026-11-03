@@ -6,21 +6,21 @@ import shogi.format.usi.Usi
 
 class ChushogiTest extends ShogiTest {
 
-  def perft(state: Situation, depth: Int) = Perft.perft(state, depth)
+  def perft(position: Position, depth: Int) = Perft.perft(position, depth)
 
   "calculate chushogi perfts" should {
-    val state = Situation(shogi.variant.Chushogi)
+    val position = Position(shogi.variant.Chushogi)
     "1 depth" in {
-      perft(state, 1) must be equalTo 36
+      perft(position, 1) must be equalTo 36
     }
     "2 depth" in {
-      perft(state, 2) must be equalTo 1296
+      perft(position, 2) must be equalTo 1296
     }
   }
 
   "default positions" should {
     "be identical" in {
-      Situation(shogi.variant.Chushogi).toSfen must_== shogi.variant.Chushogi.initialSfen
+      Position(shogi.variant.Chushogi).toSfen must_== shogi.variant.Chushogi.initialSfen
     }
   }
 
@@ -40,8 +40,8 @@ class ChushogiTest extends ShogiTest {
       forall(chushogiPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
-            perft(state, 1) must be equalTo d1.toInt
+            val position = Position(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
+            perft(position, 1) must be equalTo d1.toInt
           }
         }
       }
@@ -50,166 +50,166 @@ class ChushogiTest extends ShogiTest {
 
   "move legaility" should {
     "lion" in {
-      val sit =
-        Sfen("12/12/12/12/12/6+O5/12/12/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
+      val position =
+        Sfen("12/12/12/12/12/6+O5/12/12/12/12/12/12 b").toPosition(shogi.variant.Chushogi).get
       // 1 step, 0 dist move
-      sit(Usi("6f6f").get).isValid must beFalse
+      position(Usi("6f6f").get).isValid must beFalse
       // 1 step, 1 dist move
-      sit(Usi("6f5e").get).isValid must beTrue
-      sit(Usi("6f7g").get).isValid must beTrue
+      position(Usi("6f5e").get).isValid must beTrue
+      position(Usi("6f7g").get).isValid must beTrue
       // 1 step, 2 dist move
-      sit(Usi("6f7d").get).isValid must beTrue
-      sit(Usi("6f4h").get).isValid must beTrue
+      position(Usi("6f7d").get).isValid must beTrue
+      position(Usi("6f4h").get).isValid must beTrue
       // 2 step, back to start
-      sit(Usi("6f6g6f").get).isValid must beTrue
+      position(Usi("6f6g6f").get).isValid must beTrue
       // 2 step
-      sit(Usi("6f5e6d").get).isValid must beTrue
-      sit(Usi("6f7g8h").get).isValid must beTrue
+      position(Usi("6f5e6d").get).isValid must beTrue
+      position(Usi("6f7g8h").get).isValid must beTrue
 
-      val sit2 = Sfen("3l8/11p/10p1/3n5+D2/2i1f7/3N5G2/9+H2/2t2P1i4/2p3+D5/2+H9/12/12 b")
-        .toSituation(shogi.variant.Chushogi)
+      val position2 = Sfen("3l8/11p/10p1/3n5+D2/2i1f7/3N5G2/9+H2/2t2P1i4/2p3+D5/2+H9/12/12 b")
+        .toPosition(shogi.variant.Chushogi)
         .get
-      sit2(Usi("3g3e").get).isValid must beTrue
-      sit2(Usi("3g3f").get).isValid must beFalse
-      sit2(Usi("6i4g").get).isValid must beTrue
-      sit2(Usi("6i8g").get).isValid must beTrue
-      sit2(Usi("6i7h").get).isValid must beFalse
-      sit2(Usi("6i5h").get).isValid must beTrue
-      sit2(Usi("6i5h6i").get).isValid must beTrue
-      sit2(Usi("6i5h4g").get).isValid must beTrue
-      sit2(Usi("3d2c").get).isValid must beTrue
-      sit2(Usi("3d1b").get).isValid must beTrue
-      sit2(Usi("3d2c1b").get).isValid must beTrue
-      sit2(Usi("3d1b2c").get).isValid must beFalse
-      sit2(Usi("10j10i").get).isValid must beTrue
-      sit2(Usi("10j10h").get).isValid must beTrue
-      sit2(Usi("10j10i10h").get).isValid must beTrue
-      sit2(Usi("10j10h10i").get).isValid must beFalse
-      sit2(Usi("9f10e").get).isValid must beTrue
-      sit2(Usi("9f8e").get).isValid must beTrue
-      sit2(Usi("9f9d").get).isValid must beFalse
-      sit2(Usi("9f10e9d").get).isValid must beFalse
-      sit2(Usi("9f8e9d").get).isValid must beTrue
-      sit2(Usi("9f9e9d").get).isValid must beFalse
+      position2(Usi("3g3e").get).isValid must beTrue
+      position2(Usi("3g3f").get).isValid must beFalse
+      position2(Usi("6i4g").get).isValid must beTrue
+      position2(Usi("6i8g").get).isValid must beTrue
+      position2(Usi("6i7h").get).isValid must beFalse
+      position2(Usi("6i5h").get).isValid must beTrue
+      position2(Usi("6i5h6i").get).isValid must beTrue
+      position2(Usi("6i5h4g").get).isValid must beTrue
+      position2(Usi("3d2c").get).isValid must beTrue
+      position2(Usi("3d1b").get).isValid must beTrue
+      position2(Usi("3d2c1b").get).isValid must beTrue
+      position2(Usi("3d1b2c").get).isValid must beFalse
+      position2(Usi("10j10i").get).isValid must beTrue
+      position2(Usi("10j10h").get).isValid must beTrue
+      position2(Usi("10j10i10h").get).isValid must beTrue
+      position2(Usi("10j10h10i").get).isValid must beFalse
+      position2(Usi("9f10e").get).isValid must beTrue
+      position2(Usi("9f8e").get).isValid must beTrue
+      position2(Usi("9f9d").get).isValid must beFalse
+      position2(Usi("9f10e9d").get).isValid must beFalse
+      position2(Usi("9f8e9d").get).isValid must beTrue
+      position2(Usi("9f9e9d").get).isValid must beFalse
 
-      val sit3 =
+      val position3 =
         Sfen("11l/6l5/5Nn5/11n/9N2/12/1N10/9n2/1n7N2/4r7/4nN6/4r7 b")
-          .toSituation(shogi.variant.Chushogi)
+          .toPosition(shogi.variant.Chushogi)
           .get
-      sit3(Usi("7c6c").get).isValid must beTrue
-      sit3(Usi("7c6b6c").get).isValid must beTrue
-      sit3(Usi("3e1d").get).isValid must beFalse
-      sit3(Usi("3e2e1d").get).isValid must beFalse
-      sit3(Usi("3i3h").get).isValid must beTrue
-      sit3(Usi("3i3h3g").get).isValid must beTrue
-      sit3(Usi("3i2h3h").get).isValid must beTrue
-      sit3(Usi("7k8k").get).isValid must beTrue
-      sit3(Usi("7k8j8k").get).isValid must beTrue
-      sit3(Usi("7k8l8k").get).isValid must beTrue
-      sit3(Usi("7k8k8j").get).isValid must beTrue
-      sit3(Usi("7k8k8l").get).isValid must beTrue
-      sit3(Usi("7k7j8k").get).isValid must beTrue
-      sit3(Usi("11g11i").get).isValid must beTrue
-      sit3(Usi("11g11h11i").get).isValid must beTrue
+      position3(Usi("7c6c").get).isValid must beTrue
+      position3(Usi("7c6b6c").get).isValid must beTrue
+      position3(Usi("3e1d").get).isValid must beFalse
+      position3(Usi("3e2e1d").get).isValid must beFalse
+      position3(Usi("3i3h").get).isValid must beTrue
+      position3(Usi("3i3h3g").get).isValid must beTrue
+      position3(Usi("3i2h3h").get).isValid must beTrue
+      position3(Usi("7k8k").get).isValid must beTrue
+      position3(Usi("7k8j8k").get).isValid must beTrue
+      position3(Usi("7k8l8k").get).isValid must beTrue
+      position3(Usi("7k8k8j").get).isValid must beTrue
+      position3(Usi("7k8k8l").get).isValid must beTrue
+      position3(Usi("7k7j8k").get).isValid must beTrue
+      position3(Usi("11g11i").get).isValid must beTrue
+      position3(Usi("11g11h11i").get).isValid must beTrue
 
-      val sit4Base = Sfen("11k/12/12/10bm/9N2/12/5n6/6N5/5r6/12/9K2/12 b")
-        .toSituation(shogi.variant.Chushogi)
+      val position4Base = Sfen("11k/12/12/10bm/9N2/12/5n6/6N5/5r6/12/9K2/12 b")
+        .toPosition(shogi.variant.Chushogi)
         .get
-      val sit4     = sit4Base(Usi("6h7g").get).toOption.get
-      val sit4Alt  = sit4Base(Usi("6h7i6h").get).toOption.get
-      val sit4Alt2 = sit4Base(Usi("6h5g6h").get).toOption.get
+      val position4     = position4Base(Usi("6h7g").get).toOption.get
+      val position4Alt  = position4Base(Usi("6h7i6h").get).toOption.get
+      val position4Alt2 = position4Base(Usi("6h5g6h").get).toOption.get
 
-      sit4.history.lastLionCapture must beNone
-      sit4(Usi("2d3e").get).isValid must beTrue
-      sit4Alt.history.lastLionCapture must beNone
-      sit4Alt(Usi("2d3e").get).isValid must beTrue
-      sit4Alt2.history.lastLionCapture must beNone
-      sit4Alt2(Usi("2d3e").get).isValid must beTrue
+      position4.history.lastLionCapture must beNone
+      position4(Usi("2d3e").get).isValid must beTrue
+      position4Alt.history.lastLionCapture must beNone
+      position4Alt(Usi("2d3e").get).isValid must beTrue
+      position4Alt2.history.lastLionCapture must beNone
+      position4Alt2(Usi("2d3e").get).isValid must beTrue
 
-      val sit5Base = Sfen("12/12/12/12/12/12/12/12/4+ho3n2/4N7/12/6B5 w")
-        .toSituation(shogi.variant.Chushogi)
+      val position5Base = Sfen("12/12/12/12/12/12/12/12/4+ho3n2/4N7/12/6B5 w")
+        .toPosition(shogi.variant.Chushogi)
         .get
-      val sit5     = sit5Base(Usi("8i8j8i").get).toOption.get
-      val sit5Alt  = sit5Base(Usi("8i8j").get).toOption.get
-      val sit5Alt2 = sit5Base(Usi("7i8j+").get).toOption.get
+      val position5     = position5Base(Usi("8i8j8i").get).toOption.get
+      val position5Alt  = position5Base(Usi("8i8j").get).toOption.get
+      val position5Alt2 = position5Base(Usi("7i8j+").get).toOption.get
 
-      sit5(Usi("6l3i").get).isValid must beFalse
-      sit5.history.lastLionCapture must beSome
-      sit5Alt(Usi("6l3i").get).isValid must beFalse
-      sit5Alt2(Usi("6l3i").get).isValid must beFalse
-      sit5Alt2(Usi("6l8j").get).isValid must beTrue
+      position5(Usi("6l3i").get).isValid must beFalse
+      position5.history.lastLionCapture must beSome
+      position5Alt(Usi("6l3i").get).isValid must beFalse
+      position5Alt2(Usi("6l3i").get).isValid must beFalse
+      position5Alt2(Usi("6l8j").get).isValid must beTrue
     }
     "wiki and more" in {
-      val sit =
-        Sfen("12/12/12/12/7g4/6n5/5N6/12/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
-      sit(Usi("7g6f").get).isValid must beTrue
-      sit(Usi("7g6f5e").get).isValid must beTrue
-      sit(Usi("7g6f6e").get).isValid must beTrue
+      val position =
+        Sfen("12/12/12/12/7g4/6n5/5N6/12/12/12/12/12 b").toPosition(shogi.variant.Chushogi).get
+      position(Usi("7g6f").get).isValid must beTrue
+      position(Usi("7g6f5e").get).isValid must beTrue
+      position(Usi("7g6f6e").get).isValid must beTrue
 
-      val sit2 =
-        Sfen("12/12/12/12/4B2l4/4S7/5N6/7n4/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
-      val sit2opp = sit2.switch
-      sit2(Usi("7g5h").get).isValid must beFalse
-      sit2(Usi("7g5e").get).isValid must beTrue
-      sit2(Usi("8e5h").get).isValid must beTrue
-      sit2opp(Usi("5h7g").get).isValid must beFalse
-      sit2opp(Usi("5h5j").get).isValid must beTrue
+      val position2 =
+        Sfen("12/12/12/12/4B2l4/4S7/5N6/7n4/12/12/12/12 b").toPosition(shogi.variant.Chushogi).get
+      val position2opp = position2.switch
+      position2(Usi("7g5h").get).isValid must beFalse
+      position2(Usi("7g5e").get).isValid must beTrue
+      position2(Usi("8e5h").get).isValid must beTrue
+      position2opp(Usi("5h7g").get).isValid must beFalse
+      position2opp(Usi("5h5j").get).isValid must beTrue
 
-      val sit3 =
-        Sfen("12/12/12/12/3n8/12/5N6/5P6/7b4/12/12/12 b").toSituation(shogi.variant.Chushogi).get
-      val sit3Opp = sit3.switch
-      sit3(Usi("7g9e").get).isValid must beFalse
-      sit3(Usi("7g5i").get).isValid must beTrue
-      sit3Opp(Usi("9e7g").get).isValid must beFalse
-      sit3Opp(Usi("9e10e").get).isValid must beTrue
-      sit3Opp(Usi("5i7g").get).isValid must beTrue
+      val position3 =
+        Sfen("12/12/12/12/3n8/12/5N6/5P6/7b4/12/12/12 b").toPosition(shogi.variant.Chushogi).get
+      val position3Opp = position3.switch
+      position3(Usi("7g9e").get).isValid must beFalse
+      position3(Usi("7g5i").get).isValid must beTrue
+      position3Opp(Usi("9e7g").get).isValid must beFalse
+      position3Opp(Usi("9e10e").get).isValid must beTrue
+      position3Opp(Usi("5i7g").get).isValid must beTrue
 
-      val sit4 =
+      val position4 =
         Sfen("12/12/12/12/3n1H6/3sp7/5N6/5P6/1k5b4/12/12/12 b")
-          .toSituation(shogi.variant.Chushogi)
+          .toPosition(shogi.variant.Chushogi)
           .get
-      sit4(Usi("7g9e").get).isValid must beTrue
-      sit4(Usi("7g8f9e").get).isValid must beFalse
+      position4(Usi("7g9e").get).isValid must beTrue
+      position4(Usi("7g8f9e").get).isValid must beFalse
 
-      val sit5 =
-        Sfen("12/12/12/12/12/4N7/4p7/4n7/12/12/12/12 b").toSituation(shogi.variant.Chushogi).get
-      sit5(Usi("8f8g").get).isValid must beTrue
-      sit5(Usi("8f8h").get).isValid must beFalse
-      sit5(Usi("8f8g8h").get).isValid must beFalse
+      val position5 =
+        Sfen("12/12/12/12/12/4N7/4p7/4n7/12/12/12/12 b").toPosition(shogi.variant.Chushogi).get
+      position5(Usi("8f8g").get).isValid must beTrue
+      position5(Usi("8f8h").get).isValid must beFalse
+      position5(Usi("8f8g8h").get).isValid must beFalse
 
-      val sit6 =
+      val position6 =
         Sfen("12/12/12/12/6+o1r3/4gi6/6N5/7s4/8n3/12/12/12 b")
-          .toSituation(shogi.variant.Chushogi)
+          .toPosition(shogi.variant.Chushogi)
           .get
-      sit6(Usi("6g4i").get).isValid must beFalse
-      sit6(Usi("6g5h4i").get).isValid must beTrue
-      sit6(Usi("6g6e").get).isValid must beFalse
-      sit6(Usi("6g7f6e").get).isValid must beFalse
-      sit6(Usi("6g6f6e").get).isValid must beFalse
-      sit6(Usi("6g7f").get).isValid must beTrue
-      sit6(Usi("6g7f8f").get).isValid must beTrue
+      position6(Usi("6g4i").get).isValid must beFalse
+      position6(Usi("6g5h4i").get).isValid must beTrue
+      position6(Usi("6g6e").get).isValid must beFalse
+      position6(Usi("6g7f6e").get).isValid must beFalse
+      position6(Usi("6g6f6e").get).isValid must beFalse
+      position6(Usi("6g7f").get).isValid must beTrue
+      position6(Usi("6g7f8f").get).isValid must beTrue
 
-      val sit7Base = Sfen("12/12/12/12/12/4r7/12/12/5o3n1n/4N6P/12/6B5 w - 1")
-        .toSituation(shogi.variant.Chushogi)
+      val position7Base = Sfen("12/12/12/12/12/4r7/12/12/5o3n1n/4N6P/12/6B5 w - 1")
+        .toPosition(shogi.variant.Chushogi)
         .get
-      val sit7     = sit7Base(Usi("8f8j").get).toOption.get
-      val sit7Alt  = sit7Base(Usi("7i8j+").get).toOption.get
-      val sit7Alt2 = sit7Base(Usi("7i8j").get).toOption.get
-      val sit7Alt3 = sit7Base(Usi("3i4i3i").get).toOption.get
-      sit7(Usi("6l8j").get).isValid must beTrue
-      sit7(Usi("6l3i").get).isValid must beFalse
-      sit7Alt(Usi("6l8j").get).isValid must beTrue
-      sit7Alt(Usi("6l3i").get).isValid must beFalse
-      sit7Alt2(Usi("6l8j").get).isValid must beTrue
-      sit7Alt2(Usi("6l3i").get).isValid must beFalse
-      sit7Alt3(Usi("6l3i").get).isValid must beTrue
-      sit7Alt3(Usi("1j1i").get).isValid must beTrue
+      val position7     = position7Base(Usi("8f8j").get).toOption.get
+      val position7Alt  = position7Base(Usi("7i8j+").get).toOption.get
+      val position7Alt2 = position7Base(Usi("7i8j").get).toOption.get
+      val position7Alt3 = position7Base(Usi("3i4i3i").get).toOption.get
+      position7(Usi("6l8j").get).isValid must beTrue
+      position7(Usi("6l3i").get).isValid must beFalse
+      position7Alt(Usi("6l8j").get).isValid must beTrue
+      position7Alt(Usi("6l3i").get).isValid must beFalse
+      position7Alt2(Usi("6l8j").get).isValid must beTrue
+      position7Alt2(Usi("6l3i").get).isValid must beFalse
+      position7Alt3(Usi("6l3i").get).isValid must beTrue
+      position7Alt3(Usi("1j1i").get).isValid must beTrue
 
-      val sit8 =
+      val position8 =
         Sfen("12/12/3l8/12/3b4+o3/6n5/4N7/6R5/7K4/12/12/12 b - 1")
-          .toSituation(shogi.variant.Chushogi)
+          .toPosition(shogi.variant.Chushogi)
           .get
-      sit8(Usi("8g6f").get).isValid must beFalse
+      position8(Usi("8g6f").get).isValid must beFalse
     }
   }
 
@@ -220,7 +220,7 @@ class ChushogiTest extends ShogiTest {
         ("k11/12/12/12/6n5/6P5/12/7+d4/6N5/12/12/11K b", "5h6i", "5h6i5h", "5h6i7j"),
       )
       forall(positions) { case (sfen, direct, returning, continuing) =>
-        val before = Sfen(sfen).toSituation(shogi.variant.Chushogi).get
+        val before = Sfen(sfen).toPosition(shogi.variant.Chushogi).get
         val after  = before(Usi("6f6e").get).toOption.get
         val moves  = List(direct, returning, continuing).map(s => Usi.Move(s).get)
 
@@ -234,127 +234,127 @@ class ChushogiTest extends ShogiTest {
     }
 
     "not allow lion recapture" in {
-      val sit = Sfen("k11/12/12/12/6n5/6P5/12/5+h6/12/5N6/12/11K b")
-        .toSituation(shogi.variant.Chushogi)
+      val position = Sfen("k11/12/12/12/6n5/6P5/12/5+h6/12/5N6/12/11K b")
+        .toPosition(shogi.variant.Chushogi)
         .get(Usi("6f6e").get)
         .toOption
         .get
-      sit(Usi("7h7i").get).isValid must beTrue
-      sit(Usi("7h7j").get).isValid must beFalse
-      sit(Usi("7h7i7j").get).isValid must beFalse
+      position(Usi("7h7i").get).isValid must beTrue
+      position(Usi("7h7j").get).isValid must beFalse
+      position(Usi("7h7i7j").get).isValid must beFalse
 
-      val sit2 = Sfen("k11/12/12/12/6n5/6P5/12/7+d4/12/5N6/12/11K b")
-        .toSituation(shogi.variant.Chushogi)
+      val position2 = Sfen("k11/12/12/12/6n5/6P5/12/7+d4/12/5N6/12/11K b")
+        .toPosition(shogi.variant.Chushogi)
         .get(Usi("6f6e").get)
         .toOption
         .get
-      sit2(Usi("5h6i").get).isValid must beTrue
-      sit2(Usi("5h7j").get).isValid must beFalse
-      sit2(Usi("5h6i7j").get).isValid must beFalse
+      position2(Usi("5h6i").get).isValid must beTrue
+      position2(Usi("5h7j").get).isValid must beFalse
+      position2(Usi("5h6i7j").get).isValid must beFalse
     }
 
     "allow lion recapture directly after kirin promotion" in {
-      val sit3 = Sfen("k11/12/12/12/12/12/12/7+d4/12/5n6/12/5O5K b")
-        .toSituation(shogi.variant.Chushogi)
+      val position3 = Sfen("k11/12/12/12/12/12/12/7+d4/12/5n6/12/5O5K b")
+        .toPosition(shogi.variant.Chushogi)
         .get(Usi("7l7j").get)
         .toOption
         .get
 
-      sit3(Usi("5h6i").get).isValid must beTrue
-      sit3(Usi("5h7j").get).isValid must beTrue
-      sit3(Usi("5h6i7j").get).isValid must beTrue
+      position3(Usi("5h6i").get).isValid must beTrue
+      position3(Usi("5h7j").get).isValid must beTrue
+      position3(Usi("5h6i7j").get).isValid must beTrue
     }
   }
 
   "isAttacked" in {
-    val sit = Sfen("12/12/12/12/12/4r7/11n/12/5o5n/4N6P/12/6B5 w - 1")
-      .toSituation(shogi.variant.Chushogi)
+    val position = Sfen("12/12/12/12/12/4r7/11n/12/5o5n/4N6P/12/6B5 w - 1")
+      .toPosition(shogi.variant.Chushogi)
       .get
-    val sitMove     = sit(Usi("1g2g1g").get).toOption.get
-    val sitMoveAlt  = sit(Usi("1i2i1i").get).toOption.get
-    val sitMoveAlt2 = sit(Usi("8f8g").get).toOption.get
-    sitMove.history.consecutiveAttacks must_== ConsecutiveAttacks.empty
-    sitMoveAlt.history.consecutiveAttacks must_== ConsecutiveAttacks(0, 1)
-    sitMoveAlt2.history.consecutiveAttacks must_== ConsecutiveAttacks(0, 1)
+    val positionMove     = position(Usi("1g2g1g").get).toOption.get
+    val positionMoveAlt  = position(Usi("1i2i1i").get).toOption.get
+    val positionMoveAlt2 = position(Usi("8f8g").get).toOption.get
+    positionMove.history.consecutiveAttacks must_== ConsecutiveAttacks.empty
+    positionMoveAlt.history.consecutiveAttacks must_== ConsecutiveAttacks(0, 1)
+    positionMoveAlt2.history.consecutiveAttacks must_== ConsecutiveAttacks(0, 1)
 
-    val sit2 = Sfen("12/12/12/12/12/2n6n2/3h8/2N5N3/12/12/12/12 b - 1")
-      .toSituation(shogi.variant.Chushogi)
+    val position2 = Sfen("12/12/12/12/12/2n6n2/3h8/2N5N3/12/12/12/12 b - 1")
+      .toPosition(shogi.variant.Chushogi)
       .get
-    val sit2Move     = sit2(Usi("10h12g").get).toOption.get
-    val sit2MoveAlt  = sit2(Usi("10h9h10h").get).toOption.get
-    val sit2MoveAlt2 = sit2(Usi("4h4g").get).toOption.get
-    sit2Move.history.consecutiveAttacks must_== ConsecutiveAttacks.empty
-    sit2MoveAlt.history.consecutiveAttacks must_== ConsecutiveAttacks(1, 0)
-    sit2MoveAlt2.history.consecutiveAttacks must_== ConsecutiveAttacks(1, 0)
+    val position2Move     = position2(Usi("10h12g").get).toOption.get
+    val position2MoveAlt  = position2(Usi("10h9h10h").get).toOption.get
+    val position2MoveAlt2 = position2(Usi("4h4g").get).toOption.get
+    position2Move.history.consecutiveAttacks must_== ConsecutiveAttacks.empty
+    position2MoveAlt.history.consecutiveAttacks must_== ConsecutiveAttacks(1, 0)
+    position2MoveAlt2.history.consecutiveAttacks must_== ConsecutiveAttacks(1, 0)
   }
 
   "bare king" in {
-    val sit =
-      Sfen("12/12/12/12/6k5/4g7/4G7/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
-    sit.status.contains(Status.BareKing) must beFalse
-    val sitAfter = sit(Usi("8g8f").get).toOption.get
-    sitAfter.status.contains(Status.BareKing) must beTrue
-    sitAfter.winner must_== Some(Sente)
+    val position =
+      Sfen("12/12/12/12/6k5/4g7/4G7/6K5/12/12/12/12 b - 1").toPosition(shogi.variant.Chushogi).get
+    position.status.contains(Status.BareKing) must beFalse
+    val positionAfter = position(Usi("8g8f").get).toOption.get
+    positionAfter.status.contains(Status.BareKing) must beTrue
+    positionAfter.winner must_== Some(Sente)
 
-    val sit2 = Sfen("12/12/12/12/3I2k5/12/12/5+pK5/12/12/12/12 b - 1")
-      .toSituation(shogi.variant.Chushogi)
+    val position2 = Sfen("12/12/12/12/3I2k5/12/12/5+pK5/12/12/12/12 b - 1")
+      .toPosition(shogi.variant.Chushogi)
       .get
-    sit2.status.contains(Status.BareKing) must beFalse
-    val sit2After1 = sit2(Usi("6h7h").get).toOption.get
-    sit2After1.status.contains(Status.BareKing) must beFalse
-    val sit2After2 = sit2After1(Usi("6e7d").get).toOption.get
-    sit2After2.status.contains(Status.BareKing) must beFalse
-    val sit2After3 = sit2After2(Usi("9e9d+").get).toOption.get
-    sit2After3.status.contains(Status.BareKing) must beTrue
-    sit2After3.winner must_== Some(Sente)
+    position2.status.contains(Status.BareKing) must beFalse
+    val position2After1 = position2(Usi("6h7h").get).toOption.get
+    position2After1.status.contains(Status.BareKing) must beFalse
+    val position2After2 = position2After1(Usi("6e7d").get).toOption.get
+    position2After2.status.contains(Status.BareKing) must beFalse
+    val position2After3 = position2After2(Usi("9e9d+").get).toOption.get
+    position2After3.status.contains(Status.BareKing) must beTrue
+    position2After3.winner must_== Some(Sente)
 
-    val sit3 =
+    val position3 =
       Sfen("1P3PP3P1/12/12/12/6k5/12/12/6K5/12/12/12/l10l b - 1")
-        .toSituation(shogi.variant.Chushogi)
+        .toPosition(shogi.variant.Chushogi)
         .get
-    sit3.status.contains(Status.BareKing) must beFalse
-    sit3.status.contains(Status.Draw) must beTrue
+    position3.status.contains(Status.BareKing) must beFalse
+    position3.status.contains(Status.Draw) must beTrue
 
-    val sit4 =
-      Sfen("12/12/12/12/6k5/5g6/4G7/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
-    sit4.status.contains(Status.BareKing) must beFalse
-    sit4.status.contains(Status.Draw) must beFalse
-    val sit4After1 = sit4(Usi("8g7f").get).toOption.get
-    sit4After1.status.contains(Status.BareKing) must beFalse
-    sit4After1.status.contains(Status.Draw) must beFalse
-    val sit4After2 = sit4After1(Usi("6e7f").get).toOption.get
-    sit4After2.status.contains(Status.BareKing) must beFalse
-    sit4After2.status.contains(Status.Draw) must beTrue
-    val sit4After2Alt = sit4After1(Usi("6e6d").get).toOption.get
-    sit4After2Alt.status.contains(Status.Draw) must beFalse
-    sit4After2Alt.status.contains(Status.BareKing) must beTrue
-    sit4After2Alt.winner must_== Some(Sente)
+    val position4 =
+      Sfen("12/12/12/12/6k5/5g6/4G7/6K5/12/12/12/12 b - 1").toPosition(shogi.variant.Chushogi).get
+    position4.status.contains(Status.BareKing) must beFalse
+    position4.status.contains(Status.Draw) must beFalse
+    val position4After1 = position4(Usi("8g7f").get).toOption.get
+    position4After1.status.contains(Status.BareKing) must beFalse
+    position4After1.status.contains(Status.Draw) must beFalse
+    val position4After2 = position4After1(Usi("6e7f").get).toOption.get
+    position4After2.status.contains(Status.BareKing) must beFalse
+    position4After2.status.contains(Status.Draw) must beTrue
+    val position4After2Alt = position4After1(Usi("6e6d").get).toOption.get
+    position4After2Alt.status.contains(Status.Draw) must beFalse
+    position4After2Alt.status.contains(Status.BareKing) must beTrue
+    position4After2Alt.winner must_== Some(Sente)
 
-    val sit5 =
-      Sfen("12/12/12/12/6k5/5K6/12/4G7/12/12/12/12 w - 1").toSituation(shogi.variant.Chushogi).get
-    sit5.status.contains(Status.BareKing) must beFalse
+    val position5 =
+      Sfen("12/12/12/12/6k5/5K6/12/4G7/12/12/12/12 w - 1").toPosition(shogi.variant.Chushogi).get
+    position5.status.contains(Status.BareKing) must beFalse
 
-    val sit6 =
+    val position6 =
       Sfen("5P3P2/12/12/12/6k2i2/12/12/6K1I3/12/12/12/5p5p b")
-        .toSituation(shogi.variant.Chushogi)
+        .toPosition(shogi.variant.Chushogi)
         .get
-    sit6.status.contains(Status.BareKing) must beFalse
-    sit6.status.contains(Status.Draw) must beFalse
+    position6.status.contains(Status.BareKing) must beFalse
+    position6.status.contains(Status.Draw) must beFalse
 
-    val sit7 =
-      Sfen("12/11G/12/12/3d8/3S8/7k4/6K5/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
-    val sit7After1 = sit7(Usi("9f9e").get).toOption.get
-    sit7After1.status must beNone
+    val position7 =
+      Sfen("12/11G/12/12/3d8/3S8/7k4/6K5/12/12/12/12 b - 1").toPosition(shogi.variant.Chushogi).get
+    val position7After1 = position7(Usi("9f9e").get).toOption.get
+    position7After1.status must beNone
   }
 
   "playable" should {
     "be true" in {
-      val sitB =
-        Sfen("12/12/12/12/12/6k5/5K6/12/12/12/12/12 b - 1").toSituation(shogi.variant.Chushogi).get
-      val sitW =
-        Sfen("12/12/12/12/12/6k5/5K6/12/12/12/12/12 w - 1").toSituation(shogi.variant.Chushogi).get
-      sitB.playable(strict = true) must beTrue
-      sitW.playable(strict = true) must beTrue
+      val positionB =
+        Sfen("12/12/12/12/12/6k5/5K6/12/12/12/12/12 b - 1").toPosition(shogi.variant.Chushogi).get
+      val positionW =
+        Sfen("12/12/12/12/12/6k5/5K6/12/12/12/12/12 w - 1").toPosition(shogi.variant.Chushogi).get
+      positionB.playable(strict = true) must beTrue
+      positionW.playable(strict = true) must beTrue
     }
   }
 
@@ -363,9 +363,9 @@ class ChushogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
-            state.end must beFalse
-            perft(state, 1) must be equalTo d1.toInt
+            val position = Position(Some(Sfen(sfenStr)), shogi.variant.Chushogi)
+            position.end must beFalse
+            perft(position, 1) must be equalTo d1.toInt
           }
         }
       }

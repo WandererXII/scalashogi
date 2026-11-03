@@ -10,7 +10,7 @@ class VisualTest extends ShogiTest {
 
   "The visual board formatter" should {
     "export new board" in {
-      f.addNewLines(f render makeSituation(shogi.variant.Standard)) must_== newVisualFormat
+      f.addNewLines(f render makePosition(shogi.variant.Standard)) must_== newVisualFormat
     }
 
     "import and export is non destructive" in {
@@ -21,8 +21,8 @@ class VisualTest extends ShogiTest {
 
     "partial import" in {
       f.addNewLines(
-        f render (f.parse(partialSituationFormat, shogi.variant.Standard).get),
-      ) must_== fullSituationFormat
+        f render (f.parse(partialPositionFormat, shogi.variant.Standard).get),
+      ) must_== fullPositionFormat
     }
 
     "hand import" in {
@@ -41,7 +41,7 @@ class VisualTest extends ShogiTest {
     }
 
     "export with special marks" in {
-      val situation = f.parse(
+      val position = f.parse(
         """
 k . B . . . . . .
 . . . . . . . . .
@@ -58,7 +58,7 @@ Turn:Sente
         shogi.variant.Standard,
       )
       val markedBoard =
-        f render (situation.get, Map(Set(SQ8F, SQ6F, SQ8D, SQ6D, SQ9C, SQ5C, SQ4B, SQ3A) -> 'x'))
+        f render (position.get, Map(Set(SQ8F, SQ6F, SQ8D, SQ6D, SQ9C, SQ5C, SQ4B, SQ3A) -> 'x'))
       f addNewLines markedBoard must_== """
 k . B . . . x . .
 . . . . . x . . .
@@ -89,7 +89,7 @@ Hands:
 Turn:Sente
 """
 
-  val partialSituationFormat = """
+  val partialPositionFormat = """
 . . . . . . . . .
 . . . . k . . . .
 . . . . . . . . .
@@ -98,7 +98,7 @@ P P P P P P P P P
 L N S G K G S N L
 """
 
-  val fullSituationFormat = """
+  val fullPositionFormat = """
 . . . . . . . . .
 . . . . . . . . .
 . . . . . . . . .

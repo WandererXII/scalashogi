@@ -26,9 +26,9 @@ class HandicapTest extends ShogiTest {
     "parse all" in {
       Handicap.allByVariant.toList map { case (v, lsh) =>
         forall(lsh) { h =>
-          val sit = h.sfen.toSituation(v)
-          sit must beSome
-          sit.get.playable(strict = true) must beTrue
+          val position = h.sfen.toPosition(v)
+          position must beSome
+          position.get.playable(strict = true) must beTrue
         }
       }
     }

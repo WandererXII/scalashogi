@@ -25,20 +25,20 @@ final case class Found(index: Int) extends DividerData
 
 object Divider {
 
-  def apply(sits: Seq[Situation]): Division = {
+  def apply(positions: Seq[Position]): Division = {
 
-    val indexedSits = sits.zipWithIndex
+    val indexedPositions = positions.zipWithIndex
 
-    val midGame = indexedSits.foldLeft[DividerData](NotFound(0, 0)) {
+    val midGame = indexedPositions.foldLeft[DividerData](NotFound(0, 0)) {
       case (found: Found, _) =>
         found
-      case (NotFound(lastSenteInvaders, lastGoteInvaders), (sit, index)) => {
-        val curSenteInvaders = countInvaders(sit, Sente)
-        val curGoteInvaders  = countInvaders(sit, Gote)
+      case (NotFound(lastSenteInvaders, lastGoteInvaders), (position, index)) => {
+        val curSenteInvaders = countInvaders(position, Sente)
+        val curGoteInvaders  = countInvaders(position, Gote)
         if (
           // every piece except pawns and king
-          majorsAndMinors(sit) <= 17 ||
-          isBackrankSparse(sit) ||
+          majorsAndMinors(position) <= 17 ||
+          isBackrankSparse(position) ||
           // if one piece invades the opposing camp and is not immediately captured
           (curSenteInvaders >= 1 && lastSenteInvaders >= 1) ||
           (curGoteInvaders >= 1 && lastGoteInvaders >= 1)
@@ -55,14 +55,14 @@ object Divider {
     }
 
     val endGame =
-      if (midGameOption.isDefined) indexedSits.foldLeft[DividerData](NotFound(0, 0)) {
+      if (midGameOption.isDefined) indexedPositions.foldLeft[DividerData](NotFound(0, 0)) {
         case (found: Found, _) =>
           found
-        case (NotFound(lastSenteInvaders, lastGoteInvaders), (sit, index)) => {
-          val curSenteInvaders = countInvaders(sit, Sente)
-          val curGoteInvaders  = countInvaders(sit, Gote)
+        case (NotFound(lastSenteInvaders, lastGoteInvaders), (position, index)) => {
+          val curSenteInvaders = countInvaders(position, Sente)
+          val curGoteInvaders  = countInvaders(position, Gote)
           if (
-            (majorsAndMinors(sit) <= 3 && sit.board.pieces.sizeIs <= 12) ||
+            (majorsAndMinors(position) <= 3 && position.board.pieces.sizeIs <= 12) ||
             (curSenteInvaders >= 2 && lastSenteInvaders >= 2) ||
             (curGoteInvaders >= 2 && lastGoteInvaders >= 2)
           ) Found(index)
@@ -81,22 +81,22 @@ object Divider {
       midGameOption.filter(m => endGameOption.fold(true)(m <)),
       endGameOption,
       // The history includes the initial position, before any ply is played.
-      (sits.size - 1).max(0),
+      (positions.size - 1).max(0),
     )
   }
 
-  private def countInvaders(sit: Situation, color: Color): Int =
-    sit.board.pieces.count { case (pos, piece) =>
-      piece.color == color && sit.variant.promotionRanks(color).contains(pos.rank)
+  private def countInvaders(position: Position, color: Color): Int =
+    position.board.pieces.count { case (pos, piece) =>
+      piece.color == color && position.variant.promotionRanks(color).contains(pos.rank)
     }
 
-  private def majorsAndMinors(sit: Situation): Int =
-    sit.board.pieces.values.count(p => p.role != Pawn && p.role != King)
+  private def majorsAndMinors(position: Position): Int =
+    position.board.pieces.values.count(p => p.role != Pawn && p.role != King)
 
   // Sparse back-rank indicates that pieces have been developed
-  private def isBackrankSparse(sit: Situation): Boolean =
-    sit.board.pieces.count { case (pos, piece) =>
-      sit.variant.backrank(!piece.color) == pos.rank
+  private def isBackrankSparse(position: Position): Boolean =
+    position.board.pieces.count { case (pos, piece) =>
+      position.variant.backrank(!piece.color) == pos.rank
     } < 4
 
 }

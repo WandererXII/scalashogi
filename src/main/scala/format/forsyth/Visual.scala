@@ -21,7 +21,7 @@ import shogi.variant._
 // for debugging purposes
 object Visual {
 
-  def parse(source: String, variant: Variant): Option[Situation] = {
+  def parse(source: String, variant: Variant): Option[Position] = {
     val clean = source.replaceAll("^\n|\n$| ", "")
     val lines = augmentString(clean).linesIterator.map(_.trim).filter(_.nonEmpty).toList
     val hands = lines.find(_.toLowerCase.startsWith("hands")).flatMap(_.split(':').lift(1)) | ""
@@ -47,31 +47,31 @@ object Visual {
     val finalSfen =
       List[String](padStr + sfen, turn, hands)
         .mkString(" ")
-    Sfen(finalSfen).toSituation(variant)
+    Sfen(finalSfen).toPosition(variant)
   }
 
-  def render(sit: Situation, marks: Map[Iterable[Pos], Char] = Map.empty): String = {
+  def render(position: Position, marks: Map[Iterable[Pos], Char] = Map.empty): String = {
     val markedPoss: Map[Pos, Char] = marks.foldLeft[Map[Pos, Char]](Map.empty) {
       case (marks, (poss, char)) =>
         marks ++ (poss.toList map { pos =>
           (pos, char)
         })
     }
-    for (y <- 0 to (sit.variant.numberOfRanks - 1)) yield {
-      for (x <- (sit.variant.numberOfFiles - 1) to 0 by -1) yield {
-        "%2s" format (Pos.at(x, y).flatMap(markedPoss.get).map(_.toString) | (sit
+    for (y <- 0 to (position.variant.numberOfRanks - 1)) yield {
+      for (x <- (position.variant.numberOfFiles - 1) to 0 by -1) yield {
+        "%2s" format (Pos.at(x, y).flatMap(markedPoss.get).map(_.toString) | (position
           .board(x, y)
-          .flatMap(p => SfenUtils.toForsyth(p, sit.variant))
+          .flatMap(p => SfenUtils.toForsyth(p, position.variant))
           | "."))
       }
     } mkString
   } map (_.trim) mkString "\n" pipe { board =>
     List[String](
       board,
-      if (sit.variant.supportsDrops)
-        s"Hands:${Sfen.handsToString(sit.hands, sit.variant).filterNot('-' ==)}"
+      if (position.variant.supportsDrops)
+        s"Hands:${Sfen.handsToString(position.hands, position.variant).filterNot('-' ==)}"
       else "",
-      s"Turn:${sit.color.name.capitalize}",
+      s"Turn:${position.color.name.capitalize}",
     ).filter(_.nonEmpty).mkString("\n")
   }
 

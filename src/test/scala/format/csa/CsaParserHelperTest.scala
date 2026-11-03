@@ -22,7 +22,7 @@ class CsaParserHelperTest extends ShogiTest {
   }
 
   def parseAndCompare(source: String, resSfen: Sfen) =
-    parseSituation(source) must beValid.like { case s =>
+    parsePosition(source) must beValid.like { case s =>
       s.toSfen.truncate must_== resSfen
     }
 
@@ -73,7 +73,7 @@ P-00HI00HI00KA00KA00KI00KI00GI00KE00KY00KY00KY00FU00FU00FU00FU00FU00FU00FU00FU00
     forall(
       List("+", "P+59ZZ", "P+59OU\nP-59OU", "P1 * \nP+59OU", "P2 * \nP+59OU"),
     ) { source =>
-      parseSituation(source) must beInvalid
+      parsePosition(source) must beInvalid
     }
   }
 
@@ -103,7 +103,7 @@ P-00HI00HI00KA00KA00KI00KI00GI00KE00KY00KY00KY00FU00FU00FU00FU00FU00FU00FU00FU00
       forall(List("+", "-")) { color =>
         val opponent = if (color == "+") "-" else "+"
         val source   = s"$board\nP${opponent}11$promoted\nP${opponent}00$base\nP${color}00AL"
-        parseSituation(source) must beValid.like { case s =>
+        parsePosition(source) must beValid.like { case s =>
           s.hands(Color.fromSente(color == "+"))(role) must_== total - 2
         }
       }

@@ -4,22 +4,22 @@ import shogi.format.usi.Usi
 
 object Perft {
 
-  def drops(sit: Situation): List[Usi.Drop] =
-    sit.dropActors.values.toList
+  def drops(position: Position): List[Usi.Drop] =
+    position.dropActors.values.toList
       .flatMap(_.toUsis)
 
-  def moves(sit: Situation): List[Usi.Move] =
-    sit.moveActors.values.toList
+  def moves(position: Position): List[Usi.Move] =
+    position.moveActors.values.toList
       .flatMap(_.toUsis)
 
-  def perft(state: Situation, depth: Int, log: Boolean = false): Int =
+  def perft(position: Position, depth: Int, log: Boolean = false): Int =
     if (depth > 0) {
-      if (state.end) 0
+      if (position.end) 0
       else {
-        val mds: List[Usi] = moves(state) ::: drops(state)
+        val mds: List[Usi] = moves(position) ::: drops(position)
         mds.foldLeft(0) { (p, u) =>
-          val newState = state(u).toOption.get
-          val cnt      = perft(newState, depth - 1, log = false)
+          val newPosition = position(u).toOption.get
+          val cnt         = perft(newPosition, depth - 1, log = false)
           if (log) println(s"${u.usi.padTo(5, ' ')} - $cnt")
           p + cnt
         }

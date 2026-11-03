@@ -2,7 +2,7 @@ package shogi
 
 import shogi.format.usi._
 
-class SituationReplayPerfTest extends ShogiTest {
+class PositionReplayPerfTest extends ShogiTest {
 
   // args(skipAll = true)
 
@@ -11,9 +11,12 @@ class SituationReplayPerfTest extends ShogiTest {
 
   val usis = format.usi.Fixtures.prod500standard.take(nb).map(Usi.readList(_).get)
   def runOne(usis: List[Usi]) = {
-    val (situations, error) = Replay.statesWhileValid(usis, None, variant.Standard)
+    val (positions, error) = Replay.positionsWhileValid(usis, None, variant.Standard)
     require(error.isEmpty, error.getOrElse(""))
-    require(situations.size == usis.size + 1, s"expected ${usis.size + 1} situations, got ${situations.size}")
+    require(
+      positions.size == usis.size + 1,
+      s"expected ${usis.size + 1} positions, got ${positions.size}",
+    )
   }
   def run() = { usis foreach runOne }
 

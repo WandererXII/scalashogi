@@ -101,15 +101,15 @@ object KifParser {
         init             <- getComments(headerStr)
         parsedVariations <- VariationParser(variationStr)
         variations = createVariations(parsedVariations)
-        situation <- KifParserHelper.parseSituation(
+        position <- KifParserHelper.parsePosition(
           boardStr,
           preTags(_.Handicap),
           strSteps.map(_.step),
         )
-        variant     = situation.variant
-        initialSfen = situation.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
+        variant     = position.variant
+        initialSfen = position.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
         parsedSteps <- objSteps(strSteps, variant, variations)
-        tags = createTags(preTags, situation.color, parsedSteps.value.size, terminationOption)
+        tags = createTags(preTags, position.color, parsedSteps.value.size, terminationOption)
       } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>

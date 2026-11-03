@@ -8,7 +8,7 @@ import shogi.format.kif.KifParserHelper._
 class KifParserHelperTest extends ShogiTest {
 
   def parseAndCompare(source: String, handicap: Option[String], resSfen: Sfen) =
-    parseSituation(source, handicap, Nil) must beValid.like { case s =>
+    parsePosition(source, handicap, Nil) must beValid.like { case s =>
       s.toSfen.truncate must_== resSfen
     }
 
@@ -81,7 +81,7 @@ class KifParserHelperTest extends ShogiTest {
   "Chu Shogi move detection accepts distinctive pieces and arrow notation" in {
     forall(List(None, Some("平手"))) { handicap =>
       forall(List("7七歩兵 （←7八）", "7七獅子(78)")) { step =>
-        parseSituation("", handicap, List(step)) must beValid.like { case s =>
+        parsePosition("", handicap, List(step)) must beValid.like { case s =>
           s.variant must_== shogi.variant.Chushogi
           s.toSfen.truncate must_== shogi.variant.Chushogi.initialSfen.truncate
         }

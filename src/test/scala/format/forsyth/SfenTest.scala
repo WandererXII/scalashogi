@@ -20,17 +20,17 @@ class SfenTest extends ShogiTest {
           "4k4/9/4R4/9/9/9/9/9/4K4" -> Gote,
         ),
       ) { case (board, expected) =>
-        Sfen(board).toSituation(Standard) must beSome.like { case sit =>
-          sit.color must_== expected
-          sit.playable(true) must beTrue
+        Sfen(board).toPosition(Standard) must beSome.like { case position =>
+          position.color must_== expected
+          position.playable(true) must beTrue
         }
       }
     }
     "keep explicit turns and the default turn" in {
       val board = "4k4/9/9/9/9/9/4r4/9/4K4"
-      Sfen(s"$board w - 1").toSituation(Standard).get.color must_== Gote
+      Sfen(s"$board w - 1").toPosition(Standard).get.color must_== Gote
       Sfen(Standard.initialSfen.value.takeWhile(_ != ' '))
-        .toSituation(Standard)
+        .toPosition(Standard)
         .get
         .color must_== Sente
     }
@@ -60,14 +60,14 @@ class SfenTest extends ShogiTest {
     "normalize whitespace consistently across fields" in {
       val board = Standard.initialSfen.value.takeWhile(_ != ' ')
       val input = Sfen(s"  $board \t w  2P \t 2  ")
-      input.toSituation(Standard) must beSome.like { case sp =>
+      input.toPosition(Standard) must beSome.like { case sp =>
         sp.toSfen must_== Sfen(s"$board w 2P 2")
       }
       input.truncate must_== Sfen(s"$board w 2P")
     }
     "round trip every variant and piece" in {
       forall(shogi.variant.Variant.all) { variant =>
-        variant.initialSfen.toSituation(variant).get.toSfen must_== variant.initialSfen
+        variant.initialSfen.toPosition(variant).get.toSfen must_== variant.initialSfen
         forall(variant.allRoles) { role =>
           forall(Color.all) { color =>
             val piece = Piece(color, role)
@@ -81,50 +81,50 @@ class SfenTest extends ShogiTest {
   "the forsyth notation" should {
     "export" in {
       "game opening" in {
-        val steps = List("7g7f", "3c3d", "8h2b", "3a2b")
-        val state = makeState(Standard)
+        val steps    = List("7g7f", "3c3d", "8h2b", "3a2b")
+        val position = makePosition(Standard)
         "new game" in {
-          state.toSfen must_== Sfen(
+          position.toSfen must_== Sfen(
             "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1",
           )
         }
         "new game board only" in {
-          Sfen(Sfen.boardToString(makeSituation(Standard).board, Standard)) must_== Sfen(
+          Sfen(Sfen.boardToString(makePosition(Standard).board, Standard)) must_== Sfen(
             "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL",
           )
         }
         "one step" in {
-          state.playUsisStr(steps take 1) must beValid.like { case sit =>
-            sit.toSfen must_== Sfen(
+          position.playUsisStr(steps take 1) must beValid.like { case played =>
+            played.toSfen must_== Sfen(
               "lnsgkgsnl/1r5b1/ppppppppp/9/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL w - 2",
             )
           }
         }
         "2 steps" in {
-          state.playUsisStr(steps take 2) must beValid.like { case sit =>
-            sit.toSfen must_== Sfen(
+          position.playUsisStr(steps take 2) must beValid.like { case played =>
+            played.toSfen must_== Sfen(
               "lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3",
             )
           }
         }
         "3 steps" in {
-          state.playUsisStr(steps take 3) must beValid.like { case sit =>
-            sit.toSfen must_== Sfen(
+          position.playUsisStr(steps take 3) must beValid.like { case played =>
+            played.toSfen must_== Sfen(
               "lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4",
             )
           }
         }
         "4 steps" in {
-          state.playUsisStr(steps take 4) must beValid.like { case sit =>
-            sit.toSfen must_== Sfen(
+          position.playUsisStr(steps take 4) must beValid.like { case played =>
+            played.toSfen must_== Sfen(
               "lnsgkg1nl/1r5s1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL b Bb 5",
             )
           }
         }
         "5 drop" in {
-          state.playUsisStr(steps take 4) must beValid.like { case sit =>
-            sit.playUsiStr("B*5e") must beValid.like { case state2 =>
-              state2.toSfen must_== Sfen(
+          position.playUsisStr(steps take 4) must beValid.like { case played =>
+            played.playUsiStr("B*5e") must beValid.like { case position2 =>
+              position2.toSfen must_== Sfen(
                 "lnsgkg1nl/1r5s1/pppppp1pp/6p2/4B4/2P6/PP1PPPPPP/7R1/LNSGKGSNL w b 6",
               )
             }
@@ -136,8 +136,8 @@ class SfenTest extends ShogiTest {
     "import" in {
       val steps                                = List("7g7f", "3c3d", "8h2b", "3a2b")
       def compare(u: List[String], sfen: Sfen) =
-        makeState(Standard).playUsisStr(u) must beValid.like { case sit =>
-          sfen must_== sit.toSfen
+        makePosition(Standard).playUsisStr(u) must beValid.like { case position =>
+          sfen must_== position.toSfen
         }
       "new game" in {
         compare(
@@ -170,12 +170,12 @@ class SfenTest extends ShogiTest {
         )
       }
       "invalid" in {
-        Sfen("hahaha").toSituation(Standard) must beNone
+        Sfen("hahaha").toPosition(Standard) must beNone
       }
     }
     "promoted pieces in sfen" in {
       Sfen("+l+n+sgkg+s+n+l/1r5+b1/+p+p+p+p+p+p+p+p+p/9/9/9/PPPP+PPPPP/1B5R1/LNSGKGSNL b - 1")
-        .toSituation(
+        .toPosition(
           Standard,
         ) must beSome
         .like { case s =>
@@ -188,10 +188,10 @@ class SfenTest extends ShogiTest {
         }
     }
   }
-  "import situation numbering" should {
+  "import position numbering" should {
     "with plies" in {
       "starting" in {
-        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1").toSituation(
+        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1").toPosition(
           Standard,
         ) must beSome.like { case s =>
           s.color must_== Sente
@@ -200,7 +200,7 @@ class SfenTest extends ShogiTest {
         }
       }
       "sente to play" in {
-        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 11").toSituation(
+        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 11").toPosition(
           Standard,
         ) must beSome.like { case s =>
           s.color must_== Sente
@@ -209,7 +209,7 @@ class SfenTest extends ShogiTest {
         }
       }
       "gote to play" in {
-        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 2").toSituation(
+        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 2").toPosition(
           Standard,
         ) must beSome.like { case s =>
           s.color must_== Gote
@@ -218,7 +218,7 @@ class SfenTest extends ShogiTest {
         }
       }
       "gote to play starting at 1" in {
-        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1").toSituation(
+        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1").toPosition(
           Standard,
         ) must beSome.like { case s =>
           s.color must_== Gote
@@ -228,38 +228,38 @@ class SfenTest extends ShogiTest {
       }
     }
   }
-  "make game" should {
+  "make position" should {
     "sente starts - 1" in {
-      val sfen  = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1")
-      val state = Situation(sfen.some, shogi.variant.Standard)
-      state.plies must_== 0
-      state.startedAtPly must_== 0
-      state.startedAtStep must_== 1
-      state.toSfen must_== sfen
+      val sfen     = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1")
+      val position = Position(sfen.some, shogi.variant.Standard)
+      position.plies must_== 0
+      position.startedAtPly must_== 0
+      position.startedAtStep must_== 1
+      position.toSfen must_== sfen
     }
     "sente starts - 2" in {
-      val sfen  = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 2")
-      val state = Situation(sfen.some, shogi.variant.Standard)
-      state.plies must_== 2
-      state.startedAtPly must_== 2
-      state.startedAtStep must_== 2
-      state.toSfen must_== sfen
+      val sfen     = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 2")
+      val position = Position(sfen.some, shogi.variant.Standard)
+      position.plies must_== 2
+      position.startedAtPly must_== 2
+      position.startedAtStep must_== 2
+      position.toSfen must_== sfen
     }
     "gote starts - 1" in {
-      val sfen  = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
-      val state = Situation(sfen.some, shogi.variant.Standard)
-      state.plies must_== 1
-      state.startedAtPly must_== 1
-      state.startedAtStep must_== 1
-      state.toSfen must_== sfen
+      val sfen     = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+      val position = Position(sfen.some, shogi.variant.Standard)
+      position.plies must_== 1
+      position.startedAtPly must_== 1
+      position.startedAtStep must_== 1
+      position.toSfen must_== sfen
     }
     "gote starts - 2" in {
-      val sfen  = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 2")
-      val state = Situation(sfen.some, shogi.variant.Standard)
-      state.plies must_== 1
-      state.startedAtPly must_== 1
-      state.startedAtStep must_== 2
-      state.toSfen must_== sfen
+      val sfen     = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 2")
+      val position = Position(sfen.some, shogi.variant.Standard)
+      position.plies must_== 1
+      position.startedAtPly must_== 1
+      position.startedAtStep must_== 2
+      position.toSfen must_== sfen
     }
   }
   "pieces in hand" should {
@@ -276,14 +276,14 @@ class SfenTest extends ShogiTest {
         }
       }
       "empty hand" in {
-        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1").toSituation(
+        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1").toPosition(
           Standard,
         ) must beSome.like { case s =>
           s.hands must_== Hands.empty
         }
       }
       "simple hand" in {
-        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b PNr 1").toSituation(
+        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b PNr 1").toPosition(
           Standard,
         ) must beSome.like { case s =>
           s.hands must_== Hands(Hand(Map(Knight -> 1, Pawn -> 1)), Hand(Map(Rook -> 1)))
@@ -291,7 +291,7 @@ class SfenTest extends ShogiTest {
       }
       "hand with numbers" in {
         Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b 15P3Nr2LB7R3s230gG12pl 1")
-          .toSituation(Standard) must beSome
+          .toPosition(Standard) must beSome
           .like { case s =>
             s.hands must_== Hands(
               Hand(Map(Rook -> 7, Bishop -> 1, Gold -> 1, Knight -> 3, Lance -> 2, Pawn -> 15)),
@@ -301,7 +301,7 @@ class SfenTest extends ShogiTest {
       }
       "hand repeating" in {
         Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b ppBG15ppppP 1")
-          .toSituation(
+          .toPosition(
             Standard,
           ) must beSome.like { case s =>
           s.hands must_== Hands(
@@ -312,12 +312,12 @@ class SfenTest extends ShogiTest {
       }
       "invalid roles" in {
         Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b T13k10t 1")
-          .toSituation(
+          .toPosition(
             Standard,
           ) must beNone
       }
       "open number" in {
-        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b 120 1").toSituation(
+        Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b 120 1").toPosition(
           Standard,
         ) must beSome.like { case s =>
           s.hands must_== Hands.empty
@@ -325,7 +325,7 @@ class SfenTest extends ShogiTest {
       }
       "ignore wrong input" in {
         Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b 3P2ljk 1")
-          .toSituation(
+          .toPosition(
             Standard,
           ) must beNone
       }
@@ -333,46 +333,46 @@ class SfenTest extends ShogiTest {
   }
   "minishogi" in {
     "default" in {
-      Situation(Minishogi).toSfen.value must_== "rbsgk/4p/5/P4/KGSBR b - 1"
+      Position(Minishogi).toSfen.value must_== "rbsgk/4p/5/P4/KGSBR b - 1"
     }
     "too many ranks" in {
-      Sfen("rbsgk/4p/5/PG3/K1SBR/PG3").toSituation(Minishogi) must beNone
+      Sfen("rbsgk/4p/5/PG3/K1SBR/PG3").toPosition(Minishogi) must beNone
     }
     "too many files" in {
-      Sfen("rrbsgk/4p/5/PG3/K1SBR/PG3").toSituation(Minishogi) must beNone
+      Sfen("rrbsgk/4p/5/PG3/K1SBR/PG3").toPosition(Minishogi) must beNone
     }
   }
   "dobutsu" in {
     "reject unsupported pieces" in {
       val symbols = List("s", "g", "+s", "+b", "+r")
       forall(symbols.flatMap(s => List(s, s.toUpperCase))) { symbol =>
-        Sfen(s"rkb/${symbol}p1/1P1/BKR b - 1").toSituation(Dobutsu) must beNone
+        Sfen(s"rkb/${symbol}p1/1P1/BKR b - 1").toPosition(Dobutsu) must beNone
       }
     }
     "round trip supported pieces of both colors" in {
       val sfen = Sfen("rkb/+p2/2+P/BKR b RBPrbp 1")
-      sfen.toSituation(Dobutsu) must beSome.like { case s =>
+      sfen.toPosition(Dobutsu) must beSome.like { case s =>
         s.toSfen must_== sfen
       }
     }
   }
   "chushogi" in {
     "default" in {
-      Situation(
+      Position(
         Chushogi,
       ).toSfen.value must_== "lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1"
     }
     "all promoted" in {
       Sfen(
         "+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1",
-      ).toSituation(Chushogi)
+      ).toPosition(Chushogi)
         .get
         .toSfen
         .truncate
         .value must_== "+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b -"
     }
     "double digit files" in {
-      Sfen("11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b").toSituation(Chushogi) must beSome.like {
+      Sfen("11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b").toPosition(Chushogi) must beSome.like {
         case s =>
           s.toSfen.truncate.value must_== "11k/11d/12/12/12/11N/10N1/9N2/12/12/D11/K11 b -"
           s.board(Pos.SQ1F) must beSome
@@ -383,12 +383,12 @@ class SfenTest extends ShogiTest {
     "last lion capture" in {
       Sfen(
         "lf1s1x1kg1sl/ac1degt1ocfa/mb1h1tn1drvm/pv6pbp1/3pp1p1i2p/1prI2P3h1/3PP1+H1IPPP/1Pp4pPR2/P3DP1S2Q1/MR1HO1E1B1VM/AVBCTKDT2FA/LF1S1G1GXC1L b 5h",
-      ).toSituation(Chushogi) must beSome.like { case s =>
+      ).toPosition(Chushogi) must beSome.like { case s =>
         s.toSfen.truncate.value must_== "lf1s1x1kg1sl/ac1degt1ocfa/mb1h1tn1drvm/pv6pbp1/3pp1p1i2p/1prI2P3h1/3PP1+H1IPPP/1Pp4pPR2/P3DP1S2Q1/MR1HO1E1B1VM/AVBCTKDT2FA/LF1S1G1GXC1L b 5h"
       }
     }
     "last lion capture from play" in {
-      Sfen("12/12/12/12/12/4r7/12/12/5o3n2/4N7/12/6B5 w - 1").toSituation(Chushogi) must beSome
+      Sfen("12/12/12/12/12/4r7/12/12/5o3n2/4N7/12/6B5 w - 1").toPosition(Chushogi) must beSome
         .like { case s =>
           val s1 = s(Usi("8f8j+").get).toOption.get
           val s2 = s(Usi("8f3f").get).toOption.get

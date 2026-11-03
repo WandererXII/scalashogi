@@ -6,73 +6,74 @@ import shogi.format.usi.Usi
 
 class DobutsuTest extends ShogiTest {
 
-  def perft(state: Situation, depth: Int, log: Boolean = false) = Perft.perft(state, depth, log)
+  def perft(position: Position, depth: Int, log: Boolean = false) =
+    Perft.perft(position, depth, log)
 
   "calculate dobutsu perfts" should {
-    val state = Situation(shogi.variant.Dobutsu)
+    val position = Position(shogi.variant.Dobutsu)
     "1 depth" in {
-      perft(state, 1) must be equalTo 4
+      perft(position, 1) must be equalTo 4
     }
     "2 depth" in {
-      perft(state, 2) must be equalTo 17
+      perft(position, 2) must be equalTo 17
     }
     "3 depth" in {
-      perft(state, 3) must be equalTo 123
+      perft(position, 3) must be equalTo 123
     }
     "4 depth" in {
-      perft(state, 4) must be equalTo 976
+      perft(position, 4) must be equalTo 976
     }
     "5 depth" in {
-      perft(state, 5) must be equalTo 8122
+      perft(position, 5) must be equalTo 8122
     }
     "6 depth" in {
-      perft(state, 6) must be equalTo 71677
+      perft(position, 6) must be equalTo 71677
     }
   }
 
   "moving into check and being captured" should {
     "allow king capture behavior" in {
-      val sit = Sfen("3/1k1/3/1K1 b - 1").toSituation(shogi.variant.Dobutsu).get
-      sit.moveActorAt(Pos.SQ2D).get.destinations.size must_== 5
+      val position = Sfen("3/1k1/3/1K1 b - 1").toPosition(shogi.variant.Dobutsu).get
+      position.moveActorAt(Pos.SQ2D).get.destinations.size must_== 5
 
       val move1 = Usi("2d2c").get
-      sit(move1).isValid must beTrue
-      val sit2 = sit(move1).toOption.get
-      sit2.moveActorAt(Pos.SQ2B).get.destinations.size must_== 8
+      position(move1).isValid must beTrue
+      val position2 = position(move1).toOption.get
+      position2.moveActorAt(Pos.SQ2B).get.destinations.size must_== 8
 
       val move2 = Usi("2b2c").get
-      sit2(move2).isValid must beTrue
-      val sitCaptureAfter = sit2(move2).toOption.get
-      sitCaptureAfter.end must beTrue
-      sitCaptureAfter.status must_== Some(Status.RoyalsLost)
-      sitCaptureAfter.winner must_== Some(Color.Gote)
+      position2(move2).isValid must beTrue
+      val positionCaptureAfter = position2(move2).toOption.get
+      positionCaptureAfter.end must beTrue
+      positionCaptureAfter.status must_== Some(Status.RoyalsLost)
+      positionCaptureAfter.winner must_== Some(Color.Gote)
 
-      val sitMissAfter = sit2(Usi("2b1b").get).toOption.get
-      sitMissAfter.end must beFalse
+      val positionMissAfter = position2(Usi("2b1b").get).toOption.get
+      positionMissAfter.end must beFalse
     }
   }
 
   "try rule" should {
     "win by reaching other side" in {
-      val sit = Sfen("k2/2K/3/3 b - 1").toSituation(shogi.variant.Dobutsu).get
-      sit.moveActorAt(Pos.SQ1B).get.destinations.size must_== 5
+      val position = Sfen("k2/2K/3/3 b - 1").toPosition(shogi.variant.Dobutsu).get
+      position.moveActorAt(Pos.SQ1B).get.destinations.size must_== 5
 
       val move = Usi("1b1a").get
-      sit(move).isValid must beTrue
+      position(move).isValid must beTrue
 
-      val afterTry = sit(move).toOption.get
+      val afterTry = position(move).toOption.get
       afterTry.end must beTrue
       afterTry.status must_== Some(Status.TryRule)
       afterTry.winner must_== Some(Color.Sente)
     }
 
     "work in check" in {
-      val sit = Sfen("1r1/bpK/k2/3 b -").toSituation(shogi.variant.Dobutsu).get
-      sit.moveActorAt(Pos.SQ1B).get.destinations.size must_== 5
+      val position = Sfen("1r1/bpK/k2/3 b -").toPosition(shogi.variant.Dobutsu).get
+      position.moveActorAt(Pos.SQ1B).get.destinations.size must_== 5
 
       val moveTry = Usi("1b1a").get
-      sit(moveTry).isValid must beTrue
-      val s1 = sit(moveTry).toOption.get
+      position(moveTry).isValid must beTrue
+      val s1 = position(moveTry).toOption.get
       s1.switch.check must beTrue
       s1.end must beFalse
 
@@ -97,56 +98,56 @@ class DobutsuTest extends ShogiTest {
     }
 
     "be draw" in {
-      val sit = Sfen("1K1/1r1/1R1/1k1 w BPbp 40").toSituation(shogi.variant.Dobutsu).get
-      sit.playable(strict = true) must beTrue
-      val sitAfter = sit(Usi("2b2c").get).toOption.get
-      sitAfter.end must beTrue
-      sitAfter.status must_== Some(Status.Draw)
-      sitAfter.winner must_== None
+      val position = Sfen("1K1/1r1/1R1/1k1 w BPbp 40").toPosition(shogi.variant.Dobutsu).get
+      position.playable(strict = true) must beTrue
+      val positionAfter = position(Usi("2b2c").get).toOption.get
+      positionAfter.end must beTrue
+      positionAfter.status must_== Some(Status.Draw)
+      positionAfter.winner must_== None
     }
   }
 
   "force promoting" should {
     "enforce promotion rules" in {
-      val sit = Sfen("3/BRP/2k/K2 b P").toSituation(shogi.variant.Dobutsu).get
-      sit(Usi("1b1a").get).isValid must beFalse
-      sit(Usi("1b1a+").get).isValid must beTrue
-      sit(Usi("3b2a+").get).isValid must beFalse
+      val position = Sfen("3/BRP/2k/K2 b P").toPosition(shogi.variant.Dobutsu).get
+      position(Usi("1b1a").get).isValid must beFalse
+      position(Usi("1b1a+").get).isValid must beTrue
+      position(Usi("3b2a+").get).isValid must beFalse
     }
   }
 
   "drops" should {
     "allow pawns on the last rank" in {
-      val sit = Sfen("3/2k/K2/3 b P").toSituation(shogi.variant.Dobutsu).get
-      sit(Usi("P*1a").get).toOption.get.valid(strict = true) must beTrue
+      val position = Sfen("3/2k/K2/3 b P").toPosition(shogi.variant.Dobutsu).get
+      position(Usi("P*1a").get).toOption.get.valid(strict = true) must beTrue
     }
 
     "be legal" in {
-      val sit  = Sfen("rkr/b1b/1P1/BKR b P").toSituation(shogi.variant.Dobutsu).get
-      val drop = Usi("P*2b").get
-      sit(drop).isValid must beTrue
+      val position = Sfen("rkr/b1b/1P1/BKR b P").toPosition(shogi.variant.Dobutsu).get
+      val drop     = Usi("P*2b").get
+      position(drop).isValid must beTrue
 
-      val afterDrop = sit(drop).toOption.get
+      val afterDrop = position(drop).toOption.get
       afterDrop.end must beFalse
     }
   }
 
   "playable" should {
     "be true" in {
-      val sitB = Sfen("r2/2k/PKb/B2 b Pr").toSituation(shogi.variant.Dobutsu).get
-      val sitW = Sfen("r2/2k/PKb/B2 w Pr").toSituation(shogi.variant.Dobutsu).get
-      sitB.playable(strict = true) must beTrue
-      sitW.playable(strict = true) must beTrue
+      val positionB = Sfen("r2/2k/PKb/B2 b Pr").toPosition(shogi.variant.Dobutsu).get
+      val positionW = Sfen("r2/2k/PKb/B2 w Pr").toPosition(shogi.variant.Dobutsu).get
+      positionB.playable(strict = true) must beTrue
+      positionW.playable(strict = true) must beTrue
     }
   }
 
   "double pawn" should {
     "work" in {
-      val sit = Sfen("rkb/2P/2P/BKR b - 1").toSituation(shogi.variant.Dobutsu).get
-      sit.playable(strict = true) must beTrue
+      val position = Sfen("rkb/2P/2P/BKR b - 1").toPosition(shogi.variant.Dobutsu).get
+      position.playable(strict = true) must beTrue
 
-      val sitPre = Sfen("rkb/3/2P/BKR b P 1").toSituation(shogi.variant.Dobutsu).get
-      sitPre(Usi("P*1b").get).isValid must beTrue
+      val positionPre = Sfen("rkb/3/2P/BKR b P 1").toPosition(shogi.variant.Dobutsu).get
+      positionPre(Usi("P*1b").get).isValid must beTrue
     }
   }
 }

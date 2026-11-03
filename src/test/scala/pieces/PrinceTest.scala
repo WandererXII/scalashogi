@@ -44,7 +44,7 @@ L N . G+E . . . . . N L""" moveDestsFrom SQ8L must bePoss(SQ7L)
     }
 
     "not move to positions that are occupied by the same colour" in {
-      val situation = """
+      val position = """
 . . . P . . . . . . . .
 N P+E L . . . P . . . .
 . . . . . . . . . . . .
@@ -56,8 +56,8 @@ P . P . P P P . P . . .
 . . . . . . . . . . . .
 Turn:Sente
 """
-      situation moveDestsFrom SQ10E must bePoss(
-        situation,
+      position moveDestsFrom SQ10E must bePoss(
+        position,
         """
 . . . . . . . . . . . .
 . . . . . . . . . . . .
@@ -77,7 +77,7 @@ Turn:Sente
     }
 
     "threaten" in {
-      val situation = """
+      val position = """
 +e. B . . . . . . . . .
 . . . . . . . . . . . .
 . b . B . . . . . . . .
@@ -93,13 +93,13 @@ L N S G . G S N L . . .
 Turn:Sente
 """
       "a reachable enemy" in {
-        situation moveActorAt SQ10E map (_ threatens SQ11D) must beSome(true)
+        position moveActorAt SQ10E map (_ threatens SQ11D) must beSome(true)
       }
       "an unreachable enemy" in {
-        situation moveActorAt SQ10E map (_ threatens SQ12D) must beSome(false)
+        position moveActorAt SQ10E map (_ threatens SQ12D) must beSome(false)
       }
       "a reachable friend" in {
-        situation moveActorAt SQ10E map (_ threatens SQ10F) must beSome(true)
+        position moveActorAt SQ10E map (_ threatens SQ10F) must beSome(true)
       }
     }
   }

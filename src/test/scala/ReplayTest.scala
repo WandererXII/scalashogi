@@ -7,7 +7,7 @@ import shogi.variant.Standard
 class ReplayTest extends ShogiTest {
   val usis = format.usi.Fixtures.prod500standard.map(Usi.readList(_).get)
 
-  "replaying to the last game" should {
+  "replaying to the last position" should {
     "preserve each variant's initial setup with and without an explicit SFEN" in {
       val variants = List(
         Standard,
@@ -20,47 +20,47 @@ class ReplayTest extends ShogiTest {
       )
       forall(variants) { variant =>
         forall(List(None, Some(variant.initialSfen))) { initialSfen =>
-          val expected = Situation(initialSfen, variant)
-          Replay.fromUsi(Nil, initialSfen, variant).valid must beValid.like { case sit =>
-            sit.toSfen must_== expected.toSfen
-            sit.plies must_== expected.plies
-            sit.startedAtPly must_== expected.startedAtPly
-            sit.startedAtStep must_== expected.startedAtStep
-            sit.usis must beEmpty
+          val expected = Position(initialSfen, variant)
+          Replay.fromUsi(Nil, initialSfen, variant).valid must beValid.like { case position =>
+            position.toSfen must_== expected.toSfen
+            position.plies must_== expected.plies
+            position.startedAtPly must_== expected.startedAtPly
+            position.startedAtStep must_== expected.startedAtStep
+            position.usis must beEmpty
           }
         }
       }
     }
 
-    "return the initial game for an empty record" in {
-      Replay.fromUsi(Nil, None, Standard).valid must beValid.like { case sit =>
-        sit.toSfen must_== Situation(Standard).toSfen
-        sit.usis must beEmpty
-        sit.playedPlies must_== 0
+    "return the initial position for an empty record" in {
+      Replay.fromUsi(Nil, None, Standard).valid must beValid.like { case position =>
+        position.toSfen must_== Position(Standard).toSfen
+        position.usis must beEmpty
+        position.playedPlies must_== 0
       }
     }
 
     "preserve the valid prefix and original error after a later illegal move" in {
       val moves = Usi.readList("7g7f 7g7f 3c3d").get
-      val first = Situation(Standard)(moves.head).toOption.get
+      val first = Position(Standard)(moves.head).toOption.get
       val error = first(moves(1)).swap.toOption.get
       Replay.fromUsi(moves, None, Standard) must beLike {
-        case result @ Replay.Result.Incomplete(state, failure) =>
-          state.toSfen must_== first.toSfen
-          state.usis must_== Vector(moves.head)
-          state.playedPlies must_== 1
+        case result @ Replay.Result.Incomplete(position, failure) =>
+          position.toSfen must_== first.toSfen
+          position.usis must_== Vector(moves.head)
+          position.playedPlies must_== 1
           failure must_== error
           result.valid must beInvalid(error)
       }
     }
 
-    "return the initial game and error when the first move is illegal" in {
+    "return the initial position and error when the first move is illegal" in {
       val moves = Usi.readList("3c3d 7g7f").get
       Replay.fromUsi(moves, None, Standard) must beLike {
-        case result @ Replay.Result.Incomplete(state, _) =>
-          state.toSfen must_== Situation(Standard).toSfen
-          state.usis must beEmpty
-          state.playedPlies must_== 0
+        case result @ Replay.Result.Incomplete(position, _) =>
+          position.toSfen must_== Position(Standard).toSfen
+          position.usis must beEmpty
+          position.playedPlies must_== 0
           result.valid must beInvalid
       }
     }
@@ -69,26 +69,26 @@ class ReplayTest extends ShogiTest {
       val parsed   = format.csa.CsaParser.full("PI\n+\n+7776FU\n-3334FU\n+7776FU").toOption.get
       val result   = Replay.fromParsedNotation(parsed, identity)
       val moves    = Usi.readList("7g7f 3c3d").get
-      val expected = Replay.fromUsi(moves, None, Standard).state
-      result must beLike { case Replay.Result.Incomplete(sit, error) =>
-        sit.toSfen must_== expected.toSfen
-        sit.usis must_== moves.toVector
-        sit.plies must_== 2
+      val expected = Replay.fromUsi(moves, None, Standard).position
+      result must beLike { case Replay.Result.Incomplete(position, error) =>
+        position.toSfen must_== expected.toSfen
+        position.usis must_== moves.toVector
+        position.plies must_== 2
         error must_== expected(parsed.parsedSteps.value.last).swap.toOption.get
       }
     }
 
     "preserve SFEN numbering and a Gote starting turn" in {
       val sfen    = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 42")
-      val initial = Situation(Some(sfen), Standard)
+      val initial = Position(Some(sfen), Standard)
       val moves   = Usi.readList("3c3d 7g7f").get
-      Replay.fromUsi(moves, Some(sfen), Standard).valid must beValid.like { case sit =>
-        sit.startedAtPly must_== initial.plies
-        sit.startedAtStep must_== 42
-        sit.plies must_== initial.plies + 2
-        sit.stepNumber must_== 44
-        sit.color must_== Gote
-        sit.usis must_== moves.toVector
+      Replay.fromUsi(moves, Some(sfen), Standard).valid must beValid.like { case position =>
+        position.startedAtPly must_== initial.plies
+        position.startedAtStep must_== 42
+        position.plies must_== initial.plies + 2
+        position.stepNumber must_== 44
+        position.color must_== Gote
+        position.usis must_== moves.toVector
       }
     }
   }
@@ -96,16 +96,16 @@ class ReplayTest extends ShogiTest {
   "all 500 fixtures" should {
     "have no errors and correct size" in {
       forall(usis) { u =>
-        val r = Replay.statesWhileValid(u, None, shogi.variant.Standard)
+        val r = Replay.positionsWhileValid(u, None, shogi.variant.Standard)
         r._1.tail.size must_== u.size
         r._2 must beEmpty
-        Replay.fromUsi(u, None, Standard).valid must beValid.like { case sit =>
+        Replay.fromUsi(u, None, Standard).valid must beValid.like { case position =>
           val expected = r._1.last
-          sit.toSfen must_== expected.toSfen
-          sit.usis must_== expected.usis
-          sit.plies must_== expected.plies
-          sit.history.positionHashes.toList must_== expected.history.positionHashes.toList
-          sit.history.consecutiveAttacks must_== expected.history.consecutiveAttacks
+          position.toSfen must_== expected.toSfen
+          position.usis must_== expected.usis
+          position.plies must_== expected.plies
+          position.history.positionHashes.toList must_== expected.history.positionHashes.toList
+          position.history.consecutiveAttacks must_== expected.history.consecutiveAttacks
         }
         val r2 = Replay.usiWithRoleWhilePossible(u, None, shogi.variant.Standard)
         r2.size must_== u.size

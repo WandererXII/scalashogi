@@ -8,7 +8,7 @@ class PawnTest extends ShogiTest {
   "a sente pawn" should {
 
     "move towards rank by 1 square" in {
-      makeSituationWithBoard(
+      makePositionWithBoard(
         shogi.variant.Standard,
         Sente,
         SQ9F -> Sente.pawn,
@@ -16,7 +16,7 @@ class PawnTest extends ShogiTest {
     }
 
     "not move to positions that are occupied by the same color" in {
-      makeSituationWithBoard(
+      makePositionWithBoard(
         shogi.variant.Standard,
         Sente,
         SQ9F -> Sente.pawn,
@@ -25,7 +25,7 @@ class PawnTest extends ShogiTest {
     }
 
     "capture forward" in {
-      makeSituationWithBoard(
+      makePositionWithBoard(
         shogi.variant.Standard,
         Sente,
         SQ6F -> Sente.pawn,
@@ -37,7 +37,7 @@ class PawnTest extends ShogiTest {
   "a gote pawn" should {
 
     "move towards rank by 1 square" in {
-      makeSituationWithBoard(
+      makePositionWithBoard(
         shogi.variant.Standard,
         Gote,
         SQ9E -> Gote.pawn,
@@ -45,7 +45,7 @@ class PawnTest extends ShogiTest {
     }
 
     "not move to positions that are occupied by the same color" in {
-      makeSituationWithBoard(
+      makePositionWithBoard(
         shogi.variant.Standard,
         Gote,
         SQ9F -> Gote.pawn,
@@ -54,7 +54,7 @@ class PawnTest extends ShogiTest {
     }
 
     "capture forward" in {
-      makeSituationWithBoard(
+      makePositionWithBoard(
         shogi.variant.Standard,
         Gote,
         SQ6E -> Gote.pawn,

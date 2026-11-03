@@ -8,7 +8,7 @@ import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 import shogi.variant.Variant
 
-final case class Situation(
+final case class Position(
     board: Board,
     hands: Hands,
     color: Color,
@@ -16,13 +16,13 @@ final case class Situation(
     variant: Variant,
 ) {
 
-  def apply(usi: Usi): Validated[String, Situation] =
+  def apply(usi: Usi): Validated[String, Position] =
     usi match {
       case u: Usi.Move => move(u)
       case u: Usi.Drop => drop(u)
     }
 
-  def apply(parsedStep: ParsedStep): Validated[String, Situation] =
+  def apply(parsedStep: ParsedStep): Validated[String, Position] =
     parsedStep.toUsi(this) flatMap (apply _)
 
   // Moves
@@ -39,7 +39,7 @@ final case class Situation(
 
   def moveDestsFrom(from: Pos): Option[List[Pos]] = moveActorAt(from) map (_.destinations)
 
-  def move(usi: Usi.Move): Validated[String, Situation] =
+  def move(usi: Usi.Move): Validated[String, Position] =
     for {
       actor <- moveActorAt(usi.orig) toValid s"No piece on ${usi.orig}"
       _     <- Validated.cond(actor.piece is color, (), s"Not my piece on ${usi.orig}")
@@ -102,7 +102,7 @@ final case class Situation(
     dropActors.values
       .exists(_.destinations.nonEmpty)
 
-  def drop(usi: Usi.Drop): Validated[String, Situation] =
+  def drop(usi: Usi.Drop): Validated[String, Position] =
     for {
       _ <- Validated.cond(variant.supportsDrops, (), "Variant doesn't support drops")
       _ <- Validated.cond(
@@ -134,9 +134,9 @@ final case class Situation(
       updatedBoard: Board,
       updatedHands: Hands,
       usi: Usi,
-  ): Situation = {
-    val newSit = copy(board = updatedBoard, hands = updatedHands).switch
-    val h      = history
+  ): Position = {
+    val newPosition = copy(board = updatedBoard, hands = updatedHands).switch
+    val h           = history
       .record(usi)
       .withLastLionCapture {
         val roleOpt = usi.positions.headOption.flatMap(board(_).map(_.role))
@@ -146,23 +146,23 @@ final case class Situation(
             .reverse // start from the final dest
             .find(pos =>
               board(pos)
-                .exists(p => (p is newSit.color) && Role.allLions.contains(p.role)),
+                .exists(p => (p is newPosition.color) && Role.allLions.contains(p.role)),
             )
         else None
       }
       .withConsecutiveAttacks {
-        if (variant.isAttacking(newSit, usi))
-          history.consecutiveAttacks.add(!newSit.color)
-        else history.consecutiveAttacks.reset(!newSit.color)
+        if (variant.isAttacking(newPosition, usi))
+          history.consecutiveAttacks.add(!newPosition.color)
+        else history.consecutiveAttacks.reset(!newPosition.color)
       }
       .withPositionHashes {
         val basePositionHashes =
-          if (variant.isIrreversible(board, newSit.board, usi)) Array.empty: PositionHash
+          if (variant.isIrreversible(board, newPosition.board, usi)) Array.empty: PositionHash
           else if (history.positionHashes.isEmpty) Hash(this)
           else history.positionHashes
-        Hash(newSit) ++ basePositionHashes
+        Hash(newPosition) ++ basePositionHashes
       }
-    newSit.withHistory(h)
+    newPosition.withHistory(h)
   }
 
   // King safety
@@ -213,7 +213,7 @@ final case class Situation(
   def stepNumber: Int     = startedAtStep + playedPlies
   def fullTurnNumber: Int = 1 + plies / 2
 
-  def withPlies(plies: Int): Situation = withHistory(history.copy(plies = plies))
+  def withPlies(plies: Int): Position = withHistory(history.copy(plies = plies))
 
   def withBoard(board: Board)                     = copy(board = board)
   def withHands(hands: Hands)                     = copy(hands = hands)
@@ -227,19 +227,19 @@ final case class Situation(
 
   def toSfen: Sfen = Sfen(this)
 
-  def toSfenWithoutMoveNumber: Sfen = Sfen(Sfen.situationToString(this))
+  def toSfenWithoutMoveNumber: Sfen = Sfen(Sfen.positionToString(this))
 
   override def toString =
     s"${variant.name}\n$visual\nLast USI: ${history.lastUsi.fold("-")(_.usi)}\n"
 }
 
-object Situation {
+object Position {
 
-  def apply(initialSfen: Option[Sfen], variant: Variant): Situation =
-    initialSfen.flatMap(_.toSituation(variant)).getOrElse(apply(variant))
+  def apply(initialSfen: Option[Sfen], variant: Variant): Position =
+    initialSfen.flatMap(_.toPosition(variant)).getOrElse(apply(variant))
 
-  def apply(variant: shogi.variant.Variant): Situation =
-    Situation(
+  def apply(variant: shogi.variant.Variant): Position =
+    Position(
       Board(variant),
       Hands(variant),
       Sente,
@@ -247,6 +247,6 @@ object Situation {
       variant,
     )
 
-  def apply(board: Board, hands: Hands, color: Color, variant: Variant): Situation =
-    Situation(board, hands, color, History.empty, variant)
+  def apply(board: Board, hands: Hands, color: Color, variant: Variant): Position =
+    Position(board, hands, color, History.empty, variant)
 }

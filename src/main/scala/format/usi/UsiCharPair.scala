@@ -3,8 +3,8 @@ package format.usi
 
 import shogi.variant.Variant
 
-// Every possible legal usi in a given situation is mapped to a unique char pair
-// Not isomorphic on it's own, but together with situation it is
+// Every possible legal usi in a given position is mapped to a unique char pair
+// Not isomorphic on it's own, but together with position it is
 final case class UsiCharPair(a: Char, b: Char) {
   override def toString = s"$a$b"
 }

@@ -1,35 +1,37 @@
 package shogi
 
 object Impasse {
-  def apply(situation: Situation): Boolean =
-    situation.variant.allPositions.sizeIs == (9 * 9) && !situation.check && {
-      val color        = situation.color
-      val ranks        = situation.variant.promotionRanks(color)
-      val enteredRoles = situation.board.pieces.collect {
+  def apply(position: Position): Boolean =
+    position.variant.allPositions.sizeIs == (9 * 9) && !position.check && {
+      val color        = position.color
+      val ranks        = position.variant.promotionRanks(color)
+      val enteredRoles = position.board.pieces.collect {
         case (pos, piece) if (piece is color) && (ranks contains pos.rank) => piece.role
       }.toList
       def impassePoints: Int =
-        enteredRoles.map(impasseValueOf).sum + situation.hands(color).sum(impasseValueOf)
+        enteredRoles.map(impasseValueOf).sum + position.hands(color).sum(impasseValueOf)
 
       enteredRoles.sizeIs > necessaryEnteredPieces && enteredRoles
         .contains(King) && impassePoints >= color.fold(
         necessarySenteScore,
-        necessaryGoteScore - missingImpassePoints(situation),
+        necessaryGoteScore - missingImpassePoints(position),
       )
     }
 
   // In handicaps we give the value of the missing pieces to the handicap giver
   // Since this rule applies only to handicap games, only gote/uwate can be affected
-  private def missingImpassePoints(situation: Situation): Int =
-    situation.history.initialSfen
-      .filter(Handicap.isHandicap(_, situation.variant))
-      .flatMap(_.toSituation(situation.variant))
-      .fold(0) { initSit =>
+  private def missingImpassePoints(position: Position): Int =
+    position.history.initialSfen
+      .filter(Handicap.isHandicap(_, position.variant))
+      .flatMap(_.toPosition(position.variant))
+      .fold(0) { initPosition =>
         math.max(
           0,
           (necessaryGoteScore * 2) -
-            (initSit.board.pieces.values.map(p => impasseValueOf(p.role)).sum +
-              initSit.hands(Sente).sum(impasseValueOf) + initSit.hands(Gote).sum(impasseValueOf)),
+            (initPosition.board.pieces.values.map(p => impasseValueOf(p.role)).sum +
+              initPosition.hands(Sente).sum(impasseValueOf) + initPosition
+                .hands(Gote)
+                .sum(impasseValueOf)),
         )
       }
 

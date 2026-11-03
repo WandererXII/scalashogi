@@ -5,30 +5,30 @@ import shogi.format.forsyth.Sfen
 
 class MinishogiTest extends ShogiTest {
 
-  def perft(state: Situation, depth: Int) = Perft.perft(state, depth)
+  def perft(position: Position, depth: Int) = Perft.perft(position, depth)
 
   "calculate minishogi perfts" should {
-    val state = Situation(shogi.variant.Minishogi)
+    val position = Position(shogi.variant.Minishogi)
     "1 depth" in {
-      perft(state, 1) must be equalTo 14
+      perft(position, 1) must be equalTo 14
     }
     "2 depth" in {
-      perft(state, 2) must be equalTo 181
+      perft(position, 2) must be equalTo 181
     }
     "3 depth" in {
-      perft(state, 3) must be equalTo 2512
+      perft(position, 3) must be equalTo 2512
     }
     "4 depth" in {
-      perft(state, 4) must be equalTo 35401
+      perft(position, 4) must be equalTo 35401
     }
     // "5 depth" in {
-    //  perft(game, 5) must be equalTo 533203
+    //  perft(position, 5) must be equalTo 533203
     // }
   }
 
   "default positions" should {
     "be identical" in {
-      Situation(shogi.variant.Minishogi).toSfen must_== shogi.variant.Minishogi.initialSfen
+      Position(shogi.variant.Minishogi).toSfen must_== shogi.variant.Minishogi.initialSfen
     }
   }
 
@@ -37,8 +37,8 @@ class MinishogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Minishogi)
-            Perft.perft(state, 1) must be equalTo d1.toInt
+            val position = Position(Some(Sfen(sfenStr)), shogi.variant.Minishogi)
+            Perft.perft(position, 1) must be equalTo d1.toInt
           }
         }
       }

@@ -7,9 +7,9 @@ class DividerPerfTest extends ShogiTest {
       initial: Option[shogi.format.forsyth.Sfen],
       v: shogi.variant.Variant,
   ) = {
-    val (situations, error) = Replay.statesWhileValid(usis, initial, v)
+    val (positions, error) = Replay.positionsWhileValid(usis, initial, v)
     require(error.isEmpty, error.getOrElse(""))
-    situations
+    positions
   }
 
   // args(skipAll = true)

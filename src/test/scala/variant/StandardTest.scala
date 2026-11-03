@@ -5,24 +5,24 @@ import shogi.format.forsyth.Sfen
 
 class StandardTest extends ShogiTest {
 
-  def perft(state: Situation, depth: Int) = Perft.perft(state, depth)
+  def perft(position: Position, depth: Int) = Perft.perft(position, depth)
 
   "starting position" should {
-    val state = Situation(shogi.variant.Standard)
+    val position = Position(shogi.variant.Standard)
     "1 depth" in {
-      perft(state, 1) must be equalTo 30
+      perft(position, 1) must be equalTo 30
     }
     "2 depth" in {
-      perft(state, 2) must be equalTo 900
+      perft(position, 2) must be equalTo 900
     }
     "3 depth" in {
-      perft(state, 3) must be equalTo 25470
+      perft(position, 3) must be equalTo 25470
     }
     "4 depth" in {
-      perft(state, 4) must be equalTo 719731
+      perft(position, 4) must be equalTo 719731
     }
     // "5 depth" in {
-    //  perft(game, 5) must be equalTo 19861490
+    //  perft(position, 5) must be equalTo 19861490
     // }
   }
 
@@ -84,7 +84,7 @@ class StandardTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      Situation(shogi.variant.Standard).toSfen must_== shogi.variant.Standard.initialSfen
+      Position(shogi.variant.Standard).toSfen must_== shogi.variant.Standard.initialSfen
     }
   }
 
@@ -93,9 +93,9 @@ class StandardTest extends ShogiTest {
       forall(random) { line =>
         line match {
           case (sfenStr, d1, d2) => {
-            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Standard)
-            perft(state, 1) must be equalTo d1.toInt
-            perft(state, 2) must be equalTo d2.toInt
+            val position = Position(Some(Sfen(sfenStr)), shogi.variant.Standard)
+            perft(position, 1) must be equalTo d1.toInt
+            perft(position, 2) must be equalTo d2.toInt
           }
         }
       }
@@ -107,8 +107,8 @@ class StandardTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Standard)
-            perft(state, 1) must be equalTo d1.toInt
+            val position = Position(Some(Sfen(sfenStr)), shogi.variant.Standard)
+            perft(position, 1) must be equalTo d1.toInt
           }
         }
       }

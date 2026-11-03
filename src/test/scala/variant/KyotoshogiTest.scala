@@ -6,24 +6,25 @@ import shogi.format.usi.Usi
 
 class KyotoshogiTest extends ShogiTest {
 
-  def perft(state: Situation, depth: Int, log: Boolean = false) = Perft.perft(state, depth, log)
+  def perft(position: Position, depth: Int, log: Boolean = false) =
+    Perft.perft(position, depth, log)
 
   "calculate kyotoshogi perfts" should {
-    val state = Situation(shogi.variant.Kyotoshogi)
+    val position = Position(shogi.variant.Kyotoshogi)
     "1 depth" in {
-      perft(state, 1) must be equalTo 12
+      perft(position, 1) must be equalTo 12
     }
     "2 depth" in {
-      perft(state, 2) must be equalTo 137
+      perft(position, 2) must be equalTo 137
     }
     "3 depth" in {
-      perft(state, 3) must be equalTo 1636
+      perft(position, 3) must be equalTo 1636
     }
     "4 depth" in {
-      perft(state, 4) must be equalTo 18268
+      perft(position, 4) must be equalTo 18268
     }
     // "5 depth" in {
-    //  perft(game, 5) must be equalTo 225903
+    //  perft(position, 5) must be equalTo 225903
     // }
   }
 
@@ -38,8 +39,8 @@ class KyotoshogiTest extends ShogiTest {
       forall(kyotoPerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
-            perft(state, 1) must be equalTo d1.toInt
+            val position = Position(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
+            perft(position, 1) must be equalTo d1.toInt
           }
         }
       }
@@ -48,47 +49,47 @@ class KyotoshogiTest extends ShogiTest {
 
   "default positions" should {
     "be identical" in {
-      Situation(shogi.variant.Kyotoshogi).toSfen must_== shogi.variant.Kyotoshogi.initialSfen
+      Position(shogi.variant.Kyotoshogi).toSfen must_== shogi.variant.Kyotoshogi.initialSfen
     }
   }
 
   "move/drop legality" should {
     "drops" in {
-      val sit = Sfen("5/5/5/5/k3K b PTGS").toSituation(shogi.variant.Kyotoshogi).get
-      sit(Usi("T*3a").get).isValid must beTrue
-      sit(Usi("S*3a").get).isValid must beTrue
-      sit(Usi("G*3a").get).isValid must beTrue
-      sit(Usi("P*3a").get).isValid must beTrue
+      val position = Sfen("5/5/5/5/k3K b PTGS").toPosition(shogi.variant.Kyotoshogi).get
+      position(Usi("T*3a").get).isValid must beTrue
+      position(Usi("S*3a").get).isValid must beTrue
+      position(Usi("G*3a").get).isValid must beTrue
+      position(Usi("P*3a").get).isValid must beTrue
       // promoted
-      sit(Usi("L*3a").get).isValid must beTrue
-      sit(Usi("B*3a").get).isValid must beTrue
-      sit(Usi("N*3a").get).isValid must beTrue
-      sit(Usi("R*3a").get).isValid must beTrue
+      position(Usi("L*3a").get).isValid must beTrue
+      position(Usi("B*3a").get).isValid must beTrue
+      position(Usi("N*3a").get).isValid must beTrue
+      position(Usi("R*3a").get).isValid must beTrue
     }
     "pawn checkmate" in {
-      val sit = Sfen("kl3/1n3/G4/5/TSK1P b P").toSituation(shogi.variant.Kyotoshogi).get
-      sit(Usi("P*5b").get).isValid must beTrue
-      sit(Usi("P*5b").get).toOption.get.status must_== Some(Status.Mate)
+      val position = Sfen("kl3/1n3/G4/5/TSK1P b P").toPosition(shogi.variant.Kyotoshogi).get
+      position(Usi("P*5b").get).isValid must beTrue
+      position(Usi("P*5b").get).toOption.get.status must_== Some(Status.Mate)
     }
     "enforce + in usi" in {
-      val sit = Situation(shogi.variant.Kyotoshogi)
-      val s1  = sit(Usi("2e3d").get)
-      val s2  = sit(Usi("2e3d+").get)
+      val position = Position(shogi.variant.Kyotoshogi)
+      val s1       = position(Usi("2e3d").get)
+      val s2       = position(Usi("2e3d+").get)
       s1.isValid must beFalse
       s2.isValid must beTrue
       Usi("2e3d-") must beNone
     }
     "move to last rank" in {
-      val sit = Sfen("pgkst/R3P/5/5/TSKG1 b P").toSituation(shogi.variant.Kyotoshogi).get
-      sit(Usi("1b1a+").get).isValid must beTrue
-      sit(Usi("5b5a+").get).isValid must beTrue
+      val position = Sfen("pgkst/R3P/5/5/TSKG1 b P").toPosition(shogi.variant.Kyotoshogi).get
+      position(Usi("1b1a+").get).isValid must beTrue
+      position(Usi("5b5a+").get).isValid must beTrue
     }
   }
 
   "parse with pieces in dead zone" in {
-    Sfen("PgksL/3N1/5/1n3/pSKGl b").toSituation(shogi.variant.Kyotoshogi) must beSome
+    Sfen("PgksL/3N1/5/1n3/pSKGl b").toPosition(shogi.variant.Kyotoshogi) must beSome
     Sfen("PgksL/3N1/5/1n3/pSKGl b")
-      .toSituation(shogi.variant.Kyotoshogi)
+      .toPosition(shogi.variant.Kyotoshogi)
       .get
       .valid(true) must beTrue
   }
@@ -98,8 +99,8 @@ class KyotoshogiTest extends ShogiTest {
       forall(fixturePerfts) { line =>
         line match {
           case (sfenStr, d1) => {
-            val state = Situation(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
-            perft(state, 1) must be equalTo d1.toInt
+            val position = Position(Some(Sfen(sfenStr)), shogi.variant.Kyotoshogi)
+            perft(position, 1) must be equalTo d1.toInt
           }
         }
       }

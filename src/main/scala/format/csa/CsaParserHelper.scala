@@ -10,7 +10,7 @@ import cats.implicits._
 import shogi.variant.Standard
 
 object CsaParserHelper {
-  def parseSituation(str: String): Validated[String, Situation] = {
+  def parsePosition(str: String): Validated[String, Position] = {
     val lines        = augmentString(str.replace(",", "\n")).linesIterator.map(_.trim).toList
     val handicap     = lines.find(l => l.startsWith("PI"))
     val ranks        = lines.filter(l => l.startsWith("P") && l.lift(1).exists(_.isDigit))
@@ -27,11 +27,11 @@ object CsaParserHelper {
       }(h => parseHandicap(h))
       for {
         pieces <- initPieces
-        board = Board(pieces)
-        color = Color.fromSente(!lines.contains("-"))
-        sit   = Situation(board, Hands.empty, color, Standard)
-        sit2 <- parseAdditions(additions, sit)
-      } yield sit2
+        board    = Board(pieces)
+        color    = Color.fromSente(!lines.contains("-"))
+        position = Position(board, Hands.empty, color, Standard)
+        position2 <- parseAdditions(additions, position)
+      } yield position2
     }
   }
 
@@ -92,20 +92,22 @@ object CsaParserHelper {
 
   private def parseAdditions(
       additions: List[String],
-      sit: Situation,
-  ): Validated[String, Situation] = {
-    def parseSingleLine(line: String, sit: Situation): Validated[String, Situation] = {
+      position: Position,
+  ): Validated[String, Position] = {
+    def parseSingleLine(line: String, position: Position): Validated[String, Position] = {
       def parseHandAddition(
           str: String,
           color: Color,
-          sit: Situation,
-      ): Validated[String, Situation] = {
+          position: Position,
+      ): Validated[String, Position] = {
         if (str == "00AL") {
-          val hands        = sit.hands
+          val hands        = position.hands
           val otherHand    = hands(!color)
           val initialRoles = Standard.pieces.values.toList
           val curBoard     =
-            sit.board.pieces.values.toList.map(p => Standard.unpromote(p.role).getOrElse(p.role))
+            position.board.pieces.values.toList.map(p =>
+              Standard.unpromote(p.role).getOrElse(p.role),
+            )
           val newHand = Standard.handRoles.foldLeft(Hand.empty) { case (acc, cur) =>
             val n =
               initialRoles.count(_.role == cur) - otherHand(cur) - curBoard.count(_ == cur)
@@ -115,7 +117,7 @@ object CsaParserHelper {
             hands.copy(sente = newHand),
             hands.copy(gote = newHand),
           )
-          valid(sit.withHands(newHands))
+          valid(position.withHands(newHands))
         } else
           for {
             _ <-
@@ -128,13 +130,13 @@ object CsaParserHelper {
             role <- Standard.handRoles.find(
               _ == roleBase,
             ) toValid s"Can't have $roleBase in hand: $line"
-          } yield sit.withHands(sit.hands.store(color, role))
+          } yield position.withHands(position.hands.store(color, role))
       }
       def parseBoardAddition(
           str: String,
           color: Color,
-          sit: Situation,
-      ): Validated[String, Situation] = {
+          position: Position,
+      ): Validated[String, Position] = {
         for {
           _ <-
             if (str.sizeIs == 4) valid(str)
@@ -143,16 +145,16 @@ object CsaParserHelper {
           roleStr = str.slice(2, 4)
           pos  <- CsaUtils.parseCsaPos(posStr) toValid s"Incorrect position (${posStr}) in: $line"
           role <- CsaUtils.toRole(roleStr) toValid s"Non existent piece role (${roleStr}) in: $line"
-          boardWithPiece <- sit.board
+          boardWithPiece <- position.board
             .place(
               Piece(color, role),
               pos,
             ) toValid s"Cannot place $role on $posStr - already occupied - in: $line"
-        } yield sit.withBoard(boardWithPiece)
+        } yield position.withBoard(boardWithPiece)
       }
 
       val color = Color.fromSente(line.lift(1).contains('+'))
-      line.drop(2).grouped(4).foldLeft[Validated[String, Situation]](valid(sit)) {
+      line.drop(2).grouped(4).foldLeft[Validated[String, Position]](valid(position)) {
         case (acc, cur) =>
           acc andThen { s =>
             if (cur startsWith "00")
@@ -169,7 +171,7 @@ object CsaParserHelper {
     )
       invalid("00AL must be the last addition made")
     else {
-      additions.foldLeft[Validated[String, Situation]](valid(sit)) { case (acc, cur) =>
+      additions.foldLeft[Validated[String, Position]](valid(position)) { case (acc, cur) =>
         acc andThen (parseSingleLine(cur, _))
       }
     }

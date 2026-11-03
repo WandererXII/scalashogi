@@ -140,7 +140,7 @@ Turn:Sente
       )
     }
     "threaten" in {
-      val situation = """
+      val position = """
 k . B . . . . . .
 . . r . . r . . .
 p . . . . . . . .
@@ -154,22 +154,22 @@ Hands:
 Turn:Sente
 """
       "a reachable enemy to the left" in {
-        situation moveActorAt SQ7E map (_ threatens SQ9E) must beSome(true)
+        position moveActorAt SQ7E map (_ threatens SQ9E) must beSome(true)
       }
       "a reachable enemy to the top" in {
-        situation moveActorAt SQ7E map (_ threatens SQ7B) must beSome(true)
+        position moveActorAt SQ7E map (_ threatens SQ7B) must beSome(true)
       }
       "an unreachable enemy" in {
-        situation moveActorAt SQ7E map (_ threatens SQ9C) must beSome(false)
+        position moveActorAt SQ7E map (_ threatens SQ9C) must beSome(false)
       }
       "a reachable friend" in {
-        situation moveActorAt SQ7E map (_ threatens SQ2E) must beSome(true)
+        position moveActorAt SQ7E map (_ threatens SQ2E) must beSome(true)
       }
       "nothing left" in {
-        situation moveActorAt SQ7E map (_ threatens SQ8E) must beSome(true)
+        position moveActorAt SQ7E map (_ threatens SQ8E) must beSome(true)
       }
       "nothing up" in {
-        situation moveActorAt SQ7E map (_ threatens SQ7D) must beSome(true)
+        position moveActorAt SQ7E map (_ threatens SQ7D) must beSome(true)
       }
     }
   }

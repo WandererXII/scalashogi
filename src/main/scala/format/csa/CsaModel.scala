@@ -36,7 +36,7 @@ final case class Csa(
     val header  = Csa renderHeader tags
     val initialSfenOrDefault = initialSfen | variant.initialSfen
     val setup                =
-      initialSfenOrDefault.toSituation(variant).fold("")(Csa renderSituation _)
+      initialSfenOrDefault.toPosition(variant).fold("")(Csa renderPosition _)
     val startColor: Color = initialSfenOrDefault.color | Sente
     val stepsStr          = renderMainline(steps, startColor)
     List[String](
@@ -100,12 +100,12 @@ object Csa {
   private def isValidTagValue(str: String): Boolean =
     str.nonEmpty && str != "?"
 
-  def renderSituation(sit: Situation): String = {
+  def renderPosition(position: Position): String = {
     val csaBoard = new scala.collection.mutable.StringBuilder(256)
     for (y <- 0 to 8) {
       csaBoard append ("P" + (y + 1))
       for (x <- 8 to 0 by -1) {
-        sit.board(x, y).flatMap(CsaUtils toCsa _) match {
+        position.board(x, y).flatMap(CsaUtils toCsa _) match {
           case None      => csaBoard append " * "
           case Some(csa) =>
             csaBoard append s"$csa"
@@ -115,9 +115,9 @@ object Csa {
     }
     List[String](
       csaBoard.toString,
-      renderHand(sit.hands(Sente), "P+"),
-      renderHand(sit.hands(Gote), "P-"),
-      if (sit.color.gote) "-" else "+",
+      renderHand(position.hands(Sente), "P+"),
+      renderHand(position.hands(Gote), "P-"),
+      if (position.color.gote) "-" else "+",
     ).filter(_.nonEmpty).mkString("\n")
   }
 

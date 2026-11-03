@@ -4,24 +4,24 @@ import shogi.format.usi.Usi
 
 final case class DropActor(
     role: DroppableRole,
-    situation: Situation,
+    position: Position,
 ) {
 
-  def board   = situation.board
-  def color   = situation.color
-  def history = situation.history
-  def variant = situation.variant
+  def board   = position.board
+  def color   = position.color
+  def history = position.history
+  def variant = position.variant
 
-  def check = situation.check
+  def check = position.check
 
-  def unfilteredDestinations: List[Pos] = situation.possibleDropDests
+  def unfilteredDestinations: List[Pos] = position.possibleDropDests
 
   lazy val destinations: List[Pos] =
     if (
-      situation.variant.supportsDrops &&
-      situation.variant.dropRoles.contains(role)
+      position.variant.supportsDrops &&
+      position.variant.dropRoles.contains(role)
     )
-      situation.variant.dropFilter(this)
+      position.variant.dropFilter(this)
     else Nil
 
   def toUsis: List[Usi.Drop] =
@@ -33,23 +33,23 @@ final case class DropActor(
 
 object DropActor {
 
-  def blockades(sit: Situation, royalPos: Pos): List[Pos] = {
+  def blockades(position: Position, royalPos: Pos): List[Pos] = {
     def attacker(realPiece: Piece, from: Pos) = {
-      val piece = sit.variant.attackingPiece(realPiece, from, sit.board)
-      piece.projectionDirs.nonEmpty && piece.eyes(from, royalPos) && piece.color != sit.color
+      val piece = position.variant.attackingPiece(realPiece, from, position.board)
+      piece.projectionDirs.nonEmpty && piece.eyes(from, royalPos) && piece.color != position.color
     }
     @scala.annotation.tailrec
     def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] =
       dir(p) match {
-        case None                                                    => Nil
-        case Some(next) if !sit.variant.isInsideBoard(next)          => Nil
-        case Some(next) if sit.board(next).exists(attacker(_, next)) => squares
-        case Some(next) if sit.board(next).isDefined                 => Nil
+        case None                                                         => Nil
+        case Some(next) if !position.variant.isInsideBoard(next)          => Nil
+        case Some(next) if position.board(next).exists(attacker(_, next)) => squares
+        case Some(next) if position.board(next).isDefined                 => Nil
         case Some(next) => forward(next, dir, next :: squares)
       }
     Pos.allDirections flatMap { forward(royalPos, _, Nil) } filter { square =>
-      sit.board.place(Piece(sit.color, Gold), square) exists { defended =>
-        !sit.copy(board = defended).check
+      position.board.place(Piece(position.color, Gold), square) exists { defended =>
+        !position.copy(board = defended).check
       }
     }
   }

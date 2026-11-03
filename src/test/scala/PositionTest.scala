@@ -2,9 +2,9 @@ package shogi
 
 import scala.language.reflectiveCalls
 
-class SituationTest extends ShogiTest {
+class PositionTest extends ShogiTest {
 
-  "a game" should {
+  "a position" should {
     "detect check" should {
       "by rook" in {
         """
@@ -77,52 +77,52 @@ K . . . . . . . .
       }
     }
 
-    "Give the correct winner for a game" in {
-      val game =
+    "Give the correct winner for a position" in {
+      val position =
         """
 P P . . . . . . .
 K . . r . . . . .
 """
 
-      game.status must_== Some(Status.Mate)
-      game.winner must beSome.like { case color =>
+      position.status must_== Some(Status.Mate)
+      position.winner must beSome.like { case color =>
         color.gote
       }
     }
 
     "Not give a winner if the game is still in progress" in {
-      val game = """
+      val position = """
 . . . . p . . . .
 . . . . . K . . .
 """
 
-      game.winner must beNone
+      position.winner must beNone
 
     }
 
     "not be playable" in {
       "with touching kings" in {
-        val game = "k K . B N . . . ." as Gote
-        game.playable(strict = true) must beFalse
-        game.playable(strict = false) must beFalse
+        val position = "k K . B N . . . ." as Gote
+        position.playable(strict = true) must beFalse
+        position.playable(strict = false) must beFalse
       }
 
       "with other side in check" in {
-        val game = "k . R . K . . . ."
-        game.playable(strict = true) must beFalse
-        game.playable(strict = false) must beFalse
+        val position = "k . R . K . . . ."
+        position.playable(strict = true) must beFalse
+        position.playable(strict = false) must beFalse
       }
 
       "with doubled pawns" in {
-        val game = """
+        val position = """
 k . . . . . . . .
 . . . . . . . . .
 P p . . . . . . .
 P . . . . . . . .
 K . . . . . . . .
 """
-        game.playable(strict = true) must beFalse
-        game.playable(strict = false) must beFalse
+        position.playable(strict = true) must beFalse
+        position.playable(strict = false) must beFalse
       }
     }
 

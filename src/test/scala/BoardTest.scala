@@ -4,7 +4,7 @@ import shogi.Pos._
 
 class BoardTest extends ShogiTest {
 
-  val board = makeSituation(shogi.variant.Standard).board
+  val board = makePosition(shogi.variant.Standard).board
 
   "a board" should {
 
@@ -86,7 +86,7 @@ class BoardTest extends ShogiTest {
     }
 
     "allow a pawn to be promoted" in {
-      makeEmptySituation(shogi.variant.Standard).board
+      makeEmptyPosition(shogi.variant.Standard).board
         .place(Gote.pawn, SQ9F) flatMap (_.promote(SQ9F, SQ9G, _ => Some(Tokin))) must beSome.like {
         case b =>
           b(SQ9G) must beSome(Gote.tokin)
@@ -94,7 +94,7 @@ class BoardTest extends ShogiTest {
     }
 
     "allow chaining actions" in {
-      makeEmptySituation(shogi.variant.Standard).board.seq(
+      makeEmptyPosition(shogi.variant.Standard).board.seq(
         _.place(Sente - Pawn, SQ9H),
         _.place(Sente - Pawn, SQ9G),
         _.move(SQ9H, SQ9F),
@@ -104,7 +104,7 @@ class BoardTest extends ShogiTest {
     }
 
     "fail on bad actions chain" in {
-      makeEmptySituation(shogi.variant.Standard).board.seq(
+      makeEmptyPosition(shogi.variant.Standard).board.seq(
         _.place(Sente - Pawn, SQ9H),
         _.place(Sente - Pawn, SQ7G),
         _.move(SQ8G, SQ8F),

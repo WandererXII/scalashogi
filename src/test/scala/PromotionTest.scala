@@ -3,16 +3,15 @@ package shogi
 class PromotionTest extends ShogiTest {
 
   "pawn promotion" should {
-    val situation: Situation = """
+    val position: Position = """
 . . p . . . . . .
 . . . . . . . . .
 K . . . . . . . .
 Hands:
 Turn:Gote
 """
-    val state                = situation
     "promote to a tokin" in {
-      state.playUsiStr("7g7h+") must beState(
+      position.playUsiStr("7g7h+") must bePosition(
         """
 . . . . . . . . .
 . . . . . . . . .
@@ -30,7 +29,7 @@ Turn:Sente
       )
     }
     "don't force promotion by default" in {
-      state.playUsiStr("7g7h") must beState(
+      position.playUsiStr("7g7h") must bePosition(
         """
 . . . . . . . . .
 . . . . . . . . .
@@ -48,12 +47,12 @@ Turn:Sente
       )
     }
     "promotion by killing" in {
-      stringToSituation(
+      stringToPosition(
         """
 . . p . . . . . .
 K . R . . . . . .
 Turn:Gote""",
-      ).playUsiStr("7h7i+") must beState(
+      ).playUsiStr("7h7i+") must bePosition(
         """
 . . . . . . . . .
 . . . . . . . . .

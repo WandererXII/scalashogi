@@ -37,7 +37,7 @@ case object Checkshogi
   def valueOfRole(r: Role): Int = Standard.valueOfRole(r)
 
   override def isAttacking(
-      @unused after: Situation,
+      @unused after: Position,
       @unused usi: Usi,
   ): Boolean =
     false
@@ -45,8 +45,8 @@ case object Checkshogi
   override def dropFilterPawnCheckmate(@unused a: DropActor, @unused d: Pos): Boolean =
     false
 
-  override def status(sit: Situation): Option[Status] =
-    if (sit.check) Status.Check.some
-    else super.status(sit)
+  override def status(position: Position): Option[Status] =
+    if (position.check) Status.Check.some
+    else super.status(position)
 
 }

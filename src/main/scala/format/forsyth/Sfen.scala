@@ -10,15 +10,16 @@ import shogi.variant.Variant
 
 final case class Sfen(value: String) extends AnyVal {
 
-  def toSituation(variant: Variant): Option[Situation] =
+  def toPosition(variant: Variant): Option[Position] =
     for {
       board <- toBoard(variant)
       hands <- toHands(variant)
       history = toHistory(variant)
     } yield {
-      val sit      = Situation(board, hands, color | Sente, history, variant)
+      val parsed   = Position(board, hands, color | Sente, history, variant)
       val position =
-        if (color.isEmpty && variant.noOppositeCheck && sit.switch.check) sit.switch else sit
+        if (color.isEmpty && variant.noOppositeCheck && parsed.switch.check) parsed.switch
+        else parsed
       val sn    = stepNumber.fold(1)(_ max 1 min 9999)
       val plies = sn - (if ((sn % 2 == 1) == position.color.sente) 1 else 0)
       position.withHistory(history.copy(plies = plies, startedAtPly = plies, startedAtStep = sn))
@@ -67,15 +68,15 @@ final case class Sfen(value: String) extends AnyVal {
 
 object Sfen {
 
-  def apply(sit: Situation): Sfen =
-    Sfen(s"${situationToString(sit)} ${sit.stepNumber}")
+  def apply(position: Position): Sfen =
+    Sfen(s"${positionToString(position)} ${position.stepNumber}")
 
-  def situationToString(sit: Situation): String =
+  def positionToString(position: Position): String =
     List[String](
-      boardToString(sit.board, sit.variant),
-      sit.color.letter.toString,
-      if (sit.variant == shogi.variant.Chushogi) lastLionCaptureDestToString(sit.history)
-      else handsToString(sit.hands, sit.variant),
+      boardToString(position.board, position.variant),
+      position.color.letter.toString,
+      if (position.variant == shogi.variant.Chushogi) lastLionCaptureDestToString(position.history)
+      else handsToString(position.hands, position.variant),
     ) mkString " "
 
   def boardToString(board: Board, variant: Variant): String = {

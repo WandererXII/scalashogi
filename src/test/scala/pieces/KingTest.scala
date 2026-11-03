@@ -44,7 +44,7 @@ L N . G K . . N L""" moveDestsFrom SQ5I must bePoss(SQ4I)
     }
 
     "not move to positions that are occupied by the same colour" in {
-      val situation = """
+      val position = """
 . . . P . . . . .
 N P K L . . . P .
 . . . . . . . . .
@@ -54,8 +54,8 @@ P . P . P P P . P
 Hands:
 Turn:Sente
 """
-      situation moveDestsFrom SQ7E must bePoss(
-        situation,
+      position moveDestsFrom SQ7E must bePoss(
+        position,
         """
 . . . . . . . . .
 . . . . . . . . .
@@ -73,7 +73,7 @@ Turn:Sente
     }
 
     "capture hanging opponent pieces" in {
-      val situation = """
+      val position = """
 k . . . . . . . .
 . . . . . . . . .
 . . . . . . . . .
@@ -86,8 +86,8 @@ l . . . . . . . .
 Hands:
 Turn:Sente
 """
-      situation moveDestsFrom SQ7G must bePoss(
-        situation,
+      position moveDestsFrom SQ7G must bePoss(
+        position,
         """
 k . . . . . . . .
 . . . . . . . . .
@@ -104,7 +104,7 @@ Turn:Sente
       )
     }
     "threaten" in {
-      val situation = """
+      val position = """
 k . B . . . . . .
 . . . . . . . . .
 . b . B . . . . .
@@ -118,13 +118,13 @@ Hands:
 Turn:Sente
 """
       "a reachable enemy" in {
-        situation moveActorAt SQ7E map (_ threatens SQ8D) must beSome(true)
+        position moveActorAt SQ7E map (_ threatens SQ8D) must beSome(true)
       }
       "an unreachable enemy" in {
-        situation moveActorAt SQ7E map (_ threatens SQ9D) must beSome(false)
+        position moveActorAt SQ7E map (_ threatens SQ9D) must beSome(false)
       }
       "a reachable friend" in {
-        situation moveActorAt SQ7E map (_ threatens SQ7F) must beSome(true)
+        position moveActorAt SQ7E map (_ threatens SQ7F) must beSome(true)
       }
     }
     "not move near from the other king" in {

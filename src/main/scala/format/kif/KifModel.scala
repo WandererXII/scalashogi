@@ -144,22 +144,24 @@ object Kif {
         val handicap = getHandicapName(sf, variant)
         handicap
           .filter(_ => variant.standard)
-          .fold(sf.toSituation(variant).map(sit => renderSituation(sit, handicap.isDefined)) | "") {
-            hc =>
-              s"${Tag.Handicap.kifName}：$hc"
+          .fold(
+            sf.toPosition(variant)
+              .map(position => renderPosition(position, handicap.isDefined)) | "",
+          ) { hc =>
+            s"${Tag.Handicap.kifName}：$hc"
           }
       }
 
-  def renderSituation(sit: Situation, isHandicap: Boolean = false): String = {
+  def renderPosition(position: Position, isHandicap: Boolean = false): String = {
     val kifBoard = new scala.collection.mutable.StringBuilder(256)
-    val nbRanks  = sit.variant.numberOfRanks - 1
-    val nbFiles  = sit.variant.numberOfFiles - 1
-    val space    = if (sit.variant.chushogi) 3 else 2
-    val padder   = if (sit.variant.chushogi) "  ・" else " ・"
+    val nbRanks  = position.variant.numberOfRanks - 1
+    val nbFiles  = position.variant.numberOfFiles - 1
+    val space    = if (position.variant.chushogi) 3 else 2
+    val padder   = if (position.variant.chushogi) "  ・" else " ・"
     for (y <- 0 to nbRanks) {
       kifBoard append "|"
       for (x <- nbFiles to 0 by -1) {
-        sit.board(x, y).flatMap(p => KifUtils.toKifBoard(p, sit.variant)) match {
+        position.board(x, y).flatMap(p => KifUtils.toKifBoard(p, position.variant)) match {
           case None      => kifBoard append padder
           case Some(kif) =>
             kifBoard append String
@@ -171,20 +173,20 @@ object Kif {
       if (y < nbRanks) kifBoard append '\n'
     }
     List[String](
-      if (sit.variant.standard || sit.variant.chushogi) ""
+      if (position.variant.standard || position.variant.chushogi) ""
       else
-        s"手合割：${defaultHandicap(sit.variant)}", // we have to indicate the variant somehow
-      if (sit.variant.supportsDrops)
-        s"${colorName(Gote, isHandicap)}の持駒：${renderHand(sit.hands(Gote), sit.variant)}"
+        s"手合割：${defaultHandicap(position.variant)}", // we have to indicate the variant somehow
+      if (position.variant.supportsDrops)
+        s"${colorName(Gote, isHandicap)}の持駒：${renderHand(position.hands(Gote), position.variant)}"
       else "",
-      fileNums(sit.variant),
+      fileNums(position.variant),
       s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
       kifBoard.toString,
       s"+${"-" * ((nbFiles + 1) * (space + 1))}+",
-      if (sit.variant.supportsDrops)
-        s"${colorName(Sente, isHandicap)}の持駒：${renderHand(sit.hands(Sente), sit.variant)}"
+      if (position.variant.supportsDrops)
+        s"${colorName(Sente, isHandicap)}の持駒：${renderHand(position.hands(Sente), position.variant)}"
       else "",
-      if (sit.color.gote) s"${colorName(Gote, isHandicap)}番" else "",
+      if (position.color.gote) s"${colorName(Gote, isHandicap)}番" else "",
     ).filter(_.nonEmpty).mkString("\n")
   }
 

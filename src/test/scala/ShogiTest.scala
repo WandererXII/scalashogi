@@ -13,7 +13,7 @@ import shogi.variant._
 
 trait ShogiTest extends Specification with ValidatedMatchers {
 
-  implicit def stringToSituation(str: String): Situation =
+  implicit def stringToPosition(str: String): Position =
     Visual
       .parse(str, Standard)
       .orElse(Visual.parse(str, Chushogi))
@@ -23,9 +23,9 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       .orElse(Visual.parse(str, Kyotoshogi))
       .get
 
-  implicit def colorChanger(str: String): AnyRef { def as(color: shogi.Color): shogi.Situation } =
+  implicit def colorChanger(str: String): AnyRef { def as(color: shogi.Color): shogi.Position } =
     new {
-      def as(color: Color): Situation = stringToSituation(str).copy(color = color)
+      def as(color: Color): Position = stringToPosition(str).copy(color = color)
     }
 
   case class RichActor(actor: MoveActor) {
@@ -41,66 +41,64 @@ trait ShogiTest extends Specification with ValidatedMatchers {
 
   implicit def richActor(actor: MoveActor): RichActor = RichActor(actor)
 
-  case class RichState(state: Situation) {
+  case class RichPosition(position: Position) {
 
-    def as(color: Color): Situation = state.withColor(color)
+    def as(color: Color): Position = position.withColor(color)
 
-    def playUsisStr(usisStr: Seq[String]): Validated[String, Situation] = {
-      val validatedState = usisStr.foldLeft[Validated[String, Situation]](Validated.valid(state)) {
-        case (validatedState, usiStr) =>
-          validatedState.foreach { state =>
-            val _ = state.moveActors.values.map { actor =>
-              actor.destinations
+    def playUsisStr(usisStr: Seq[String]): Validated[String, Position] = {
+      val validatedPosition =
+        usisStr.foldLeft[Validated[String, Position]](Validated.valid(position)) {
+          case (validatedPosition, usiStr) =>
+            validatedPosition.foreach { position =>
+              val _ = position.moveActors.values.map { actor =>
+                actor.destinations
+              }
+              val _ = position.dropActors.values.map { actor =>
+                actor.destinations
+              }
             }
-            val _ = state.dropActors.values.map { actor =>
-              actor.destinations
+            val nextPosition = validatedPosition flatMap { position =>
+              position(Usi(usiStr).get)
             }
-          }
-          val nextState = validatedState flatMap { state =>
-            state(Usi(usiStr).get)
-          }
-          nextState
-      }
-      validatedState
+            nextPosition
+        }
+      validatedPosition
     }
 
     def playUsiStr(
         usiStr: String,
-    ): Validated[String, Situation] =
-      state.apply(Usi(usiStr).get)
+    ): Validated[String, Position] =
+      position.apply(Usi(usiStr).get)
 
   }
 
-  implicit def richState(state: Situation): RichState = RichState(state)
+  implicit def richPosition(position: Position): RichPosition = RichPosition(position)
 
-  def sfenToState(sfen: Sfen, variant: Variant) =
-    sfen.toSituation(variant) toValid "Could not construct situation from SFEN"
+  def sfenToPosition(sfen: Sfen, variant: Variant) =
+    sfen.toPosition(variant) toValid "Could not construct position from SFEN"
 
-  def makeSituation(variant: Variant): Situation =
-    Situation(variant)
+  def makePosition(variant: Variant): Position =
+    Position(variant)
 
-  def makeSituationWithBoard(variant: Variant, color: Color, pieces: (Pos, Piece)*): Situation =
-    makeSituation(variant).withColor(color).withBoard(Board(pieces))
+  def makePositionWithBoard(variant: Variant, color: Color, pieces: (Pos, Piece)*): Position =
+    makePosition(variant).withColor(color).withBoard(Board(pieces))
 
-  def makeEmptySituation(variant: Variant): Situation =
-    Situation(variant).withBoard(Board.empty)
+  def makeEmptyPosition(variant: Variant): Position =
+    Position(variant).withBoard(Board.empty)
 
   def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>
       p.toList must containTheSameElementsAs(poss.toList)
     }
 
-  def makeState(variant: Variant): Situation =
-    makeSituation(variant)
-
-  def bePoss(situation: Situation, visual: String): Matcher[Option[Iterable[Pos]]] =
+  def bePoss(position: Position, visual: String): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>
-      Visual.addNewLines(Visual.render(situation, Map(p -> 'x'))) must_== visual
+      Visual.addNewLines(Visual.render(position, Map(p -> 'x'))) must_== visual
     }
 
-  def beState(visual: String, variant: Variant): Matcher[Validated[String, Situation]] =
-    beValid.like { case sit =>
-      sit.visual must_== Visual.parse(visual, variant).get.visual
+  def bePosition(visual: String, variant: Variant): Matcher[Validated[String, Position]] =
+    beValid.like { case position =>
+      position.visual must_== Visual.parse(visual, variant).get.visual
     }
 
   def pieceMoves(
@@ -108,10 +106,10 @@ trait ShogiTest extends Specification with ValidatedMatchers {
       pos: Pos,
       variant: Variant,
   ): Option[List[Pos]] = {
-    val sit = makeEmptySituation(variant)
-    sit
+    val position = makeEmptyPosition(variant)
+    position
       .withColor(piece.color)
-      .withBoard(sit.board.place(piece, pos).get)
+      .withBoard(position.board.place(piece, pos).get)
       .moveActorAt(pos) map (_.destinations)
   }
 }

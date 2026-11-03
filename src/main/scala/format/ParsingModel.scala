@@ -26,7 +26,7 @@ object ParsedSteps {
 
 sealed trait ParsedStep {
 
-  def toUsi(sit: Situation): Validated[String, Usi]
+  def toUsi(position: Position): Validated[String, Usi]
 
   def positions: List[Pos]
 
@@ -60,9 +60,11 @@ final case class KifMove(
     metas: Metas = Metas.empty,
 ) extends ParsedStep {
 
-  def toUsi(sit: Situation) = {
+  def toUsi(position: Position) = {
     val mandatoryFlip =
-      sit.variant.kyotoshogi && sit.board(orig).exists(sit.variant.forcePromote(_, dest))
+      position.variant.kyotoshogi && position
+        .board(orig)
+        .exists(position.variant.forcePromote(_, dest))
     valid(Usi.Move(orig, dest, promotion || mandatoryFlip, midStep))
   }
 
@@ -79,9 +81,9 @@ final case class CsaMove(
     metas: Metas = Metas.empty,
 ) extends ParsedStep {
 
-  def toUsi(sit: Situation): Validated[String, Usi] =
-    Validated.fromOption(sit.board(orig), s"No piece at $orig") map { p =>
-      Usi.Move(orig, dest, sit.variant.promote(p.role).contains(role), None)
+  def toUsi(position: Position): Validated[String, Usi] =
+    Validated.fromOption(position.board(orig), s"No piece at $orig") map { p =>
+      Usi.Move(orig, dest, position.variant.promote(p.role).contains(role), None)
     }
 
   def withMetas(m: Metas) = copy(metas = m)
@@ -97,7 +99,7 @@ final case class Drop(
     metas: Metas = Metas.empty,
 ) extends ParsedStep {
 
-  def toUsi(sit: Situation) =
+  def toUsi(position: Position) =
     valid(Usi.Drop(role, pos))
 
   def withMetas(m: Metas) = copy(metas = m)

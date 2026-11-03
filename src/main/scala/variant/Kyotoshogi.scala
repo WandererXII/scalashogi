@@ -107,12 +107,12 @@ case object Kyotoshogi
 
   override def hasDoublePawns(board: Board, color: Color) = false
 
-  override def status(sit: Situation): Option[Status] =
-    if (!sit.hasDestinations) {
-      if (sit.check) Status.Mate.some
+  override def status(position: Position): Option[Status] =
+    if (!position.hasDestinations) {
+      if (position.check) Status.Mate.some
       else Status.Stalemate.some
-    } else if (sit.history.threefoldRepetition) Status.Repetition.some
-    else if (isInsufficientMaterial(sit.board, sit.hands)) Status.Draw.some
+    } else if (position.history.threefoldRepetition) Status.Repetition.some
+    else if (isInsufficientMaterial(position.board, position.hands)) Status.Draw.some
     else none
 
 }
