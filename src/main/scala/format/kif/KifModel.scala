@@ -23,7 +23,7 @@ final case class Kif(
     copy(tags = tags)
 
   def renderStepsAndVariations(steps: List[NotationStep]): String = {
-    val mainline = steps
+    def mainline(steps: List[NotationStep]): String = steps
       .foldLeft[(List[String], Option[Square])]((Nil, None)) { case ((acc, lastDest), cur) =>
         (
           Kif.renderNotationStep(cur, lastDest, variant) :: acc,
@@ -33,13 +33,19 @@ final case class Kif(
       ._1
       .reverse mkString "\n"
 
-    val variations = steps.reverse.foldLeft("")((acc, cur) => {
-      acc + cur.variations
-        .map(v => s"\n\n変化：${cur.stepNumber}手\n${renderStepsAndVariations(v)}")
-        .mkString("")
-    })
-
-    s"$mainline$variations"
+    val result = new StringBuilder
+    @scala.annotation.tailrec
+    def loop(pending: List[(String, List[NotationStep])]): String =
+      pending match {
+        case Nil                       => result.toString
+        case (header, current) :: rest =>
+          result.append(header).append(mainline(current))
+          val children = current.reverse.flatMap { cur =>
+            cur.variations.map(v => (s"\n\n変化：${cur.stepNumber}手\n", v))
+          }
+          loop(children ::: rest)
+      }
+    loop(List(("", steps)))
   }
 
   def render: String = {
