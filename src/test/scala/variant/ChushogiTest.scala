@@ -266,6 +266,20 @@ class ChushogiTest extends ShogiTest {
     }
   }
 
+  "lion-capture restrictions" should {
+    "apply to the reply without hiding the capturing piece's threats" in {
+      val before = Sfen("11k/12/12/6n5/6n5/6P5/12/12/12/12/12/K11 b - 1")
+        .toPosition(shogi.variant.Chushogi)
+        .get
+      val move  = Usi("6f6e").get
+      val after = before(move).toOption.get
+
+      after.history.lastLionCapture must beSome(Square.SQ6E)
+      shogi.variant.Chushogi.isAttacking(after, move) must beTrue
+      after.history.consecutiveAttacks must_== ConsecutiveAttacks(1, 0)
+    }
+  }
+
   "isAttacked" in {
     val position = Sfen("12/12/12/12/12/4r7/11n/12/5o5n/4N6P/12/6B5 w - 1")
       .toPosition(shogi.variant.Chushogi)

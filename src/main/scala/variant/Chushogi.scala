@@ -343,6 +343,7 @@ case object Chushogi
       usi match {
         case Usi.Move(_, dest, _, _) =>
           after.switch
+            .withHistory(after.history.withLastLionCapture(None))
             .moveActorAt(dest)
             .exists(a => a.destinations.exists(d => after.board(d).exists(_.color == after.color)))
         case _ => false
