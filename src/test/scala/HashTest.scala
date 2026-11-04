@@ -6,6 +6,15 @@ import shogi.variant.Standard
 
 class HashTest extends ShogiTest {
 
+  private def hashPosition(position: Position): PositionHash =
+    Hash(
+      position.board,
+      position.hands,
+      position.color,
+      position.variant,
+      position.history.lastLionCapture,
+    )
+
   "Hasher" should {
 
     "preserve captured position bytes and hashes for every variant" in {
@@ -21,10 +30,10 @@ class HashTest extends ShogiTest {
       forall(expected) { case (variant, bytes) =>
         val position = Position(variant)
         position.toSfenWithoutMoveNumber must_== variant.initialSfen.truncate
-        Hash(position).toList.map(_.toInt) must_== bytes
+        hashPosition(position).toList.map(_.toInt) must_== bytes
         val imported = Sfen(s"${variant.initialSfen.truncate.value} 42").toPosition(variant).get
         imported.toSfenWithoutMoveNumber must_== position.toSfenWithoutMoveNumber
-        Hash(imported).toList must_== Hash(position).toList
+        hashPosition(imported).toList must_== hashPosition(position).toList
         val edited = imported.withHistory(
           imported.history.copy(
             usis = Vector(Usi("7g7f").get),
@@ -34,7 +43,7 @@ class HashTest extends ShogiTest {
             initialSfen = Some(Sfen("provenance")),
           ),
         )
-        Hash(edited).toList must_== Hash(position).toList
+        hashPosition(edited).toList must_== hashPosition(position).toList
         edited.toSfen.truncate must_== edited.toSfenWithoutMoveNumber
       }
     }
@@ -43,23 +52,37 @@ class HashTest extends ShogiTest {
       val original = Position(shogi.variant.Chushogi)
       val captured = original.withHistory(original.history.withLastLionCapture(Some(Square.SQ5H)))
       captured.toSfenWithoutMoveNumber.value must endWith(" b 5h")
-      Hash(captured).toList mustNotEqual (Hash(original).toList)
-      Hash(original.switch).toList mustNotEqual (Hash(original).toList)
+      hashPosition(captured).toList mustNotEqual (hashPosition(original).toList)
+      hashPosition(original.switch).toList mustNotEqual (hashPosition(original).toList)
       val imported = captured.toSfen.toPosition(shogi.variant.Chushogi).get
       imported.history.lastLionCapture must beSome(Square.SQ5H)
       imported.history.initialSfen must beNone
-      Hash(imported).toList must_== Hash(captured).toList
+      hashPosition(imported).toList must_== hashPosition(captured).toList
+    }
+
+    "hash current Chu lion-capture rights when they are set and cleared" in {
+      val before = Sfen("11k/12/12/12/6n5/6P5/12/5+h6/5N6/12/12/K11 b - 1")
+        .toPosition(shogi.variant.Chushogi)
+        .get
+      val captured = before(Usi("6f6e").get).toOption.get
+      val expired  = captured(Usi("1a1b").get).toOption.get
+
+      captured.history.lastLionCapture must beSome(Square.SQ6E)
+      expired.history.lastLionCapture must beNone
+      forall(List(captured, expired)) { position =>
+        position.history.positionHashes.take(Hash.size).toList must_== hashPosition(position).toList
+      }
     }
 
     "be consistent" in {
       val sfen     = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
       val position = sfen.toPosition(Standard).get
       val positionAfterMove = position(Usi.Move(Square.SQ8H, Square.SQ2B, false, None)).toOption.get
-      val hashAfterMove     = Hash(positionAfterMove)
+      val hashAfterMove     = hashPosition(positionAfterMove)
 
       val sfenAfter     = Sfen("lnsgkgsnl/1r5B1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL w B 4")
       val positionAfter = sfenAfter.toPosition(Standard).get
-      val hashAfter     = Hash(positionAfter)
+      val hashAfter     = hashPosition(positionAfter)
 
       hashAfterMove.toList mustEqual hashAfter.toList
     }
@@ -67,11 +90,11 @@ class HashTest extends ShogiTest {
     "board diffs" in {
       val sfen     = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
       val position = sfen.toPosition(Standard).get
-      val hash     = Hash(position)
+      val hash     = hashPosition(position)
 
       val sfenDiff     = Sfen("nnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
       val positionDiff = sfenDiff.toPosition(Standard).get
-      val hashDiff     = Hash(positionDiff)
+      val hashDiff     = hashPosition(positionDiff)
 
       hash.toList mustNotEqual hashDiff.toList
     }
@@ -79,11 +102,11 @@ class HashTest extends ShogiTest {
     "color diffs" in {
       val sfenGote     = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL w - 3")
       val positionGote = sfenGote.toPosition(Standard).get
-      val hashGote     = Hash(positionGote)
+      val hashGote     = hashPosition(positionGote)
 
       val sfenSente = Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b - 3")
       val positionSente = sfenSente.toPosition(Standard).get
-      val hashSente     = Hash(positionSente)
+      val hashSente     = hashPosition(positionSente)
 
       hashGote.toList mustNotEqual hashSente.toList
     }
@@ -93,13 +116,13 @@ class HashTest extends ShogiTest {
         Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b p 3")
           .toPosition(Standard)
           .get
-      val gotePawnHash = Hash(gotePawn)
+      val gotePawnHash = hashPosition(gotePawn)
 
       val sentePawn =
         Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b P 3")
           .toPosition(Standard)
           .get
-      val sentePawnHash = Hash(sentePawn)
+      val sentePawnHash = hashPosition(sentePawn)
 
       sentePawnHash.toList mustNotEqual gotePawnHash.toList
     }
@@ -109,13 +132,13 @@ class HashTest extends ShogiTest {
         Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b 1r 3")
           .toPosition(Standard)
           .get
-      val goteRooksHash = Hash(goteRooks)
+      val goteRooksHash = hashPosition(goteRooks)
 
       val senteRooks =
         Sfen("lnsgkgsnl/1r5b1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/1B5R1/LNSGKGSNL b 2R 3")
           .toPosition(Standard)
           .get
-      val senteRoksHash = Hash(senteRooks)
+      val senteRoksHash = hashPosition(senteRooks)
 
       senteRoksHash.toList mustNotEqual goteRooksHash.toList
     }

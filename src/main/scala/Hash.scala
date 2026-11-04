@@ -2,6 +2,9 @@ package shogi
 
 import java.security.MessageDigest
 
+import shogi.format.forsyth.Sfen
+import shogi.variant.Variant
+
 object Hash {
 
   val size = 3
@@ -9,7 +12,13 @@ object Hash {
   private def apply(str: String): PositionHash =
     MessageDigest getInstance "MD5" digest (str getBytes "UTF-8") take size
 
-  def apply(position: Position): PositionHash = apply(position.toSfenWithoutMoveNumber.value)
+  def apply(
+      board: Board,
+      hands: Hands,
+      color: Color,
+      variant: Variant,
+      lastLionCapture: Option[Square],
+  ): PositionHash = apply(Sfen.positionToString(board, hands, color, variant, lastLionCapture))
 
   def debug(hashes: PositionHash) = hashes.map(_.toInt).sum.toString
 

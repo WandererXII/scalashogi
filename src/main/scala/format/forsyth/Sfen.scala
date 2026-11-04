@@ -72,11 +72,26 @@ object Sfen {
     Sfen(s"${positionToString(position)} ${position.stepNumber}")
 
   def positionToString(position: Position): String =
+    positionToString(
+      position.board,
+      position.hands,
+      position.color,
+      position.variant,
+      position.history.lastLionCapture,
+    )
+
+  def positionToString(
+      board: Board,
+      hands: Hands,
+      color: Color,
+      variant: Variant,
+      lastLionCapture: Option[Square],
+  ): String =
     List[String](
-      boardToString(position.board, position.variant),
-      position.color.letter.toString,
-      if (position.variant == shogi.variant.Chushogi) lastLionCaptureDestToString(position.history)
-      else handsToString(position.hands, position.variant),
+      boardToString(board, variant),
+      color.letter.toString,
+      if (variant == shogi.variant.Chushogi) lastLionCapture.fold("-")(_.key)
+      else handsToString(hands, variant),
     ) mkString " "
 
   def boardToString(board: Board, variant: Variant): String = {
@@ -100,9 +115,6 @@ object Sfen {
     }
     sfen.toString
   }
-
-  private def lastLionCaptureDestToString(history: History): String =
-    history.lastLionCapture.fold("-")(_.key)
 
   private[forsyth] def handToString(hand: Hand, variant: Variant): String =
     variant.handRoles map { r =>

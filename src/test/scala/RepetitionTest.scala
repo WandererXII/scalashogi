@@ -30,6 +30,22 @@ class RepetitionTest extends ShogiTest {
         }
       }
     }
+    "chushogi fourfold after lion-capture rights expire" in {
+      val before = Sfen("11k/12/12/12/6n5/6P5/12/5+h6/5N6/12/12/K11 b - 1")
+        .toPosition(Chushogi)
+        .get
+      val start = before.playUsisStr(List("6f6e", "1a1b")).toOption.get
+      val cycle = List("12l12k", "1b1c", "12k12l", "1c1b")
+
+      forall(1 to 3) { repeats =>
+        start.playUsisStr(List.fill(repeats)(cycle).flatten) must beValid.like { case played =>
+          played.toSfenWithoutMoveNumber must_== start.toSfenWithoutMoveNumber
+          played.history.fourfoldRepetition must_== (repeats == 3)
+          played.status must_== (if (repeats == 3) Some(Status.Repetition) else None)
+          played.winner must beNone
+        }
+      }
+    }
     "standard fourfold" in {
       val usis = List(
         "2h3h",

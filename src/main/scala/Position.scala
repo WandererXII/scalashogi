@@ -139,21 +139,22 @@ final case class Position(
       updatedHands: Hands,
       usi: Usi,
   ): Position = {
+    val lastLionCapture = {
+      val roleOpt = usi.squares.headOption.flatMap(board(_).map(_.role))
+      if (variant.chushogi && roleOpt.exists(!Role.allLions.contains(_)))
+        usi.squares
+          .drop(1) // drop orig
+          .reverse // start from the final dest
+          .find(square =>
+            board(square)
+              .exists(p => p.color != color && Role.allLions.contains(p.role)),
+          )
+      else None
+    }
     val newPosition = copy(board = updatedBoard, hands = updatedHands).switch
     val h           = history
       .record(usi)
-      .withLastLionCapture {
-        val roleOpt = usi.squares.headOption.flatMap(board(_).map(_.role))
-        if (variant.chushogi && roleOpt.exists(!Role.allLions.contains(_)))
-          usi.squares
-            .drop(1) // drop orig
-            .reverse // start from the final dest
-            .find(square =>
-              board(square)
-                .exists(p => (p is newPosition.color) && Role.allLions.contains(p.role)),
-            )
-        else None
-      }
+      .withLastLionCapture(lastLionCapture)
       .withConsecutiveAttacks {
         if (variant.isAttacking(newPosition, usi))
           history.consecutiveAttacks.add(!newPosition.color)
@@ -162,9 +163,16 @@ final case class Position(
       .withPositionHashes {
         val basePositionHashes =
           if (variant.isIrreversible(board, newPosition.board, usi)) Array.empty: PositionHash
-          else if (history.positionHashes.isEmpty) Hash(this)
+          else if (history.positionHashes.isEmpty)
+            Hash(board, hands, color, variant, history.lastLionCapture)
           else history.positionHashes
-        Hash(newPosition) ++ basePositionHashes
+        Hash(
+          updatedBoard,
+          updatedHands,
+          newPosition.color,
+          variant,
+          lastLionCapture,
+        ) ++ basePositionHashes
       }
     newPosition.withHistory(h)
   }
