@@ -1,6 +1,6 @@
 name := "scalashogi"
 
-version := "13.3.0"
+version := "13.3.0-clock-migration-SNAPSHOT"
 
 scalaVersion := "2.13.18"
 
@@ -17,6 +17,8 @@ dependencyOverrides += "org.scala-lang.modules" %% "scala-parser-combinators" % 
 scalacOptions ++= Seq(
   "-encoding",
   "utf-8",
+  "-release",
+  "21",
   "-explaintypes",
   "-feature",
   "-language:implicitConversions",
