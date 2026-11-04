@@ -64,8 +64,8 @@ class HandTest extends ShogiTest {
       hands.store(Sente, Pawn).take(Sente, Pawn) must beSome.like { h =>
         h.size must_== 0
         h.isEmpty must beTrue
-        hands.sente.isEmpty must beTrue
-        hands.gote.isEmpty must beTrue
+        h.sente.isEmpty must beTrue
+        h.gote.isEmpty must beTrue
       }
     }
   }

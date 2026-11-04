@@ -16,9 +16,10 @@ class DrawTest extends ShogiTest {
       }
       "opened" in {
         makePosition(Standard)
-          .playUsisStr(List("5g5f", "5c5d", "7g7f", "5d5e", "5f5e"))
-          .toOption
-          .flatMap(_.status) must beNone
+          .playUsisStr(List("5g5f", "5c5d", "7g7f", "5d5e", "5f5e")) must beValid.like {
+          case position =>
+            position.status must beNone
+        }
       }
       "two kings with nothing in hand" in {
         """

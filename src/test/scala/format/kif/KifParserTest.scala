@@ -199,6 +199,8 @@ class KifParserTest extends ShogiTest {
           m.orig must_== Square.SQ7G
           m.roles.head must_== Rook
           m.promotion must beFalse
+          m.metas.timeSpent must beSome(Duration.ofMillis(12000L))
+          m.metas.timeTotal must beNone
         }
       }
     }
@@ -958,7 +960,7 @@ class KifParserTest extends ShogiTest {
 上手：G
 手数----指手---------消費時間--""") must beValid.like { case p =>
       p.initialSfen must beSome.like { sfen =>
-        sfen.truncate.value == "1gks1/5/5/5/TSKGP w -"
+        sfen.truncate.value must_== "1gks1/5/5/5/TSKGP w -"
       }
       p.variant.kyotoshogi must beTrue
       p.tags.value must contain { (tag: Tag) =>

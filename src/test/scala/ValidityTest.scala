@@ -48,8 +48,13 @@ class ValidityTest extends ShogiTest {
     (Chushogi, "12/12/7k3p/12/7K4/12/12/9+E2/12/3X8/12/12 b", true, true),
     (Chushogi, "12/12/7k3p/12/7+E4/12/12/9+E2/12/3X8/12/12 b", false, false),
   )
-  sfens foreach { case (variant, sfen, strict, valid) =>
-    val position = Sfen(sfen).toPosition(variant).get
-    position.valid(strict) must_== valid
+
+  "position validity" should {
+    "match the expected result for each sfen" in {
+      forall(sfens) { case (variant, sfen, strict, valid) =>
+        val position = Sfen(sfen).toPosition(variant).get
+        position.valid(strict) must_== valid
+      }
+    }
   }
 }

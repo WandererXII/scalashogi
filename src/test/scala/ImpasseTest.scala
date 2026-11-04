@@ -35,7 +35,7 @@ class ImpasseTest extends ShogiTest {
       }
       "position without enough value" in {
         val validated =
-          sfenToPosition(Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"), Standard)
+          sfenToPosition(Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2r2b2gs4n4l9p 1"), Standard)
         validated must beValid.like { case position =>
           position.status.contains(Status.Impasse27) must beFalse
           position.winner must beNone
@@ -229,7 +229,7 @@ class ImpasseTest extends ShogiTest {
         "position without enough value" in {
           val validated =
             sfenToPosition(
-              Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2r2b2gs4n4l9p 2"),
+              Sfen("9/1G2K2G1/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2r2b2gs4n4l9p 1"),
               Annanshogi,
             )
           validated must beValid.like { case position =>

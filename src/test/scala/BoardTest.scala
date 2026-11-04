@@ -127,7 +127,7 @@ R . . . K B . . R""".board
 R . . . K . . . R""".board
         SQ5I |< (square => board.pieces contains square) must_== List(SQ6I, SQ7I, SQ8I, SQ9I)
       }
-      "right to next" in {
+      "left to next" in {
         val board: Board = """
 R . . B K . . . R""".board
         SQ5I |< (square => board.pieces contains square) must_== List(SQ6I)
