@@ -182,7 +182,6 @@ class PositionTimelineTest extends ShogiTest {
           position.withVariant(Minishogi),
           position.copy(color = Sente),
           position.switch,
-          position.withHistory(position.history.withLastUsi(Usi("3c3d").get)),
           position.withHistory(position.history.withPositionHashes(Array.empty)),
         ),
       ) { edited =>

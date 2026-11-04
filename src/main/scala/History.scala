@@ -6,7 +6,6 @@ import shogi.format.forsyth.Sfen
 import shogi.format.usi.Usi
 
 final case class History(
-    lastUsi: Option[Usi],
     lastLionCapture: Option[Square],
     consecutiveAttacks: ConsecutiveAttacks,
     positionHashes: PositionHash,
@@ -16,6 +15,8 @@ final case class History(
     startedAtPly: Int = 0,
     startedAtStep: Int = 1,
 ) {
+
+  def lastUsi: Option[Usi] = usis.lastOption
 
   // only hashes for positions with the same side to play
   private def currentTurnHashes = positionHashes.sliding(Hash.size, 2 * Hash.size).toList
@@ -60,9 +61,7 @@ final case class History(
   lazy val fourfoldRepetition  = isRepetition(4)
 
   private[shogi] def record(usi: Usi): History =
-    copy(lastUsi = usi.some, usis = usis :+ usi, plies = plies + 1)
-
-  def withLastUsi(u: Usi) = copy(lastUsi = u.some)
+    copy(usis = usis :+ usi, plies = plies + 1)
 
   def withLastLionCapture(squareOpt: Option[Square]) = copy(lastLionCapture = squareOpt)
 
@@ -82,7 +81,7 @@ final case class History(
 
 object History {
 
-  def empty: History = History(none, none, ConsecutiveAttacks.empty, Array.empty, none)
+  def empty: History = History(none, ConsecutiveAttacks.empty, Array.empty, none)
 
 }
 
