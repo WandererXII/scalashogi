@@ -128,7 +128,7 @@ object Replay {
       variant: shogi.variant.Variant,
   ): Validated[String, Position] =
     initialSfen.fold(Validated.valid[String, Position](Position(variant))) { sfen =>
-      sfen.toPosition(variant) toValid s"Invalid SFEN for ${variant.name}: $sfen"
+      Position.fromInitialSfen(sfen, variant) toValid s"Invalid SFEN for ${variant.name}: $sfen"
     }
 
   private def playSteps[A](

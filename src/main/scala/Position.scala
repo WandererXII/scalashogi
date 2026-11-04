@@ -248,7 +248,10 @@ final case class Position(
 object Position {
 
   def apply(initialSfen: Option[Sfen], variant: Variant): Position =
-    initialSfen.flatMap(_.toPosition(variant)).getOrElse(apply(variant))
+    initialSfen.flatMap(fromInitialSfen(_, variant)).getOrElse(apply(variant))
+
+  def fromInitialSfen(sfen: Sfen, variant: Variant): Option[Position] =
+    sfen.toPosition(variant).map(p => p.withHistory(p.history.withInitialSfen(sfen)))
 
   def apply(variant: shogi.variant.Variant): Position =
     Position(

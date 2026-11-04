@@ -93,6 +93,49 @@ class ReplayTest extends ShogiTest {
     }
   }
 
+  "replaying from a SFEN" should {
+    val handicap = Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")
+    val moves    = Usi.readList("3c3d 7g7f").get
+
+    "record it in the history of every position" in {
+      Replay.fromUsi(moves, Some(handicap), Standard).valid must beValid.like { case position =>
+        position.history.initialSfen must beSome(handicap)
+      }
+      val (positions, error) = Replay.positionsWhileValid(moves, Some(handicap), Standard)
+      error must beNone
+      positions.map(_.history.initialSfen).distinct must_== List(Some(handicap))
+    }
+
+    "keep it when the record is rejected" in {
+      val rejected = Usi.readList("3c3d 7g7f 9i9a").get
+      Replay.fromUsi(rejected, Some(handicap), Standard) must beLike {
+        case Replay.Result.Incomplete(position, _) =>
+          position.history.initialSfen must beSome(handicap)
+      }
+    }
+
+    "record it when setting up a position to play from" in {
+      Position(Some(handicap), Standard).history.initialSfen must beSome(handicap)
+    }
+
+    "leave it empty when there is none" in {
+      Replay.fromUsi(moves.reverse, None, Standard).valid must beValid.like { case position =>
+        position.history.initialSfen must beNone
+      }
+      Position(None, Standard).history.initialSfen must beNone
+    }
+
+    "award minishogi repetition against the starting color" in {
+      val usis = List.fill(3)(Usi.readList("2a2b 4e4d 2b2a 4d4e").get).flatten
+      val sfen = Sfen("rbsgk/4p/5/P4/KGSBR w - 1")
+      Replay.fromUsi(usis, Some(sfen), shogi.variant.Minishogi).valid must beValid.like {
+        case position =>
+          position.status.contains(Status.Repetition) must beTrue
+          position.winner must_== Some(Sente)
+      }
+    }
+  }
+
   "replaying from an unparsable SFEN" should {
     val moves = Usi.readList("7g7f").get
     val sfens = List(

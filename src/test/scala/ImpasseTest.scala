@@ -1,6 +1,7 @@
 package shogi
 
 import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
 import shogi.variant._
 
 class ImpasseTest extends ShogiTest {
@@ -157,6 +158,24 @@ class ImpasseTest extends ShogiTest {
           handicapPosition.status.contains(Status.Impasse27) must beTrue
           handicapPosition.winner must beSome.like { case color =>
             color.gote
+          }
+        }
+      }
+      "17 points for gote (uwate), but 2 piece handicap from a replayed game" in {
+        val validated =
+          sfenToPosition(Sfen("9/9/9/9/9/9/3p1lllg/+P+P2kssgg/K+P4ssg w r 2"), Standard)
+        val replay = Replay.fromUsi(
+          Usi.readList("3c3d 7g7f").get,
+          Some(Sfen("lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1")),
+          Standard,
+        )
+        validated must beValid.like { case position =>
+          replay.valid must beValid.like { case replayed =>
+            val handicapPosition = position.withHistory(replayed.history)
+            handicapPosition.status.contains(Status.Impasse27) must beTrue
+            handicapPosition.winner must beSome.like { case color =>
+              color.gote
+            }
           }
         }
       }
