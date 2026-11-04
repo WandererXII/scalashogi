@@ -133,7 +133,7 @@ final case class Position(
   // Moves and drops
 
   def hasDestinations: Boolean =
-    hasDropDestinations || hasMoveDestinations
+    hasMoveDestinations || hasDropDestinations
 
   private def finalizeAfterUsi(
       updatedBoard: Board,
