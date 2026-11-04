@@ -8,6 +8,50 @@ import shogi.format.usi._
 import shogi.variant._
 
 class KifModelTest extends ShogiTest {
+  "the step number of a setup survives export and import" in {
+    val first  = NotationStep(42, Usi.WithRole(Usi("7g7f").get, Pawn))
+    val custom = Sfen("4k4/9/9/9/9/9/9/9/4K4 b R 42")
+    val setups = List(
+      Standard -> Sfen(s"${Standard.initialSfen.truncate} 42"),
+      Standard -> Sfen(s"${Handicap.allByVariant(Standard).head.sfen.truncate} 42"),
+      Standard -> custom,
+    )
+    forall(setups) { case (variant, sfen) =>
+      KifParser.full(Kif(Nil, Some(sfen), variant).render) must beValid.like { case parsed =>
+        parsed.initialSfen must beSome(sfen)
+      }
+    }
+    // the default Chu setup is only recognised by its moves
+    val chuSfen = Sfen(s"${Chushogi.initialSfen.truncate} 42")
+    val chuStep = NotationStep(42, Usi.WithRole(Usi("6i6h").get, Pawn))
+    KifParser.full(Kif(List(chuStep), Some(chuSfen), Chushogi).render) must beValid.like {
+      case parsed =>
+        parsed.variant must_== Chushogi
+        parsed.initialSfen must beSome(chuSfen)
+    }
+    KifParser.full(Kif(List(first), Some(Standard.initialSfen), Standard).render) must beValid
+      .like { case parsed =>
+        parsed.initialSfen must beNone
+      }
+    val direct = Replay.fromUsi(List(first.usiWithRole.usi), Some(setups.head._2), Standard)
+    KifParser.full(Kif(List(first), Some(setups.head._2), Standard).render) must beValid.like {
+      case parsed =>
+        val replay = Replay.fromParsedNotation(parsed, identity)
+        replay.valid.map(_.stepNumber) must_== direct.valid.map(_.stepNumber)
+        replay.valid.map(_.stepNumber) must beValid(43)
+    }
+  }
+
+  "the step number is read from a Kakinoki board diagram line" in {
+    val setup = Kif.renderPosition(Position(Standard))
+    KifParser.full(s"$setup\n手数＝41  ▲７六歩  まで") must beValid.like { case parsed =>
+      parsed.initialSfen must beSome(Sfen(s"${Standard.initialSfen.truncate} 42"))
+    }
+    KifParser.full(s"$setup\n手数＝0") must beValid.like { case parsed =>
+      parsed.initialSfen must beNone
+    }
+  }
+
   "move clocks preserve whole hours on export and import" in {
     forall(List(59, 60, 3599, 3600, 3661, 7201, 86400, 360001, Int.MaxValue)) { seconds =>
       val step = NotationStep(

@@ -40,6 +40,12 @@ class ReplayTest extends ShogiTest {
       }
     }
 
+    "tell an opponent's piece from an empty square" in {
+      val position = Position(Standard)
+      position(Usi("3c3d").get).swap.toOption must beSome("Not my piece on 3c")
+      position(Usi("5e5d").get).swap.toOption must beSome("No piece on 5e")
+    }
+
     "preserve the valid prefix and original error after a later illegal move" in {
       val moves = Usi.readList("7g7f 7g7f 3c3d").get
       val first = Position(Standard)(moves.head).toOption.get

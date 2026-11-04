@@ -12,6 +12,7 @@ import cats.data.Validated.invalid
 import cats.data.Validated.valid
 import cats.implicits._
 
+import shogi.format.forsyth.Sfen
 import shogi.format.forsyth.SfenUtils
 import shogi.variant._
 
@@ -107,7 +108,11 @@ object KifParser {
           strSteps.map(_.step),
         )
         variant     = position.variant
-        initialSfen = position.toSfen.some.filterNot(_.truncate == variant.initialSfen.truncate)
+        initialSfen = KifParserHelper
+          .parseStartStep(boardStr)
+          .fold(position.toSfen)(sn => Sfen(s"${position.toSfenWithoutMoveNumber} $sn"))
+          .some
+          .filterNot(s => s.truncate == variant.initialSfen.truncate && s.stepNumber.forall(_ <= 1))
         parsedSteps <- objSteps(strSteps, variant, variations)
         tags = createTags(preTags, position.color, parsedSteps.value.size, terminationOption)
       } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)

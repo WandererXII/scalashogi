@@ -13,8 +13,8 @@ import shogi.format.usi.Usi
 
 object Replay {
 
-  // Complete and Incomplete expose the last valid game, including the setup if no move was accepted.
-  // InvalidSfen has no game to expose, as no setup could be read.
+  // Complete and Incomplete expose the last valid position, including the setup if no move was accepted.
+  // InvalidSfen has no position to expose, as no setup could be read.
   sealed trait Result {
     def valid: Validated[String, Position]
   }
@@ -23,11 +23,11 @@ object Replay {
     final case class Complete(position: Position) extends Result {
       def valid = Validated.valid(position)
     }
-    final case class Incomplete(position: Position, failures: String) extends Result {
-      def valid = Validated.invalid(failures)
+    final case class Incomplete(position: Position, failure: String) extends Result {
+      def valid = Validated.invalid(failure)
     }
-    final case class InvalidSfen(failures: String) extends Result {
-      def valid = Validated.invalid(failures)
+    final case class InvalidSfen(failure: String) extends Result {
+      def valid = Validated.invalid(failure)
     }
   }
 

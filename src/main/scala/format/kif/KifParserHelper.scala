@@ -48,6 +48,14 @@ object KifParserHelper {
       )
   }
 
+  private val stepsPlayedRegex = raw"""^${Kif.stepsPlayedHeader}(\d+)""".r.unanchored
+
+  def parseStartStep(str: String): Option[Int] =
+    augmentString(str).linesIterator
+      .collectFirst { case stepsPlayedRegex(steps) => steps }
+      .flatMap(_.toIntOption)
+      .map(steps => (steps min 9998) + 1)
+
   // We need to somehow figure out if it's chushogi
   // looking for something like this - `△6五龍馬 （←4三）`
   // shared Standard piece names only identify chushogi when an origin arrow is present.

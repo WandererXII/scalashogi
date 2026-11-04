@@ -58,6 +58,9 @@ final case class Kif(
 
 object Kif {
 
+  // Kakinoki board diagram line: the number of steps played before the setup.
+  private[kif] val stepsPlayedHeader = "手数＝"
+
   def renderNotationStep(cur: NotationStep, lastDest: Option[Square], variant: Variant): String = {
     val suf           = if (variant.chushogi) "手目" else ""
     val stepNumberStr = stepNumberOffset(cur.stepNumber, suf)
@@ -133,6 +136,12 @@ object Kif {
   }
 
   def renderSetup(sfen: Option[Sfen], variant: Variant): String =
+    List(
+      renderBoardSetup(sfen, variant),
+      sfen.flatMap(_.stepNumber).filter(_ > 1).fold("")(sn => s"$stepsPlayedHeader${sn - 1}"),
+    ).filter(_.nonEmpty).mkString("\n")
+
+  private def renderBoardSetup(sfen: Option[Sfen], variant: Variant): String =
     sfen
       .filterNot(f => variant.initialSfen.truncate == f.truncate)
       .fold {

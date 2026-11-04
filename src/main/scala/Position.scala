@@ -41,8 +41,9 @@ final case class Position(
 
   def move(usi: Usi.Move): Validated[String, Position] =
     for {
-      actor <- moveActorAt(usi.orig) toValid s"No piece on ${usi.orig}"
-      _     <- Validated.cond(actor.piece is color, (), s"Not my piece on ${usi.orig}")
+      actor <- moveActorAt(usi.orig) toValid board(usi.orig).fold(s"No piece on ${usi.orig}")(_ =>
+        s"Not my piece on ${usi.orig}",
+      )
       capture = board(usi.dest).filter(_.color != color)
       _ <- Validated.cond(
         !usi.promotion || variant.canPromote(actor.piece, usi.orig, usi.dest, capture.isDefined),
