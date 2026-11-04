@@ -13,9 +13,9 @@ import shogi.format.usi.Usi
 
 object Replay {
 
-  // Both outcomes expose the last valid game, including the setup if no move was accepted.
+  // Complete and Incomplete expose the last valid game, including the setup if no move was accepted.
+  // InvalidSfen has no game to expose, as no setup could be read.
   sealed trait Result {
-    def position: Position
     def valid: Validated[String, Position]
   }
 
@@ -24,6 +24,9 @@ object Replay {
       def valid = Validated.valid(position)
     }
     final case class Incomplete(position: Position, failures: String) extends Result {
+      def valid = Validated.invalid(failures)
+    }
+    final case class InvalidSfen(failures: String) extends Result {
       def valid = Validated.invalid(failures)
     }
   }
@@ -47,11 +50,12 @@ object Replay {
     }
 
   // Chronological snapshots, setup first; retain the accepted prefix and first error.
+  // An unparsable SFEN yields no snapshots, only the error.
   def positionsWhileValid(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
       variant: shogi.variant.Variant,
-  ): (NonEmptyList[Position], Option[String]) = {
+  ): (List[Position], Option[String]) = {
 
     @scala.annotation.tailrec
     def mk(
@@ -67,13 +71,18 @@ object Replay {
           }
       }
 
-    mk(NonEmptyList.one(Position(initialSfen, variant)), usis.toList) match {
-      case (positions, err) => (positions.reverse, err)
+    setup(initialSfen, variant) match {
+      case Valid(position) =>
+        mk(NonEmptyList.one(position), usis.toList) match {
+          case (positions, err) => (positions.reverse.toList, err)
+        }
+      case Invalid(err) => (Nil, err.some)
     }
   }
 
   // Use for trusted usis
   // doesn't verify whether the usis are valid
+  // empty if the SFEN is unparsable, there is no board to read roles from
   def usiWithRoleWhilePossible(
       usis: Seq[Usi],
       initialSfen: Option[Sfen],
@@ -108,9 +117,19 @@ object Replay {
           }
       }
 
-    val init = Position(initialSfen, variant)
-    mk(init.board.pieces.map { case (k, v) => k -> v.role }, usis.toList, Nil).reverse
+    setup(initialSfen, variant).fold(
+      _ => Nil,
+      init => mk(init.board.pieces.map { case (k, v) => k -> v.role }, usis.toList, Nil).reverse,
+    )
   }
+
+  private def setup(
+      initialSfen: Option[Sfen],
+      variant: shogi.variant.Variant,
+  ): Validated[String, Position] =
+    initialSfen.fold(Validated.valid[String, Position](Position(variant))) { sfen =>
+      sfen.toPosition(variant) toValid s"Invalid SFEN for ${variant.name}: $sfen"
+    }
 
   private def playSteps[A](
       initialSfen: Option[Sfen],
@@ -130,7 +149,10 @@ object Replay {
           }
       }
 
-    loop(Position(initialSfen, variant), steps.toList)
+    setup(initialSfen, variant) match {
+      case Valid(position) => loop(position, steps.toList)
+      case Invalid(err)    => Result.InvalidSfen(err)
+    }
   }
 
 }

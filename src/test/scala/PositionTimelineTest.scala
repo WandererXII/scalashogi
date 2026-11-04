@@ -10,9 +10,9 @@ class PositionTimelineTest extends ShogiTest {
   private val board = Standard.initialSfen.boardString.get
 
   "Position timeline" should {
-    "initialize every variant consistently, including fallback setup" in {
+    "initialize every variant consistently" in {
       forall(Variant.all) { v =>
-        forall(List(None, Some(v.initialSfen), Some(Sfen("invalid")))) { initial =>
+        forall(List(None, Some(v.initialSfen))) { initial =>
           val setup              = Position(initial, v)
           val (snapshots, error) = Replay.positionsWhileValid(Nil, initial, v)
           setup.toSfen must_== v.initialSfen
@@ -23,7 +23,9 @@ class PositionTimelineTest extends ShogiTest {
           snapshots.head.toSfen must_== setup.toSfen
           snapshots.size must_== 1
           error must beNone
-          Replay.fromUsi(Nil, initial, v).position.toSfen must_== setup.toSfen
+          Replay.fromUsi(Nil, initial, v).valid must beValid.like { case position =>
+            position.toSfen must_== setup.toSfen
+          }
         }
       }
     }
@@ -148,9 +150,11 @@ class PositionTimelineTest extends ShogiTest {
       snapshots.last.usis must_== usis.take(2).toVector
       snapshots.last.toSfen.value must endWith(" w - 44")
       error must beSome(snapshots.last(usis(2)).swap.toOption.get)
-      val finalPosition = Replay.fromUsi(usis, Some(initial), Standard).position
-      finalPosition.toSfen must_== snapshots.last.toSfen
-      finalPosition.usis must_== snapshots.last.usis
+      Replay.fromUsi(usis, Some(initial), Standard) must beLike {
+        case Replay.Result.Incomplete(finalPosition, _) =>
+          finalPosition.toSfen must_== snapshots.last.toSfen
+          finalPosition.usis must_== snapshots.last.usis
+      }
       forall(snapshots.toList.zipWithIndex) { case (position, i) =>
         position.usis must_== usis.take(i).toVector
         position.plies must_== 41 + i

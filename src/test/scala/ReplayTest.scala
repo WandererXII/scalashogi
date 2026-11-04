@@ -69,7 +69,7 @@ class ReplayTest extends ShogiTest {
       val parsed   = format.csa.CsaParser.full("PI\n+\n+7776FU\n-3334FU\n+7776FU").toOption.get
       val result   = Replay.fromParsedNotation(parsed, identity)
       val moves    = Usi.readList("7g7f 3c3d").get
-      val expected = Replay.fromUsi(moves, None, Standard).position
+      val expected = Replay.positionsWhileValid(moves, None, Standard)._1.last
       result must beLike { case Replay.Result.Incomplete(position, error) =>
         position.toSfen must_== expected.toSfen
         position.usis must_== moves.toVector
@@ -89,6 +89,40 @@ class ReplayTest extends ShogiTest {
         position.stepNumber must_== 44
         position.color must_== Gote
         position.usis must_== moves.toVector
+      }
+    }
+  }
+
+  "replaying from an unparsable SFEN" should {
+    val moves = Usi.readList("7g7f").get
+    val sfens = List(
+      Sfen("not a sfen"),
+      shogi.variant.Minishogi.initialSfen,
+    )
+
+    "report the error, and not play from the default setup" in {
+      forall(sfens) { sfen =>
+        forall(List(moves, Nil)) { usis =>
+          Replay.fromUsi(usis, Some(sfen), Standard) must beLike {
+            case result @ Replay.Result.InvalidSfen(failure) =>
+              failure must_== s"Invalid SFEN for Standard: $sfen"
+              result.valid must beInvalid(failure)
+          }
+        }
+      }
+    }
+
+    "report the error when collecting positions" in {
+      forall(sfens) { sfen =>
+        val (positions, error) = Replay.positionsWhileValid(moves, Some(sfen), Standard)
+        error must beSome(s"Invalid SFEN for Standard: $sfen")
+        positions must beEmpty
+      }
+    }
+
+    "resolve no roles" in {
+      forall(sfens) { sfen =>
+        Replay.usiWithRoleWhilePossible(moves, Some(sfen), Standard) must beEmpty
       }
     }
   }

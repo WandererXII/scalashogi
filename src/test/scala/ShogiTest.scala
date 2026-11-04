@@ -1,6 +1,5 @@
 package shogi
 
-import cats.data.NonEmptyList
 import cats.data.Validated
 import cats.syntax.option._
 import org.specs2.execute.Result
@@ -88,7 +87,7 @@ trait ShogiTest extends Specification with ValidatedMatchers {
   def makeEmptyPosition(variant: Variant): Position =
     Position(variant).withBoard(Board.empty)
 
-  def completeReplay(usis: Seq[Usi]): NonEmptyList[Position] = {
+  def completeReplay(usis: Seq[Usi]): List[Position] = {
     val (positions, error) = Replay.positionsWhileValid(usis, None, Standard)
     require(error.isEmpty, error.getOrElse(""))
     positions
