@@ -64,6 +64,11 @@ object Handicap {
       Sfen("2sgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
     ),
     Handicap(
+      "左五枚落ち",
+      "Left 5-piece",
+      Sfen("1nsgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
       "六枚落ち",
       "6-piece",
       Sfen("2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
@@ -72,6 +77,11 @@ object Handicap {
       "七枚落ち",
       "7-piece",
       Sfen("3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
+    ),
+    Handicap(
+      "左七枚落ち",
+      "Left 7-piece",
+      Sfen("2sgkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1"),
     ),
     Handicap(
       "八枚落ち",

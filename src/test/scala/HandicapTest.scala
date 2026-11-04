@@ -6,12 +6,12 @@ class HandicapTest extends ShogiTest {
 
   "handicap" in {
     "count" in {
-      Handicap.allByVariant(shogi.variant.Standard).size must_== 34
+      Handicap.allByVariant(shogi.variant.Standard).size must_== 36
       Handicap.allByVariant(shogi.variant.Minishogi).size must_== 5
       Handicap.allByVariant(shogi.variant.Chushogi).size must_== 3
       Handicap.allByVariant(shogi.variant.Annanshogi).size must_== 15
       Handicap.allByVariant(shogi.variant.Kyotoshogi).size must_== 7
-      Handicap.allByVariant(shogi.variant.Checkshogi).size must_== 34
+      Handicap.allByVariant(shogi.variant.Checkshogi).size must_== 36
       Handicap.allByVariant(shogi.variant.Dobutsu).size must_== 1
     }
     "all variants defined" in {
@@ -19,8 +19,11 @@ class HandicapTest extends ShogiTest {
     }
     "no duplicates" in {
       shogi.variant.Variant.all forall { v =>
-        val allSfens = Handicap.allByVariant(v).map(_.sfen)
-        allSfens.size == allSfens.distinct.size
+        val all = Handicap.allByVariant(v)
+        all.size == all.distinct.size &&
+        all.map(_.sfen.truncate).distinct.size == all.size &&
+        all.map(_.japanese).distinct.size == all.size &&
+        all.map(_.english).distinct.size == all.size
       } must beTrue
     }
     "parse all" in {
