@@ -88,6 +88,29 @@ class KifModelTest extends ShogiTest {
     }
   }
 
+  "Chu winning terminations preserve the winner on export and import" in {
+    forall(List(Status.RoyalsLost, Status.BareKing)) { status =>
+      forall(List(false, true)) { winnerTurn =>
+        val termination         = createTerminationStep(status, winnerTurn)
+        val expectedTermination = if (winnerTurn) "入玉勝ち" else "詰み"
+        termination must beSome(expectedTermination)
+        forall(List(1, 2)) { moveCount =>
+          val steps = List(
+            NotationStep(1, Usi.WithRole(Usi("6i6h").get, Pawn)),
+            NotationStep(2, Usi.WithRole(Usi("6d6e").get, Pawn)),
+          ).take(moveCount)
+          val record = Kif(steps.init :+ steps.last.copy(result = termination), None, Chushogi)
+          val expectedWinner = Color.fromSente((moveCount % 2 == 0) == winnerTurn)
+          KifParser.full(record.render) must beValid.like { case parsed =>
+            parsed.variant must_== Chushogi
+            parsed.tags(_.Termination) must beSome(expectedTermination)
+            parsed.tags(_.Result) must beSome(expectedWinner.fold("sente", "gote"))
+          }
+        }
+      }
+    }
+  }
+
   "render steps" in {
     Kif.renderStep(Usi.WithRole(Usi("7h7g").get, Gold), None, Standard) must_== "７七金(78)"
     Kif.renderStep(Usi.WithRole(Usi("P*6d").get, Pawn), None, Standard) must_== "６四歩打"
