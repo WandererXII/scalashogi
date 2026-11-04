@@ -59,7 +59,7 @@ object CsaParser {
       } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>
-        sys error "### StackOverflowError ### in CSA parser"
+        invalid("Cannot parse CSA: parser stack limit exceeded")
     }
 
   def objSteps(strSteps: List[StrStep]): Validated[String, ParsedSteps] = {

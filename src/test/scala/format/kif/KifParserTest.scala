@@ -531,6 +531,15 @@ class KifParserTest extends ShogiTest {
   }
 
   "variations" should {
+    "return a validation error when nesting exhausts the parser stack" in {
+      val variations = (1 to 3000).map { i =>
+        s"\n変化：${i}手\n$i ７六歩(77)\n"
+      }.mkString
+      parser(s"1 ７六歩(77)\n$variations") must beInvalid(
+        "Cannot parse KIF: parser stack limit exceeded",
+      )
+    }
+
     "resolve same-square branches before a two-step lion move" in {
       forall(List("仝", "同")) { same =>
         parser(s"""

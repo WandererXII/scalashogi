@@ -118,7 +118,7 @@ object KifParser {
       } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>
-        sys error "### StackOverflowError ### in KIF parser"
+        invalid("Cannot parse KIF: parser stack limit exceeded")
     }
 
   def objSteps(

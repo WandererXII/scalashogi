@@ -11,6 +11,14 @@ class CsaParserTest extends ShogiTest {
   val parser                 = CsaParser.full _
   def parseStep(str: String) = CsaParser.StepParser(str)
 
+  "return a validation error when input exhausts the parser stack" in {
+    val header = "x" * 20000
+    parser(s"$header\nPI\n+\n+7776FU") must beInvalid(
+      "Cannot parse CSA: parser stack limit exceeded",
+    )
+    parser("PI\n+\n+7776FU") must beValid
+  }
+
   "drop" in {
     parseStep("-0077FU") must beValid.like { case d: Drop =>
       d.role must_== Pawn
