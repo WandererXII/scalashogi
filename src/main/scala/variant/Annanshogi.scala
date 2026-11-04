@@ -107,6 +107,16 @@ case object Annanshogi
       .filter(_.color == piece.color)
       .getOrElse(piece)
 
+  override def dropFilterPawnCheckmate(a: DropActor, d: Square): Boolean =
+    (a.piece is Pawn) && a.position.hands.take(a.color, Pawn).exists { hands =>
+      // A drop can change both the pawn's movement and that of the piece in front of it.
+      val after = a.position
+        .withBoard(a.board.forcePlace(a.piece, d))
+        .withHands(hands)
+        .switch
+      after.check && !after.hasDestinations
+    }
+
   override def hasUnmovablePieces(board: Board) = false
 
   override def hasDoublePawns(board: Board, color: Color) = false

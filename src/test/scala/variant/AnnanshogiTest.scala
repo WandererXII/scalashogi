@@ -108,6 +108,32 @@ class AnnanshogiTest extends ShogiTest {
       position(Usi("P*4b").get).isValid must beTrue
       position(Usi("P*5b").get).isValid must beFalse
     }
+    "reject pawn-drop mate with borrowed knight movement" in {
+      val position = Sfen("8k/6B2/8G/7N1/9/9/9/9/K8 b P 1")
+        .toPosition(shogi.variant.Annanshogi)
+        .get
+      position.playable(true) must beTrue
+      position(Usi("P*2c").get).isValid must beFalse
+    }
+    "allow a borrowed knight check when the king can escape" in {
+      val position = Sfen("8k/9/8G/7N1/9/9/9/9/K8 b P 1")
+        .toPosition(shogi.variant.Annanshogi)
+        .get
+      position(Usi("P*2c").get) must beValid.like { case after =>
+        after.check must beTrue
+        after(Usi("1a2a").get).isValid must beTrue
+      }
+    }
+    "allow a non-checking pawn drop that causes stalemate" in {
+      val position = Sfen("8k/9/7GB/9/9/9/9/9/K8 b P 1")
+        .toPosition(shogi.variant.Annanshogi)
+        .get
+      position.playable(true) must beTrue
+      position(Usi("P*1b").get) must beValid.like { case after =>
+        after.check must beFalse
+        after.status must_== Some(Status.Stalemate)
+      }
+    }
     "backrank drops" in {
       val position = Sfen("9/9/9/k8/g8/G8/K8/9/9 b NLP").toPosition(shogi.variant.Annanshogi).get
       position(Usi("P*5a").get).isValid must beTrue

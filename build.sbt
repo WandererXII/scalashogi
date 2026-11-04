@@ -1,6 +1,6 @@
 name := "scalashogi"
 
-version := "13.3.0-clock-migration-SNAPSHOT"
+version := "13.3.0"
 
 scalaVersion := "2.13.18"
 
