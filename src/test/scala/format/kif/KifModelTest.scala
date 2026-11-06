@@ -71,6 +71,28 @@ class KifModelTest extends ShogiTest {
     }
   }
 
+  "perpetual check preserves the winner when the attacker is on move" in {
+    val sfen = Some(Sfen("4k4/R8/9/9/9/9/9/9/4K4 b - 1"))
+    val usis = List.fill(3)(List("9b9a", "5a5b", "9a9b", "5b5a")).flatten.map(Usi(_).get)
+
+    Replay.fromUsi(usis, sfen, Standard).valid must beValid.like { case position =>
+      position.status must beSome[Status](Status.PerpetualCheck)
+      position.color must_== Sente
+      position.winner must beSome[Color](Gote)
+
+      val termination =
+        createTerminationStep(Status.PerpetualCheck, position.winner.contains(position.color))
+      val steps = Replay.usiWithRoleWhilePossible(usis, sfen, Standard).zipWithIndex.map {
+        case (usi, index) => NotationStep(index + 1, usi)
+      }
+      val record = Kif(steps.init :+ steps.last.copy(result = termination), sfen, Standard)
+      KifParser.full(record.render) must beValid.like { case parsed =>
+        parsed.tags(_.Termination) must beSome("反則負け")
+        parsed.tags(_.Result) must beSome("gote")
+      }
+    }
+  }
+
   "illegal-move termination preserves the winner on import" in {
     forall(List(false, true)) { winnerTurn =>
       val termination = createTerminationStep(Status.IllegalMove, winnerTurn).get
