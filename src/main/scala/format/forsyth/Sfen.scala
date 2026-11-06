@@ -14,15 +14,21 @@ final case class Sfen(value: String) extends AnyVal {
     for {
       board <- toBoard(variant)
       hands <- toHands(variant)
-      history = toHistory(variant)
     } yield {
-      val parsed   = Position(board, hands, color | Sente, history, variant)
-      val position =
-        if (color.isEmpty && variant.noOppositeCheck && parsed.switch.check) parsed.switch
-        else parsed
-      val sn    = stepNumber.fold(1)(_ max 1 min 9999)
-      val plies = sn - (if ((sn % 2 == 1) == position.color.sente) 1 else 0)
-      position.withHistory(history.copy(plies = plies, startedAtPly = plies, startedAtStep = sn))
+      val sideToMove = color.getOrElse {
+        if (variant.noOppositeCheck && variant.check(board, Gote)) Gote else Sente
+      }
+      val sn              = stepNumber.fold(1)(_ max 1 min 9999)
+      val plies           = sn - (if ((sn % 2 == 1) == sideToMove.sente) 1 else 0)
+      val lastLionCapture =
+        if (variant == shogi.variant.Chushogi) handsString.flatMap(Square.fromKey) else None
+      val history = History.empty.copy(
+        lastLionCapture = lastLionCapture,
+        plies = plies,
+        startedAtPly = plies,
+        startedAtStep = sn,
+      )
+      Position(board, hands, sideToMove, history, variant)
     }
 
   def toBoard(variant: Variant): Option[Board] = {
@@ -36,13 +42,6 @@ final case class Sfen(value: String) extends AnyVal {
     if (variant.supportsDrops)
       handsString.fold(Hands(variant).some)(Sfen.makeHandsFromString(_, variant))
     else Hands.empty.some
-
-  def toHistory(variant: Variant): History =
-    if (variant == shogi.variant.Chushogi)
-      handsString
-        .map(s => History.empty withLastLionCapture Square.fromKey(s))
-        .getOrElse(History.empty)
-    else History.empty
 
   private def fields: Array[String] = fieldSeparator.split(value.trim)
 
