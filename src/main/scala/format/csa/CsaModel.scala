@@ -126,8 +126,8 @@ object Csa {
     else
       Standard.handRoles
         .map { r =>
-          val cnt = hand(r)
-          s"00${CsaUtils.toCsa(r) | ""}".repeat(math.min(cnt, 81))
+          val cnt = hand(r).max(0).min(81)
+          s"00${CsaUtils.toCsa(r) | ""}".repeat(cnt)
         }
         .filter(_.nonEmpty)
         .mkString(prefix, "", "")

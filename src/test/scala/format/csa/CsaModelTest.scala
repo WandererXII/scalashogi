@@ -78,6 +78,14 @@ class CsaModelTest extends ShogiTest {
     }
   }
 
+  "render only the positive hand counts in a CSA position" in {
+    val hand     = Hand(Map[DroppableRole, Int](Pawn -> -1, Gold -> 1))
+    val position = Sfen("4k4/9/9/9/9/9/9/9/4K4 b - 1").toPosition(Standard).get
+    val rendered = renderPosition(position.withHands(Hands(hand, Hand.empty)))
+
+    rendered.linesIterator.filter(_.startsWith("P+")).toList must_== List("P+00KI")
+  }
+
   "render csa position - board, hands, turn, from random sfen" in {
     renderPosition(
       Sfen("lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p").toPosition(Standard).get,
