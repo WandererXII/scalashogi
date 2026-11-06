@@ -586,6 +586,28 @@ class KifParserTest extends ShogiTest {
         }
       }
     }
+    "keep a nested variation off the main line after a variation termination" in {
+      parser("""
+        1 ７六歩(77)
+        2 ３四歩(33)
+        3 投了
+
+        変化：1手
+        1 ２六歩(27)
+        2 ８四歩(83)
+        3 中断 ( 0:01/00:00:01)
+        * End of the first variation
+
+        変化：2手
+        2 ４二玉(51)
+      """) must beValid.like { case ParsedNotation(ParsedSteps(List(first, second)), _, _, _, tags) =>
+        first.metas.variations must haveSize(1)
+        first.metas.variations.head.value(1).metas.variations must haveSize(1)
+        tags(_.Termination) must beSome("投了")
+        second.metas.variations must beEmpty
+      }
+    }
+
     "nested variations" in {
       parser("""
     手合割：平手

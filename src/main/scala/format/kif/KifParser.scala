@@ -260,15 +260,18 @@ object KifParser {
 
     def variation: Parser[StrVariation] =
       as("variation") {
-        header ~ rep(step) ^^ { case h ~ s =>
+        header ~ rep(step) <~ rep(termination) <~ rep(commentary) ^^ { case h ~ s =>
           StrVariation(h, s, Nil)
         }
       }
 
     def header: Parser[Int] =
-      """.+""".r ^^ { case num =>
+      """変化.*""".r ^^ { case num =>
         raw"""${numbersS}""".r.findFirstIn(num).map(KifUtils.kanjiToInt _) | 0
       }
+
+    private def termination: Parser[Unit] =
+      (opt(number) ~ terminationRegex ~ opt(clock)).^^^(())
 
     // todo - don't repeat this just use StepsParser
     def step: Parser[StrStep] =
