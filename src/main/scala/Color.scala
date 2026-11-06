@@ -57,8 +57,8 @@ sealed trait Color {
   final def whale                 = this - Whale
   final def whiteHorse            = this - WhiteHorse
 
-  final val sente = this == Color.Sente
-  final val gote  = this == Color.Gote
+  final def sente = this == Color.Sente
+  final def gote  = this == Color.Gote
 }
 
 object Color {
