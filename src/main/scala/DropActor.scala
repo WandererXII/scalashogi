@@ -1,6 +1,7 @@
 package shogi
 
 import shogi.format.usi.Usi
+import shogi.variant.Variant
 
 final case class DropActor(
     role: DroppableRole,
@@ -33,26 +34,31 @@ final case class DropActor(
 
 object DropActor {
 
-  def blockades(position: Position, royalSquare: Square): List[Square] = {
+  def blockades(
+      board: Board,
+      color: Color,
+      variant: Variant,
+      royalSquare: Square,
+  ): List[Square] = {
     def attacker(realPiece: Piece, from: Square) = {
-      val piece = position.variant.attackingPiece(realPiece, from, position.board)
+      val piece = variant.attackingPiece(realPiece, from, board)
       piece.projectionDirs.nonEmpty && piece.eyes(
         from,
         royalSquare,
-      ) && piece.color != position.color
+      ) && piece.color != color
     }
     @scala.annotation.tailrec
     def forward(from: Square, dir: Direction, squares: List[Square]): List[Square] =
       dir(from) match {
-        case None                                                         => Nil
-        case Some(next) if !position.variant.isInsideBoard(next)          => Nil
-        case Some(next) if position.board(next).exists(attacker(_, next)) => squares
-        case Some(next) if position.board(next).isDefined                 => Nil
+        case None                                                => Nil
+        case Some(next) if !variant.isInsideBoard(next)          => Nil
+        case Some(next) if board(next).exists(attacker(_, next)) => squares
+        case Some(next) if board(next).isDefined                 => Nil
         case Some(next) => forward(next, dir, next :: squares)
       }
     Square.allDirections flatMap { forward(royalSquare, _, Nil) } filter { square =>
-      position.board.place(Piece(position.color, Gold), square) exists { defended =>
-        !position.copy(board = defended).check
+      board.place(Piece(color, Gold), square) exists { defended =>
+        !variant.check(defended, color)
       }
     }
   }

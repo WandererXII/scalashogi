@@ -34,8 +34,7 @@ final case class Position(
 
   def moveActorAt(at: Square): Option[MoveActor] = moveActors get at
 
-  lazy val hasMoveDestinations: Boolean =
-    moveActors.values.exists(_.destinations.nonEmpty)
+  def hasMoveDestinations: Boolean = moveActors.values.exists(_.destinations.nonEmpty)
 
   def moveDestsFrom(from: Square): Option[List[Square]] = moveActorAt(from) map (_.destinations)
 
@@ -99,9 +98,7 @@ final case class Position(
 
   def dropActorOf(role: DroppableRole): Option[DropActor] = dropActors get role
 
-  lazy val hasDropDestinations: Boolean =
-    dropActors.values
-      .exists(_.destinations.nonEmpty)
+  def hasDropDestinations: Boolean = dropActors.values.exists(_.destinations.nonEmpty)
 
   def drop(usi: Usi.Drop): Validated[String, Position] =
     for {
@@ -180,23 +177,19 @@ final case class Position(
 
   // King safety
 
-  lazy val check: Boolean = variant.check(board, color)
+  private val kingSafety = new KingSafety(board, color, variant)
 
-  lazy val checkSquares: List[Square] = variant.checkSquares(board, color)
+  def check: Boolean = kingSafety.check
+
+  def checkSquares: List[Square] = kingSafety.checkSquares
 
   // Not taking into account specific drop rules, cached here
-  lazy val possibleDropDests: List[Square] =
-    Some(checkSquares)
-      .filter(_.size == 1)
-      .fold(
-        variant.allSquares.filterNot(board.pieces contains _),
-      ) { royals =>
-        DropActor.blockades(this, royals.head)
-      }
+  def possibleDropDests: List[Square] = kingSafety.possibleDropDests
 
   // Results
 
-  lazy val status: Option[Status] = variant.status(this)
+  // Not a lazy val, it would hold the position's monitor while waiting for actors
+  def status: Option[Status] = variant.status(this)
 
   def winner: Option[Color] = variant.winner(this)
 
