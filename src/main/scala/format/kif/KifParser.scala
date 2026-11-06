@@ -190,36 +190,42 @@ object KifParser {
   }
 
   def createVariations(vs: List[StrVariation]): List[StrVariation] = {
-    def getChildren(parent: StrVariation, rest: List[StrVariation]): StrVariation = {
-      // variationStart is increasing as long as it relates to the current variation
-      val ch = rest
-        .takeWhile(_.variationStart > parent.variationStart)
-        .zipWithIndex
-        .foldLeft[List[(StrVariation, Int)]](Nil) { case (acc, cur) =>
-          if (acc.headOption.fold(false)(_._1.variationStart < cur._1.variationStart)) acc
-          else cur :: acc
-        }
-        .reverse
-      val res = ch.map { case (k, i) =>
-        getChildren(k, rest.drop(i + 1))
-      }
-      StrVariation(parent.variationStart, parent.steps, res)
+    final class Frame(val variation: StrVariation) {
+      var children: List[StrVariation] = Nil
+      var result: StrVariation = variation
     }
-    // Obtain first depth variations - that's what we want to use in objSteps
-    val ch = vs.zipWithIndex
-      .foldLeft[List[(StrVariation, Int)]](Nil) { case (acc, cur) =>
-        if (
-          acc.headOption.fold(false)(v =>
-            (v._1.variationStart < cur._1.variationStart) && ((v._1.variationStart + v._1.steps.size) > cur._1.variationStart),
-          )
-        ) acc
-        else cur :: acc
-      }
-      .reverse
 
-    ch.map { case (k, i) =>
-      getChildren(k, vs.drop(i + 1))
+    var stack: List[Frame] = Nil
+    var roots: List[Frame] = Nil
+    var rootEnd = 0
+
+    def closeVariation(): Unit = {
+      val frame = stack.head
+      stack = stack.tail
+      frame.result = frame.variation.copy(variations = frame.children.reverse)
+      stack.headOption.foreach(parent => parent.children = frame.result :: parent.children)
     }
+
+    vs.foreach { variation =>
+      val start = variation.variationStart
+      // A variation's descendants end at the next header with an equal or lower start.
+      while (stack.headOption.exists(_.variation.variationStart >= start))
+        closeVariation()
+
+      val frame = new Frame(variation)
+      stack = frame :: stack
+
+      // Root selection is independent of nesting. A header can also be a root if
+      // it falls outside the previous root's move range.
+      if (roots.headOption.forall(root => start <= root.variation.variationStart || start >= rootEnd)) {
+        roots = frame :: roots
+        rootEnd = start + variation.steps.size
+      }
+    }
+    while (stack.nonEmpty)
+      closeVariation()
+
+    roots.reverse.map(_.result)
   }
 
   def createTags(
