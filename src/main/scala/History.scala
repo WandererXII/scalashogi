@@ -10,10 +10,10 @@ final case class History(
     consecutiveAttacks: ConsecutiveAttacks,
     positionHashes: PositionHash,
     initialSfen: Option[Sfen],
-    usis: Vector[Usi] = Vector.empty,
-    plies: Int = 0,
-    startedAtPly: Int = 0,
-    startedAtStep: Int = 1,
+    usis: Vector[Usi],
+    plies: Int,
+    startedAtPly: Int,
+    startedAtStep: Int,
 ) {
 
   def lastUsi: Option[Usi] = usis.lastOption
@@ -81,7 +81,16 @@ final case class History(
 
 object History {
 
-  def empty: History = History(none, ConsecutiveAttacks.empty, Array.empty, none)
+  def empty: History = History(
+    lastLionCapture = none,
+    consecutiveAttacks = ConsecutiveAttacks.empty,
+    positionHashes = Array.empty,
+    initialSfen = none,
+    usis = Vector.empty,
+    plies = 0,
+    startedAtPly = 0,
+    startedAtStep = 1,
+  )
 
 }
 
