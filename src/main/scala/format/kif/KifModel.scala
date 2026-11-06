@@ -281,8 +281,6 @@ object Kif {
 
   private val offset = "   "
 
-  private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
-
   private def stepNumberOffset(stepNumber: Int, suf: String) =
     f"$stepNumber%4d${suf}"
 

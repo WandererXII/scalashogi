@@ -173,8 +173,6 @@ object Csa {
   private def clockString(cur: NotationStep): Option[String] =
     cur.secondsSpent.map(spent => s",T$spent")
 
-  private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
-
   private def fixComment(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n").replace("\n", "\n'")
 

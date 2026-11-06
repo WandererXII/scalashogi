@@ -98,7 +98,7 @@ object CsaParser {
 
   object StepsParser extends RegexParsers with Logging {
 
-    override val whiteSpace = """(\s|\t|\r?\n)+""".r
+    override val whiteSpace = fieldSeparator
 
     def apply(csaSteps: String): Validated[String, (List[StrStep], Option[Tag])] = {
       parseAll(strSteps, csaSteps) match {
@@ -253,7 +253,7 @@ object CsaParser {
 
     def all: Parser[List[Tag]] =
       as("all") {
-        rep(tags) <~ """(.|\n)*""".r
+        rep(tags) <~ """(?s).*""".r
       }
 
     def tags: Parser[Tag] = tag | playerTag

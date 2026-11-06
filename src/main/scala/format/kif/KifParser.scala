@@ -241,7 +241,7 @@ object KifParser {
 
   object VariationParser extends RegexParsers with Logging {
 
-    override val whiteSpace = """(\s|\t|\r?\n)+""".r
+    override val whiteSpace = fieldSeparator
 
     def apply(kifVariations: String): Validated[String, List[StrVariation]] = {
       parseAll(variations, kifVariations.trim) match {
@@ -316,7 +316,7 @@ object KifParser {
 
   object StepsParser extends RegexParsers with Logging {
 
-    override val whiteSpace = """(\s|\t|\r?\n)+""".r
+    override val whiteSpace = fieldSeparator
 
     def apply(kifSteps: String): Validated[String, (List[StrStep], Option[Tag])] = {
       parseAll(strSteps, kifSteps) match {
@@ -448,9 +448,8 @@ object KifParser {
               if (destS == "同" || destS == "仝") lastDest
               else KifUtils.parseKifSquare(destS)
             dest <- destOpt toValid s"Cannot parse destination square in move: $str"
-            orig <- KifUtils.parseKifSquare(
-              origS,
-            ) toValid s"Cannot parse origin square in move: $str"
+            orig <- Option(origS).flatMap(KifUtils.parseKifSquare) toValid
+              s"Cannot parse origin square in move: $str"
           } yield KifMove(
             dest = dest,
             roles = roles,
@@ -503,7 +502,7 @@ object KifParser {
 
     def all: Parser[List[Tag]] =
       as("all") {
-        rep(tag) <~ """(.|\n)*""".r
+        rep(tag) <~ """(?s).*""".r
       }
 
     def tag: Parser[Tag] =
