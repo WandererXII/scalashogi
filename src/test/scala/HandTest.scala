@@ -6,6 +6,12 @@ class HandTest extends ShogiTest {
   val hands = Hands.empty
 
   "Hand count validation" should {
+    "treat a negative count in a directly constructed hand as zero" in {
+      val hand = Hand(Map[DroppableRole, Int](Pawn -> -1, Gold -> 1))
+
+      (hand(Pawn), hand.size, hand.sum(_ => 1), hand.roles) must_== (0, 1, 1, List(Gold))
+    }
+
     "clamp negative removals to zero" in {
       hands.store(Sente, Pawn).take(Sente, Pawn, -2) must beSome(hands.store(Sente, Pawn))
     }

@@ -52,7 +52,7 @@ object Hands {
 final case class Hand(handMap: HandMap) extends AnyVal {
 
   def apply(role: DroppableRole): Int =
-    handMap.getOrElse(role, 0)
+    handMap.getOrElse(role, 0).max(0)
 
   def take(role: DroppableRole, cnt: Int = 1): Option[Hand] = {
     val amountToTake = cnt.max(0)
@@ -70,7 +70,7 @@ final case class Hand(handMap: HandMap) extends AnyVal {
     handMap.view.filter(_._2 > 0).map(_._1).toList
 
   def size: Int =
-    handMap.values.sum
+    sum(_ => 1)
 
   def nonEmpty: Boolean =
     handMap.exists(_._2 > 0)
@@ -80,7 +80,7 @@ final case class Hand(handMap: HandMap) extends AnyVal {
 
   def sum(f: (DroppableRole) => Int): Int =
     handMap.foldLeft(0) { case (acc, (role, cnt)) =>
-      acc + f(role) * cnt
+      acc + f(role) * cnt.max(0)
     }
 
 }
