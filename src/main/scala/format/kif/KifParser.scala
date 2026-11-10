@@ -69,6 +69,9 @@ object KifParser {
   val commentRegex =
     raw"""\*|＊""".r
 
+  private val inlineCommentRegex =
+    raw"""\s+#.*$$""".r
+
   final case class StrStep(
       turnNumber: Option[Int],
       step: String,
@@ -89,9 +92,11 @@ object KifParser {
       val preprocessed = augmentString(cleanKif(kif)).linesIterator
         .collect {
           case l if !commentRegex.matches(l.trim.take(1)) =>
-            (l.split("#|&").headOption | "").trim
+            val t = l.trim
+            if (t.startsWith("#") || t.startsWith("&")) ""
+            else inlineCommentRegex.replaceFirstIn(t, "")
           case l => l.trim
-        } // remove # or & comments, but keep them in * comments
+        } // remove # or & comment lines and trailing ' #' comments, but keep them in * comments
         .filterNot(l => l.isEmpty || l.startsWith("まで") || commentRegex.matches(l))
         .mkString("\n")
       for {

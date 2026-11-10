@@ -534,6 +534,17 @@ ${uwate}番
     }
   }
 
+  "keep # and & inside header values" in {
+    parser("""
+      先手：A&B
+      後手：C#D # comment
+      1 ７六歩(77) (00:00/00:00:00)
+    """) must beValid.like { case p =>
+      p.tags(_.Sente) must beSome("A&B")
+      p.tags(_.Gote) must beSome("C#D")
+    }
+  }
+
   "from position board" in {
     parser("""
       後手：
