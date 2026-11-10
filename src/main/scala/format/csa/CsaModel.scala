@@ -35,10 +35,10 @@ final case class Csa(
     val initStr = initial.comments.map(text => s"'${Csa.fixComment(text)}").mkString("\n")
     val header  = Csa renderHeader tags
     val initialSfenOrDefault = initialSfen | variant.initialSfen
-    val setup                =
-      initialSfenOrDefault.toPosition(variant).fold("")(Csa renderPosition _)
-    val startColor: Color = initialSfenOrDefault.color | Sente
-    val stepsStr          = renderMainline(steps, startColor)
+    val position             = initialSfenOrDefault.toPosition(variant)
+    val setup                = position.fold("")(Csa.renderPosition)
+    val startColor           = position.map(_.color).getOrElse(initialSfenOrDefault.color | Sente)
+    val stepsStr             = renderMainline(steps, startColor)
     List[String](
       header,
       setup,

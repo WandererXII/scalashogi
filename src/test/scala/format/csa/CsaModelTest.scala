@@ -38,6 +38,14 @@ class CsaModelTest extends ShogiTest {
     }
   }
 
+  "render the first move with the side inferred from the SFEN position" in {
+    val sfen = Sfen("4k4/9/4R4/9/9/9/9/9/4K4")
+    val move = Usi.WithRole(Usi("5a4a").get, King)
+    val csa  = Csa(List(NotationStep(1, move)), Some(sfen))
+
+    csa.render.linesIterator.toList.takeRight(2) must_== List("-", "-5141OU")
+  }
+
   "checkmate export and import preserve the winner for either color" in {
     forall(
       List(
