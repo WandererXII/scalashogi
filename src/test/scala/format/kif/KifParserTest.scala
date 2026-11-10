@@ -733,6 +733,26 @@ ${uwate}番
       }
     }
 
+    "attach nested variations to the right step without move numbers" in {
+      parser("""
+        ７六歩(77)
+        ３四歩(33)
+
+        変化：1手
+        ２六歩(27)
+        ８四歩(83)
+
+        変化：2手
+        ４二玉(51)
+      """) must beValid.like { case ParsedNotation(ParsedSteps(List(first, _)), _, _, _, _) =>
+        first.metas.variations must haveSize(1)
+        val branch = first.metas.variations.head.value
+        branch must haveSize(2)
+        branch(0).metas.variations must beEmpty
+        branch(1).metas.variations must haveSize(1)
+      }
+    }
+
     "nested variations" in {
       parser("""
     手合割：平手

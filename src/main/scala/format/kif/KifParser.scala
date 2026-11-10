@@ -225,7 +225,7 @@ object KifParser {
                   (Nil, pending - start, true)
                 else {
                   val (parsed, stepHasTooDeepVariation) =
-                    parseVariations(pending.getOrElse(start, Nil), lastDest, ply + 1)
+                    parseVariations(pending.getOrElse(start, Nil), lastDest, ply)
                   (parsed, pending - start, hasTooDeepVariation || stepHasTooDeepVariation)
                 }
               val s1         = s withComments comments withVariations stepVariations
