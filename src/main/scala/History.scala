@@ -1,5 +1,7 @@
 package shogi
 
+import java.util.Arrays
+
 import cats.syntax.option._
 
 import shogi.format.forsyth.Sfen
@@ -70,6 +72,31 @@ final case class History(
   def withPositionHashes(h: PositionHash) = copy(positionHashes = h)
 
   def withInitialSfen(s: Sfen) = copy(initialSfen = s.some)
+
+  override def equals(other: Any): Boolean = other match {
+    case that: History =>
+      lastLionCapture == that.lastLionCapture &&
+      consecutiveAttacks == that.consecutiveAttacks &&
+      initialSfen == that.initialSfen &&
+      usis == that.usis &&
+      plies == that.plies &&
+      startedAtPly == that.startedAtPly &&
+      startedAtStep == that.startedAtStep &&
+      Arrays.equals(positionHashes, that.positionHashes)
+    case _ => false
+  }
+
+  override def hashCode(): Int =
+    (
+      lastLionCapture,
+      consecutiveAttacks,
+      initialSfen,
+      usis,
+      plies,
+      startedAtPly,
+      startedAtStep,
+      Arrays.hashCode(positionHashes),
+    ).hashCode()
 
   override def toString = {
     val positions = (positionHashes grouped Hash.size).toList

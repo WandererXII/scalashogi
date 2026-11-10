@@ -49,7 +49,7 @@ object Hands {
   def empty: Hands = Hands(Nil, Nil)
 }
 
-final case class Hand(handMap: HandMap) extends AnyVal {
+final case class Hand private (handMap: HandMap) extends AnyVal {
 
   def apply(role: DroppableRole): Int =
     handMap.getOrElse(role, 0).max(0)
@@ -58,13 +58,19 @@ final case class Hand(handMap: HandMap) extends AnyVal {
     val amountToTake = cnt.max(0)
     val currentCount = apply(role)
     if (amountToTake > currentCount) None
-    else Some(copy(handMap = handMap + (role -> (currentCount - amountToTake))))
+    else Some(withCount(role, currentCount - amountToTake))
   }
 
   def store(role: DroppableRole, cnt: Int = 1): Hand = {
     val newCount = (apply(role).toLong + cnt.max(0)).min(Int.MaxValue).toInt
-    copy(handMap = handMap + (role -> newCount))
+    withCount(role, newCount)
   }
+
+  private def withCount(role: DroppableRole, count: Int): Hand =
+    new Hand(if (count <= 0) handMap - role else handMap.updated(role, count))
+
+  // replaces the synthesized copy, which would bypass normalization
+  def copy(handMap: HandMap = handMap): Hand = Hand(handMap)
 
   def roles: List[DroppableRole] =
     handMap.view.filter(_._2 > 0).map(_._1).toList
@@ -87,9 +93,12 @@ final case class Hand(handMap: HandMap) extends AnyVal {
 
 object Hand {
 
-  def apply(hand: Iterable[(DroppableRole, Int)]): Hand =
-    new Hand(hand.toMap)
+  def apply(handMap: HandMap): Hand =
+    new Hand(handMap.filter(_._2 > 0))
 
-  def empty: Hand = Hand(Nil)
+  def apply(hand: Iterable[(DroppableRole, Int)]): Hand =
+    apply(hand.toMap)
+
+  val empty: Hand = new Hand(Map.empty)
 
 }

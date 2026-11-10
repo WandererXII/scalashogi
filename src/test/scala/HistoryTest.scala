@@ -51,10 +51,18 @@ class HistoryTest extends ShogiTest {
       history.firstRepetitionDistance must_== Some(6)
     }
   }
-//  Doesn't work - Array == Array will always be false
-//  ArraySeq could be used, but with java Array I can be sure primitives are used
-//  And since this is not really an issue, let's leave it for now
-//  "equals" in {
-//    History.empty must_== History.empty
-//  }
+  "equality" should {
+    "hold for empty histories" in {
+      (History.empty must_== History.empty) and
+        (History.empty.hashCode must_== History.empty.hashCode)
+    }
+    "compare position hashes by content" in {
+      val first  = makeHistory(List(1, 2, 3))
+      val second = makeHistory(List(1, 2, 3))
+      (first must_== second) and (first.hashCode must_== second.hashCode)
+    }
+    "distinguish different position hashes" in {
+      makeHistory(List(1, 2, 3)) must_!= makeHistory(List(1, 2, 4))
+    }
+  }
 }

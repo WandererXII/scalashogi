@@ -12,20 +12,22 @@ class HandTest extends ShogiTest {
       (hand(Pawn), hand.size, hand.sum(_ => 1), hand.roles) must_== (0, 1, 1, List(Gold))
     }
 
+    "drop non-positive counts when constructed directly" in {
+      (Hand(Map[DroppableRole, Int](Pawn -> 0, Gold -> -1)) must_== Hand.empty) and
+        (Hand(List(Pawn -> 0, Gold -> 1)) must_== Hand.empty.store(Gold))
+    }
+
     "clamp negative removals to zero" in {
       hands.store(Sente, Pawn).take(Sente, Pawn, -2) must beSome(hands.store(Sente, Pawn))
     }
     "clamp negative stores to zero" in {
-      hands.store(Gote, Pawn, -1).isEmpty must beTrue
+      hands.store(Gote, Pawn, -1) must_== hands
     }
     "saturate overflowing stores" in {
       Hand.empty.store(Pawn, Int.MaxValue).store(Pawn)(Pawn) must_== Int.MaxValue
     }
     "allow removing zero from an empty hand" in {
-      Hand.empty.take(Pawn, 0) must beSome.like { h =>
-        h(Pawn) must_== 0
-        h.isEmpty must beTrue
-      }
+      Hand.empty.take(Pawn, 0) must beSome(Hand.empty)
     }
   }
 
@@ -66,6 +68,9 @@ class HandTest extends ShogiTest {
     }
   }
   "Taking the piece away" should {
+    "restore the original empty hand" in {
+      Hand.empty.store(Pawn).take(Pawn) must beSome(Hand.empty)
+    }
     "have no pieces" in {
       hands.store(Sente, Pawn).take(Sente, Pawn) must beSome.like { h =>
         h.size must_== 0

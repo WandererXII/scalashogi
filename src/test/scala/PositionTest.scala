@@ -2,9 +2,29 @@ package shogi
 
 import scala.language.reflectiveCalls
 
+import shogi.format.usi.Usi
+import shogi.variant.Standard
+
 class PositionTest extends ShogiTest {
 
   "a position" should {
+    "compare equal after independently playing the same move" in {
+      val move   = Usi("7g7f").get
+      val first  = Position(Standard)(move).toOption.get
+      val second = Position(Standard)(move).toOption.get
+
+      (first must_== second) and (first.hashCode must_== second.hashCode)
+    }
+
+    "distinguish different repetition histories with the same SFEN" in {
+      val position         = Position(Standard)
+      val differentHistory = position.withHistory(
+        position.history.withPositionHashes(Array[Byte](1, 2, 3)),
+      )
+
+      (position.toSfen must_== differentHistory.toSfen) and (position must_!= differentHistory)
+    }
+
     "detect check" should {
       "by rook" in {
         """
