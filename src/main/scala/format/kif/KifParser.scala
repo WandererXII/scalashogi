@@ -58,7 +58,10 @@ object KifParser {
     raw"""^\s*(${numbersS}[\s\.。(?:手目)]{1,})?(${lionMoveS})?(${colorsS})?(${squareS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(?:${iguiS})?(${parsS})?←?${squareS}(${parsS})?)|${dropS})""".r.unanchored
 
   private val terminationRegex =
-    """中断|投了|持将棋|千日手|引き分け|引分け|詰み|切れ負け|反則勝ち|反則負け|入玉勝ち|トライ勝ち|トライ負け|王手勝ち|Time-up""".r
+    """中断|投了|持将棋|千日手|引き分け|引分け|詰み|不詰|切れ負け|反則勝ち|反則負け|入玉勝ち|不戦勝|不戦敗|トライ勝ち|トライ負け|王手勝ち|Time-up""".r
+
+  private val handicapLabels =
+    List("上手:", "下手:", "上手の持駒:", "下手の持駒:", "上手番", "下手番")
 
   val terminationLineRegex =
     raw"""^\s*(?:${numbersS}[\s\.。(?:手目)]{1,})?(?:${terminationRegex.regex})(?=$$|[\s(（*＊])""".r.unanchored
@@ -114,7 +117,17 @@ object KifParser {
           .some
           .filterNot(s => s.truncate == variant.initialSfen.truncate && s.stepNumber.forall(_ <= 1))
         parsedSteps <- objSteps(strSteps, variant, variations)
-        tags = createTags(preTags, position.color, parsedSteps.value.size, terminationOption)
+        isHandicap = initialSfen.exists(Handicap.isHandicap(_, variant)) ||
+          augmentString(headerStr).linesIterator
+            .map(_.trim)
+            .exists(l => handicapLabels.exists(l.startsWith))
+        tags = createTags(
+          preTags,
+          position.color,
+          parsedSteps.value.size,
+          terminationOption,
+          isHandicap,
+        )
       } yield ParsedNotation(parsedSteps, initialSfen, variant, init, tags)
     } catch {
       case _: StackOverflowError =>
@@ -283,6 +296,7 @@ object KifParser {
       color: Color,
       nbSteps: Int,
       stepTermTag: Option[Tag],
+      handicap: Boolean,
   ): Tags = {
     val termTag =
       (tags(_.Termination) orElse stepTermTag.map(_.value)).map(t => Tag(_.Termination, t))
@@ -290,6 +304,7 @@ object KifParser {
       .createResult(
         termTag,
         Color.fromSente((nbSteps + { if (color.gote) 1 else 0 }) % 2 == 0),
+        handicap,
       )
 
     List[Option[Tag]](resultTag, termTag).flatten.foldLeft(tags)(_ + _)

@@ -185,7 +185,7 @@ object KifParserHelper {
       position <- handicap.sfen.toPosition(variant) toValid s"Cannot parse handicap: $str"
     } yield position
 
-  def createResult(termination: Option[Tag], color: Color): Option[Tag] = {
+  def createResult(termination: Option[Tag], color: Color, handicap: Boolean): Option[Tag] = {
     termination.map(_.value.toLowerCase) match {
       case Some("投了") | Some("詰み") | Some("反則負け") | Some("切れ負け") | Some("time-up") |
           Some("トライ勝ち") | Some("王手勝ち") =>
@@ -194,6 +194,9 @@ object KifParserHelper {
         Tag(_.Result, Color.showResult(Some(color))).some
       case Some("持将棋") | Some("千日手") | Some("引き分け") | Some("引分け") =>
         Tag(_.Result, Color.showResult(None)).some
+      // Forfeits are from sente's view, or uwate's in handicap games
+      case Some("不戦勝") => Tag(_.Result, Color.showResult(Some(Color.fromSente(!handicap)))).some
+      case Some("不戦敗") => Tag(_.Result, Color.showResult(Some(Color.fromSente(handicap)))).some
       case _ => None
     }
   }

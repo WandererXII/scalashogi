@@ -95,6 +95,58 @@ class KifParserTest extends ShogiTest {
     }
   }
 
+  "forfeit results use sente in even games and uwate in handicap games" in {
+    forall(
+      List(
+        ("1 不戦勝", "不戦勝", "sente"),
+        ("1 不戦敗", "不戦敗", "gote"),
+        ("1 ７六歩(77)\n2 不戦勝", "不戦勝", "sente"),
+        ("手合割：二枚落ち\n1 不戦勝", "不戦勝", "gote"),
+        ("手合割：二枚落ち\n1 ３四歩(33)\n2 不戦敗", "不戦敗", "sente"),
+        ("上手：Player\n1 不戦勝", "不戦勝", "gote"),
+        ("手合割：平手\n下手向けメモ：注記\n1 不戦勝", "不戦勝", "sente"),
+      ),
+    ) { case (record, termination, winner) =>
+      parser(record) must beValid.like { case p =>
+        p.tags(_.Termination) must beSome(termination)
+        p.tags(_.Result) must beSome(winner)
+      }
+    }
+  }
+
+  "forfeit results follow board labels, not the side to move" in {
+    def record(uwate: String, shitate: String) = s"""
+${uwate}の持駒：なし
+  ９ ８ ７ ６ ５ ４ ３ ２ １
++---------------------------+
+|v香v桂v銀v金v玉v金v銀v桂v香|一
+| ・v飛 ・ ・ ・ ・ ・v角 ・|二
+|v歩v歩v歩v歩v歩v歩 ・v歩v歩|三
+| ・ ・ ・ ・ ・ ・v歩 ・ ・|四
+| ・ ・ ・ ・ ・ ・ ・ ・ ・|五
+| ・ ・ ・ ・ ・ ・ ・ ・ ・|六
+| 歩 歩 歩 歩 歩 歩 歩 歩 歩|七
+| ・ 角 ・ ・ ・ ・ ・ 飛 ・|八
+| 香 桂 銀 金 玉 金 銀 桂 香|九
++---------------------------+
+${shitate}の持駒：なし
+${uwate}番
+1 不戦勝"""
+    forall(List(("上手", "下手", "gote"), ("後手", "先手", "sente"))) { case (uwate, shitate, winner) =>
+      parser(record(uwate, shitate)) must beValid.like { case p =>
+        p.tags(_.Result) must beSome(winner)
+      }
+    }
+  }
+
+  "no-mate termination preserves the moves without assigning a result" in {
+    parser("1 ７六歩(77)\n2 不詰") must beValid.like { case p =>
+      p.parsedSteps.value must haveSize(1)
+      p.tags(_.Termination) must beSome("不詰")
+      p.tags(_.Result) must beNone
+    }
+  }
+
   "drop" in {
     parseStep("６四歩打") must beValid.like { case d: Drop =>
       d.role must_== Pawn
