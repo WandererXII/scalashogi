@@ -137,6 +137,15 @@ class CsaParserTest extends ShogiTest {
         }
       }
     }
+    "keep tags after an unparsable header line" in {
+      forall(List("$START TIME:2020/01/01", "N", "$:nothing")) { junk =>
+        parser(s"$$SITE:here\n$junk\n$$EVENT:cup\nN+Alice\nPI\n+") must beValid.like { case p =>
+          p.tags(_.Site) must beSome("here")
+          p.tags(_.Event) must beSome("cup")
+          p.tags(_.Sente) must beSome("Alice")
+        }
+      }
+    }
     "preserve drawn results" in {
       forall(List("JISHOGI", "SENNICHITE", "HIKIWAKE")) { termination =>
         parser(s"PI\n+\n+7776FU\n%$termination") must beValid.like { case p =>

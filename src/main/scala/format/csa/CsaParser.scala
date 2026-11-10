@@ -244,17 +244,15 @@ object CsaParser {
 
   object TagParser extends RegexParsers with Logging {
 
+    // Each line is parsed on its own, so an unparsable line doesn't swallow the tags after it
     def apply(csa: String): Validated[String, Tags] =
-      parseAll(all, csa) match {
-        case f: Failure       => invalid("Cannot parse CSA tags: %s\n%s".format(f.toString, csa))
-        case Success(tags, _) => valid(Tags(tags.filter(_.value.nonEmpty)))
-        case err              => invalid("Cannot parse CSA tags: %s\n%s".format(err.toString, csa))
-      }
-
-    def all: Parser[List[Tag]] =
-      as("all") {
-        rep(tags) <~ """(?s).*""".r
-      }
+      valid(
+        Tags(
+          augmentString(csa).linesIterator.toList
+            .flatMap(line => parseAll(tags, line.trim).map(Option(_)).getOrElse(None))
+            .filter(_.value.nonEmpty),
+        ),
+      )
 
     def tags: Parser[Tag] = tag | playerTag
 
