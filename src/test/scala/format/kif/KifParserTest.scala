@@ -531,13 +531,67 @@ class KifParserTest extends ShogiTest {
   }
 
   "variations" should {
-    "return a validation error when nesting exhausts the parser stack" in {
-      val variations = (1 to 3000).map { i =>
-        s"\n変化：${i}手\n$i ７六歩(77)\n"
+    // Level i branches off step i and leads to level i + 1 from its own step i + 1
+    def nested(levels: Int, nextSteps: Int = 1) =
+      "1 ７六歩(77)\n" + (1 to levels).map { i =>
+        s"変化：${i}手\n$i ７六歩(77)\n" + s"${i + 1} ７六歩(77)\n" * nextSteps
       }.mkString
-      parser(s"1 ７六歩(77)\n$variations") must beInvalid(
-        "Cannot parse KIF: parser stack limit exceeded",
+    def nesting(steps: ParsedSteps): Int =
+      steps.value.flatMap(_.metas.variations).map(nesting(_) + 1).maxOption | 0
+    val tooDeep = "Cannot parse KIF: variation nesting exceeds 100 levels"
+
+    "accept variations nested 100 levels deep" in {
+      parser(nested(100)) must beValid.like { case p =>
+        nesting(p.parsedSteps) must_== 100
+      }
+    }
+
+    // ParsedNotation's toString recurses per level; around 200 levels overflows it
+    "print the deepest accepted nesting on a 1 MB stack" in {
+      val notation = parser(nested(100)).toOption.get
+      var error    = Option.empty[Throwable]
+      val thread   = new Thread(
+        null,
+        () =>
+          try {
+            notation.toString
+            notation.hashCode
+            ()
+          } catch { case e: Throwable => error = Some(e) },
+        "kif-print",
+        1L << 20,
       )
+      thread.start()
+      thread.join()
+      error must beNone
+    }
+
+    "reject variations nested more than 100 levels deep" in {
+      forall(List(101, 30000)) { levels =>
+        parser(nested(levels)) must beInvalid(tooDeep)
+      }
+    }
+
+    "drop empty and unparsable branches beyond the nesting limit" in {
+      forall(List("", "101 ５五玉打\n")) { branch =>
+        parser(s"${nested(100)}変化：101手\n$branch") must beValid.like { case p =>
+          nesting(p.parsedSteps) must_== 100
+        }
+      }
+    }
+
+    "ignore too deep branches of a dropped variation" in {
+      parser(s"${nested(100)}102 ５五玉打\n変化：101手\n101 ７六歩(77)\n") must beValid.like { case p =>
+        nesting(p.parsedSteps) must_== 99
+      }
+    }
+
+    "parse each variation once despite repeated step numbers" in {
+      parser(nested(60, nextSteps = 2)) must beValid.like { case p =>
+        nesting(p.parsedSteps) must_== 60
+        p.parsedSteps.value.head.metas.variations.head.value.map(_.metas.variations.size) must_==
+          List(0, 1, 0)
+      }
     }
 
     "resolve same-square branches before a two-step lion move" in {
@@ -600,11 +654,12 @@ class KifParserTest extends ShogiTest {
 
         変化：2手
         2 ４二玉(51)
-      """) must beValid.like { case ParsedNotation(ParsedSteps(List(first, second)), _, _, _, tags) =>
-        first.metas.variations must haveSize(1)
-        first.metas.variations.head.value(1).metas.variations must haveSize(1)
-        tags(_.Termination) must beSome("投了")
-        second.metas.variations must beEmpty
+      """) must beValid.like {
+        case ParsedNotation(ParsedSteps(List(first, second)), _, _, _, tags) =>
+          first.metas.variations must haveSize(1)
+          first.metas.variations.head.value(1).metas.variations must haveSize(1)
+          tags(_.Termination) must beSome("投了")
+          second.metas.variations must beEmpty
       }
     }
 

@@ -121,83 +121,131 @@ object KifParser {
         invalid("Cannot parse KIF: parser stack limit exceeded")
     }
 
+  private val maxVariationDepth = 100
+
+  sealed private trait StepsError
+  final private case class InvalidStep(error: String) extends StepsError
+  private case object VariationTooDeep                extends StepsError
+
   def objSteps(
       strSteps: List[StrStep],
       variant: Variant,
       variations: List[StrVariation],
       startDest: Option[Square] = None,
       startNum: Int = 1,
-  ): Validated[String, ParsedSteps] = {
+  ): Validated[String, ParsedSteps] =
+    objSteps(strSteps, variant, variations, startDest, startNum, depth = 0) leftMap {
+      case InvalidStep(error) => error
+      case VariationTooDeep   =>
+        s"Cannot parse KIF: variation nesting exceeds $maxVariationDepth levels"
+    }
+
+  // A line at depth maxVariationDepth + 1 is parsed without its own variations,
+  // only to know whether it would be kept
+  private def objSteps(
+      strSteps: List[StrStep],
+      variant: Variant,
+      variations: List[StrVariation],
+      startDest: Option[Square],
+      startNum: Int,
+      depth: Int,
+  ): Validated[StepsError, ParsedSteps] = {
     // No need to store 0s that mean nothing
     val uselessTimes =
       strSteps.forall(s =>
         s.timeSpent.fold(true)(_ == Duration.ZERO) && s.timeTotal.fold(true)(_ == Duration.ZERO),
       )
 
+    // Each variation is used up by the first step it starts at, parsed or not.
+    // Stops at the first too deep variation, since this line can't be kept anymore
+    @scala.annotation.tailrec
+    def parseVariations(
+        candidates: List[StrVariation],
+        lastDest: Option[Square],
+        ply: Int,
+        parsed: List[ParsedSteps] = Nil,
+    ): (List[ParsedSteps], Boolean) =
+      candidates match {
+        case Nil       => (parsed.reverse, false)
+        case v :: rest =>
+          objSteps(v.steps, variant, v.variations, lastDest, ply, depth + 1) match {
+            case Invalid(VariationTooDeep) => (Nil, true)
+            case Valid(steps) if steps.value.nonEmpty =>
+              parseVariations(rest, lastDest, ply, steps :: parsed)
+            case _ => parseVariations(rest, lastDest, ply, parsed)
+          }
+      }
+
     @scala.annotation.tailrec
     def mk(
         parsedSteps: List[ParsedStep],
         strSteps: List[StrStep],
+        pending: Map[Int, List[StrVariation]],
         lastDest: Option[Square],
         ply: Int,
-    ): Validated[String, List[ParsedStep]] =
+        hasTooDeepVariation: Boolean,
+    ): Validated[StepsError, List[ParsedStep]] =
       strSteps match {
-        case Nil          => valid(parsedSteps.reverse)
-        case step :: rest =>
-          step match {
-            case StrStep(stepNumber, stepStr, comments, secondLionMove, timeSpent, timeTotal) => {
-              MoveDropParser(
-                stepStr,
-                lastDest,
-                if (variant.chushogi && secondLionMove)
-                  parsedSteps.headOption.flatMap(_.squares.headOption)
-                else None,
-                variant,
-              ) map { s =>
-                val s1 = s withComments comments withVariations {
-                  if (variant.chushogi && secondLionMove && parsedSteps.nonEmpty)
-                    parsedSteps.head.metas.variations
-                  else
-                    variations
-                      .withFilter(_.variationStart == (stepNumber | ply))
-                      .map { v =>
-                        objSteps(
-                          v.steps,
-                          variant,
-                          v.variations,
-                          lastDest,
-                          ply + 1,
-                        ) getOrElse ParsedSteps.empty
-                      }
-                      .filter(_.value.nonEmpty)
+        case Nil =>
+          if (hasTooDeepVariation) invalid(VariationTooDeep) else valid(parsedSteps.reverse)
+        case StrStep(stepNumber, stepStr, comments, secondLionMove, timeSpent, timeTotal) :: rest =>
+          val lionContinuation = variant.chushogi && secondLionMove && parsedSteps.nonEmpty
+          MoveDropParser(
+            stepStr,
+            lastDest,
+            if (lionContinuation) parsedSteps.head.squares.headOption else None,
+            variant,
+          ) match {
+            case Invalid(err) => invalid(InvalidStep(err))
+            case Valid(s)     =>
+              val start                                                  = stepNumber | ply
+              val (stepVariations, nextPending, nextHasTooDeepVariation) =
+                if (lionContinuation)
+                  (parsedSteps.head.metas.variations, pending, hasTooDeepVariation)
+                else if (hasTooDeepVariation)
+                  // Only whether a later step is invalid still matters
+                  (Nil, pending - start, true)
+                else {
+                  val (parsed, stepHasTooDeepVariation) =
+                    parseVariations(pending.getOrElse(start, Nil), lastDest, ply + 1)
+                  (parsed, pending - start, hasTooDeepVariation || stepHasTooDeepVariation)
                 }
+              val s1         = s withComments comments withVariations stepVariations
+              val parsedStep =
                 if (uselessTimes) s1 else s1 withTimeSpent timeSpent withTimeTotal timeTotal
-              } match {
-                case Valid(parsedStep) => {
-                  val newSteps =
-                    if (variant.chushogi && secondLionMove && parsedSteps.nonEmpty)
-                      parsedStep :: parsedSteps.tail
-                    else parsedStep :: parsedSteps
-                  mk(newSteps, rest, parsedStep.squares.lastOption, ply + 1)
-                }
-                case Invalid(err) => invalid(err)
-              }
-            }
+              val newSteps =
+                if (lionContinuation) parsedStep :: parsedSteps.tail
+                else parsedStep :: parsedSteps
+              mk(
+                newSteps,
+                rest,
+                nextPending,
+                parsedStep.squares.lastOption,
+                ply + 1,
+                nextHasTooDeepVariation,
+              )
           }
       }
 
-    mk(Nil, strSteps, startDest, startNum) map ParsedSteps.apply
+    val pending =
+      if (depth > maxVariationDepth) Map.empty[Int, List[StrVariation]]
+      else variations.groupBy(_.variationStart)
+
+    mk(Nil, strSteps, pending, startDest, startNum, hasTooDeepVariation = false) andThen { steps =>
+      if (depth > maxVariationDepth && steps.nonEmpty) invalid(VariationTooDeep)
+      else valid(ParsedSteps(steps))
+    }
   }
 
   def createVariations(vs: List[StrVariation]): List[StrVariation] = {
     final class Frame(val variation: StrVariation) {
       var children: List[StrVariation] = Nil
-      var result: StrVariation = variation
+      var result: StrVariation         = variation
     }
 
     var stack: List[Frame] = Nil
     var roots: List[Frame] = Nil
-    var rootEnd = 0
+    var rootEnd            = 0
 
     def closeVariation(): Unit = {
       val frame = stack.head
@@ -217,7 +265,9 @@ object KifParser {
 
       // Root selection is independent of nesting. A header can also be a root if
       // it falls outside the previous root's move range.
-      if (roots.headOption.forall(root => start <= root.variation.variationStart || start >= rootEnd)) {
+      if (
+        roots.headOption.forall(root => start <= root.variation.variationStart || start >= rootEnd)
+      ) {
         roots = frame :: roots
         rootEnd = start + variation.steps.size
       }
