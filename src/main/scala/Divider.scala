@@ -93,10 +93,13 @@ object Divider {
   private def majorsAndMinors(position: Position): Int =
     position.board.pieces.values.count(p => p.role != Pawn && p.role != King)
 
-  // Sparse back-rank indicates that pieces have been developed
+  // A sparse back rank on either side indicates that pieces have been developed.
   private def isBackrankSparse(position: Position): Boolean =
-    position.board.pieces.count { case (square, piece) =>
-      position.variant.backrank(!piece.color) == square.rank
-    } < 4
+    Color.all.exists { color =>
+      val homeRank = position.variant.backrank(!color)
+      position.board.pieces.count { case (square, piece) =>
+        piece.color == color && square.rank == homeRank
+      } < 4
+    }
 
 }

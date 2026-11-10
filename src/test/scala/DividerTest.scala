@@ -1,7 +1,11 @@
 package shogi
 
+import shogi.format.forsyth.Sfen
+import shogi.format.usi.Usi
+import shogi.variant.Standard
+
 class DividerTest extends ShogiTest {
-  val usis = shogi.format.usi.Usi.readList(format.usi.Fixtures.fromProd2).get
+  val usis = Usi.readList(format.usi.Fixtures.fromProd2).get
 
   "the divider counts played plies" should {
     "handle an empty history" in {
@@ -71,6 +75,15 @@ class DividerTest extends ShogiTest {
 
   // more tests wanted
   "the divider finds middlegame and endgame" should {
+    "start the middlegame when either side drops below four pieces on its back rank" in {
+      val initial = Sfen("lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1BNSS1NRG/L3KG2L b - 1")
+      val moves   = List(Usi("4i4h").get)
+      val (positions, error) = Replay.positionsWhileValid(moves, Some(initial), Standard)
+
+      require(error.isEmpty, error.getOrElse(""))
+      Divider(positions) must_== Division(Some(1), None, 1)
+    }
+
     "game1" in {
       val positions = completeReplay(usis)
       val divided   = Divider(positions.toList)
