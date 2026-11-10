@@ -58,7 +58,7 @@ object KifParser {
     raw"""^\s*(${numbersS}[\s\.。(?:手目)]{1,})?(${lionMoveS})?(${colorsS})?(${squareS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(?:${iguiS})?(${parsS})?←?${squareS}(${parsS})?)|${dropS})""".r.unanchored
 
   private val terminationRegex =
-    """中断|投了|持将棋|千日手|引き分け|引分け|詰み|切れ負け|反則勝ち|反則負け|入玉勝ち|Time-up""".r
+    """中断|投了|持将棋|千日手|引き分け|引分け|詰み|切れ負け|反則勝ち|反則負け|入玉勝ち|トライ勝ち|トライ負け|王手勝ち|Time-up""".r
 
   val terminationLineRegex =
     raw"""^\s*(?:${numbersS}[\s\.。(?:手目)]{1,})?(?:${terminationRegex.regex})(?=$$|[\s(（*＊])""".r.unanchored

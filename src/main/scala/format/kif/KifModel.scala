@@ -245,7 +245,10 @@ object Kif {
       case Mate | Stalemate          => "詰み".some
       case RoyalsLost | BareKing     => (if (winnerTurn) "入玉勝ち" else "詰み").some
       case Repetition                => "千日手".some
+      case Draw                      => "引き分け".some
       case Impasse27                 => "入玉勝ち".some
+      case TryRule                   => (if (winnerTurn) "トライ負け" else "トライ勝ち").some
+      case Check                     => "王手勝ち".some
       case IllegalMove | PerpetualCheck =>
         (if (winnerTurn) "反則勝ち" else "反則負け").some
       case _                         => None
