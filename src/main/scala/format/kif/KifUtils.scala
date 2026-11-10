@@ -52,6 +52,7 @@ object KifUtils {
 
   private[kif] def toDigit(c: Char): Char = {
     c match {
+      case '０'             => '0'
       case '１' | '一' | 'a' => '1'
       case '２' | '二' | 'b' => '2'
       case '３' | '三' | 'c' => '3'
