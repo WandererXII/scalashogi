@@ -395,7 +395,7 @@ object KifParser {
     def strSteps: Parser[(List[StrStep], Option[String])] =
       as("steps") {
         (strStep *) ~ (termination *) ~ (commentary *) ^^ { case parsedSteps ~ term ~ coms =>
-          (updateLastComments(parsedSteps, coms), term.headOption)
+          (updateLastComments(parsedSteps, cleanComments(coms)), term.headOption)
         }
       }
 

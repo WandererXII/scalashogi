@@ -335,6 +335,13 @@ class KifParserTest extends ShogiTest {
           )
       }
     }
+    "truncate long comments after termination" in {
+      val longComment = "x" * 5000
+      parser(s"1 ７六歩(77)\n* before termination\n2 投了\n* $longComment") must beValid.like {
+        case ParsedNotation(ParsedSteps(List(step)), _, _, _, _) =>
+          step.metas.comments must_== List("before termination", "x" * 2000)
+      }
+    }
     "comments in header" in {
       parser("""*HEADER COMMENT
       後手：俺
