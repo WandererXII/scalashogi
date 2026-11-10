@@ -178,8 +178,9 @@ object CsaParser {
         }
       }
 
-    val termValue: Parser[String] =
-      "CHUDAN" | "TORYO" | "JISHOGI" | "SENNICHITE" | "TSUMI" | "TIME_UP" | "ILLEGAL_MOVE" | "+ILLEGAL_ACTION" | "-ILLEGAL_ACTION" | "KACHI" | "HIKIWAKE" | "FUZUMI" | "MATTA" | "ERROR"
+    // Any ending is accepted, so an unknown one doesn't discard the moves,
+    // CsaParserHelper.createResult decides which endings have a result
+    val termValue: Parser[String] = """[+-]?\w+""".r
   }
 
   object StepParser extends RegexParsers with Logging {

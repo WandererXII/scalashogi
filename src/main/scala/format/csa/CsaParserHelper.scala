@@ -189,7 +189,7 @@ object CsaParserHelper {
       case Some("+ILLEGAL_ACTION") => Tag(_.Result, Color.showResult(Some(Gote))).some
       case Some("-ILLEGAL_ACTION") => Tag(_.Result, Color.showResult(Some(Sente))).some
       case Some("KACHI")           => Tag(_.Result, Color.showResult(Some(color))).some
-      case Some("JISHOGI") | Some("SENNICHITE") | Some("HIKIWAKE") =>
+      case Some("JISHOGI") | Some("SENNICHITE") | Some("HIKIWAKE") | Some("MAX_MOVES") =>
         Tag(_.Result, Color.showResult(None)).some
       case _ => None
     }

@@ -147,11 +147,24 @@ class CsaParserTest extends ShogiTest {
       }
     }
     "preserve drawn results" in {
-      forall(List("JISHOGI", "SENNICHITE", "HIKIWAKE")) { termination =>
+      forall(List("JISHOGI", "SENNICHITE", "HIKIWAKE", "MAX_MOVES")) { termination =>
         parser(s"PI\n+\n+7776FU\n%$termination") must beValid.like { case p =>
           p.tags(_.Result) must beSome("draw")
           p.tags.resultColor must_== Some(None)
         }
+      }
+    }
+    "keep moves when the game ends at the move limit" in {
+      parser("PI\n+\n+7776FU\n-3334FU\n%MAX_MOVES") must beValid.like { case p =>
+        p.parsedSteps.value must haveSize(2)
+        p.tags(_.Termination) must beSome("MAX_MOVES")
+      }
+    }
+    "keep moves after an unknown termination" in {
+      parser("PI\n+\n+7776FU\n-3334FU\n%SOMETHING_NEW,T3") must beValid.like { case p =>
+        p.parsedSteps.value must haveSize(2)
+        p.tags(_.Termination) must beSome("SOMETHING_NEW")
+        p.tags(_.Result) must beNone
       }
     }
     "preserve standard CSA time-control tags" in {
