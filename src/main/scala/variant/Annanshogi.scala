@@ -80,26 +80,18 @@ case object Annanshogi
   private def directlyBehind(square: Square, color: Color): Option[Square] =
     color.fold(square.down, square.up)
 
-  private def toAnnanAttackPieceMap(pieces: PieceMap): PieceMap =
-    pieces.foldLeft(Map.empty[Square, Piece]) { case (acc, (square, piece)) =>
-      acc.updated(
-        square,
-        directlyBehind(square, piece.color)
-          .flatMap(pieces.get)
-          .filter(_.color == piece.color)
-          .getOrElse(piece),
-      )
-    }
-
+  // Ignores filter - any move can change how the pieces around it move
   override def squareThreatened(
       board: Board,
       color: Color,
       square: Square,
       filter: Piece => Boolean = _ => true,
-  ): Boolean = {
-    val updatedBoard = Board(toAnnanAttackPieceMap(board.pieces))
-    super.squareThreatened(updatedBoard, color, square, _ => true)
-  }
+  ): Boolean =
+    board.pieces exists {
+      case (from, piece) if piece.color == color =>
+        pieceThreatens(board, from, attackingPiece(piece, from, board), square)
+      case _ => false
+    }
 
   override def attackingPiece(piece: Piece, square: Square, board: Board): Piece =
     directlyBehind(square, piece.color)

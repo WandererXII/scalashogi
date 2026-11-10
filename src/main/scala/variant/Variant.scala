@@ -72,15 +72,19 @@ abstract class Variant private[variant] (
       filter: Piece => Boolean = _ => true,
   ): Boolean =
     board.pieces exists {
-      case (from, piece) if piece.color == color && filter(piece) && piece.eyes(from, square) =>
-        piece.projectionDirs.isEmpty || piece.directDirs.exists(dir =>
-          dir(from).contains(square),
-        ) ||
+      case (from, piece) if piece.color == color && filter(piece) =>
+        pieceThreatens(board, from, piece, square)
+      case _ => false
+    }
+
+  // Does piece standing on from attack square
+  protected def pieceThreatens(board: Board, from: Square, piece: Piece, square: Square): Boolean =
+    piece.eyes(from, square) && (
+      piece.projectionDirs.isEmpty || piece.directDirs.exists(dir => dir(from).contains(square)) ||
         Square.findDirection(from, square).exists { dir =>
           longRangeThreatens(board, from, dir, square)
         }
-      case _ => false
-    }
+    )
 
   def attackingPiece(piece: Piece, @unused square: Square, @unused board: Board): Piece = piece
 
