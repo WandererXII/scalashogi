@@ -707,6 +707,25 @@ ${uwate}番
       }
     }
 
+    "count a two-step lion move once without move numbers" in {
+      parser("""
+        ▲7八歩兵 （←7九）
+        一歩目 △6四獅子 （←6三）
+        二歩目 △6五獅子 （←6四）
+        ▲8八歩兵 （←8九）
+        △6六獅子 （←6五）
+        変化：3手
+        ▲9八歩兵 （←9九）
+        変化：2手
+        △6四獅子 （←6三）
+      """) must beValid.like { case p =>
+        p.variant must_== shogi.variant.Chushogi
+        p.parsedSteps.value.map(_.metas.variations.size) must_== List(0, 1, 1, 0)
+        p.parsedSteps.value(2).metas.variations.head.value.head.squares must_==
+          List(Square.SQ9I, Square.SQ9H)
+      }
+    }
+
     "preserve branch clocks" in {
       forall(List("1:05/0:1:05", "1:05.006/0:1:05.006")) { clock =>
         val expected =
@@ -773,6 +792,57 @@ ${uwate}番
         branch must haveSize(2)
         branch(0).metas.variations must beEmpty
         branch(1).metas.variations must haveSize(1)
+      }
+    }
+
+    "keep nested variations nested past the end of their root variation" in {
+      parser("""
+        1 ７六歩(77)
+        2 ３四歩(33)
+        3 ２六歩(27)
+        4 ８四歩(83)
+        5 ２五歩(26)
+        6 ８五歩(84)
+
+        変化：1手
+        1 ２六歩(27)
+        2 ８四歩(83)
+        3 ７六歩(77)
+        4 ３四歩(33)
+
+        変化：3手
+        3 ２五歩(26)
+        4 ８五歩(84)
+        5 ２四歩(25)
+        6 同 歩(23)
+
+        変化：5手
+        5 ７六歩(77)
+
+        変化：2手
+        2 ３四歩(33)
+      """) must beValid.like { case p =>
+        p.parsedSteps.value.map(_.metas.variations.size) must_== List(1, 0, 0, 0, 0, 0)
+        val root = p.parsedSteps.value.head.metas.variations.head.value
+        root.map(_.metas.variations.size) must_== List(0, 1, 1, 0)
+        root(1).metas.variations.head.value.map(_.squares.last) must_== List(Square.SQ3D)
+        val deep = root(2).metas.variations.head.value
+        deep.map(_.metas.variations.size) must_== List(0, 0, 1, 0)
+        deep(2).metas.variations.head.value.map(_.squares.last) must_== List(Square.SQ7F)
+      }
+    }
+
+    "count unnumbered steps from the steps played header" in {
+      parser("""
+        手数＝41
+        ７六歩(77)
+        ３四歩(33)
+
+        変化：43手
+        ８四歩(83)
+      """) must beValid.like { case p =>
+        p.initialSfen.flatMap(_.stepNumber) must beSome(42)
+        p.parsedSteps.value.map(_.metas.variations.size) must_== List(0, 1)
       }
     }
 

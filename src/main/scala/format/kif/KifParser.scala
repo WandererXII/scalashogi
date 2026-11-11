@@ -118,12 +118,13 @@ object KifParser {
           strSteps.map(_.step),
         )
         variant     = position.variant
-        initialSfen = KifParserHelper
-          .parseStartStep(boardStr)
+        startStep   = KifParserHelper.parseStartStep(boardStr)
+        initialSfen = startStep
           .fold(position.toSfen)(sn => Sfen(s"${position.toSfenWithoutMoveNumber} $sn"))
           .some
           .filterNot(s => s.truncate == variant.initialSfen.truncate && s.stepNumber.forall(_ <= 1))
-        parsedSteps <- objSteps(strSteps, variant, variations)
+        // unnumbered steps are counted from the start step, like the variation headers
+        parsedSteps <- objSteps(strSteps, variant, variations, startNum = startStep | 1)
         isHandicap = initialSfen.exists(Handicap.isHandicap(_, variant)) ||
           augmentString(headerStr).linesIterator
             .map(_.trim)
@@ -241,7 +242,8 @@ object KifParser {
                 rest,
                 nextPending,
                 parsedStep.squares.lastOption,
-                ply + 1,
+                // the second lion step completes the same move
+                if (lionContinuation) ply else ply + 1,
                 nextHasTooDeepVariation,
               )
           }
@@ -265,7 +267,6 @@ object KifParser {
 
     var stack: List[Frame] = Nil
     var roots: List[Frame] = Nil
-    var rootEnd            = 0
 
     def closeVariation(): Unit = {
       val frame = stack.head
@@ -276,21 +277,20 @@ object KifParser {
 
     vs.foreach { variation =>
       val start = variation.variationStart
-      // A variation's descendants end at the next header with an equal or lower start.
-      while (stack.headOption.exists(_.variation.variationStart >= start))
+      // A header branches off the deepest open variation that has a later step it can replace,
+      // otherwise off the main line. Branching at a variation's first step is the same as
+      // branching where that variation does, so it becomes a sibling.
+      while (
+        stack.headOption.exists { open =>
+          val openStart = open.variation.variationStart
+          start <= openStart || start >= openStart + open.variation.steps.size
+        }
+      )
         closeVariation()
 
       val frame = new Frame(variation)
+      if (stack.isEmpty) roots = frame :: roots
       stack = frame :: stack
-
-      // Root selection is independent of nesting. A header can also be a root if
-      // it falls outside the previous root's move range.
-      if (
-        roots.headOption.forall(root => start <= root.variation.variationStart || start >= rootEnd)
-      ) {
-        roots = frame :: roots
-        rootEnd = start + variation.steps.size
-      }
     }
     while (stack.nonEmpty)
       closeVariation()

@@ -52,6 +52,68 @@ class KifModelTest extends ShogiTest {
     }
   }
 
+  "nested variations survive export and import, numbered or not" in {
+    val rnd = new scala.util.Random(7)
+
+    def legal(pos: Position): Vector[Usi.WithRole] =
+      (pos.moveActors.values.flatMap(a => a.toUsis.map(Usi.WithRole(_, a.piece.role))) ++
+        pos.dropActors.values.flatMap(_.toUsis.map(u => Usi.WithRole(u, u.role)))).toVector
+        .sortBy(_.usi.usi)
+
+    def randomLine(pos: Position, num: Int, len: Int, depth: Int): List[NotationStep] =
+      legal(pos) match {
+        case moves if len == 0 || moves.isEmpty || pos.end => Nil
+        case moves                                         =>
+          val m        = moves(rnd.nextInt(moves.size))
+          val branches =
+            if (depth < 4 && rnd.nextDouble() < 0.25)
+              List.fill(1 + rnd.nextInt(2))(randomLine(pos, num, 1 + rnd.nextInt(5), depth + 1))
+            else Nil
+          NotationStep(num, m, variations = branches.filter(_.nonEmpty)) ::
+            randomLine(pos(m.usi).toOption.get, num + 1, len - 1, depth)
+      }
+
+    // every line from the start to the end of a branch
+    def exported(steps: List[NotationStep], prefix: Vector[String]): Set[Vector[String]] =
+      steps
+        .foldLeft((Set.empty[Vector[String]], prefix)) { case ((acc, pre), s) =>
+          (acc ++ s.variations.flatMap(exported(_, pre)), pre :+ s.usiWithRole.usi.usi)
+        } match { case (acc, line) => acc + line }
+
+    def imported(
+        steps: List[ParsedStep],
+        pos: Position,
+        prefix: Vector[String],
+    ): Set[Vector[String]] =
+      steps match {
+        case Nil       => Set(prefix)
+        case s :: rest =>
+          val usi = s.toUsi(pos).toOption
+          s.metas.variations.flatMap(v => imported(v.value, pos, prefix)).toSet ++
+            usi.flatMap(pos(_).toOption).fold(Set(prefix :+ "illegal")) { next =>
+              imported(rest, next, prefix :+ usi.get.usi)
+            }
+      }
+
+    val unnumbered = """(?m)^\s*\d+ """.r
+    forall(List(1, 42)) { startStep =>
+      val sfen = Option.when(startStep > 1)(Sfen(s"${Standard.initialSfen.truncate} $startStep"))
+      val pos  = Position(sfen, Standard)
+      forall(1 to 100) { _ =>
+        val steps    = randomLine(pos, startStep, 1 + rnd.nextInt(14), 0)
+        val rendered = Kif(steps, sfen, Standard).render
+        forall(List(rendered, unnumbered.replaceAllIn(rendered, ""))) { kif =>
+          KifParser.full(kif) must beValid.like { case parsed =>
+            imported(parsed.parsedSteps.value, pos, Vector.empty) must_== exported(
+              steps,
+              Vector.empty,
+            )
+          }
+        }
+      }
+    }
+  }
+
   "move clocks preserve whole hours on export and import" in {
     forall(List(59, 60, 3599, 3600, 3661, 7201, 86400, 360001, Int.MaxValue)) { seconds =>
       val step = NotationStep(
