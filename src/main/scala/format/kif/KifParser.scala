@@ -74,6 +74,19 @@ object KifParser {
   private val inlineCommentRegex =
     raw"""\s+#.*$$""".r
 
+  // Moves and terminations never contain # or &, so anything from them on is a comment,
+  private def stripStepLineComment(line: String): String = {
+    val beforeComment = line.takeWhile(c => c != '*' && c != '＊')
+    val cut           = beforeComment.indexWhere(c => c == '#' || c == '&')
+    if (cut < 0) line
+    else {
+      val stripped = line.take(cut).trim
+      if (moveOrDropLineRegex.matches(stripped) || terminationLineRegex.matches(stripped))
+        s"$stripped ${line.drop(beforeComment.length)}".trim
+      else line
+    }
+  }
+
   final private[kif] case class StrStep(
       turnNumber: Option[Int],
       step: String,
@@ -96,7 +109,7 @@ object KifParser {
           case l if !commentRegex.matches(l.trim.take(1)) =>
             val t = l.trim
             if (t.startsWith("#") || t.startsWith("&")) ""
-            else inlineCommentRegex.replaceFirstIn(t, "")
+            else stripStepLineComment(inlineCommentRegex.replaceFirstIn(t, ""))
           case l => l.trim
         } // remove # or & comment lines and trailing ' #' comments, but keep them in * comments
         .filterNot(l => l.isEmpty || l.startsWith("まで") || commentRegex.matches(l))
@@ -332,10 +345,14 @@ object KifParser {
 
     def variation: Parser[StrVariation] =
       as("variation") {
-        header ~ rep(step) <~ rep(termination) <~ rep(commentary) ^^ { case h ~ s =>
-          StrVariation(h, s, Nil)
+        header ~ rep(step) <~ rep(termination) <~ rep(commentary) <~ rep(unknownLine) ^^ {
+          case h ~ s =>
+            StrVariation(h, s, Nil)
         }
       }
+
+    private def unknownLine: Parser[String] =
+      not(header) ~> """.+""".r
 
     def header: Parser[Int] =
       """変化.*""".r ^^ { case num =>

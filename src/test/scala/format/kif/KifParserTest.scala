@@ -568,6 +568,38 @@ ${uwate}番
     }
   }
 
+  "strip # and & comments attached to step lines" in {
+    parser("""
+      1 ７六歩(77)#note
+      2 ３四歩(33) &bookmark
+      3 ２六歩(27)&x *comment & kept
+      4 投了#end
+    """) must beValid.like { case p =>
+      p.parsedSteps.value.map(_.squares.last) must_== List(Square.SQ7F, Square.SQ3D, Square.SQ2F)
+      p.parsedSteps.value(2).metas.comments must_== List("comment & kept")
+      p.tags(_.Termination) must beSome("投了")
+    }
+  }
+
+  "skip unknown lines in variations up to the next header" in {
+    parser("""
+      1 ７六歩(77)
+      2 ３四歩(33)
+      3 ２六歩(27)
+      変化：2手
+      2 ８四歩(83)
+      棋譜終了
+      3 ２六歩(27)
+      変化：3手
+      3 ６六歩(67)
+    """) must beValid.like { case p =>
+      val steps = p.parsedSteps.value
+      steps.map(_.squares.last) must_== List(Square.SQ7F, Square.SQ3D, Square.SQ2F)
+      steps(1).metas.variations.map(_.value.map(_.squares.last)) must_== List(List(Square.SQ8D))
+      steps(2).metas.variations.map(_.value.map(_.squares.last)) must_== List(List(Square.SQ6F))
+    }
+  }
+
   "from position board" in {
     parser("""
       後手：
