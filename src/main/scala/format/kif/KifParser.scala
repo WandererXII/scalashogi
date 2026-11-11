@@ -27,35 +27,36 @@ import shogi.variant._
 object KifParser {
 
   // Helper strings for regex, so we don't have to repeat ourselves that much
-  val colorsS     = """▲|△|☗|☖"""
-  val numbersS    = """[1-9１-９一二三四五六七八九十百][0-9０-９一二三四五六七八九十百]*"""
+  private[kif] val colorsS     = """▲|△|☗|☖"""
+  private[kif] val numbersS    = """[1-9１-９一二三四五六七八九十百][0-9０-９一二三四五六七八九十百]*"""
   private[kif] val stepNumberS = raw"""${numbersS}(?:[\s\.。)）]|手目)+"""
-  val filesS      = s"""${(Square.MaxFiles to 1 by -1)
+  private[kif] val filesS      = s"""${(Square.MaxFiles to 1 by -1)
       .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}")
       .toList
       .mkString("|")}"""
-  val ranksS = s"""${(Square.MaxRanks to 1 by -1)
+  private[kif] val ranksS = s"""${(Square.MaxRanks to 1 by -1)
       .map(i =>
         s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}|${('a' + i - 1).toChar}",
       )
       .toList
       .mkString("|")}"""
-  val squareS       = s"""(?:(?:(?:${filesS})(?:${ranksS}))|同|仝)"""
-  val piecesJPS     = s"""${KifUtils.allKif mkString "|"}"""
-  val handPiecesJPS = s"""${KifUtils.allKifDroppable mkString "|"}"""
-  val piecesENGS = s"""${SfenUtils.allForsyth.mkString("|").toUpperCase.replace("+", """\+""")}"""
-  val handPiecesENGS =
+  private[kif] val squareS       = s"""(?:(?:(?:${filesS})(?:${ranksS}))|同|仝)"""
+  private[kif] val piecesJPS     = s"""${KifUtils.allKif mkString "|"}"""
+  private[kif] val handPiecesJPS = s"""${KifUtils.allKifDroppable mkString "|"}"""
+  private[kif] val piecesENGS    =
+    s"""${SfenUtils.allForsyth.mkString("|").toUpperCase.replace("+", """\+""")}"""
+  private[kif] val handPiecesENGS =
     s"""${SfenUtils.allForsythDroppable.mkString("|").toUpperCase.replace("+", """\+""")}"""
-  val promotionS = """不成|成|\+"""
-  val dropS      = """打"""
-  val parsS      = """\(|（|\)|）"""
-  val lionMoveS  = """(?:一歩目|二歩目)\s?"""
-  val iguiS      = raw"""(?:まで|(?:${parsS})居食い(?:${parsS}))\s?"""
+  private[kif] val promotionS = """不成|成|\+"""
+  private[kif] val dropS      = """打"""
+  private[kif] val parsS      = """\(|（|\)|）"""
+  private[kif] val lionMoveS  = """(?:一歩目|二歩目)\s?"""
+  private[kif] val iguiS      = raw"""(?:まで|(?:${parsS})居食い(?:${parsS}))\s?"""
 
-  val moveOrDropRegex =
+  private[kif] val moveOrDropRegex =
     raw"""(${colorsS})?(${squareS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(${iguiS})?(${parsS})?←?(${squareS})(${parsS})?)|(${dropS}))""".r
 
-  val moveOrDropLineRegex =
+  private[kif] val moveOrDropLineRegex =
     raw"""^\s*(${stepNumberS})?(${lionMoveS})?(${colorsS})?(${squareS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(?:${iguiS})?(${parsS})?←?${squareS}(${parsS})?)|${dropS})""".r.unanchored
 
   private val terminationRegex =
@@ -64,16 +65,16 @@ object KifParser {
   private val handicapLabels =
     List("上手:", "下手:", "上手の持駒:", "下手の持駒:", "上手番", "下手番")
 
-  val terminationLineRegex =
+  private[kif] val terminationLineRegex =
     raw"""^\s*(?:${stepNumberS})?(?:${terminationRegex.regex})(?=$$|[\s(（*＊])""".r.unanchored
 
-  val commentRegex =
+  private[kif] val commentRegex =
     raw"""\*|＊""".r
 
   private val inlineCommentRegex =
     raw"""\s+#.*$$""".r
 
-  final case class StrStep(
+  final private[kif] case class StrStep(
       turnNumber: Option[Int],
       step: String,
       comments: List[String],
@@ -82,7 +83,7 @@ object KifParser {
       timeTotal: Option[Duration] = None,
   )
 
-  final case class StrVariation(
+  final private[kif] case class StrVariation(
       variationStart: Int,
       steps: List[StrStep],
       variations: List[StrVariation],
@@ -146,7 +147,7 @@ object KifParser {
   final private case class InvalidStep(error: String) extends StepsError
   private case object VariationTooDeep                extends StepsError
 
-  def objSteps(
+  private[kif] def objSteps(
       strSteps: List[StrStep],
       variant: Variant,
       variations: List[StrVariation],
@@ -256,7 +257,7 @@ object KifParser {
     }
   }
 
-  def createVariations(vs: List[StrVariation]): List[StrVariation] = {
+  private[kif] def createVariations(vs: List[StrVariation]): List[StrVariation] = {
     final class Frame(val variation: StrVariation) {
       var children: List[StrVariation] = Nil
       var result: StrVariation         = variation
@@ -297,7 +298,7 @@ object KifParser {
     roots.reverse.map(_.result)
   }
 
-  def createTags(
+  private[kif] def createTags(
       tags: Tags,
       color: Color,
       nbSteps: Int,
@@ -316,7 +317,7 @@ object KifParser {
     List[Option[Tag]](resultTag, termTag).flatten.foldLeft(tags)(_ + _)
   }
 
-  object VariationParser extends RegexParsers with Logging {
+  private[kif] object VariationParser extends RegexParsers with Logging {
 
     override val whiteSpace = fieldSeparator
 
@@ -389,14 +390,14 @@ object KifParser {
 
   }
 
-  trait Logging { self: Parsers =>
+  private[kif] trait Logging { self: Parsers =>
     protected val loggingEnabled =
       false
     protected def as[T](msg: String)(p: => Parser[T]): Parser[T] =
       if (loggingEnabled) log(p)(msg) else p
   }
 
-  object StepsParser extends RegexParsers with Logging {
+  private[kif] object StepsParser extends RegexParsers with Logging {
 
     override val whiteSpace = fieldSeparator
 
@@ -506,7 +507,7 @@ object KifParser {
     val termValue: Parser[String] = terminationRegex
   }
 
-  object MoveDropParser extends RegexParsers with Logging {
+  private[kif] object MoveDropParser extends RegexParsers with Logging {
 
     val MoveRegex =
       raw"""(?:${colorsS})?(${squareS})\s?(${piecesJPS}|${piecesENGS})(${promotionS})?\s?(?:${iguiS})?(?:(?:${parsS})?←?(${squareS})(?:${parsS})?)?""".r
@@ -575,7 +576,7 @@ object KifParser {
     }
   }
 
-  object TagParser extends RegexParsers with Logging {
+  private[kif] object TagParser extends RegexParsers with Logging {
 
     def apply(kif: String): Validated[String, Tags] =
       parseAll(all, kif) match {
@@ -595,7 +596,7 @@ object KifParser {
         Tag(normalizeKifName(s.head), s.lift(1) | "")
       }
   }
-  def normalizeKifName(str: String): String =
+  private[kif] def normalizeKifName(str: String): String =
     Tag.kifNameToTag.get(str).fold(str)(_.lowercase)
 
   private def cleanKif(kif: String): String =

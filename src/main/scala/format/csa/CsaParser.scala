@@ -16,16 +16,16 @@ import shogi.variant.Standard
 object CsaParser {
 
   // Helper strings for regex, so we don't have to repeat ourselves that much
-  val colorsS     = """\+|-"""
-  val squareS     = """[1-9][1-9]"""
-  val dropOriginS = """00"""
-  val piecesS     = """OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO"""
-  val handPiecesS = """HI|KA|KI|GI|KE|KY|FU"""
+  private[csa] val colorsS     = """\+|-"""
+  private[csa] val squareS     = """[1-9][1-9]"""
+  private[csa] val dropOriginS = """00"""
+  private[csa] val piecesS     = """OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO"""
+  private[csa] val handPiecesS = """HI|KA|KI|GI|KE|KY|FU"""
 
-  val moveOrDropRegex =
+  private[csa] val moveOrDropRegex =
     raw"""($colorsS)?($squareS|$dropOriginS)($squareS)($piecesS)""".r
 
-  final case class StrStep(
+  final private[csa] case class StrStep(
       step: String,
       comments: List[String],
       timeSpent: Option[Duration] = None,
@@ -62,7 +62,7 @@ object CsaParser {
         invalid("Cannot parse CSA: parser stack limit exceeded")
     }
 
-  def objSteps(strSteps: List[StrStep]): Validated[String, ParsedSteps] = {
+  private[csa] def objSteps(strSteps: List[StrStep]): Validated[String, ParsedSteps] = {
     strSteps.map { case StrStep(stepStr, comments, timeSpent) =>
       (
         StepParser(stepStr) map { s =>
@@ -72,7 +72,7 @@ object CsaParser {
     }.sequence map { ParsedSteps.apply(_) }
   }
 
-  def createTags(
+  private[csa] def createTags(
       tags: Tags,
       color: Color,
       nbSteps: Int,
@@ -89,14 +89,14 @@ object CsaParser {
     List[Option[Tag]](resultTag, termTag).flatten.foldLeft(tags)(_ + _)
   }
 
-  trait Logging { self: Parsers =>
+  private[csa] trait Logging { self: Parsers =>
     protected val loggingEnabled =
       false
     protected def as[T](msg: String)(p: => Parser[T]): Parser[T] =
       if (loggingEnabled) log(p)(msg) else p
   }
 
-  object StepsParser extends RegexParsers with Logging {
+  private[csa] object StepsParser extends RegexParsers with Logging {
 
     override val whiteSpace = fieldSeparator
 
@@ -183,7 +183,7 @@ object CsaParser {
     val termValue: Parser[String] = """[+-]?\w+""".r
   }
 
-  object StepParser extends RegexParsers with Logging {
+  private[csa] object StepParser extends RegexParsers with Logging {
 
     val MoveRegex =
       raw"""^(?:${colorsS})?($squareS)($squareS)($piecesS)""".r
@@ -243,7 +243,7 @@ object CsaParser {
     }
   }
 
-  object TagParser extends RegexParsers with Logging {
+  private[csa] object TagParser extends RegexParsers with Logging {
 
     // Each line is parsed on its own, so an unparsable line doesn't swallow the tags after it
     def apply(csa: String): Validated[String, Tags] =

@@ -187,8 +187,8 @@ object KifParserHelper {
 
   def createResult(termination: Option[Tag], color: Color, handicap: Boolean): Option[Tag] = {
     termination.map(_.value.toLowerCase) match {
-      case Some("投了") | Some("詰み") | Some("反則負け") | Some("切れ負け") | Some("time-up") |
-          Some("トライ勝ち") | Some("王手勝ち") =>
+      case Some("投了") | Some("詰み") | Some("反則負け") | Some("切れ負け") | Some("time-up") | Some("トライ勝ち") |
+          Some("王手勝ち") =>
         Tag(_.Result, Color.showResult(Some(!color))).some
       case Some("入玉勝ち") | Some("反則勝ち") | Some("トライ負け") =>
         Tag(_.Result, Color.showResult(Some(color))).some
@@ -197,7 +197,7 @@ object KifParserHelper {
       // Forfeits are from sente's view, or uwate's in handicap games
       case Some("不戦勝") => Tag(_.Result, Color.showResult(Some(Color.fromSente(!handicap)))).some
       case Some("不戦敗") => Tag(_.Result, Color.showResult(Some(Color.fromSente(handicap)))).some
-      case _ => None
+      case _           => None
     }
   }
 
