@@ -147,6 +147,29 @@ ${uwate}番
     }
   }
 
+  "unnumbered steps with a space before the piece" in {
+    parser("手合割：平手\n７六 歩(77)\n３四歩(33)") must beValid.like { case p =>
+      p.parsedSteps.value must haveSize(2)
+    }
+    parser("手合割：平手\n1 ７六 歩(77)\n2手目 ３四 歩(33)") must beValid.like { case p =>
+      p.parsedSteps.value must haveSize(2)
+    }
+  }
+
+  "step numbers followed by a parenthesis" in {
+    parser("手合割：平手\n1) ７六歩(77)\n2 ３四歩(33)") must beValid.like { case p =>
+      p.parsedSteps.value must haveSize(2)
+    }
+    parser("手合割：平手\n1) 投了") must beValid.like { case p =>
+      p.tags(_.Termination) must beSome("投了")
+      p.tags(_.Result) must beSome("gote")
+    }
+    parser("1) ７六歩(77)\n2） ３四歩(33)\n変化：2手\n2) ８四歩(83)") must beValid.like {
+      case ParsedNotation(ParsedSteps(List(_, second)), _, _, _, _) =>
+        second.metas.variations must haveSize(1)
+    }
+  }
+
   "drop" in {
     parseStep("６四歩打") must beValid.like { case d: Drop =>
       d.role must_== Pawn

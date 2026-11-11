@@ -27,9 +27,10 @@ import shogi.variant._
 object KifParser {
 
   // Helper strings for regex, so we don't have to repeat ourselves that much
-  val colorsS  = """▲|△|☗|☖"""
-  val numbersS = """[1-9１-９一二三四五六七八九十百][0-9０-９一二三四五六七八九十百]*"""
-  val filesS   = s"""${(Square.MaxFiles to 1 by -1)
+  val colorsS     = """▲|△|☗|☖"""
+  val numbersS    = """[1-9１-９一二三四五六七八九十百][0-9０-９一二三四五六七八九十百]*"""
+  private[kif] val stepNumberS = raw"""${numbersS}(?:[\s\.。)）]|手目)+"""
+  val filesS      = s"""${(Square.MaxFiles to 1 by -1)
       .map(i => s"$i|${KifUtils.intToFullWidth(i)}|${KifUtils.intToKanji(i)}")
       .toList
       .mkString("|")}"""
@@ -55,7 +56,7 @@ object KifParser {
     raw"""(${colorsS})?(${squareS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(${iguiS})?(${parsS})?←?(${squareS})(${parsS})?)|(${dropS}))""".r
 
   val moveOrDropLineRegex =
-    raw"""^\s*(${numbersS}[\s\.。(?:手目)]{1,})?(${lionMoveS})?(${colorsS})?(${squareS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(?:${iguiS})?(${parsS})?←?${squareS}(${parsS})?)|${dropS})""".r.unanchored
+    raw"""^\s*(${stepNumberS})?(${lionMoveS})?(${colorsS})?(${squareS})\s?(${piecesJPS}|${piecesENGS})(((${promotionS})?\s?(?:${iguiS})?(${parsS})?←?${squareS}(${parsS})?)|${dropS})""".r.unanchored
 
   private val terminationRegex =
     """中断|投了|持将棋|千日手|引き分け|引分け|詰み|不詰|切れ負け|反則勝ち|反則負け|入玉勝ち|不戦勝|不戦敗|トライ勝ち|トライ負け|王手勝ち|Time-up""".r
@@ -64,7 +65,7 @@ object KifParser {
     List("上手:", "下手:", "上手の持駒:", "下手の持駒:", "上手番", "下手番")
 
   val terminationLineRegex =
-    raw"""^\s*(?:${numbersS}[\s\.。(?:手目)]{1,})?(?:${terminationRegex.regex})(?=$$|[\s(（*＊])""".r.unanchored
+    raw"""^\s*(?:${stepNumberS})?(?:${terminationRegex.regex})(?=$$|[\s(（*＊])""".r.unanchored
 
   val commentRegex =
     raw"""\*|＊""".r
@@ -187,7 +188,7 @@ object KifParser {
         case Nil       => (parsed.reverse, false)
         case v :: rest =>
           objSteps(v.steps, variant, v.variations, lastDest, ply, depth + 1) match {
-            case Invalid(VariationTooDeep) => (Nil, true)
+            case Invalid(VariationTooDeep)            => (Nil, true)
             case Valid(steps) if steps.value.nonEmpty =>
               parseVariations(rest, lastDest, ply, steps :: parsed)
             case _ => parseVariations(rest, lastDest, ply, parsed)
@@ -347,10 +348,9 @@ object KifParser {
     def step: Parser[StrStep] =
       as("step") {
         (commentary *) ~>
-          (opt(number) ~ opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(
-            commentary,
-          )) <~
-          (stepExtras *) ^^ { case num ~ lionMove ~ stepStr ~ clk ~ comments =>
+          // try without a step number too, so a square like ７六 in '７六 歩(77)' isn't taken for one
+          ((number.map(Option(_)) ~ stepBody) | (success(Option.empty[Int]) ~ stepBody)) <~
+          (stepExtras *) ^^ { case num ~ (lionMove ~ stepStr ~ clk ~ comments) =>
             StrStep(
               num,
               stepStr,
@@ -362,8 +362,11 @@ object KifParser {
           }
       }
 
-    def number: Parser[Int] = raw"""${numbersS}[\s\.。(?:手目)]{1,}""".r ^^ { case n =>
-      KifUtils.kanjiToInt(n.filterNot(c => List[Char]('.', '。', '手', '目').contains(c)).trim)
+    private def stepBody =
+      opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(commentary)
+
+    def number: Parser[Int] = stepNumberS.r ^^ { case n =>
+      numbersS.r.findPrefixOf(n).fold(0)(KifUtils.kanjiToInt _)
     }
 
     def clock: Parser[(Option[Duration], Option[Duration])] = Parser { input =>
@@ -422,10 +425,9 @@ object KifParser {
     def strStep: Parser[StrStep] =
       as("step") {
         (commentary *) ~>
-          (opt(number) ~ opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(
-            commentary,
-          )) <~
-          (stepExtras *) ^^ { case num ~ lionMove ~ stepStr ~ clk ~ comments =>
+          // try without a step number too, so a square like ７六 in '７六 歩(77)' isn't taken for one
+          ((number.map(Option(_)) ~ stepBody) | (success(Option.empty[Int]) ~ stepBody)) <~
+          (stepExtras *) ^^ { case num ~ (lionMove ~ stepStr ~ clk ~ comments) =>
             StrStep(
               num,
               stepStr,
@@ -437,8 +439,11 @@ object KifParser {
           }
       }
 
-    def number: Parser[Int] = raw"""${numbersS}[\s\.。(?:手目)]{1,}""".r ^^ { case n =>
-      KifUtils.kanjiToInt(n.filterNot(c => List[Char]('.', '。', '手', '目').contains(c)).trim)
+    private def stepBody =
+      opt(raw"""${lionMoveS}""".r) ~ moveOrDropRegex ~ opt(clock) ~ rep(commentary)
+
+    def number: Parser[Int] = stepNumberS.r ^^ { case n =>
+      numbersS.r.findPrefixOf(n).fold(0)(KifUtils.kanjiToInt _)
     }
 
     private val clockMinuteSecondRegex     = """(\d++):(\d+(?:\.\d+)?)""".r
