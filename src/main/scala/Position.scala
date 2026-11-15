@@ -215,11 +215,9 @@ final case class Position(
   def plies: Int          = history.plies
   def startedAtPly: Int   = history.startedAtPly
   def startedAtStep: Int  = history.startedAtStep
-  def playedPlies: Int    = plies - startedAtPly
+  def playedPlies: Int    = usis.size
   def stepNumber: Int     = startedAtStep + playedPlies
   def fullTurnNumber: Int = 1 + plies / 2
-
-  def withPlies(plies: Int): Position = withHistory(history.copy(plies = plies))
 
   def withBoard(board: Board)                     = copy(board = board)
   def withHands(hands: Hands)                     = copy(hands = hands)

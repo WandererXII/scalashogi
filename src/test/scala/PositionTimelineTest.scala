@@ -189,8 +189,6 @@ class PositionTimelineTest extends ShogiTest {
         edited.plies must_== position.plies
         edited.history.initialSfen must beSome(provenance)
       }
-      position.withPlies(99).plies must_== 99
-      position.withPlies(99).usis must_== position.usis
       val reset = position.withHistory(History.empty)
       reset.usis must beEmpty
       reset.plies must_== 0

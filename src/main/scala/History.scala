@@ -13,10 +13,13 @@ final case class History(
     positionHashes: PositionHash,
     initialSfen: Option[Sfen],
     usis: Vector[Usi],
-    plies: Int,
     startedAtPly: Int,
-    startedAtStep: Int,
+    stepShifted: Boolean, // true if the starting step number equals the starting ply
 ) {
+
+  def plies: Int = startedAtPly + usis.size
+
+  def startedAtStep: Int = startedAtPly + (if (stepShifted) 0 else 1)
 
   def lastUsi: Option[Usi] = usis.lastOption
 
@@ -63,7 +66,7 @@ final case class History(
   lazy val fourfoldRepetition  = isRepetition(4)
 
   private[shogi] def record(usi: Usi): History =
-    copy(usis = usis :+ usi, plies = plies + 1)
+    copy(usis = usis :+ usi)
 
   def withLastLionCapture(squareOpt: Option[Square]) = copy(lastLionCapture = squareOpt)
 
@@ -79,9 +82,8 @@ final case class History(
       consecutiveAttacks == that.consecutiveAttacks &&
       initialSfen == that.initialSfen &&
       usis == that.usis &&
-      plies == that.plies &&
       startedAtPly == that.startedAtPly &&
-      startedAtStep == that.startedAtStep &&
+      stepShifted == that.stepShifted &&
       Arrays.equals(positionHashes, that.positionHashes)
     case _ => false
   }
@@ -92,9 +94,8 @@ final case class History(
       consecutiveAttacks,
       initialSfen,
       usis,
-      plies,
       startedAtPly,
-      startedAtStep,
+      stepShifted,
       Arrays.hashCode(positionHashes),
     ).hashCode()
 
@@ -114,9 +115,8 @@ object History {
     positionHashes = Array.empty,
     initialSfen = none,
     usis = Vector.empty,
-    plies = 0,
     startedAtPly = 0,
-    startedAtStep = 1,
+    stepShifted = false,
   )
 
 }

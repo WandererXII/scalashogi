@@ -37,9 +37,8 @@ class HashTest extends ShogiTest {
         val edited = imported.withHistory(
           imported.history.copy(
             usis = Vector(Usi("7g7f").get),
-            plies = 99,
             startedAtPly = 80,
-            startedAtStep = 100,
+            stepShifted = true,
             initialSfen = Some(Sfen("provenance")),
           ),
         )

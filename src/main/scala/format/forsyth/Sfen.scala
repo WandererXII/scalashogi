@@ -24,9 +24,8 @@ final case class Sfen(value: String) extends AnyVal {
         if (variant == shogi.variant.Chushogi) handsString.flatMap(Square.fromKey) else None
       val history = History.empty.copy(
         lastLionCapture = lastLionCapture,
-        plies = plies,
         startedAtPly = plies,
-        startedAtStep = sn,
+        stepShifted = plies == sn,
       )
       Position(board, hands, sideToMove, history, variant)
     }
